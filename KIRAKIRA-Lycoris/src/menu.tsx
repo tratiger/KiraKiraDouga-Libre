@@ -7,66 +7,66 @@ interface MenuItem {
 	children?: MenuItem[];
 }
 
-const selfUserInfo = noBackend ? null! : await getSelfUserInfo(undefined, false); // 仅获取数据，不修改 pinia
+const selfUserInfo = noBackend ? null! : await getSelfUserInfo(undefined, false); // Piniaを更新せず、データのみ取得
 
 const menu: MenuItem[] = [
 	{
-		label: "仪表盘",
+		label: "ダッシュボード",
 		to: "/",
 		key: "",
 		icon: "dashboard",
 	},
 	{
-		label: "用户",
+		label: "ユーザー",
 		key: "user",
 		icon: "group",
 		children: [
 			{
-				label: "用户管理",
+				label: "ユーザー管理",
 				key: "manage",
 				icon: "manageAccounts",
 			},
 			{
-				label: "最近更改",
+				label: "最近の変更",
 				key: "recent",
 				icon: "history",
 			},
 			{
-				label: "用户封禁",
+				label: "ユーザーブロック",
 				key: "block",
 				icon: "block",
 			},
 		],
 	},
 	{
-		label: "视频",
+		label: "動画",
 		key: "video",
 		icon: "videoLibrary",
 		children: [
 			{
-				label: "视频管理",
+				label: "動画管理",
 				key: "manage",
 				icon: "videoSettings",
 			},
 			{
-				label: "审核视频",
+				label: "動画レビュー",
 				key: "pending-review",
 				icon: "approval",
 			},
 		],
 	},
 	{
-		label: "标签",
+		label: "タグ",
 		key: "tag",
 		icon: "sell",
 		children: [
 			{
-				label: "标签管理",
+				label: "タグ管理",
 				key: "manage",
 				icon: "sell",
 			},
 			{
-				label: "最近更改",
+				label: "最近の変更",
 				key: "recent",
 				icon: "history",
 			},
@@ -79,30 +79,30 @@ const menu: MenuItem[] = [
 		shown: checkUserRole(["root", "developer"], selfUserInfo),
 		children: [
 			{
-				label: "API 路径",
+				label: "API パス",
 				key: "api-path",
 				icon: "api",
 			},
 			{
-				label: "身份",
+				label: "ロール",
 				key: "role",
 				icon: "badge",
 			},
 			{
-				label: "用户身份",
+				label: "ユーザーロール",
 				key: "user-roles",
 				icon: "person",
 			},
 		],
 	},
 	{
-		label: "预生产环境密钥",
+		label: "ステージング環境シークレット",
 		key: "stg-secret",
 		icon: "key",
 		shown: checkUserRole(["root", "developer"], selfUserInfo),
 	},
 	{
-		label: "关于",
+		label: "このアプリについて",
 		key: "about",
 		icon: "info",
 	},

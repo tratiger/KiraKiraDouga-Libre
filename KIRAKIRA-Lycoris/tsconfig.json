@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"skipLibCheck": true, // FIXME: 此处忽略了所有 .d.ts 文件用于缓解构建时的报错，但这不是最佳实践。
+		"skipLibCheck": true, // FIXME: ここではビルド時のエラーを緩和するためにすべての.d.tsファイルを無視していますが、これはベストプラクティスではありません。
 		"jsx": "preserve",
 		"jsxImportSource": "vue",
 		"module": "ESNext",

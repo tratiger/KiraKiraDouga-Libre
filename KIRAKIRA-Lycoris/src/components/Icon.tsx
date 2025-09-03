@@ -3,9 +3,9 @@ import * as MaterialIcons from "@vicons/material";
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 export default function Icon({ name, style = "round" }: {
-	/** 图标名称。 */
+	/** アイコン名。 */
 	name: MaterialIcon.Names;
-	/** 图标样式：填充、轮廓、圆润、双色、锐利。默认为圆润。 */
+	/** アイコンのスタイル：塗りつぶし、アウトライン、角丸、2色、シャープ。デフォルトは角丸です。 */
 	style?: MaterialIcon.Styles;
 }) {
 	const Icon = MaterialIcons[(capitalize(name) + capitalize(style)) as never] as () => JSX.Element;

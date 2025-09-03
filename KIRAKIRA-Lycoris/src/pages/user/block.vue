@@ -23,21 +23,21 @@
 			key: "UUID",
 		},
 		{
-			title: "昵称",
+			title: "ニックネーム",
 			key: "userNickname",
 			sorter: "default",
 			sortOrder: currentSortKey.value === "userNickname" ? currentSortOrder.value : false,
 		},
 		{
-			title: "用户名",
+			title: "ユーザー名",
 			key: "username",
 		},
 		{
-			title: "邮箱",
+			title: "メールアドレス",
 			key: "email",
 		},
 		{
-			title: "角色",
+			title: "ロール",
 			key: "roles",
 			render(row) {
 				if (!row.roles?.length) return h(NTag, { style: { marginRight: "6px" }, type: "info", bordered: false }, { default: () => "user" });
@@ -48,14 +48,14 @@
 			},
 		},
 		{
-			title: "注册时间",
+			title: "登録日時",
 			key: "userCreateDateTime",
 			sorter: "default",
 			sortOrder: currentSortKey.value === "userCreateDateTime" ? currentSortOrder.value : false,
 			render(row) {
-				if (row.userCreateDateTime === undefined) return h(NText, { depth: 3 }, () => "未记录");
+				if (row.userCreateDateTime === undefined) return h(NText, { depth: 3 }, () => "未記録");
 				const result = formatDateTime(row.userCreateDateTime);
-				if (!result) return h(NText, { depth: 3 }, () => "未记录");
+				if (!result) return h(NText, { depth: 3 }, () => "未記録");
 				return h("div", { class: "time-wrapper" }, [h("div", result.formatted),
 				]);
 			} },
@@ -90,7 +90,7 @@
 	const userListPageCount = computed(() => getPageCountByDataCount(userListCount.value, pagination.pageSize));
 
 	/**
-	 * 获取用户列表
+	 * ユーザーリストを取得する
 	 */
 	async function getUserInfo() {
 		let apiSortBy: string | undefined = undefined;
@@ -130,15 +130,15 @@
 				userList.value = getUserInfoResult.result;
 				userListCount.value = getUserInfoResult.totalCount ?? 0;
 			} else
-				console.error("ERROR", "获取用户列表失败。");
+				console.error("ERROR", "ユーザーリストの取得に失敗しました。");
 		} catch (error) {
-			console.error("ERROR", "请求用户列表时出错:", error);
+			console.error("ERROR", "ユーザーリストのリクエスト中にエラーが発生しました:", error);
 		}
 	}
 
 	/**
-	 * 处理排序变化
-	 * @param options 排序选项
+	 * ソート順の変更を処理する
+	 * @param options ソートオプション
 	 */
 	async function handleSorterChange(options: { columnKey: string | number | null; sorter: string; order: "ascend" | "descend" | undefined }) {
 		currentSortKey.value = options.columnKey as string | null;
@@ -148,7 +148,7 @@
 	}
 
 	/**
-	 * 解封用户
+	 * ユーザーのブロックを解除する
 	 */
 	async function unbanUser() {
 		if (userInputUnbanUserInfo.value === "") return;
@@ -162,16 +162,16 @@
 		const unbanUserResult = await adminUpdateUserRoleController(unbanUserRequest);
 		if (unbanUserResult.success) {
 			closeUnbanUserModal();
-			message.success("解封用户成功");
+			message.success("ユーザーのブロックを解除しました");
 			await getUserInfo();
 		} else
-			message.error("解封用户失败");
+			message.error("ユーザーのブロック解除に失敗しました");
 		isUnbanUser.value = false;
 	}
 
 	/**
-	 * 更新正在解封的用户 UUID，并打开解封用户信息的表单
-	 * @param banUUID 正在解封的用户信息
+	 * ブロック解除中のユーザーUUIDを更新し、ブロック解除フォームを開く
+	 * @param banUUID ブロック解除中のユーザー情報
 	 */
 	function openUnbanUserModal(banUUID: string) {
 		currentUnbanUserInfo.value = banUUID;
@@ -179,7 +179,7 @@
 	}
 
 	/**
-	 * 关闭解封用户信息的表单，并清除正在解封的用户信息
+	 * ブロック解除フォームを閉じ、ブロック解除中のユーザー情報をクリアする
 	 */
 	function closeUnbanUserModal() {
 		isShowUnbanUserModal.value = false;
@@ -191,23 +191,23 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA 封禁用户</PageHeading>
+		<PageHeading>KIRAKIRA ブロック済みユーザー</PageHeading>
 		<NSpace align="center" justify="space-between">
 			<NCollapse class="mlb-4">
-				<NCollapseItem title="使用说明">
-					<NP>排序选项</NP>
+				<NCollapseItem title="使用方法">
+					<NP>ソートオプション</NP>
 					<NUl>
-						<NLi>点击 UID、昵称、注册时间可以对表格排序</NLi>
-						<NLi>再次点击可以切换“升序”及“降序”</NLi>
-						<NLi>默认以 UID 升序排列</NLi>
+						<NLi>UID、ニックネーム、登録日時をクリックしてテーブルをソートできます</NLi>
+						<NLi>再度クリックすると「昇順」と「降順」を切り替えられます</NLi>
+						<NLi>デフォルトではUIDの昇順で並んでいます</NLi>
 					</NUl>
-					<NP>点击解封按钮可以解封用户，输入用户的 UUID 来确认解封</NP>
-					<NP>解封后，用户将恢复为普通用户</NP>
+					<NP>ブロック解除ボタンをクリックするとユーザーのブロックを解除できます。ユーザーのUUIDを入力して確認してください</NP>
+					<NP>ブロック解除後、ユーザーは通常のユーザーに戻ります</NP>
 				</NCollapseItem>
 			</NCollapse>
 			<NFlex align="center" justify="right">
-				<NInputNumber v-model:value="searchUserUid" placeholder="要查询的用户的 UID" :showButton="false" />
-				<NButton @click="getUserInfo()"><template #icon><Icon name="search" /></template>查询</NButton>
+				<NInputNumber v-model:value="searchUserUid" placeholder="照会したいユーザーのUID" :showButton="false" />
+				<NButton @click="getUserInfo()"><template #icon><Icon name="search" /></template>照会</NButton>
 			</NFlex>
 		</NSpace>
 
@@ -238,16 +238,16 @@
 			v-model:show="isShowUnbanUserModal"
 			:maskClosable="false"
 			preset="dialog"
-			:title="`确认要解封该用户吗？`"
+			:title="`このユーザーのブロックを解除してもよろしいですか？`"
 		>
 			<br />
-			<NFormItem :label="`请输入用户的 UUID 来确定解封 ${currentUnbanUserInfo}`">
-				<NInput v-model:value="userInputUnbanUserInfo" placeholder="用户 UUID" />
+			<NFormItem :label="`ブロックを解除するには、ユーザーのUUIDを入力してください: ${currentUnbanUserInfo}`">
+				<NInput v-model:value="userInputUnbanUserInfo" placeholder="ユーザーUUID" />
 			</NFormItem>
 
 			<template #action>
-				<NButton @click="closeUnbanUserModal">算了</NButton>
-				<NButton :disabled="currentUnbanUserInfo !== userInputUnbanUserInfo" :loading="isUnbanUser" type="warning" :secondary="true" @click="unbanUser()">确认解封</NButton>
+				<NButton @click="closeUnbanUserModal">キャンセル</NButton>
+				<NButton :disabled="currentUnbanUserInfo !== userInputUnbanUserInfo" :loading="isUnbanUser" type="warning" :secondary="true" @click="unbanUser()">ブロック解除を確認</NButton>
 			</template>
 		</NModal>
 

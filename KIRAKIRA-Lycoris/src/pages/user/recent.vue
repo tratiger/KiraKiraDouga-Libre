@@ -20,9 +20,9 @@
 	};
 	const userInfoData = reactive({ ...defaultUserInfoData });
 	const genderMap: Record<string, string> = {
-		male: "男",
-		female: "女",
-		unknown: "未知",
+		male: "男性",
+		female: "女性",
+		unknown: "不明",
 	};
 
 	const columns = computed<DataTableColumns<NonNullable<UserList>[number]>>(() => [
@@ -37,21 +37,21 @@
 			key: "UUID",
 		},
 		{
-			title: "昵称",
+			title: "ニックネーム",
 			key: "userNickname",
 			sorter: "default",
 			sortOrder: currentSortKey.value === "userNickname" ? currentSortOrder.value : false,
 		},
 		{
-			title: "用户名",
+			title: "ユーザー名",
 			key: "username",
 		},
 		{
-			title: "邮箱",
+			title: "メールアドレス",
 			key: "email",
 		},
 		{
-			title: "角色",
+			title: "ロール",
 			key: "roles",
 			render(row) {
 				if (!row.roles?.length) return h(NTag, { style: { marginRight: "6px" }, type: "info", bordered: false }, { default: () => "user" });
@@ -62,14 +62,14 @@
 			},
 		},
 		{
-			title: "注册时间",
+			title: "登録日時",
 			key: "userCreateDateTime",
 			sorter: "default",
 			sortOrder: currentSortKey.value === "userCreateDateTime" ? currentSortOrder.value : false,
 			render(row) {
-				if (row.userCreateDateTime === undefined) return h(NText, { depth: 3 }, () => "未记录");
+				if (row.userCreateDateTime === undefined) return h(NText, { depth: 3 }, () => "未記録");
 				const result = formatDateTime(row.userCreateDateTime);
-				if (!result) return h(NText, { depth: 3 }, () => "未记录");
+				if (!result) return h(NText, { depth: 3 }, () => "未記録");
 				return h("div", { class: "time-wrapper" }, [h("div", result.formatted),
 				]);
 			} },
@@ -82,7 +82,7 @@
 					<NPopconfirm onPositiveClick={() => clearUserInfo(row.uid)}>
 						{{
 							trigger: <NButton type="error" strong secondary size="small">{{ icon: <Icon name="delete" /> }}</NButton>,
-							default: "确认驳回该用户修改信息审核吗？",
+							default: "このユーザーの情報変更申請を却下してもよろしいですか？",
 						}}
 					</NPopconfirm>
 				</NFlex>
@@ -110,7 +110,7 @@
 	const userListPageCount = computed(() => getPageCountByDataCount(userListCount.value, pagination.pageSize));
 
 	/**
-	 * 获取用户列表
+	 * ユーザーリストを取得する
 	 */
 	async function getUserInfo() {
 		let apiSortBy: string | undefined;
@@ -137,15 +137,15 @@
 				userList.value = getUserInfoResult.result;
 				userListCount.value = getUserInfoResult.totalCount ?? 0;
 			} else
-				console.error("ERROR", "获取用户列表失败。");
+				console.error("ERROR", "ユーザーリストの取得に失敗しました。");
 		} catch (error) {
-			console.error("ERROR", "请求用户列表时出错:", error);
+			console.error("ERROR", "ユーザーリストのリクエスト中にエラーが発生しました:", error);
 		}
 	}
 
 	/**
-	 * 处理排序变化
-	 * @param options 排序选项
+	 * ソート順の変更を処理する
+	 * @param options ソートオプション
 	 */
 	async function handleSorterChange(options: { columnKey: string | number | null; sorter: string; order: "ascend" | "descend" | undefined }) {
 		currentSortKey.value = options.columnKey as string | null;
@@ -155,7 +155,7 @@
 	}
 
 	/**
-	 * 清空用户信息
+	 * ユーザー情報をクリアする
 	 */
 	async function clearUserInfo(uid: number) {
 		isDeleteUser.value = true;
@@ -164,16 +164,16 @@
 		};
 		const clearUserInfoResult = await adminClearUserInfo(clearUserInfoRequest);
 		if (clearUserInfoResult.success) {
-			message.success("清除用户信息成功");
+			message.success("ユーザー情報をクリアしました");
 			isOpenUserInfoModal.value = false;
 			await getUserInfo();
 		} else
-			message.error("清除用户信息失败");
+			message.error("ユーザー情報のクリアに失敗しました");
 		isDeleteUser.value = false;
 	}
 
 	/**
-	 * 处理用户信息
+	 * ユーザー情報を処理する
 	 */
 	function handleUserInfo(userData: NonNullable<UserList>[number]) {
 		Object.assign(userInfoData, {
@@ -189,7 +189,7 @@
 	}
 
 	/**
-	 * 通过用户审核
+	 * ユーザーレビューを承認する
 	 */
 	async function passUserInfo() {
 		isPassUser.value = true;
@@ -201,16 +201,16 @@
 		};
 		const passUserInfoResult = await adminEditUserInfo(passUserInfoRequest);
 		if (passUserInfoResult.success) {
-			message.success("通过用户信息成功");
+			message.success("ユーザー情報を承認しました");
 			isOpenUserInfoModal.value = false;
 			await getUserInfo();
 		} else
-			message.error("通过用户信息失败");
+			message.error("ユーザー情報の承認に失敗しました");
 		isPassUser.value = false;
 	}
 
 	/**
-	 * 设置数据并打开用户信息的模态框
+	 * データを設定してユーザー情報モーダルを開く
 	 */
 	function openUserInfoModal(userData: NonNullable<UserList>[number]) {
 		isOpenUserInfoModal.value = true;
@@ -222,23 +222,23 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA 最近更改用户</PageHeading>
+		<PageHeading>KIRAKIRA 最近情報を変更したユーザー</PageHeading>
 		<NSpace align="center" justify="space-between">
 			<NCollapse class="mlb-4">
-				<NCollapseItem title="使用说明">
-					<NP>排序选项</NP>
+				<NCollapseItem title="使用方法">
+					<NP>ソートオプション</NP>
 					<NUl>
-						<NLi>点击 UID, 昵称, 注册时间可以对表格排序</NLi>
-						<NLi>再次点击可以切换“升序”及“降序”</NLi>
-						<NLi>默认以 UID 升序排列</NLi>
+						<NLi>UID、ニックネーム、登録日時をクリックしてテーブルをソートできます</NLi>
+						<NLi>再度クリックすると「昇順」と「降順」を切り替えられます</NLi>
+						<NLi>デフォルトではUIDの昇順で並んでいます</NLi>
 					</NUl>
-					<NP>点击通过按钮可以通过用户信息，输入用户的 UUID 来确认通过<br />通过后，用户将恢复为普通用户</NP>
-					<NP>点击清除按钮可以清除用户信息，输入用户的 UID 来确认清除<br />清除后，用户信息将被清除</NP>
+					<NP>承認ボタンをクリックするとユーザー情報を承認できます。ユーザーのUUIDを入力して確認してください<br />承認後、ユーザーは通常のユーザーに戻ります</NP>
+					<NP>クリアボタンをクリックするとユーザー情報をクリアできます。ユーザーのUIDを入力して確認してください<br />クリア後、ユーザー情報は削除されます</NP>
 				</NCollapseItem>
 			</NCollapse>
 			<NFlex align="center" justify="right">
-				<NInputNumber v-model:value="searchUserUid" placeholder="要查询的用户的 UID" :showButton="false" />
-				<NButton @click="getUserInfo()"><template #icon><Icon name="search" /></template>查询</NButton>
+				<NInputNumber v-model:value="searchUserUid" placeholder="照会したいユーザーのUID" :showButton="false" />
+				<NButton @click="getUserInfo()"><template #icon><Icon name="search" /></template>照会</NButton>
 			</NFlex>
 		</NSpace>
 
@@ -269,7 +269,7 @@
 			v-model:show="isOpenUserInfoModal"
 			:maskClosable="false"
 			preset="dialog"
-			title="用户信息"
+			title="ユーザー情報"
 			:style="{ width: '700px' }"
 		>
 			<br />
@@ -293,19 +293,19 @@
 					</div>
 				</div>
 				<div class="whitespace-nowrap">
-					性别：{{ genderMap[userInfoData.gender] || '未知' }}
+					性別：{{ genderMap[userInfoData.gender] || '不明' }}
 				</div>
 			</div>
 
 			<div class="mt-4">
-				<div class="font-bold mb-2">用户简介</div>
+				<div class="font-bold mb-2">自己紹介</div>
 				<div class="min-h-[80px] bg-gray-100 p-2 rounded-md">
-					{{ userInfoData.signature || '暂无简介' }}
+					{{ userInfoData.signature || '自己紹介がありません' }}
 				</div>
 			</div>
 
 			<div class="mt-4">
-				<div class="font-bold mb-2">用户标签</div>
+				<div class="font-bold mb-2">ユーザー設定タグ</div>
 				<div class="flex flex-wrap gap-2">
 					<NTag
 						v-for="(tag, index) in (userInfoData.label || [])"
@@ -315,7 +315,7 @@
 					>
 						{{ tag }}
 					</NTag>
-					<span v-if="(userInfoData.label || []).length === 0"><NTag size="small" type="info">暂无标签</NTag></span>
+					<span v-if="(userInfoData.label || []).length === 0"><NTag size="small" type="info">タグがありません</NTag></span>
 				</div>
 			</div>
 
@@ -324,7 +324,7 @@
 					<template #trigger>
 						<NButton type="error" :loading="isDeleteUser" style="margin-right: 8px"><Icon name="delete" /></NButton>
 					</template>
-					确认驳回该用户修改信息审核吗？
+					このユーザーの情報変更申請を却下してもよろしいですか？
 				</NPopconfirm>
 				<NButton type="success" :loading="isPassUser" @click="passUserInfo()"><Icon name="check" /></NButton>
 			</div>

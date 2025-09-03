@@ -44,12 +44,12 @@
 
 	const columns: DataTableColumns<NonNullable<RbacRole>[number]> = [
 		{
-			title: "身份名",
+			title: "ロール名",
 			key: "roleName",
 			render: row => <NTag color={{ color: row.roleColor, textColor: getContrastiveColor(row.roleColor!) }}>{row.roleName}</NTag>,
 		},
 		{
-			title: "可以访问以下 API 路径",
+			title: "アクセス可能なAPIパス",
 			key: "apiPathPermissions",
 			ellipsis: true,
 			width: "min(400px, 40dvw)",
@@ -62,20 +62,20 @@
 		{
 			type: "expand",
 			renderExpand: rowData => [
-				<div id={`${rowData.roleName}-expand-title`} class="mbe-2">{`身份 ${rowData.roleName} 有以下 API 路径的访问权限`}</div>,
+				<div id={`${rowData.roleName}-expand-title`} class="mbe-2">{`ロール ${rowData.roleName} は以下のAPIパスへのアクセス権を持っています`}</div>,
 				...rowData.apiPathList.map(apiPath => <NTag color={{ color: apiPath.apiPathColor, textColor: getContrastiveColor(apiPath.apiPathColor!) }} class="mie-2 mbe-1">{apiPath.apiPath}</NTag>),
 			],
 		},
 		{
-			title: "类型",
+			title: "タイプ",
 			key: "roleType",
 		},
 		{
-			title: "显示颜色",
+			title: "表示色",
 			key: "roleColor",
 		},
 		{
-			title: "备注",
+			title: "備考",
 			key: "roleDescription",
 		},
 		{
@@ -110,7 +110,7 @@
 	const rbacRolePageCount = computed(() => getPageCountByDataCount(rbacRoleCount.value, pagination.pageSize));
 
 	/**
-	 * 获取 RBAC 身份
+	 * RBACロールを取得する
 	 */
 	async function fetchRbacRole() {
 		const getRbacRoleRequest: GetRbacRoleRequestDto = {
@@ -125,11 +125,11 @@
 			rbacRole.value = rbacRoleResult.result;
 			rbacRoleCount.value = rbacRoleResult.count ?? 0;
 		} else
-			console.error("ERROR", "获取 RBAC 身份失败。");
+			console.error("ERROR", "RBACロールの取得に失敗しました。");
 	}
 
 	/**
-	 * 清除数据并打开创建身份的模态框
+	 * データをクリアしてロール作成モーダルを開く
 	 */
 	function openCreateRoleModal() {
 		createRoleFormModal.value = { ...EMPTY_ROLE_CREATE_DATA };
@@ -137,7 +137,7 @@
 	}
 
 	/**
-	 * 关闭创建身份的模态框，并清除数据
+	 * ロール作成モーダルを閉じてデータをクリアする
 	 */
 	function closeCreateRoleModal() {
 		isShowCreateNewRoleModal.value = false;
@@ -145,12 +145,12 @@
 	}
 
 	/**
-	 * 创建 RBAC 身份
+	 * RBACロールを作成する
 	 */
 	async function createRole() {
 		const createRbacRoleRequest: CreateRbacRoleRequestDto = { ...createRoleFormModal.value };
 		if (!createRbacRoleRequest.roleName) {
-			console.error("ERROR", "创建身份失败，参数不合法");
+			console.error("ERROR", "ロールの作成に失敗しました、パラメータが不正です");
 			return;
 		}
 		isCreatingRole.value = true;
@@ -164,7 +164,7 @@
 	}
 
 	/**
-	 * 获取 RBAC API 路径
+	 * RBAC APIパスを取得する
 	 */
 	async function fetchRbacApiPath() {
 		const getRbacApiPathRequest: GetRbacApiPathRequestDto = {
@@ -179,12 +179,12 @@
 
 			rbacApiPath.value = rbacApiPathResult.result;
 		else
-			console.error("ERROR", "获取 RBAC API 路径失败。");
+			console.error("ERROR", "RBAC APIパスの取得に失敗しました。");
 	}
 
 	/**
-	 * 删除 RBAC 身份
-	 * @param roleName 要删除的 RBAC 身份的名字
+	 * RBACロールを削除する
+	 * @param roleName 削除するRBACロールの名前
 	 */
 	async function fetchDeleteRbacRole(roleName: string) {
 		isDeletingRole.value = true;
@@ -195,9 +195,9 @@
 		const deleteRbacApiPathResult = await deleteRbacRoleController(deleteRbacRoleRequest);
 		if (!deleteRbacApiPathResult.success)
 			dialog.error({
-				title: "删除 RBAC 身份失败",
+				title: "RBACロールの削除に失敗しました",
 				content: deleteRbacApiPathResult.message,
-				positiveText: "知道了",
+				positiveText: "OK",
 			});
 
 		await fetchRbacRole();
@@ -206,8 +206,8 @@
 	}
 
 	/**
-	 * 开启删除身份的模态框
-	 * @param roleName 要删除的身份的名字
+	 * ロール削除モーダルを開く
+	 * @param roleName 削除するロールの名前
 	 */
 	function openDeleteRoleModal(roleName: string) {
 		currentDeletingRole.value = roleName;
@@ -216,7 +216,7 @@
 	}
 
 	/**
-	 * 关闭删除身份的模态框
+	 * ロール削除モーダルを閉じる
 	 */
 	function closeDeleteRoleModal() {
 		currentDeletingRole.value = "";
@@ -225,8 +225,8 @@
 	}
 
 	/**
-	 * 设置数据并打开编辑身份的模态框
-	 * @param roleData 正在更新的身份数据
+	 * データを設定してロール編集モーダルを開く
+	 * @param roleData 更新中のロールデータ
 	 */
 	async function openEditRoleModal(roleData: NonNullable<RbacRole>[number]) {
 		unableToEditRole.value = true;
@@ -240,7 +240,7 @@
 	}
 
 	/**
-	 * 关闭编辑身份的模态框并清除数据
+	 * ロール編集モーダルを閉じてデータをクリアする
 	 */
 	function closeEditRoleModal() {
 		unableToEditRole.value = true;
@@ -249,7 +249,7 @@
 	}
 
 	/**
-	 * 更新身份的 API 路径
+	 * ロールのAPIパスを更新する
 	 */
 	async function updateApiPathPermissionsForRole() {
 		isEditingRole.value = true;
@@ -259,15 +259,15 @@
 			closeEditRoleModal();
 		} else
 			dialog.error({
-				title: "更新身份的 API 路径时出错",
+				title: "ロールのAPIパス更新時にエラーが発生しました",
 				content: updateApiPathPermissionsForRoleResult.message,
-				positiveText: "知道了",
+				positiveText: "OK",
 			});
 		isEditingRole.value = false;
 	}
 
 	/**
-	 * 获取 role.vue 页面所有初始化数据
+	 * role.vueページのすべての初期化データを取得する
 	 */
 	async function fetchAllDataInRolePage() {
 		await fetchRbacRole();
@@ -278,31 +278,31 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA RBAC 身份管理</PageHeading>
+		<PageHeading>KIRAKIRA RBAC ロール管理</PageHeading>
 		<NCollapse class="mlb-4">
-			<NCollapseItem title="使用说明">
-				<NP>KIRAKIRA RBAC 权限控制的最小单位是 API 路径。</NP>
+			<NCollapseItem title="使用方法">
+				<NP>KIRAKIRA RBACの権限管理は、APIパスを最小単位として行われます。</NP>
 				<NUl>
-					<NLi>一个用户可以拥有多个身份</NLi>
-					<NLi>一个身份可以对应多位用户</NLi>
-					<NLi>一个身份可以拥有对多个 API 的访问权限</NLi>
-					<NLi>一个 API 可以对应多个身份</NLi>
+					<NLi>一人のユーザーは複数のロールを持つことができます</NLi>
+					<NLi>一つのロールは複数のユーザーに対応できます</NLi>
+					<NLi>一つのロールは複数のAPIへのアクセス権を持つことができます</NLi>
+					<NLi>一つのAPIは複数のロールに対応できます</NLi>
 				</NUl>
 				<NP>
-					你可以添加或删除身份。<br />
-					拥有以下特殊名称的身份具有特殊效果，在创建、分配（绑定/解除绑定）和删除时请多加注意：
+					ロールを追加または削除できます。<br />
+					以下の特殊な名前を持つロールは特別な効果があるため、作成、割り当て（紐付け/解除）、削除の際には特に注意してください：
 				</NP>
 				<NUl>
-					<NLi><b>root</b> - 拥有 RBAC 的管理权限</NLi>
-					<NLi><b>adminsitrator</b> - 拥有对内容管理权限</NLi>
-					<NLi><b>developer</b> - 拥有某些开发资源的访问权限</NLi>
-					<NLi><b>user</b> - 普通用户</NLi>
-					<NLi><b>blocked</b> - 已封禁的用户</NLi>
+					<NLi><b>root</b> - RBACの管理権限を持ちます</NLi>
+					<NLi><b>adminsitrator</b> - コンテンツの管理権限を持ちます</NLi>
+					<NLi><b>developer</b> - 特定の開発リソースへのアクセス権を持ちます</NLi>
+					<NLi><b>user</b> - 一般ユーザー</NLi>
+					<NLi><b>blocked</b> - ブロックされたユーザー</NLi>
 				</NUl>
 			</NCollapseItem>
 		</NCollapse>
 		<NFlex class="mlb-2">
-			<NButton @click="openCreateRoleModal"><template #icon><Icon name="add" /></template>新增</NButton>
+			<NButton @click="openCreateRoleModal"><template #icon><Icon name="add" /></template>新規追加</NButton>
 		</NFlex>
 		<NDataTable
 			:columns="columns"
@@ -330,15 +330,15 @@
 			v-model:show="isShowDeleteRoleModal"
 			:maskClosable="false"
 			preset="dialog"
-			:title="`确认要删除身份 ${currentDeletingRole} 吗？`"
+			:title="`ロール ${currentDeletingRole} を削除してもよろしいですか？`"
 		>
-			<NFormItem label="再次输入身份的名字来确定删除">
-				<NInput v-model:value="userInputDeleteingRole" placeholder="身份名字" />
+			<NFormItem label="削除を確認するには、ロール名を再度入力してください">
+				<NInput v-model:value="userInputDeleteingRole" placeholder="ロール名" />
 			</NFormItem>
 
 			<template #action>
-				<NButton @click="closeDeleteRoleModal">算了</NButton>
-				<NButton :disabled="currentDeletingRole !== userInputDeleteingRole" :loading="isDeletingRole" type="warning" :secondary="true" @click="fetchDeleteRbacRole(currentDeletingRole)">确认删除</NButton>
+				<NButton @click="closeDeleteRoleModal">キャンセル</NButton>
+				<NButton :disabled="currentDeletingRole !== userInputDeleteingRole" :loading="isDeletingRole" type="warning" :secondary="true" @click="fetchDeleteRbacRole(currentDeletingRole)">削除を確認</NButton>
 			</template>
 		</NModal>
 
@@ -347,29 +347,29 @@
 			v-model:show="isShowCreateNewRoleModal"
 			:maskClosable="false"
 			preset="card"
-			title="创建新身份"
+			title="新しいロールを作成"
 		>
 			<NForm>
-				<NFormItem label="身份的名字" :rule="{ required: true }">
-					<NInput :status="!createRoleFormModal.roleName ? 'error' : 'success'" v-model:value="createRoleFormModal.roleName" placeholder="（必填）唯一且简短的身份名" />
+				<NFormItem label="ロール名" :rule="{ required: true }">
+					<NInput :status="!createRoleFormModal.roleName ? 'error' : 'success'" v-model:value="createRoleFormModal.roleName" placeholder="（必須）ユニークで短いロール名" />
 				</NFormItem>
-				<NFormItem label="身份的类型">
-					<NInput v-model:value="createRoleFormModal.roleType" placeholder='用于标识身份，例如 "maintenance"' />
+				<NFormItem label="ロールのタイプ">
+					<NInput v-model:value="createRoleFormModal.roleType" placeholder='ロールを識別するためのもの、例："maintenance"' />
 				</NFormItem>
-				<NFormItem label="身份的显示颜色">
+				<NFormItem label="ロールの表示色">
 					<NFlex vertical :size="0" class="is-full">
-						<small class="n-form-item-label text-xs min-bs-0">填写颜色可以更方便区分不同身份</small>
+						<small class="n-form-item-label text-xs min-bs-0">色を設定すると、異なるロールを区別しやすくなります</small>
 						<NColorPicker v-model:value="createRoleFormModal.roleColor" :modes="['hex']" :showAlpha="true" />
 					</NFlex>
 				</NFormItem>
-				<NFormItem label="身份的介绍">
-					<NInput v-model:value="createRoleFormModal.roleDescription" type="textarea" :autosize="{ minRows: 3 }" placeholder="身份的详细说明" />
+				<NFormItem label="ロールの説明">
+					<NInput v-model:value="createRoleFormModal.roleDescription" type="textarea" :autosize="{ minRows: 3 }" placeholder="ロールの詳細な説明" />
 				</NFormItem>
 			</NForm>
 			<template #footer>
 				<NFlex class="justify-end">
-					<NButton @click="closeCreateRoleModal">算了</NButton>
-					<NButton :disabled="!createRoleFormModal?.roleName" :loading="isCreatingRole" type="primary" :secondary="true" @click="createRole">确认创建</NButton>
+					<NButton @click="closeCreateRoleModal">キャンセル</NButton>
+					<NButton :disabled="!createRoleFormModal?.roleName" :loading="isCreatingRole" type="primary" :secondary="true" @click="createRole">作成を確認</NButton>
 				</NFlex>
 			</template>
 		</NModal>
@@ -379,13 +379,13 @@
 			v-model:show="isShowEditRoleModal"
 			:maskClosable="false"
 			preset="card"
-			title="编辑身份可以访问的 API 路径"
+			title="ロールがアクセスできるAPIパスを編集"
 		>
 			<NForm>
-				<NFormItem label="身份的名字">
-					<NInput :disabled="true" v-model:value="updateApiPathPermissionsForRoleFormModal.roleName" placeholder="身份名" />
+				<NFormItem label="ロール名">
+					<NInput :disabled="true" v-model:value="updateApiPathPermissionsForRoleFormModal.roleName" placeholder="ロール名" />
 				</NFormItem>
-				<NFormItem label="身份可以访问的 API 路径">
+				<NFormItem label="ロールがアクセスできるAPIパス">
 					<NTransfer
 						v-model:value="updateApiPathPermissionsForRoleFormModal.apiPathPermissions"
 						:options="rbacApiPath?.map(apiPath => ({
@@ -400,8 +400,8 @@
 			</NForm>
 			<template #footer>
 				<NFlex class="justify-end">
-					<NButton @click="closeEditRoleModal">算了</NButton>
-					<NButton :disabled="!updateApiPathPermissionsForRoleFormModal.roleName" :loading="isEditingRole" type="primary" :secondary="true" @click="updateApiPathPermissionsForRole">确认更新身份</NButton>
+					<NButton @click="closeEditRoleModal">キャンセル</NButton>
+					<NButton :disabled="!updateApiPathPermissionsForRoleFormModal.roleName" :loading="isEditingRole" type="primary" :secondary="true" @click="updateApiPathPermissionsForRole">ロールの更新を確認</NButton>
 				</NFlex>
 			</template>
 		</NModal>

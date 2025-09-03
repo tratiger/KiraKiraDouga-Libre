@@ -1,267 +1,267 @@
 /**
- * 用户注册提交的参数
+ * ユーザー登録時に送信するパラメータ
  */
 export type UserRegistrationRequestDto = {
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
-	/** 验证码 */
+	/** 認証コード */
 	verificationCode: string;
-	/** 在前端已经被 Bcrypt Hash 过一次的的密码 */
+	/** フロントエンドでBcryptでハッシュ化されたパスワード */
 	passwordHash: string;
-	/** 密码提示 */
+	/** パスワードのヒント */
 	passwordHint?: string;
-	/** 注册时使用的邀请码 */
+	/** 登録時に使用した招待コード */
 	invitationCode?: string;
-	/** 用户名 */
+	/** ユーザー名 */
 	username: string;
-	/** 用户昵称 */
+	/** ユーザーニックネーム */
 	userNickname?: string;
 };
 
 /**
- * 用户注册的返回参数
+ * ユーザー登録のレスポンスパラメータ
  */
 export type UserRegistrationResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户的 UUID */
+	/** ユーザーのUUID */
 	UUID?: string;
-	/** 用户 ID */
+	/** ユーザーID */
 	uid?: number;
-	/** 如果注册成功，则返回一个 token，如果注册失败，则 token 是一个假值（undefined、null 或 ""） */
+	/** 登録に成功した場合、トークンを返す。失敗した場合は偽の値（undefined、null、または ""） */
 	token?: string;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户登录提交的参数
+ * ユーザーログイン時に送信するパラメータ
  */
 export type UserLoginRequestDto = {
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
-	/** 在前端已经 Hash 过一次的的密码 */
+	/** フロントエンドでハッシュ化されたパスワード */
 	passwordHash: string;
-	/** 用户输入的一次性验证码 */
+	/** ユーザーが入力したワンタイムパスワード */
 	clientOtp?: string;
-	/** 用户输入的邮箱验证码 */
+	/** ユーザーが入力したメール認証コード */
 	verificationCode?: string;
 };
 
 /**
- * 用户登录的返回参数
+ * ユーザーログインのレスポンスパラメータ
  */
 export type UserLoginResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email?: string;
-	/** 用户的 UUID */
+	/** ユーザーのUUID */
 	UUID?: string;
-	/** 用户 ID */
+	/** ユーザーID */
 	uid?: number;
-	/** 如果登录成功，则返回一个 token，如果登录失败，则 token 是一个假值（undefined、null 或 ""） */
+	/** ログインに成功した場合、トークンを返す。失敗した場合は偽の値（undefined、null、または ""） */
 	token?: string;
-	/** 密码提示 */
+	/** パスワードのヒント */
 	passwordHint?: string;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 是否冷却 */
+	/** クールダウン中かどうか */
 	isCoolingDown?: boolean;
-	/** 身份验证器的类型 */
+	/** 認証アプリのタイプ */
 	authenticatorType?: "email" | "totp" | "none";
 };
 
 /**
- * 检查用户是否存在的请求参数
+ * ユーザーが存在するかどうかの確認リクエストパラメータ
  */
 export type UserExistsCheckByUIDRequestDto = {
-	/** 用户 UID */
+	/** ユーザーUID */
 	uid: number;
 };
 
 /**
- * 检查用户是否存在的请求响应
+ * ユーザーが存在するかどうかの確認リクエストのレスポンス
  */
 export type UserExistsCheckByUIDResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户存在返回 true，不存在返回 false */
+	/** ユーザーが存在する場合はtrue、存在しない場合はfalse */
 	exists: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 验证用户邮箱是否存在提交的参数
+ * ユーザーのメールアドレスが存在するか確認するために送信するパラメータ
  */
 export type UserEmailExistsCheckRequestDto = {
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
 };
 
 /**
- * 验证用户邮箱是否已经存在的返回参数
+ * ユーザーのメールアドレスが既に存在するか確認した結果のレスポンスパラメータ
  */
 export type UserEmailExistsCheckResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户存在或者查询失败（悲观）都会返回 true，不存在返回 false */
-	exists: boolean; // WARN: 用户已存在或查询失败（悲观）时都会返回 true，用以防止用户意外的使用重复邮箱注册。
-	/** 附加的文本消息 */
+	/** ユーザーが存在するか、クエリに失敗した場合（ペシミスティック）はtrue、存在しない場合はfalse */
+	exists: boolean; // WARN: ユーザーが既に存在するか、クエリに失敗した場合（ペシミスティック）はtrueを返し、ユーザーが誤って重複したメールアドレスで登録するのを防ぎます。
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户更改邮箱的请求的参数
+ * ユーザーがメールアドレスを変更するリクエストのパラメータ
  */
 export type UpdateUserEmailRequestDto = {
-	/** 用户 ID */
+	/** ユーザーID */
 	uid: number;
-	/** 用户的旧邮箱 */
+	/** ユーザーの古いメールアドレス */
 	oldEmail: string;
-	/** 用户的新邮箱 */
+	/** ユーザーの新しいメールアドレス */
 	newEmail: string;
-	/** 经过一次 Hash 的用户密码 */
+	/** 一度ハッシュ化されたユーザーパスワード */
 	passwordHash: string;
-	/** 验证码 */
+	/** 認証コード */
 	verificationCode: string;
 };
 
 /**
- * 用户更改邮箱返回的参数
+ * ユーザーがメールアドレスを変更した結果のレスポンスパラメータ
  */
 export type UpdateUserEmailResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 等待被 Hash 的密码和用户信息
+ * ハッシュ化される前のパスワードとユーザー情報
  */
 export type BeforeHashPasswordDataType = {
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
-	/** 在前端已经 Hash 过一次的的密码 */
+	/** フロントエンドで一度ハッシュ化されたパスワード */
 	passwordHash: string;
 };
 
 /**
- * 用户的个人标签
+ * ユーザーの個人タグ
  */
 export type UserLabel = {
-	/** 标签 ID */
+	/** タグID */
 	id: number;
-	/** 标签名 */
+	/** タグ名 */
 	labelName: string;
 };
 
 /**
- * 用户的关联账户
+ * ユーザーの連携アカウント
  */
 export type UserLinkedAccounts = {
-	/** 关联账户的平台 - 例："X" */
+	/** 連携アカウントのプラットフォーム - 例："X" */
 	platformId: string;
-	/** 关联账户唯一标识 */
+	/** 連携アカウントのユニークID */
 	accountUniqueId: string;
 };
 
 /**
- * 用户的关联网站
+ * ユーザーのウェブサイト
  */
 export type UserWebsite = {
-	/** 关联网站名 - 例："我的个人主页" */
+	/** ウェブサイト名 - 例："私の個人ホームページ" */
 	websiteName: string;
-	/** 关联网站 URL */
+	/** ウェブサイトURL */
 	websiteUrl: string;
 };
 
 /**
- * 更新或创建用户信息时的请求参数
+ * ユーザー情報を更新または作成するリクエストパラメータ
  */
 export type UpdateOrCreateUserInfoRequestDto = {
-	/** 用户名 */
+	/** ユーザー名 */
 	username?: string;
-	/** 用户昵称 */
+	/** ユーザーニックネーム */
 	userNickname?: string;
-	/** 用户头像的链接 */
+	/** ユーザーアバターのリンク */
 	avatar?: string;
-	/** 用户背景图片的链接 */
+	/** ユーザーのバナー画像のリンク */
 	userBannerImage?: string;
-	/** 用户的个性签名 */
+	/** ユーザーの自己紹介 */
 	signature?: string;
-	/** 用户的性别，男、女和自定义（字符串） */
+	/** ユーザーの性別、男性、女性、カスタム（文字列） */
 	gender?: string;
-	/** 用户的个人标签 */
+	/** ユーザーの個人タグ */
 	label?: UserLabel[];
-	/** 用户生日 */
+	/** ユーザーの誕生日 */
 	userBirthday?: string;
-	/** 用户主页 Markdown */
+	/** ユーザープロフィールのMarkdown */
 	userProfileMarkdown?: string;
-	/** 用户的关联账户 */
+	/** ユーザーの連携アカウント */
 	userLinkedAccounts?: UserLinkedAccounts[];
-	/** 用户的关联网站 */
+	/** ユーザーのウェブサイト */
 	userWebsite?: UserWebsite;
 };
 
 /**
- * 更新或创建用户信息的请求结果
+ * ユーザー情報を更新または作成したリクエストの結果
  */
 export type UpdateOrCreateUserInfoResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 请求结果 */
+	/** リクエスト結果 */
 	result?: {} & UpdateOrCreateUserInfoRequestDto;
 };
 
 /**
- * 获取当前登录的用户信息的请求参数
+ * 現在ログインしているユーザーの情報を取得するリクエストパラメータ
  */
 export type GetSelfUserInfoRequestDto = {
-	/** 用户 ID */
+	/** ユーザーID */
 	uid: number;
-	/** 用户的身分令牌 */
+	/** ユーザーの認証トークン */
 	token: string;
 };
 
 /**
- * 通过 UUID 获取当前登录的用户信息的请求参数
+ * UUIDによって現在ログインしているユーザーの情報を取得するリクエストパラメータ
  */
 export type GetSelfUserInfoByUuidRequestDto = {
 	/** UUID */
 	uuid: string;
-	/** 用户的身分令牌 */
+	/** ユーザーの認証トークン */
 	token: string;
 };
 
 /**
- * 获取当前登录的用户信息的请求响应
+ * 現在ログインしているユーザーの情報を取得するリクエストのレスポンス
  */
 export type GetSelfUserInfoResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 请求结果 */
+	/** リクエスト結果 */
 	result?: (
 		{
-			/** 用户 ID */
+			/** ユーザーID */
 			uid?: number;
 			/** UUID */
 			uuid?: string;
-			/** 用户邮箱 */
+			/** ユーザーのメールアドレス */
 			email?: string;
-			/** 用户创建时间 */
+			/** ユーザー作成日時 */
 			userCreateDateTime?: number;
-			/** 用户的角色 */
+			/** ユーザーのロール */
 			roles?: string[];
-			/** 2FA 的类型 */
+			/** 2FAのタイプ */
 			authenticatorType?: string;
-			/** 使用的邀请码 */
+			/** 使用した招待コード */
 			invitationCode?: string;
 		}
 		& UpdateOrCreateUserInfoRequestDto
@@ -269,524 +269,524 @@ export type GetSelfUserInfoResponseDto = {
 };
 
 /**
- * 通过 UUID 获取当前登录的用户信息的请求响应
+ * UUIDによって現在ログインしているユーザーの情報を取得するリクエストのレスポンス
  */
 export type GetSelfUserInfoByUuidResponseDto = {} & GetSelfUserInfoResponseDto;
 
 /**
- * 通过 UID 获取用户信息的请求载荷
+ * UIDによってユーザー情報を取得するリクエストペイロード
  */
 export type GetUserInfoByUidRequestDto = {
-	/** 目标用户的 UID */
+	/** ターゲットユーザーのUID */
 	uid: number;
 };
 
 /**
- * 用户被屏蔽的状态
+ * ユーザーがブロックされている状態
  */
 type BlockState = { isBlockedByOther: boolean; isBlocked: boolean; isHidden: boolean };
 
 /**
- * 通过 UID 获取用户信息的请求响应
+ * UIDによってユーザー情報を取得するリクエストのレスポンス
  */
 export type GetUserInfoByUidResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 请求结果 */
+	/** リクエスト結果 */
 	result?: {
-		/** 用户名 */
+		/** ユーザー名 */
 		username?: string;
-		/** 用户昵称 */
+		/** ユーザーニックネーム */
 		userNickname?: string;
-		/** 用户头像的链接 */
+		/** ユーザーアバターのリンク */
 		avatar?: string;
-		/** 用户背景图片的链接 */
+		/** ユーザーのバナー画像のリンク */
 		userBannerImage?: string;
-		/** 用户的个性签名 */
+		/** ユーザーの自己紹介 */
 		signature?: string;
-		/** 用户的性别，男、女和自定义（字符串） */
+		/** ユーザーの性別、男性、女性、カスタム（文字列） */
 		gender?: string;
-		/** 用户的个人标签 */
+		/** ユーザーの個人タグ */
 		label?: UserLabel[];
-		/** 用户创建时间 */
+		/** ユーザー作成日時 */
 		userCreateDateTime?: number;
-		/** 用户的角色 */
+		/** ユーザーのロール */
 		roles?: string[];
-		/** 是否正在关注该用户 */
+		/** このユーザーをフォローしているかどうか */
 		isFollowing: boolean;
 		/**
-		 * 查询的用户是否是自己。
-		 * 如果该字段的值为 true，则通常意味着发生了错误的请求，因为有专用的接口用于查询用户自己的信息。
+		 * 問い合わせたユーザーが自分自身であるかどうか。
+		 * このフィールドの値がtrueの場合、通常は誤ったリクエストを意味します。なぜなら、自分自身の情報を問い合わせるための専用のインターフェースがあるからです。
 		 */
 		isSlef: boolean;
 	};
 } & BlockState;
 
 /**
- * 通过 UID 和 TOKEN 校验用户的返回结果
+ * UIDとTOKENによってユーザーを検証した結果
  */
 export type CheckUserTokenResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 用户校验结果，用户正常为 true，非法用户为 false */
+	/** ユーザー検証結果。正常なユーザーはtrue、不正なユーザーはfalse */
 	userTokenOk?: boolean;
 };
 
 /**
- * 用户登出的响应
+ * ユーザーログアウトのレスポンス
  */
 export type UserLogoutResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 获取用于用户上传头像的预签名 URL, 上传限时 60 秒
+ * ユーザーがアバターをアップロードするための署名付きURLを取得する。アップロードは60秒以内に制限されます。
  */
 export type GetUserAvatarUploadSignedUrlResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用于用户上传头像的预签名 URL */
+	/** ユーザーがアバターをアップロードするための署名付きURL */
 	userAvatarUploadSignedUrl?: string;
-	/** 用于用户上传头像文件名 */
+	/** ユーザーがアップロードするアバターのファイル名 */
 	userAvatarFilename?: string;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户隐私数据可见性设置
+ * ユーザーのプライバシーデータの可視性設定
  */
 type UserPrivaryVisibilitiesSettingDto = {
-	/** 用户隐私数据项的 ID - 非空 - 例：'birthday', 'follow', 'fans' */
+	/** ユーザーのプライバシーデータ項目のID - 空であってはならない - 例：'birthday', 'follow', 'fans' */
 	privaryId: string;
-	/** 显示方式 - 非空 - 允许的值有：{public: 公开, following: 仅关注, private: 隐藏} */
+	/** 表示方法 - 空であってはならない - 許可される値：{public: 公開, following: フォロー中のみ, private: 非公開} */
 	visibilitiesType: "public" | "following" | "private";
 };
 
 /**
- * 用户关联平台的隐私可见性设置
+ * ユーザーの連携プラットフォームのプライバシー可視性設定
  */
 type UserLinkedAccountsVisibilitiesSettingDto = {
-	/** 关联账户类型 - 非空 - 例："X" */
+	/** 連携アカウントのタイプ - 空であってはならない - 例："X" */
 	platformId: string;
-	/** 显示方式 - 非空 - 允许的值有：{public: 公开, following: 仅关注, private: 隐藏} */
+	/** 表示方法 - 空であってはならない - 許可される値：{public: 公開, following: フォロー中のみ, private: 非公開} */
 	visibilitiesType: "public" | "following" | "private";
 };
 
 /**
- * 基础用户个性设置类型
+ * 基本的なユーザーの個人設定タイプ
  */
 export type BasicUserSettingsDto = {
-	/** 是否启用 Cookie - 布尔 */
+	/** Cookieを有効にするか - ブール値 */
 	enableCookie?: boolean;
-	/** 主题外观设置（主题类型） - 可选的值：{light: 浅色, dark: 深色, system: 跟随系统} */
+	/** テーマの外観設定（テーマタイプ） - 選択可能な値：{light: ライト, dark: ダーク, system: システムに従う} */
 	themeType?: "light" | "dark" | "system";
-	/** 主题颜色 - 字符串，颜色字符串 */
+	/** テーマカラー - 文字列、カラー文字列 */
 	themeColor?: string;
-	/** 用户自定义主题颜色 - 字符串，HAX 颜色字符串，不包含井号 */
+	/** ユーザーカスタムテーマカラー - 文字列、HEXカラー文字列、シャープなし */
 	themeColorCustom?: string;
-	/** 壁纸（背景图 URL） - 字符串 */
+	/** 壁紙（背景画像URL） - 文字列 */
 	wallpaper?: string;
-	/** 是否启用彩色导航栏 - 布尔 */
+	/** カラーサイドバーを有効にするか - ブール値 */
 	coloredSideBar?: boolean;
-	/** 流量使用偏好 - 字符串，{standard: 标准, limit: 节省网络流量模式, preview: 超前加载} */
+	/** データ通信量の使用設定 - 文字列、{standard: 標準, limit: データ節約モード, preview: 先行読み込み} */
 	dataSaverMode?: "standard" | "limit" | "preview";
-	/** 禁用搜索推荐 - 布尔 */
+	/** 検索推薦を無効にするか - ブール値 */
 	noSearchRecommendations?: boolean;
-	/** 禁用相关视频推荐 - 布尔 */
+	/** 関連動画の推薦を無効にするか - ブール値 */
 	noRelatedVideos?: boolean;
-	/** 禁用搜索历史 - 布尔 */
+	/** 検索履歴を無効にするか - ブール値 */
 	noRecentSearch?: boolean;
-	/** 禁用视频历史 - 布尔 */
+	/** 視聴履歴を無効にするか - ブール値 */
 	noViewHistory?: boolean;
-	/** 是否在新窗口打开视频 - 布尔 */
+	/** 新しいウィンドウで動画を開くか - ブール値 */
 	openInNewWindow?: boolean;
-	/** 显示语言 - 字符串 */
+	/** 表示言語 - 文字列 */
 	currentLocale?: string;
-	/** 用户时区 - 字符串 */
+	/** ユーザーのタイムゾーン - 文字列 */
 	timezone?: string;
-	/** 用户单位制度 - 字符串，刻度制或分度值，英制或美制等内容 */
+	/** ユーザーの単位系 - 文字列、メートル法やヤード・ポンド法など */
 	unitSystemType?: string;
-	/** 是否进入了开发者模式 - 布尔 */
+	/** 開発者モードに入っているか - ブール値 */
 	devMode?: boolean;
-	/** 用户关联网站的隐私设置 - 允许的值有：{public: 公开, following: 仅关注, private: 隐藏} */
+	/** ユーザーのウェブサイトのプライバシー設定 - 許可される値：{public: 公開, following: フォロー中のみ, private: 非公開} */
 	userWebsitePrivacySetting?: "public" | "following" | "private";
-	/** 用户隐私数据可见性设置 */
+	/** ユーザーのプライバシーデータの可視性設定 */
 	userPrivaryVisibilitiesSetting?: UserPrivaryVisibilitiesSettingDto[];
-	/** 用户关联账户的隐私设置 */
+	/** ユーザーの連携アカウントのプライバシー設定 */
 	userLinkedAccountsVisibilitiesSetting?: UserLinkedAccountsVisibilitiesSettingDto[];
-	// /** 实验性：启用直角模式 - 布尔 */
+	// /** 実験的：直角モードを有効にする - ブール値 */
 	// sharpAppearanceMode?: boolean;
-	// /** 实验性：启用扁平模式 - 布尔 */
+	// /** 実験的：フラットモードを有効にする - ブール値 */
 	// flatAppearanceMode?: boolean;
 };
 
 /**
- * 获取用于渲染页面的用户设定的请求参数
+ * ページレンダリング用のユーザー設定を取得するリクエストパラメータ
  */
 export type GetUserSettingsRequestDto = {} & GetSelfUserInfoRequestDto;
 
 /**
- * 获取用于渲染页面的用户设定的请求响应
+ * ページレンダリング用のユーザー設定を取得するリクエストのレスポンス
  */
 export type GetUserSettingsResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户个性设定 */
+	/** ユーザーの個人設定 */
 	userSettings?: { uid: number; editDateTime: number } & BasicUserSettingsDto;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 更新或创建用户设定的请求参数
+ * ユーザー設定を更新または作成するリクエストパラメータ
  */
 export type UpdateOrCreateUserSettingsRequestDto = {} & BasicUserSettingsDto;
 
 /**
- * 更新或创建用户设定的请求响应
+ * ユーザー設定を更新または作成するリクエストのレスポンス
  */
 export type UpdateOrCreateUserSettingsResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 用户个性设定 */
+	/** ユーザーの個人設定 */
 	userSettings?: { uid: number; editDateTime: number } & BasicUserSettingsDto;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 请求发送用户注册邮箱验证码的请求载荷
+ * ユーザー登録用のメール認証コード送信リクエストのペイロード
  */
 export type RequestSendVerificationCodeRequestDto = {
-	/** 用户的邮箱 - 非空 - 唯一 */
+	/** ユーザーのメールアドレス - 空であってはならない - ユニーク */
 	email: string;
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
 };
 
 /**
- * 请求发送用户邮箱验证码的请求响应
+ * ユーザーメール認証コード送信リクエストのレスポンス
  */
 export type RequestSendVerificationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 是否达到超时时间 */
+	/** タイムアウトに達したかどうか */
 	isTimeout: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 邀请码类型
+ * 招待コードのタイプ
  */
 type InvitationCode = {
-	/** 生成邀请码的用户 UID - 非空 */
+	/** 招待コードを生成したユーザーのUID - 空であってはならない */
 	creatorUid: number;
-	/** 生成邀请码的用户 UUID - 非空 */
+	/** 招待コードを生成したユーザーのUUID - 空であってはならない */
 	creatorUUID: string;
-	/** 邀请码 - 非空 */
+	/** 招待コード - 空であってはならない */
 	invitationCode: string;
-	/** 生成邀请码的时间 - 非空 */
+	/** 招待コードの生成日時 - 空であってはならない */
 	generationDateTime: number;
-	/** 邀请码被标记为等待使用中 - 非空 */
+	/** 招待コードが使用待ちとしてマークされているか - 空であってはならない */
 	isPending: boolean;
-	/** 邀请码被标记为无法使用 - 非空 */
+	/** 招待コードが無効としてマークされているか - 空であってはならない */
 	disabled: boolean;
-	/** 使用这个邀请码的用户 */
+	/** この招待コードを使用したユーザー */
 	assignee?: number;
-	/** 邀请码被使用的时间 */
+	/** 招待コードが使用された日時 */
 	usedDateTime?: number;
 };
 
 /**
- * 生成邀请码的请求响应
+ * 招待コード生成リクエストのレスポンス
  */
 export type CreateInvitationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 邀请码生成器是否在冷却中（超出邀请码生成期限才能再次生成） */
+	/** 招待コード生成器がクールダウン中かどうか（招待コード生成期限を超えたら再度生成可能） */
 	isCoolingDown: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 生成的邀请码 */
+	/** 生成された招待コード */
 	invitationCodeResult?: InvitationCode;
 };
 
 /**
- * 获取自己的邀请码的请求响应
+ * 自分の招待コードを取得するリクエストのレスポンス
  */
 export type GetMyInvitationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 邀请码列表 */
+	/** 招待コードリスト */
 	invitationCodeResult: InvitationCode[];
 };
 
 /**
- * 管理员根据邀请码查询用户的请求响应
+ * 管理者が招待コードによってユーザーを検索するリクエストのレスポンス
  */
 export type AdminGetUserByInvitationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 邀请码查询结果 */
+	/** 招待コード検索結果 */
 	userInfoResult: {
-		/** 用户 UID */
+		/** ユーザーUID */
 		uid?: number;
-		/** 用户 UUID */
+		/** ユーザーUUID */
 		uuid?: string;
 	};
 };
 
 /**
- * 使用邀请码的的请求载荷
+ * 招待コードを使用するリクエストのペイロード
  */
 export type UseInvitationCodeDto = {
-	/** 被使用的邀请码 */
+	/** 使用された招待コード */
 	invitationCode: string;
-	/** 注册者 UID */
+	/** 登録者UID */
 	registrantUid: number;
-	/** 注册者 UUID */
+	/** 登録者UUID */
 	registrantUUID: string;
 };
 
 /**
- * 使用邀请码的请求响应
+ * 招待コードを使用したリクエストのレスポンス
  */
 export type UseInvitationCodeResultDto = {
-	/** 是否成功使用验证码 */
+	/** 認証コードの使用に成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 检查一个邀请码是否可用的请求载荷
+ * 招待コードが利用可能かチェックするリクエストのペイロード
  */
 export type CheckInvitationCodeRequestDto = {
-	/** 被使用的邀请码 */
+	/** 使用された招待コード */
 	invitationCode: string;
 };
 
 /**
- * 检查一个邀请码是否可用的请求响应
+ * 招待コードが利用可能かチェックするリクエストのレスポンス
  */
 export type CheckInvitationCodeResponseDto = {
-	/** 是否成功生成邀请码 */
+	/** 招待コードの生成に成功したかどうか */
 	success: boolean;
-	/** 是否是可用的邀请码 */
+	/** 利用可能な招待コードかどうか */
 	isAvailableInvitationCode: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 请求发送用户更改邮箱验证码的请求载荷
+ * ユーザーのメールアドレス変更用の認証コード送信リクエストのペイロード
  */
 export type RequestSendChangeEmailVerificationCodeRequestDto = {
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
-	/** 用户的新邮箱 */
+	/** ユーザーの新しいメールアドレス */
 	newEmail: string;
 };
 
 /**
- * 请求发送用户更改邮箱验证码的请求响应
+ * ユーザーのメールアドレス変更用の認証コード送信リクエストのレスポンス
  */
 export type RequestSendChangeEmailVerificationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 是否达到超时时间 */
+	/** クールダウン期間に達したかどうか */
 	isCoolingDown: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 请求发送用户更改密码的验证码的请求载荷
+ * ユーザーのパスワード変更用の認証コード送信リクエストのペイロード
  */
 export type RequestSendChangePasswordVerificationCodeRequestDto = {
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
 };
 
 /**
- * 请求发送用户更改密码的验证码的请求响应
+ * ユーザーのパスワード変更用の認証コード送信リクエストのレスポンス
  */
 export type RequestSendChangePasswordVerificationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 是否达到超时时间 */
+	/** クールダウン期間に達したかどうか */
 	isCoolingDown: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户更改密码的请求的参数
+ * ユーザーがパスワードを変更するリクエストのパラメータ
  */
 export type UpdateUserPasswordRequestDto = {
-	/** 用户的旧密码 */
+	/** ユーザーの古いパスワード */
 	oldPasswordHash: string;
-	/** 用户的新邮箱 */
+	/** ユーザーの新しいパスワード */
 	newPasswordHash: string;
-	/** 验证码 */
+	/** 認証コード */
 	verificationCode: string;
 };
 
 /**
- * 用户更改密码返回的参数
+ * ユーザーがパスワードを変更した結果のレスポンスパラメータ
  */
 export type UpdateUserPasswordResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 请求发送忘记密码的邮箱验证码的请求载荷
+ * パスワードを忘れた場合のメール認証コード送信リクエストのペイロード
  */
 export type RequestSendForgotPasswordVerificationCodeRequestDto = {
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
-	/** 忘记密码的账户的邮箱 */
+	/** パスワードを忘れたアカウントのメールアドレス */
 	email: string;
 };
 
 /**
- * 请求发送忘记密码的邮箱验证码的请求响应
+ * パスワードを忘れた場合のメール認証コード送信リクエストのレスポンス
  */
 export type RequestSendForgotPasswordVerificationCodeResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 是否达到超时时间 */
+	/** クールダウン期間に達したかどうか */
 	isCoolingDown: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 找回密码（更新密码）的请求载荷
+ * パスワード再設定（更新）のリクエストペイロード
  */
 export type ForgotPasswordRequestDto = {
-	/** 忘记密码的账户的邮箱 */
+	/** パスワードを忘れたアカウントのメールアドレス */
 	email: string;
-	/** 用户的新邮箱 */
+	/** ユーザーの新しいパスワード */
 	newPasswordHash: string;
-	/** 验证码 */
+	/** 認証コード */
 	verificationCode: string;
 };
 
 /**
- * 找回密码（更新密码）的请求响应
+ * パスワード再設定（更新）のリクエストのレスポンス
  */
 export type ForgotPasswordResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 检查用户名是否可用的请求载荷
+ * ユーザー名が利用可能かチェックするリクエストのペイロード
  */
 export type CheckUsernameRequestDto = {
-	/** 用户名 */
+	/** ユーザー名 */
 	username: string;
 };
 
 /**
- * 检查用户名是否可用的请求响应
+ * ユーザー名が利用可能かチェックするリクエストのレスпоンス
  */
 export type CheckUsernameResponseDto = {
-	/** 执行结果，程序执行成功，返回 true，程序执行失败，返回 false */
+	/** 実行結果。成功した場合はtrue、失敗した場合はfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 是否是可用的用户名 */
+	/** 利用可能なユーザー名かどうか */
 	isAvailableUsername: boolean;
 };
 
 /**
- * 管理员获取所有被封禁用户信息的请求载荷
+ * 管理者がすべてのブロックされたユーザー情報を取得するリクエストペイロード
  */
 export type GetBlockedUserRequestDto = {
-	/** 排序字段 */
+	/** ソート対象のフィールド */
 	sortBy: string;
-	/** 排序方法 */
+	/** ソート順 */
 	sortOrder: string;
-	/** 查询 UID */
+	/** 検索するUID */
 	uid?: number;
-	/** 分页查询 */
+	/** ページネーション検索 */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページに表示する件数 */
 		pageSize: number;
 	};
 };
 
 /**
- * 管理员获取所有被封禁用户的信息的请求响应
+ * 管理者がすべてのブロックされたユーザー情報を取得するリクエストのレスポンス
  */
 export type GetBlockedUserResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 请求响应，被封禁的用户 */
+	/** リクエストのレスポンス、ブロックされたユーザー */
 	result?: (
 		GetUserInfoByUidResponseDto["result"] & {
 			uid: number;
 			UUID: string;
 		}
 	)[];
-	/** 数据总长度 */
+	/** データ総数 */
 	totalCount: number;
 };
 
 /**
- * 管理员获取用户信息的请求载荷
+ * 管理者がユーザー情報を取得するリクエストペイロード
  */
 export type AdminGetUserInfoRequestDto = {
-	/** 是否只展示在上一次审核通过后修改了用户信息的用户 */
+	/** 前回のレビュー承認後にユーザー情報を変更したユーザーのみ表示するか */
 	isOnlyShowUserInfoUpdatedAfterReview: boolean;
-	/** 排序字段 */
+	/** ソート対象のフィールド */
 	sortBy: string;
-	/** 排序方法 */
+	/** ソート順 */
 	sortOrder: string;
-	/** 查询 UID */
+	/** 検索するUID */
 	uid?: number;
-	/** 分页查询 */
+	/** ページネーション検索 */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページに表示する件数 */
 		pageSize: number;
 	};
 };
 
 /**
- * 管理员获取用户信息的请求响应
+ * 管理者がユーザー情報を取得するリクエストのレスポンス
  */
 export type AdminGetUserInfoResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 请求响应 */
+	/** リクエストのレスポンス */
 	result?: (
 		GetSelfUserInfoResponseDto["result"] & {
 			uid: number;
@@ -798,291 +798,291 @@ export type AdminGetUserInfoResponseDto = {
 			isUpdatedAfterReview: boolean;
 		}
 	)[];
-	/** 数据总长度 */
+	/** データ総数 */
 	totalCount: number;
 };
 
 /**
- * 管理员通过用户信息审核的请求载荷
+ * 管理者がユーザー情報レビューを承認するリクエストペイロード
  */
 export type ApproveUserInfoRequestDto = {
-	/** 用户的 UUID */
+	/** ユーザーのUUID */
 	UUID: string;
 };
 
 /**
- * 管理员通过用户信息审核的请求响应
+ * 管理者がユーザー情報レビューを承認するリクエストのレスポンス
  */
 export type ApproveUserInfoResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 管理员清空某个用户的信息的请求载荷
+ * 管理者が特定のユーザーの情報をクリアするリクエストペイロード
  */
 export type AdminClearUserInfoRequestDto = {
-	/** 用户的 UID */
+	/** ユーザーのUID */
 	uid: number;
 };
 
 /**
- * 管理员清空某个用户的信息的请求响应
+ * 管理者が特定のユーザーの情報をクリアするリクエストのレスポンス
  */
 export type AdminClearUserInfoResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 管理员编辑用户信息的请求载荷
+ * 管理者がユーザー情報を編集するリクエストペイロード
  */
 export type AdminEditUserInfoRequestDto = {
-	/** 用户的 UID */
+	/** ユーザーのUID */
 	uid: number;
-	/** 编辑用户的信息 */
+	/** 編集するユーザー情報 */
 	userInfo?: {
-		/** 用户名 */
+		/** ユーザー名 */
 		username?: string;
-		/** 用户昵称 */
+		/** ユーザーニックネーム */
 		userNickname?: string;
-		/** 用户头像的链接 */
+		/** ユーザーアバターのリンク */
 		avatar?: string;
-		/** 用户背景图片的链接 */
+		/** ユーザーのバナー画像のリンク */
 		userBannerImage?: string;
-		/** 用户的个性签名 */
+		/** ユーザーの自己紹介 */
 		signature?: string;
-		/** 用户的性别，男、女和自定义（字符串） */
+		/** ユーザーの性別、男性、女性、カスタム（文字列） */
 		gender?: string;
-		/** 用户生日 */
+		/** ユーザーの誕生日 */
 		userBirthday?: string;
-		/** 用户主页 Markdown */
+		/** ユーザープロフィールのMarkdown */
 		userProfileMarkdown?: string;
-		/** 审核状态 */
+		/** レビュー状態 */
 		isUpdatedAfterReview?: boolean;
 	};
 };
 
 /**
- * 管理员编辑用户信息的请求响应
+ * 管理者がユーザー情報を編集するリクエストのレスポンス
  */
 export type AdminEditUserInfoResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 已登录用户通过密码和 TOTP 验证码删除身份验证器的请求载荷
+ * ログイン済みユーザーがパスワードとTOTP認証コードで認証アプリを削除するリクエストペイロード
  */
 export type DeleteTotpAuthenticatorByTotpVerificationCodeRequestDto = {
-	/** 用户的 TOTP 验证器中的验证码 */
+	/** ユーザーのTOTP認証アプリの認証コード */
 	clientOtp: string;
-	/** 被哈希一次的密码 */
+	/** 一度ハッシュ化されたパスワード */
 	passwordHash: string;
 };
 
 /**
- * 已登录用户通过密码和邮箱验证码删除用户的身份验证器的请求响应
+ * ログイン済みユーザーがパスワードとメール認証コードでユーザーの認証アプリを削除するリクエストのレスポンス
  */
 export type DeleteTotpAuthenticatorByTotpVerificationCodeResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 是否正在冷却中 */
+	/** クールダウン中かどうか */
 	isCoolingDown?: boolean;
 };
 
 /**
- * 用户创建 TOTP 身份验证器的请求响应
+ * ユーザーがTOTP認証アプリを作成するリクエストのレスポンス
  */
 export type CreateUserTotpAuthenticatorResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 身份验证器是否已存在 */
+	/** 認証アプリが既に存在するかどうか */
 	isExists: boolean;
-	/** 如果已存在，则返回验证器的类型 */
+	/** 既に存在する場合、認証アプリのタイプを返す */
 	existsAuthenticatorType?: "email" | "totp";
-	/** TOTP 身份验证器信息 */
+	/** TOTP認証アプリ情報 */
 	result?: {
-		/** TOTP 的唯一 ID，验证器的二维码 */
+		/** TOTPのユニークID、認証アプリのQRコード */
 		otpAuth?: string;
 	};
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户创建 Email 身份验证器的请求响应
+ * ユーザーがEmail認証アプリを作成するリクエストのレスポンス
  */
 export type CreateUserEmailAuthenticatorResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 身份验证器是否已存在 */
+	/** 認証アプリが既に存在するかどうか */
 	isExists: boolean;
-	/** 如果已存在，则返回验证器的类型 */
+	/** 既に存在する場合、認証アプリのタイプを返す */
 	existsAuthenticatorType?: "email" | "totp";
-	/** Email 身份验证器信息 */
+	/** Email認証アプリ情報 */
 	result?: {
 		/** Email */
 		email?: string;
 		/** Email Lower Case */
 		emailLowerCase?: string;
 	};
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户确认绑定 TOTP 设备的请求载荷
+ * ユーザーがTOTPデバイスのバインドを確認するリクエストペイロード
  */
 export type ConfirmUserTotpAuthenticatorRequestDto = {
-	/** 用户设备中生成的 TOTP 验证码 */
+	/** ユーザーのデバイスで生成されたTOTP認証コード */
 	clientOtp: string;
-	/** TOTP 的唯一 ID */
+	/** TOTPのユニークID */
 	otpAuth: string;
 };
 
 /**
- * 用户确认绑定 TOTP 设备的请求响应
+ * ユーザーがTOTPデバイスのバインドを確認するリクエストのレスポンス
  */
 export type ConfirmUserTotpAuthenticatorResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 结果 */
+	/** 結果 */
 	result?: {
-		/** 验证器备份码 */
+		/** 認証アプリのバックアップコード */
 		backupCode?: string[];
-		/** 验证器恢复码 */
+		/** 認証アプリのリカバリーコード */
 		recoveryCode?: string;
 	};
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户发送 Email 身份验证器验证邮件的请求载荷
+ * ユーザーがEmail認証アプリの認証メールを送信するリクエストペイロード
  */
 export type SendUserEmailAuthenticatorVerificationCodeRequestDto = {
-	/** 用户邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
-	/** 在前端已经 Hash 过一次的的密码 */
+	/** フロントエンドで一度ハッシュ化されたパスワード */
 	passwordHash: string;
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
 };
 
 /**
- * 用户发送 Email 身份验证器验证邮件的请求响应
+ * ユーザーがEmail認証アプリの認証メールを送信するリクエストのレスポンス
  */
 export type SendUserEmailAuthenticatorVerificationCodeResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 是否达到超时时间 */
+	/** クールダウン期間に達したかどうか */
 	isCoolingDown: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户发送删除 Email 身份验证器验证邮件的请求载荷
+ * ユーザーがEmail認証アプリ削除の認証メールを送信するリクエストペイロード
  */
 export type SendDeleteUserEmailAuthenticatorVerificationCodeRequestDto = {
-	/** 用户客户端使用的语言 */
+	/** ユーザーのクライアントが使用する言語 */
 	clientLanguage: string;
 };
 
 /**
- * 用户发送删除 Email 身份验证器验证邮件的请求响应
+ * ユーザーがEmail認証アプリ削除の認証メールを送信するリクエストのレスポンス
  */
 export type SendDeleteUserEmailAuthenticatorVerificationCodeResponseDto = {} & SendUserEmailAuthenticatorVerificationCodeResponseDto;
 
 /**
- * 验证 Email 身份验证器的验证码是否正确的请求载荷
+ * Email認証アプリの認証コードが正しいか検証するリクエストペイロード
  */
 export type CheckEmailAuthenticatorVerificationCodeRequestDto = {
-	/** 用户的邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
-	/** 邮箱验证码 */
+	/** メール認証コード */
 	verificationCode: string;
 };
 
 /**
- * 验证 Email 身份验证器的验证码是否正确的请求响应
+ * Email認証アプリの認証コードが正しいか検証するリクエストのレスポンス
  */
 export type CheckEmailAuthenticatorVerificationCodeResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 用户删除 Email 2FA 的请求载荷
+ * ユーザーがEmail 2FAを削除するリクエストペイロード
  */
 export type DeleteUserEmailAuthenticatorRequestDto = {
-	/** 被哈希一次的密码 */
+	/** 一度ハッシュ化されたパスワード */
 	passwordHash: string;
-	/** 邮箱验证码 */
+	/** メール認証コード */
 	verificationCode: string;
 };
 
 /**
- * 用户删除 Email 2FA 的请求响应
+ * ユーザーがEmail 2FAを削除するリクエストのレスポンス
  */
 export type DeleteUserEmailAuthenticatorResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 检查 2FA 是否开启的请求载荷
+ * 2FAが有効かチェックするリクエストペイロード
  */
 export type CheckUserHave2FARequestDto = {
-	/** 用户的邮箱 */
+	/** ユーザーのメールアドレス */
 	email: string;
 };
 
 /**
- * 检查 2FA 是否开启的请求响应
+ * 2FAが有効かチェックするリクエストのレスポンス
  */
 export type CheckUserHave2FAResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 是否存在身份验证器 */
+	/** 認証アプリが存在するかどうか */
 	have2FA: boolean;
-	/** 如果存在，则返回 2FA 的类型 */
+	/** 存在する場合、2FAのタイプを返す */
 	type?: "email" | "totp";
-	/** 如果存在且结果为 totp，则返回 2FA 的创建时间 */
+	/** 存在し、結果がtotpの場合、2FAの作成日時を返す */
 	totpCreationDateTime?: number;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };
 
 /**
- * 根据 UUID 校验用户是否存在的请求载荷
+ * UUIDに基づいてユーザーが存在するか検証するリクエストペイロード
  */
 export type CheckUserExistsByUuidRequestDto = {
-	/** 用户的 UUID */
+	/** ユーザーのUUID */
 	uuid: string;
 };
 
 /**
- * 根据 UUID 校验用户是否存在的请求响应
+ * UUIDに基づいてユーザーが存在するか検証するリクエストのレスポンス
  */
 export type CheckUserExistsByUuidResponseDto = {
-	/** 执行结果 */
+	/** 実行結果 */
 	success: boolean;
-	/** 用户是否已存在 */
+	/** ユーザーが既に存在するかどうか */
 	exists: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
 };

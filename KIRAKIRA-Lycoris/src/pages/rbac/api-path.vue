@@ -20,7 +20,7 @@
 
 	const columns: DataTableColumns<NonNullable<RbacApiPath>[number]> = [
 		{
-			title: "API 路径",
+			title: "API パス",
 			key: "apiPath",
 			render: row => {
 				const color = row.isAssignedOnce && row.apiPathColor || "#EEEEEEFF";
@@ -28,20 +28,20 @@
 			},
 		},
 		{
-			title: "是否至少绑定到一个身份",
+			title: "少なくとも一つのロールに紐付いているか",
 			key: "isAssignedOnce",
 			render: row => <div id={`${row.apiPath}-isAssignedOnce-col`}><Icon name={row.isAssignedOnce ? "check" : "close"} /></div>,
 		},
 		{
-			title: "类型",
+			title: "タイプ",
 			key: "apiPathType",
 		},
 		{
-			title: "显示颜色",
+			title: "表示色",
 			key: "apiPathColor",
 		},
 		{
-			title: "备注",
+			title: "備考",
 			key: "apiPathDescription",
 		},
 		{
@@ -71,7 +71,7 @@
 	const rbacApiPathPageCount = computed(() => getPageCountByDataCount(rbacApiPathCount.value, pagination.pageSize));
 
 	/**
-	 * 获取 RBAC API 路径
+	 * RBAC APIパスを取得する
 	 */
 	async function fetchRbacApiPath() {
 		const getRbacApiPathRequest: GetRbacApiPathRequestDto = {
@@ -86,12 +86,12 @@
 			rbacApiPath.value = rbacApiPathResult.result;
 			rbacApiPathCount.value = rbacApiPathResult.count ?? 0;
 		} else
-			console.error("ERROR", "获取 RBAC API 路径失败。");
+			console.error("ERROR", "RBAC APIパスの取得に失敗しました。");
 	}
 
 	/**
-	 * 更新正在删除的 API 路径名，并打开删除 API 路径的表单
-	 * @param apiPathName 正在删除的 API 路径名
+	 * 削除中のAPIパス名を更新し、APIパス削除フォームを開く
+	 * @param apiPathName 削除中のAPIパス名
 	 */
 	function openDeleteApiPathModal(apiPahtName: string) {
 		currentDeletingApiPath.value = apiPahtName;
@@ -99,7 +99,7 @@
 	}
 
 	/**
-	 * 打开删除 API 路径的表单，并清除正在删除的 API 路径名
+	 * APIパス削除フォームを開き、削除中のAPIパス名をクリアする
 	 */
 	function closeDeleteApiPathModal() {
 		isShowDeleteApiPathModal.value = false;
@@ -107,8 +107,8 @@
 	}
 
 	/**
-	 * 删除 RBAC API 路径
-	 * @param apiPath 要删除的 RBAC API 路径的名字
+	 * RBAC APIパスを削除する
+	 * @param apiPath 削除するRBAC APIパスの名前
 	 */
 	async function deleteApiPath(apiPath: string) {
 		const deleteRbacApiPathRequest: DeleteRbacApiPathRequestDto = {
@@ -119,9 +119,9 @@
 
 		if (!deleteRbacApiPathResult.success || deleteRbacApiPathResult.isAssigned)
 			dialog.error({
-				title: "删除 RBAC API 路径失败",
+				title: "RBAC APIパスの削除に失敗しました",
 				content: deleteRbacApiPathResult.message,
-				positiveText: "知道了",
+				positiveText: "OK",
 			});
 		else
 			closeDeleteApiPathModal();
@@ -131,7 +131,7 @@
 	}
 
 	/**
-	 * 清空表单数据并开启创建 API 路径的模态框
+	 * フォームデータをクリアし、APIパス作成モーダルを開く
 	 */
 	function openCreateApiPathModal() {
 		createNewApiPathModal.value = { ...EMPTY_API_PATH_DATA };
@@ -139,7 +139,7 @@
 	}
 
 	/**
-	 * 关闭创建 API 路径的模态框并清空表单数据
+	 * APIパス作成モーダルを閉じ、フォームデータをクリアする
 	 */
 	function closeCreateApiPathModal() {
 		isShowCreateNewApiPathModal.value = false;
@@ -147,11 +147,11 @@
 	}
 
 	/**
-	 * 提交表单，创建新的 API 路径
+	 * フォームを送信し、新しいAPIパスを作成する
 	 */
 	async function createApiPath() {
 		if (!createNewApiPathModal.value.apiPath) {
-			console.error("ERROR", "创建 API 路径失败，参数不合法");
+			console.error("ERROR", "APIパスの作成に失敗しました、パラメータが不正です");
 			return;
 		}
 		isCreatingApiPath.value = true;
@@ -162,9 +162,9 @@
 			closeCreateApiPathModal();
 		else
 			dialog.error({
-				title: "创建新的 API 路径失败",
+				title: "新しいAPIパスの作成に失敗しました",
 				content: createRbacApiPathResult.message,
-				positiveText: "知道了",
+				positiveText: "OK",
 			});
 
 		isCreatingApiPath.value = false;
@@ -174,25 +174,25 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA RBAC API 路径管理</PageHeading>
+		<PageHeading>KIRAKIRA RBAC API パス管理</PageHeading>
 		<NCollapse class="mlb-4">
-			<NCollapseItem title="使用说明">
-				<NP>KIRAKIRA RBAC 权限控制的最小单位是 API 路径。</NP>
+			<NCollapseItem title="使用方法">
+				<NP>KIRAKIRA RBACの権限管理は、APIパスを最小単位として行われます。</NP>
 				<NUl>
-					<NLi>一个用户可以拥有多个身份</NLi>
-					<NLi>一个身份可以对应多位用户</NLi>
-					<NLi>一个身份可以拥有对多个 API 的访问权限</NLi>
-					<NLi>一个 API 可以对应多个身份</NLi>
+					<NLi>一人のユーザーは複数のロールを持つことができます</NLi>
+					<NLi>一つのロールは複数のユーザーに対応できます</NLi>
+					<NLi>一つのロールは複数のAPIへのアクセス権を持つことができます</NLi>
+					<NLi>一つのAPIは複数のロールに対応できます</NLi>
 				</NUl>
 				<NP>
-					你可以添加新的 API 路径，前提是后端中该 API 的 Controller 层受 RBAC 管制，否则添加 API 路径无效。<br />
-					你也可以删除 API 路径，前提是该 API 路径没有绑定到任何身份。
+					新しいAPIパスを追加できますが、そのためにはバックエンドの該当APIのController層がRBACで管理されている必要があります。そうでなければ、APIパスを追加しても無効です。<br />
+					また、APIパスを削除することもできますが、そのAPIパスがいかなるロールにも紐付いていないことが条件です。
 				</NP>
-				<NP>没有绑定到身份的 API 路径会显示为灰色，已经绑定到身份的 API 路径会显示用户设置的颜色。</NP>
+				<NP>どのロールにも紐付いていないAPIパスは灰色で表示され、ロールに紐付いているAPIパスはユーザーが設定した色で表示されます。</NP>
 			</NCollapseItem>
 		</NCollapse>
 		<NFlex class="mlb-2">
-			<NButton @click="openCreateApiPathModal"><template #icon><Icon name="add" /></template>新增</NButton>
+			<NButton @click="openCreateApiPathModal"><template #icon><Icon name="add" /></template>新規追加</NButton>
 		</NFlex>
 		<NDataTable
 			:columns="columns"
@@ -220,29 +220,29 @@
 			v-model:show="isShowCreateNewApiPathModal"
 			:maskClosable="false"
 			preset="card"
-			title="创建新 API 路径"
+			title="新しいAPIパスを作成"
 		>
 			<NForm>
-				<NFormItem label="API 路径的名字" :rule="{ required: true }">
-					<NInput :status="!createNewApiPathModal.apiPath ? 'error' : 'success'" v-model:value="createNewApiPathModal.apiPath" placeholder="（必填）唯一且简短的 API 路径名，例：/02/koa/hello" />
+				<NFormItem label="APIパス名" :rule="{ required: true }">
+					<NInput :status="!createNewApiPathModal.apiPath ? 'error' : 'success'" v-model:value="createNewApiPathModal.apiPath" placeholder="（必須）ユニークで短いAPIパス名、例：/02/koa/hello" />
 				</NFormItem>
-				<NFormItem label="API 路径的类型">
-					<NInput v-model:value="createNewApiPathModal.apiPathType" placeholder='用于标识 API 路径，例如 "video"' />
+				<NFormItem label="APIパスのタイプ">
+					<NInput v-model:value="createNewApiPathModal.apiPathType" placeholder='APIパスを識別するためのもの、例："video"' />
 				</NFormItem>
-				<NFormItem label="API 路径的显示颜色">
+				<NFormItem label="APIパスの表示色">
 					<NFlex vertical :size="0" class="is-full">
-						<small class="n-form-item-label text-xs min-bs-0">填写颜色可以更方便区分不同 API 路径</small>
+						<small class="n-form-item-label text-xs min-bs-0">色を設定すると、異なるAPIパスを区別しやすくなります</small>
 						<NColorPicker v-model:value="createNewApiPathModal.apiPathColor" :modes="['hex']" :showAlpha="true" />
 					</NFlex>
 				</NFormItem>
-				<NFormItem label="API 路径的介绍">
-					<NInput v-model:value="createNewApiPathModal.apiPathDescription" type="textarea" :autosize="{ minRows: 3 }" placeholder="API 路径的详细说明" />
+				<NFormItem label="APIパスの説明">
+					<NInput v-model:value="createNewApiPathModal.apiPathDescription" type="textarea" :autosize="{ minRows: 3 }" placeholder="APIパスの詳細な説明" />
 				</NFormItem>
 			</NForm>
 			<template #footer>
 				<NFlex class="justify-end">
-					<NButton @click="closeCreateApiPathModal">算了</NButton>
-					<NButton :disabled="!createNewApiPathModal.apiPath" :loading="isCreatingApiPath" type="primary" :secondary="true" @click="createApiPath">确认创建</NButton>
+					<NButton @click="closeCreateApiPathModal">キャンセル</NButton>
+					<NButton :disabled="!createNewApiPathModal.apiPath" :loading="isCreatingApiPath" type="primary" :secondary="true" @click="createApiPath">作成を確認</NButton>
 				</NFlex>
 			</template>
 		</NModal>
@@ -251,16 +251,16 @@
 			v-model:show="isShowDeleteApiPathModal"
 			:maskClosable="false"
 			preset="dialog"
-			:title="`确认要删除 API 路径 ${currentDeletingApiPath} 吗？`"
+			:title="`APIパス ${currentDeletingApiPath} を削除してもよろしいですか？`"
 		>
 
-			<NFormItem label="再次输入 API 路径的名字来确定删除">
-				<NInput v-model:value="userInputDeleteingApiPath" placeholder="API 路径名字" />
+			<NFormItem label="削除を確認するには、APIパス名を再度入力してください">
+				<NInput v-model:value="userInputDeleteingApiPath" placeholder="APIパス名" />
 			</NFormItem>
 
 			<template #action>
-				<NButton @click="closeDeleteApiPathModal">算了</NButton>
-				<NButton :disabled="currentDeletingApiPath !== userInputDeleteingApiPath" :loading="isDeletingApiPath" type="warning" :secondary="true" @click="deleteApiPath(currentDeletingApiPath)">确认删除</NButton>
+				<NButton @click="closeDeleteApiPathModal">キャンセル</NButton>
+				<NButton :disabled="currentDeletingApiPath !== userInputDeleteingApiPath" :loading="isDeletingApiPath" type="warning" :secondary="true" @click="deleteApiPath(currentDeletingApiPath)">削除を確認</NButton>
 			</template>
 		</NModal>
 	</div>

@@ -1,12 +1,12 @@
 /**
- * 获取预生产环境后端环境变量机密的请求响应
+ * ステージング環境のバックエンド環境変数シークレットを取得するリクエストのレスポンス
  */
 export type GetStgEnvBackEndSecretResponse = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 预生产环境后端环境变量机密 */
+	/** ステージング環境のバックエンド環境変数シークレット */
 	result: {
 		envs?: Record<string, string>;
 	};

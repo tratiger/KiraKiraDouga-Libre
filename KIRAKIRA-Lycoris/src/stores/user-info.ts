@@ -1,41 +1,41 @@
 export const useSelfUserInfoStore = defineStore("user-info", {
 	state: () => ({
 		/**
-		 * 是否执行了至少一次有效的用户校验？
+		 * 少なくとも一度、有効なユーザー検証が実行されたか？
 		 *
-		 * “至少一次有效的用户校验”的定义如下：
-		 * 1. 在 SSR 或 CSR 时成功获取了用户信息 `${USER_API_URI}/self`。
-		 * 2. 在 CSR 时校验用户 token 未通过。（尽管校验未通过，但这仍然是一次有效的校验）`${USER_API_URI}/check`
+		 * 「少なくとも一度の有効なユーザー検証」の定義は以下の通りです：
+		 * 1. SSRまたはCSR時にユーザー情報 `${USER_API_URI}/self` の取得に成功した。
+		 * 2. CSR時にユーザートークンの検証に失敗した。（検証には失敗したが、これも有効な検証の一環です）`${USER_API_URI}/check`
 		 *
-		 * // NOTE: “有效的校验”并不指用户校验通过，而是程序使用客户端提供（或者未提供）的、值得信赖的 Cookie 执行了至少一次用户校验。
-		 * // NOTE: 在某些需要严格校验或同时涉及到 SSR 与 CSR 的情况下，只有 isEffectiveCheckOnce 为 true 时，isLogined 以及其他 useSelfUserInfoStore 的属性才是有效、准确、可信的。
+		 * // NOTE: 「有効な検証」とは、ユーザー検証が成功したことを指すのではなく、プログラムがクライアントから提供された（または提供されなかった）信頼できるCookieを使用して、少なくとも一度ユーザー検証を実行したことを指します。
+		 * // NOTE: 厳格な検証が必要な場合や、SSRとCSRが両方関わる状況では、isEffectiveCheckOnceがtrueの場合にのみ、isLoginedおよび他のuseSelfUserInfoStoreのプロパティが有効、正確、信頼できるものとなります。
 		 */
 		isEffectiveCheckOnce: false,
-		/** 是否已经登录？ */
+		/** ログイン済みか？ */
 		isLogined: false,
-		/** 当前登录的用户的 UID */
+		/** 現在ログインしているユーザーのUID */
 		uid: undefined as undefined | number,
-		/** 用户的邮箱 */
+		/** ユーザーのメールアドレス */
 		userEmail: undefined as undefined | string,
-		/** 当前用户的注册时间 */
+		/** 現在のユーザーの登録日時 */
 		userCreateDateTime: 0,
-		/** 当前用户的身份 */
+		/** 現在のユーザーのロール */
 		roles: ["user"],
-		/** 当前登录的用户用户名。 */
+		/** 現在ログインしているユーザーのユーザー名。 */
 		username: "",
-		/** 当前登录的用户昵称 */
+		/** 現在ログインしているユーザーのニックネーム */
 		userNickname: "",
-		/** 当前登录的用户的头像 */
+		/** 現在ログインしているユーザーのアバター */
 		userAvatar: "",
-		/** 当前登录的用户的性别 */
+		/** 現在ログインしているユーザーの性別 */
 		gender: "",
-		/** 当前登录的用户的个性签名或简介 */
+		/** 現在ログインしているユーザーの自己紹介またはプロフィール */
 		signature: "",
-		/** 当前登录的用户的生日 */
+		/** 現在ログインしているユーザーの誕生日 */
 		birthday: 0,
-		/** 当前登录的用户的标签 */
+		/** 現在ログインしているユーザーのタグ */
 		tags: [] as string[],
-		/** 暂时从侧栏中隐藏头像？ */
+		/** サイドバーから一時的にアバターを隠すか？ */
 		tempHideAvatarFromSidebar: false,
 	}),
 });

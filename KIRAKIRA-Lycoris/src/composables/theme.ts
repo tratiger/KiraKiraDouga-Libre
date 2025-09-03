@@ -1,8 +1,8 @@
 import { darkTheme, lightTheme, useOsTheme as useOsThemeName, type GlobalThemeOverrides } from "naive-ui";
 
 /**
- * 获取系统主题配置。
- * @returns 系统主题配置。
+ * システムのテーマ設定を取得します。
+ * @returns システムのテーマ設定。
  */
 export function useOsTheme() {
 	const osThemeName = useOsThemeName();
