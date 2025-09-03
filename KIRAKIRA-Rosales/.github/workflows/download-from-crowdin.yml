@@ -11,7 +11,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # 获取完整历史记录，以便删除远程分支
+        fetch-depth: 0  # 完全な履歴を取得して、リモートブランチを削除できるようにする
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -49,11 +49,11 @@ jobs:
 
     - name: Generate translated files list
       run: |
-        # 确保获取最新分支信息
+        # 最新のブランチ情報を確実に取得する
         git fetch origin develop:develop
-        echo "由 GitHub Actions 自动生成的翻译更新 PR。" > pr_body.txt
-        echo "### 本次更新的翻译文件：" >> pr_body.txt
-        git diff --diff-filter=M --name-only develop..translations -- src/locales | grep -E '\.ts$' >> pr_body.txt || echo "无文件变动" >> pr_body.txt
+        echo "GitHub Actionsによって自動生成された翻訳更新PR。" > pr_body.txt
+        echo "### 今回更新された翻訳ファイル：" >> pr_body.txt
+        git diff --diff-filter=M --name-only develop..translations -- src/locales | grep -E '\.ts$' >> pr_body.txt || echo "ファイル変更なし" >> pr_body.txt
         echo "" >> pr_body.txt
 
     - name: Commit and push translations
@@ -61,7 +61,7 @@ jobs:
         mv src/locales/English.json src/locales/English.ts
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git commit -m "🌐 更新翻译" || echo "No changes to commit"
+        git commit -m "🌐 翻訳を更新" || echo "No changes to commit"
         git add .
         git push --set-upstream origin translations --force
 
@@ -71,7 +71,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: translations
         base: develop
-        commit-message: '🌐 更新翻译'
-        title: "🌐 更新翻译"
+        commit-message: '🌐 翻訳を更新'
+        title: "🌐 翻訳を更新"
         body-path: pr_body.txt
         labels: "translation, automated"

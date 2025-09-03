@@ -4,7 +4,7 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { CreateVideoTagRequestDto, GetVideoTagByTagIdRequestDto, SearchVideoTagRequestDto } from './VideoTagControllerDto.js'
 
 /**
- * 用户创建视频 TAG
+ * ユーザーが動画TAGを作成
  * @param ctx context
  * @param next context
  */
@@ -13,13 +13,13 @@ export const createVideoTagController = async (ctx: koaCtx, next: koaNext) => {
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
 	const createVideoTagRequest: CreateVideoTagRequestDto = {
-		/** 不同语言所对应的 TAG 名 */
+		/** 各言語に対応するTAG名 */
 		tagNameList: data.tagNameList,
 	}
 	const createVideoTagResponse = await createVideoTagService(createVideoTagRequest, uid, token)
@@ -29,14 +29,14 @@ export const createVideoTagController = async (ctx: koaCtx, next: koaNext) => {
 
 
 /**
- * 根据 TAG 名在数据库中搜索视频 TAG
+ * TAG名でデータベース内の動画TAGを検索
  * @param ctx context
  * @param next context
  */
 export const searchVideoTagController = async (ctx: koaCtx, next: koaNext) => {
 	const tagNameSearchKey = ctx.query.tagName as string
 	const searchVideoTagRequest: SearchVideoTagRequestDto = {
-		/** 搜索 TAG 的关键词 */
+		/** TAG検索キーワード */
 		tagNameSearchKey,
 	}
 	const searchVideoTagResponse = await searchVideoTagService(searchVideoTagRequest)
@@ -46,7 +46,7 @@ export const searchVideoTagController = async (ctx: koaCtx, next: koaNext) => {
 
 
 /**
- * 根据 TAG ID 在数据库中匹配视频 TAG
+ * TAG IDでデータベース内の動画TAGを検索
  * @param ctx context
  * @param next context
  */

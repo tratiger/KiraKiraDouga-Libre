@@ -1,20 +1,20 @@
 import bcrypt from 'bcrypt'
 
-const HASH_ROUND = 8 // Bcrypt Hash 轮次，数值越大越慢，越安全。 // WARN 千万不要改！
+const HASH_ROUND = 8 // Bcryptハッシュのラウンド数。数値が大きいほど処理が遅くなり、安全になります。 // WARN 絶対に変更しないでください！
 /**
- * 使用 Bcrypt Hash 一个密码
- * @param password 原密码
- * @returns 被 Hash 的密码
+ * Bcryptを使用してパスワードをハッシュ化します
+ * @param password 元のパスワード
+ * @returns ハッシュ化されたパスワード
  */
 export function hashPasswordSync(password: string): string {
 	return bcrypt.hashSync(password, HASH_ROUND)
 }
 
 /**
- * 校验被 Bcrypt Hash 过的密码
- * @param passwordOrigin 原密码
- * @param passwordHash 被 Bcrypt Hash 过的密码
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * Bcryptでハッシュ化されたパスワードを検証します
+ * @param passwordOrigin 元のパスワード
+ * @param passwordHash Bcryptでハッシュ化されたパスワード
+ * @returns 検証結果。有効な場合はtrue、無効な場合はfalseを返します
  */
 export function comparePasswordSync(passwordOrigin: string, passwordHash: string): boolean {
 	return bcrypt.compareSync(passwordOrigin, passwordHash)

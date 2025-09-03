@@ -1,10 +1,10 @@
 import crypto from 'crypto'
 
 /**
- * 生成不可预测的随机字符串，性能较差
+ * 予測不可能なランダムな文字列を生成します。パフォーマンスは比較的低いです
  *
- * @param length 生成的随机字符串的长度
- * @returns 随机字符串
+ * @param length 生成するランダムな文字列の長さ
+ * @returns ランダムな文字列
  */
 export const generateSecureRandomString = (length: number): string => {
 	try {
@@ -33,10 +33,10 @@ export const generateSecureRandomString = (length: number): string => {
 }
 
 /**
- * 生成可能被预测的随机字符串，性能较好 // WARN
+ * 予測可能なランダムな文字列を生成します。パフォーマンスは良好です // WARN
  *
- * @param length 生成的随机字符串的长度
- * @returns 随机字符串
+ * @param length 生成するランダムな文字列の長さ
+ * @returns ランダムな文字列
  */
 export const generateRandomString = (length: number): string => {
 	try {
@@ -59,13 +59,13 @@ export const generateRandomString = (length: number): string => {
 }
 
 /**
- * 返回一个区间中的随机整数（包括区间两端的数）
- * @param num1 第一个数
- * @param num2 第二个数
- * @returns 两个数区间的一个随机整数
+ * 指定された範囲内のランダムな整数を返します（両端の値を含む）
+ * @param num1 最初の数値
+ * @param num2 2番目の数値
+ * @returns 2つの数値の範囲内のランダムな整数
  */
 export const getRandomNumberInRange = (num1: number, num2: number): number => {
-	// 如果 num1 大于 num2，交换它们的值
+	// num1がnum2より大きい場合、それらの値を交換します
 	if (num1 > num2) {
 		[num1, num2] = [num2, num1]
 	}
@@ -73,24 +73,24 @@ export const getRandomNumberInRange = (num1: number, num2: number): number => {
 }
 
 /**
- * 生成不可预测的数字验证码
- * @param 验证码的位数
- * @returns 不可预测的数字验证码
+ * 予測不可能な数字の検証コードを生成します
+ * @param length 検証コードの桁数
+ * @returns 予測不可能な数字の検証コード
  */
 export const generateSecureVerificationNumberCode = (length: number): string => {
-	const buffer = crypto.randomBytes(length) // 生成 n 个随机字节
-	const code = Array.from(buffer, byte => (byte % 10).toString()).join('') // 从随机字节求模转化为数字
+	const buffer = crypto.randomBytes(length) // n個のランダムなバイトを生成します
+	const code = Array.from(buffer, byte => (byte % 10).toString()).join('') // ランダムなバイトを剰余演算で数値に変換します
 	return code
 }
 
 /**
- * 根据传入的长度和字符集，生成不可预测的随机字符串
- * @param length 随机字符串的位数
- * @param charset 随机字符串的字符集
- * @returns 不可预测的随机字符串
+ * 渡された長さと文字セットに基づいて、予測不可能なランダムな文字列を生成します
+ * @param length ランダムな文字列の桁数
+ * @param charset ランダムな文字列の文字セット
+ * @returns 予測不可能なランダムな文字列
  */
 export const generateSecureVerificationStringCode = (length: number, charset: string): string => {
-	const buffer = crypto.randomBytes(length) // 生成 n 个随机字节
-	const code = Array.from(buffer, byte => charset[byte % charset.length]).join('') // 从随机字节映射到字符集合
+	const buffer = crypto.randomBytes(length) // n個のランダムなバイトを生成します
+	const code = Array.from(buffer, byte => charset[byte % charset.length]).join('') // ランダムなバイトを文字セットにマッピングします
 	return code
 }

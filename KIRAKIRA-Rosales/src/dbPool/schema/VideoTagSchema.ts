@@ -1,40 +1,40 @@
 import { Schema } from 'mongoose'
 
 const VideoTagNameSchema = {
-	/** TAG 名称 - 非空 */
+	/** TAG名 - 空でないこと */
 	name: { type: String, required: true, unique: true },
-	/** 是否为该语言默认名 - 非空 */
+	/** この言語のデフォルト名かどうか - 空でないこと */
 	isDefault: { type: Boolean, required: true },
-	/** 是否为 TAG 原名 - 非空 */
+	/** TAGの元の名前かどうか - 空でないこと */
 	isOriginalTagName: { type: Boolean, required: false },
 }
 
 /**
- * 不同语言所对应的 TAG 名
+ * 各言語に対応するTAG名
  */
 const MultilingualVideoTagNameSchema = {
-	/** TAG 的语言 - 非空，原则上应该唯一 // WARN: 无法指定指定子文档的唯一索引，只能在业务上避免并做校验 */
+	/** TAGの言語 - 空でないこと、原則としてユニークであるべき // WARN: サブドキュメントにユニークインデックスを指定できないため、ビジネスロジックで重複を回避し、検証を行う必要があります */
 	lang: { type: String, required: true },
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するTAG名 */
 	tagName: { type: [VideoTagNameSchema], required: true },
 }
 
 /**
- * 视频 TAG 数据
+ * 動画TAGデータ
  */
 class VideoTagSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** TAG ID - 非空，唯一 */
+		/** TAG ID - 空でないこと、ユニーク */
 		tagId: { type: Number, required: true, unique: true },
-		/** 不同语言所对应的 TAG 名 */
+		/** 各言語に対応するTAG名 */
 		tagNameList: { type: [MultilingualVideoTagNameSchema], required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'video-tag'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const VideoTagSchema = new VideoTagSchemaFactory()

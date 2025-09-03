@@ -3,7 +3,7 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { AdminGetUserRolesByUidRequestDto, AdminUpdateUserRoleRequestDto, CreateRbacApiPathRequestDto, CreateRbacRoleRequestDto, DeleteRbacApiPathRequestDto, DeleteRbacRoleRequestDto, GetRbacApiPathRequestDto, GetRbacRoleRequestDto, UpdateApiPathPermissionsForRoleRequestDto } from './RbacControllerDto.js'
 
 /**
- * 创建 RBAC API 路径
+ * RBAC APIパスを作成
  * @param ctx context
  * @param next context
  */
@@ -12,7 +12,7 @@ export const createRbacApiPathController = async (ctx: koaCtx, next: koaNext) =>
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -29,7 +29,7 @@ export const createRbacApiPathController = async (ctx: koaCtx, next: koaNext) =>
 }
 
 /**
- * 删除 RBAC API 路径
+ * RBAC APIパスを削除
  * @param ctx context
  * @param next context
  */
@@ -38,7 +38,7 @@ export const deleteRbacApiPathController = async (ctx: koaCtx, next: koaNext) =>
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -52,7 +52,7 @@ export const deleteRbacApiPathController = async (ctx: koaCtx, next: koaNext) =>
 }
 
 /**
- * 获取 RBAC API 路径
+ * RBAC APIパスを取得
  * @param ctx context
  * @param next context
  */
@@ -67,7 +67,7 @@ export const getRbacApiPathController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -90,7 +90,7 @@ export const getRbacApiPathController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 创建 RBAC 角色
+ * RBACロールを作成
  * @param ctx context
  * @param next context
  */
@@ -99,7 +99,7 @@ export const createRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -116,7 +116,7 @@ export const createRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 删除 RBAC 角色
+ * RBACロールを削除
  * @param ctx context
  * @param next context
  */
@@ -125,7 +125,7 @@ export const deleteRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -139,7 +139,7 @@ export const deleteRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 获取 RBAC 角色
+ * RBACロールを取得
  * @param ctx context
  * @param next context
  */
@@ -154,7 +154,7 @@ export const getRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -177,7 +177,7 @@ export const getRbacRoleController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 为角色更新 API 路径权限
+ * ロールのAPIパス権限を更新
  * @param ctx context
  * @param next context
  */
@@ -186,7 +186,7 @@ export const updateApiPathPermissionsForRoleController = async (ctx: koaCtx, nex
 	const uuid = ctx.cookies.get('uuid') ?? ''
 	const token = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -201,7 +201,7 @@ export const updateApiPathPermissionsForRoleController = async (ctx: koaCtx, nex
 }
 
 /**
- * 管理员更新用户角色
+ * 管理者がユーザーロールを更新
  * @param ctx context
  * @param next context
  */
@@ -211,7 +211,7 @@ export const adminUpdateUserRoleController = async (ctx: koaCtx, next: koaNext) 
 	const adminUuid = ctx.cookies.get('uuid') ?? ''
 	const adminToken = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid: adminUuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -225,13 +225,13 @@ export const adminUpdateUserRoleController = async (ctx: koaCtx, next: koaNext) 
 	if ('uuid' in data && data.uuid) {
 		adminUpdateUserRoleRequest = {
 			uuid: data.uuid ?? '',
-			uid: undefined as never, // 触发类型校验
+			uid: undefined as never, // 型検証をトリガー
 			newRoles: data.newRoles ?? []
 		};
 	} else if ('uid' in data && data.uid !== undefined && data.uid !== null) {
 		adminUpdateUserRoleRequest = {
 			uid: data.uid ?? 0,
-			uuid: undefined as never, // 触发类型校验
+			uuid: undefined as never, // 型検証をトリガー
 			newRoles: data.newRoles ?? []
 		};
 	}
@@ -242,7 +242,7 @@ export const adminUpdateUserRoleController = async (ctx: koaCtx, next: koaNext) 
 }
 
 /**
- * 通过 uid 获取一个用户的角色
+ * uidでユーザーのロールを取得
  * @param ctx context
  * @param next context
  */
@@ -252,7 +252,7 @@ export const adminGetUserRolesByUidController = async (ctx: koaCtx, next: koaNex
 	const adminUuid = ctx.cookies.get('uuid') ?? ''
 	const adminToken = ctx.cookies.get('token') ?? ''
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid: adminUuid, apiPath: ctx.path }, ctx)) {
 		return
 	}

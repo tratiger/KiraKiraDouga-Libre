@@ -5,8 +5,8 @@ import type { estypes } from '@elastic/elasticsearch';
 
 type QueryDslQueryContainer = estypes.QueryDslQueryContainer;
 /**
- * 创建 Elasticsearch 连接，这个函数在整个应用的生命周期里应该只被调用一次（only in elasticsearchMiddleware.ts）
- * @returns Elasticsearch 客户端连接
+ * Elasticsearch接続を作成します。この関数はアプリケーションのライフサイクルで一度だけ呼び出されるべきです（only in elasticsearchMiddleware.ts）
+ * @returns Elasticsearchクライアント接続
  */
 export const connectElasticSearchCluster = async (): Promise<Client> => {
 	try {
@@ -15,22 +15,22 @@ export const connectElasticSearchCluster = async (): Promise<Client> => {
 		const ELASTICSEARCH_CLUSTER_HOST = process.env.ELASTICSEARCH_CLUSTER_HOST
 
 		if (!ELASTICSEARCH_ADMIN_USERNAME) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：ELASTICSEARCH_ADMIN_USERNAME 为空，请检查环境变量设置')
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：ELASTICSEARCH_ADMIN_USERNAMEが空です。環境変数の設定を確認してください')
 			process.exit()
 		}
 		if (!ELASTICSEARCH_ADMIN_PASSWORD) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：ELASTICSEARCH_ADMIN_PASSWORD 为空，请检查环境变量设置')
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：ELASTICSEARCH_ADMIN_PASSWORDが空です。環境変数の設定を確認してください')
 			process.exit()
 		}
 		if (!ELASTICSEARCH_CLUSTER_HOST) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：ELASTICSEARCH_CLUSTER_HOST 为空，请检查环境变量设置')
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：ELASTICSEARCH_CLUSTER_HOSTが空です。環境変数の設定を確認してください')
 			process.exit()
 		}
 
 		const ELASTICSEARCH_CLUSTER_HOST_LIST = ELASTICSEARCH_CLUSTER_HOST?.split(',')?.map(host => `https://${host}`)
 
 		if (!ELASTICSEARCH_CLUSTER_HOST_LIST || ELASTICSEARCH_CLUSTER_HOST_LIST?.length <= 0) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：ELASTICSEARCH_CLUSTER_HOST_LIST 为空，请检查环境变量设置，集群地址必须由以逗号分隔的集群地址和端口号组成，例：XXX.XXX.XXX.XXX:32000,YYY.YYY.YYY.YYY:32000,ZZZ.ZZZ.ZZZ.ZZZ:32000')
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：ELASTICSEARCH_CLUSTER_HOST_LISTが空です。環境変数の設定を確認してください。クラスターアドレスはカンマで区切られたクラスターアドレスとポート番号で構成する必要があります。例：XXX.XXX.XXX.XXX:32000,YYY.YYY.YYY.YYY:32000,ZZZ.ZZZ.ZZZ.ZZZ:32000')
 			process.exit()
 		}
 
@@ -41,14 +41,14 @@ export const connectElasticSearchCluster = async (): Promise<Client> => {
 				password: ELASTICSEARCH_ADMIN_PASSWORD,
 			},
 			tls: {
-				rejectUnauthorized: false, // 这将忽略 SSL 证书验证
+				rejectUnauthorized: false, // これによりSSL証明書の検証が無視されます
 			},
 		})
 
 		try {
 			await client.ping()
 		} catch (error) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：PING 返回了一个错误的结果：', error)
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：PINGがエラーを返しました：', error)
 			process.exit()
 		}
 
@@ -58,32 +58,32 @@ export const connectElasticSearchCluster = async (): Promise<Client> => {
 			console.info('Elasticsearch Cluster Connect successfully!')
 			console.info(`cluster_name: ${elasticsearchClusterInfoResult?.cluster_name}, cluster_uuid: ${elasticsearchClusterInfoResult?.cluster_uuid}, current_connect_name: ${elasticsearchClusterInfoResult?.name}, version: ${elasticsearchClusterInfoResult?.version?.number}, tagline: ${elasticsearchClusterInfoResult?.tagline}`)
 		} catch (error) {
-			console.error('ERROR', '创建或连接搜索引擎集群失败：INFO 返回了一个错误的结果：', error)
+			console.error('ERROR', '検索エンジンクラスターの作成または接続に失敗しました：INFOがエラーを返しました：', error)
 			process.exit()
 		}
 
 		return client
 	} catch (error) {
-		console.error('ERROR', '创建搜索引擎连接失败：connectElasticSearchCluster 意外终止：', error)
+		console.error('ERROR', '検索エンジン接続の作成に失敗しました：connectElasticSearchClusterが予期せず終了しました：', error)
 		process.exit()
 	}
 }
 
 /**
- * 从数据库集群中删除文档
- * @param client Elasticsearch 连接，应存放在 ctx 中
- * @param indexName 索引的名字，该字段应当与 schema 存放于同一个对象中（这样 schema 和 indexName 构成了绑定关系）
- * @param conditions 删除数据的条件
- * @returns 删除数据的结果，成功返回 true，失败返回 false
+ * データベースクラスターからドキュメントを削除します
+ * @param client Elasticsearch接続。ctxに保存されているべきです
+ * @param indexName インデックス名。このフィールドはスキーマと同じオブジェクトに配置する必要があります（スキーマとインデックス名が関連付けられるため）
+ * @param conditions データ削除の条件
+ * @returns 削除結果。成功した場合はtrue、失敗した場合はfalseを返します
  */
 export const deleteDataFromElasticsearchCluster = async (client: Client, indexName: string, conditions: Record<string, string | number>): Promise<boolean> => {
 	try {
-		// 构建 bool 查询条件
+		// boolクエリ条件を構築します
 		const mustConditions = Object.keys(conditions).map(field => ({
 			match: { [field]: conditions[field] },
 		}))
 
-		// 搜索满足条件的文档
+		// 条件に一致するドキュメントを検索します
 		const searchResponse = await client.search({
 			index: indexName,
 			body: {
@@ -95,9 +95,9 @@ export const deleteDataFromElasticsearchCluster = async (client: Client, indexNa
 			},
 		})
 
-		// 确保响应中包含 hits
+		// レスポンスにhitsが含まれていることを確認します
 		if (searchResponse.hits && searchResponse.hits.hits) {
-			// 遍历搜索结果并删除每个文档
+			// 検索結果をループして各ドキュメントを削除します
 			const hits = searchResponse.hits.hits
 			for (const hit of hits) {
 				await client.delete({
@@ -111,19 +111,19 @@ export const deleteDataFromElasticsearchCluster = async (client: Client, indexNa
 			return false
 		}
 	} catch (error) {
-		console.error('ERROR', '在搜索引擎中删除数据时出错，未知原因', error)
+		console.error('ERROR', '検索エンジンでのデータ削除中に不明なエラーが発生しました', error)
 		return false
 	}
 }
 
 /**
- * 向 Elasticsearch 集群插入数据，并刷新（如果 refreshFlag 为 true 则立即刷新，但默认为 false，等待集群自动刷新）
- * @param client Elasticsearch 连接，应存放在 ctx 中
- * @param indexName 索引的名字，该字段应当与 schema 存放于同一个对象中（这样 schema 和 indexName 构成了绑定关系）
- * @param schema 要插入的索引的 schema （在 Elasticsearch 中应该叫做：索引模板），主要功能是只是提供了泛型 T 并限定了 data 的类型，该字段应当与 indexName 存放于同一个对象中（这样 schema 和 indexName 构成了绑定关系）
- * @param data 要插入的数据，类型是根据 schema 的类型泛型推算而来
- * @param refreshFlag 在插入数据后是否立即刷新搜索（在高并发场景下不建议立即刷新搜索）
- * @returns 插入数据的结果，如果成功则返回 {success: true}，否则 {success: false}
+ * Elasticsearchクラスターにデータを挿入し、リフレッシュします（refreshFlagがtrueの場合は即時リフレッシュ、デフォルトはfalseでクラスターの自動リフレッシュを待ちます）
+ * @param client Elasticsearch接続。ctxに保存されているべきです
+ * @param indexName インデックス名。このフィールドはスキーマと同じオブジェクトに配置する必要があります（スキーマとインデックス名が関連付けられるため）
+ * @param schema 挿入するインデックスのスキーマ（Elasticsearchではインデックス・テンプレートと呼びます）。主な機能はジェネリックTを提供し、dataの型を限定することです。このフィールドはindexNameと同じオブジェクトに配置する必要があります
+ * @param data 挿入するデータ。型はスキーマの型から推論されます
+ * @param refreshFlag データ挿入後に即時リフレッシュするかどうか（高並列処理のシナリオでは非推奨）
+ * @returns 挿入結果。成功した場合は {success: true}、それ以外は {success: false} を返します
  */
 export const insertData2ElasticsearchCluster = async <T>(client: Client, indexName: string, schema: T, data: EsSchema2TsType<T>, refreshFlag: boolean = false): Promise< EsResultType< EsSchema2TsType<T> > > => {
 	try {
@@ -135,46 +135,46 @@ export const insertData2ElasticsearchCluster = async <T>(client: Client, indexNa
 				})
 				if (indexResult && indexResult.result) {
 					if (refreshFlag) {
-						// 在索引（v.）数据之后可以手动执行 refresh 才能显示在搜索结果里，如果不手动执行，集群会每隔一段时间自动执行一次
+						// データインデックス後、手動でrefreshを実行すると検索結果に表示されます。手動で実行しない場合、クラスターは一定時間ごとに自動で実行します
 						try {
 							const refreshResult = await client.indices.refresh({ index: indexName })
 							if (refreshResult) {
-								return { success: true, message: '向 Elasticsearch 插入数据成功，手动刷新搜索成功', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
+								return { success: true, message: 'Elasticsearchへのデータ挿入に成功し、手動リフレッシュにも成功しました', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
 							} else {
-								return { success: true, message: '向 Elasticsearch 插入数据成功，但刷新搜索的结果为空', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
+								return { success: true, message: 'Elasticsearchへのデータ挿入に成功しましたが、リフレッシュ結果が空です', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
 							}
 						} catch (error) {
-							console.warn('WARN', 'WARNING', '向 Elasticsearch 插入数据成功，但刷新搜索时出错', error)
-							return { success: true, message: '向 Elasticsearch 插入数据成功，但刷新搜索时出错', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
+							console.warn('WARN', 'WARNING', 'Elasticsearchへのデータ挿入に成功しましたが、リフレッシュ時にエラーが発生しました', error)
+							return { success: true, message: 'Elasticsearchへのデータ挿入に成功しましたが、リフレッシュ時にエラーが発生しました', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
 						}
 					} else {
-						return { success: true, message: '向 Elasticsearch 插入数据成功，请等待自动刷新', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
+						return { success: true, message: 'Elasticsearchへのデータ挿入に成功しました。自動リフレッシュをお待ちください', result: [indexResult.result] as unknown as EsSchema2TsType<T>[] }
 					}
 				} else {
-					console.error('ERROR', '向 Elasticsearch 插入数据时出错，索引（v.）数据的返回结果异常')
-					return { success: false, message: '向 Elasticsearch 插入数据时出错，索引（v.）数据的返回结果异常' }
+					console.error('ERROR', 'Elasticsearchへのデータ挿入中にエラーが発生しました。インデックス結果が異常です')
+					return { success: false, message: 'Elasticsearchへのデータ挿入中にエラーが発生しました。インデックス結果が異常です' }
 				}
 			} catch (error) {
-				console.error('ERROR', '向 Elasticsearch 插入数据时出错，索引（v.）数据时出错', error)
-				return { success: false, message: '向 Elasticsearch 插入数据时出错，索引（v.）数据时出错' }
+				console.error('ERROR', 'Elasticsearchへのデータ挿入中にエラーが発生しました。インデックス中にエラーが発生しました', error)
+				return { success: false, message: 'Elasticsearchへのデータ挿入中にエラーが発生しました。インデックス中にエラーが発生しました' }
 			}
 		} else {
-			console.error('ERROR', '向 Elasticsearch 插入数据时出错，schema、data、indexName 或 client 为空')
-			return { success: false, message: '向 Elasticsearch 插入数据时出错，必要的数据为空' }
+			console.error('ERROR', 'Elasticsearchへのデータ挿入中にエラーが発生しました。schema、data、indexName、またはclientが空です')
+			return { success: false, message: 'Elasticsearchへのデータ挿入中にエラーが発生しました。必要なデータが空です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '向 Elasticsearch 插入数据时出错，未知异常', error)
-		return { success: false, message: '向 Elasticsearch 插入数据时出错，未知异常' }
+		console.error('ERROR', 'Elasticsearchへのデータ挿入中に不明なエラーが発生しました', error)
+		return { success: false, message: 'Elasticsearchへのデータ挿入中に不明なエラーが発生しました' }
 	}
 }
 
 /**
- * 从 Elasticsearch 集群搜索数据
- * @param client Elasticsearch 连接，应存放在 ctx 中
- * @param indexName 索引的名字，该字段应当与 schema 存放于同一个对象中（这样 schema 和 indexName 构成了绑定关系）
- * @param schema 要插入的索引的 schema （在 Elasticsearch 中应该叫做：索引模板），主要功能是只是提供了泛型 T 并限定了 data 的类型，该字段应当与 indexName 存放于同一个对象中（这样 schema 和 indexName 构成了绑定关系）
- * @param query 查询的参数，类似于数据库的 WHERE，但 Elasticsearch 有一套自己的逻辑，建议参考官方文档。
- * @returns 查询的返回结果
+ * Elasticsearchクラスターからデータを検索します
+ * @param client Elasticsearch接続。ctxに保存されているべきです
+ * @param indexName インデックス名。このフィールドはスキーマと同じオブジェクトに配置する必要があります（スキーマとインデックス名が関連付けられるため）
+ * @param schema 挿入するインデックスのスキーマ（Elasticsearchではインデックス・テンプレートと呼びます）。主な機能はジェネリックTを提供し、dataの型を限定することです。このフィールドはindexNameと同じオブジェクトに配置する必要があります
+ * @param query クエリパラメータ。データベースのWHEREに似ていますが、Elasticsearch独自のロジックがあるため、公式ドキュメントを参照することをお勧めします。
+ * @returns クエリ結果
  */
 export const searchDataFromElasticsearchCluster = async <T>(client: Client, indexName: string, schema: T, query: QueryDslQueryContainer): Promise< EsResultType< EsSchema2TsType<T> > > => {
 	try {
@@ -187,25 +187,25 @@ export const searchDataFromElasticsearchCluster = async <T>(client: Client, inde
 				if (result && !isEmptyObject(result) && !result.timed_out) {
 					const hits = result?.hits?.hits
 					if (hits?.length && hits.length > 0) {
-						return { success: true, message: '在 Elasticsearch 搜索成功', result: hits.map(hit => hit._source as EsSchema2TsType<T>) }
+						return { success: true, message: 'Elasticsearchでの検索に成功しました', result: hits.map(hit => hit._source as EsSchema2TsType<T>) }
 					} else {
-						return { success: true, message: '在 Elasticsearch 搜索成功，但没有结果', result: [] }
+						return { success: true, message: 'Elasticsearchでの検索に成功しましたが、結果はありませんでした', result: [] }
 					}
 				} else {
-					console.error('ERROR', '在 Elasticsearch 搜索数据失败，返回结果为空或异常')
-					return { success: false, message: '在 Elasticsearch 搜索数据失败，返回结果为空或异常' }
+					console.error('ERROR', 'Elasticsearchでのデータ検索に失敗しました。結果が空か異常です')
+					return { success: false, message: 'Elasticsearchでのデータ検索に失敗しました。結果が空か異常です' }
 				}
 			} catch (error) {
-				console.error('ERROR', '在 Elasticsearch 搜索数据失败，搜索数据时出错', error)
-				return { success: false, message: '在 Elasticsearch 搜索数据失败，搜索数据时出错' }
+				console.error('ERROR', 'Elasticsearchでのデータ検索に失敗しました。検索中にエラーが発生しました', error)
+				return { success: false, message: 'Elasticsearchでのデータ検索に失敗しました。検索中にエラーが発生しました' }
 			}
 		} else {
-			console.error('ERROR', '在 Elasticsearch 搜索数据失败，必要的参数为空')
-			return { success: false, message: '在 Elasticsearch 搜索数据失败，必要的参数为空' }
+			console.error('ERROR', 'Elasticsearchでのデータ検索に失敗しました。必要なパラメータが空です')
+			return { success: false, message: 'Elasticsearchでのデータ検索に失敗しました。必要なパラメータが空です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '在 Elasticsearch 搜索数据失败，未知异常', error)
-		return { success: false, message: '在 Elasticsearch 搜索数据失败，未知异常' }
+		console.error('ERROR', 'Elasticsearchでのデータ検索に失敗しました。不明なエラーです', error)
+		return { success: false, message: 'Elasticsearchでのデータ検索に失敗しました。不明なエラーです' }
 	}
 }
 

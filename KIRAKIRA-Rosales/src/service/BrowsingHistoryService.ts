@@ -6,11 +6,11 @@ import { BrowsingHistorySchema } from '../dbPool/schema/BrowsingHistorySchema.js
 import { checkUserTokenByUuidService, checkUserTokenService, getUserUid } from './UserService.js'
 
 /**
- * 更新或创建用户浏览历史
- * @param createBrowsingHistoryRequest 更新或创建用户浏览历史请求载荷
- * @param uid 用户 ID
- * @param token 用户安全令牌
- * @returns 更新或创建用户浏览历史响应结果
+ * ユーザーの閲覧履歴を更新または作成する
+ * @param createBrowsingHistoryRequest ユーザーの閲覧履歴の更新または作成リクエストペイロード
+ * @param uid ユーザーID
+ * @param token ユーザーセキュリティトークン
+ * @returns ユーザーの閲覧履歴の更新または作成レスポンス結果
  */
 export const createOrUpdateBrowsingHistoryService = async (createOrUpdateBrowsingHistoryRequest: CreateOrUpdateBrowsingHistoryRequestDto, cookieUuid: string, token: string): Promise<CreateOrUpdateBrowsingHistoryResponseDto> => {
 	try {
@@ -18,30 +18,30 @@ export const createOrUpdateBrowsingHistoryService = async (createOrUpdateBrowsin
 		const nowDate = new Date().getTime()
 
 		if (!checkCreateOrUpdateBrowsingHistoryRequest(createOrUpdateBrowsingHistoryRequest)) {
-			console.error('ERROR', '更新或创建用户浏览历史时出错，参数不合法')
-			return { success: false, message: '更新或创建用户浏览历史时出错，参数不合法' }
+			console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、パラメータが不正です')
+			return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、パラメータが不正です' }
 		}
 
 		if (uuid !== cookieUuid) {
-			console.error('ERROR', '更新或创建用户浏览历史时出错，更新历史记录的目标用户与当前登录用户不一致，不允许更新其他用户的历史记录！')
-			return { success: false, message: '更新或创建用户浏览历史时出错，更新历史记录的目标用户与当前登录用户不一致，不允许更新其他用户的历史记录！' }
+			console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、履歴を更新する対象ユーザーが現在のログインユーザーと一致しません。他のユーザーの履歴を更新することは許可されていません！')
+			return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、履歴を更新する対象ユーザーが現在のログインユーザーと一致しません。他のユーザーの履歴を更新することは許可されていません！' }
 		}
 
 		if (!(await checkUserTokenByUuidService(cookieUuid, token)).success) {
-			console.error('ERROR', '更新或创建用户浏览历史时出错，用户校验失败')
-			return { success: false, message: '更新或创建用户浏览历史时出错，用户校验失败' }
+			console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、ユーザーの検証に失敗しました')
+			return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、ユーザーの検証に失敗しました' }
 		}
 
 		const uid = await getUserUid(uuid) 
 		if (uid === undefined || typeof uid !== 'number' || uid <= 0) {
-			console.error('ERROR', '更新或创建用户浏览历史时出错，UID 不存在', { uuid })
-			return { success: false, message: '更新或创建用户浏览历史时出错，UID 不存在' }
+			console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、UIDが存在しません', { uuid })
+			return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、UIDが存在しません' }
 		}
 
 		const { collectionName, schemaInstance } = BrowsingHistorySchema
 		type BrowsingHistoryType = InferSchemaType<typeof schemaInstance>
 
-		// 搜索数据
+		// データを検索
 		const BrowsingHistoryWhere: QueryType<BrowsingHistoryType> = {
 			UUID: uuid,
 			uid,
@@ -49,7 +49,7 @@ export const createOrUpdateBrowsingHistoryService = async (createOrUpdateBrowsin
 			id,
 		}
 
-		// 准备上传到 MongoDB 的数据
+		// MongoDBにアップロードするデータを準備
 		const BrowsingHistoryData: BrowsingHistoryType = {
 			UUID: uuid,
 			uid,
@@ -64,24 +64,24 @@ export const createOrUpdateBrowsingHistoryService = async (createOrUpdateBrowsin
 			const insert2MongoDResult = await findOneAndUpdateData4MongoDB(BrowsingHistoryWhere, BrowsingHistoryData, schemaInstance, collectionName)
 			const result = insert2MongoDResult.result
 			if (insert2MongoDResult.success && result) {
-				return { success: true, message: '更新或创建用户浏览历史成功', result: result as CreateOrUpdateBrowsingHistoryResponseDto['result'] }
+				return { success: true, message: 'ユーザーの閲覧履歴の更新または作成に成功しました', result: result as CreateOrUpdateBrowsingHistoryResponseDto['result'] }
 			}
 		} catch (error) {
-			console.error('ERROR', '更新或创建用户浏览历史时出错，插入数据时出错')
-			return { success: false, message: '更新或创建用户浏览历史时出错，插入数据时出错' }
+			console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、データの挿入中にエラーが発生しました')
+			return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、データの挿入中にエラーが発生しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '更新或创建用户浏览历史时出错，未知原因：', error)
-		return { success: false, message: '更新或创建用户浏览历史时出错，未知原因' }
+		console.error('ERROR', 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、原因不明：', error)
+		return { success: false, message: 'ユーザーの閲覧履歴の更新または作成中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * 获取全部或过滤后的用户浏览历史，按对某一内容的最后访问时间降序排序
- * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
- * @param uid 用户 ID
- * @param token 用户安全令牌
- * @returns 获取用户浏览历史的请求响应，全部或过滤后的用户浏览历史
+ * 全てまたはフィルタリングされたユーザーの閲覧履歴を取得し、特定のコンテンツへの最終アクセス時間で降順にソートする
+ * @param getUserBrowsingHistoryWithFilterRequest ユーザーの閲覧履歴取得リクエストペイロード
+ * @param uid ユーザーID
+ * @param token ユーザーセキュリティトークン
+ * @returns ユーザーの閲覧履歴取得リクエストレスポンス、全てまたはフィルタリングされたユーザーの閲覧履歴
  */
 export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHistoryWithFilterRequest: GetUserBrowsingHistoryWithFilterRequestDto, uid: number, token: string): Promise<GetUserBrowsingHistoryWithFilterResponseDto> => {
 	try {
@@ -89,7 +89,7 @@ export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHis
 			if ((await checkUserTokenService(uid, token)).success) {
 				const { collectionName, schemaInstance } = BrowsingHistorySchema
 
-				// TODO: 下方这个 Aggregate 只适用于视频历史记录的搜索
+				// TODO: 以下のAggregateは動画履歴の検索にのみ適用されます
 				const videoHistoryAggregateProps: PipelineStage[] = [
 					{
 						$match: {
@@ -99,7 +99,7 @@ export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHis
 					},
 					{
 						$addFields: {
-							id_number: { $toInt: '$id' }, // 将 video_id 从字符串转换为数字
+							id_number: { $toInt: '$id' }, // video_idを文字列から数値に変換
 						},
 					},
 					{
@@ -115,13 +115,13 @@ export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHis
 					},
 					{
 						$match: {
-							'video_info.title': { $regex: getUserBrowsingHistoryWithFilterRequest.videoTitle ?? '', $options: 'i' }, // 使用正则表达式进行模糊查询，不区分大小写
+							'video_info.title': { $regex: getUserBrowsingHistoryWithFilterRequest.videoTitle ?? '', $options: 'i' }, // 正規表現を使用してあいまい検索、大文字小文字を区別しない
 						},
 					},
 					{
 						$lookup: {
 							from: 'user-infos',
-							localField: 'video_info.uploaderId', // 假设视频表中有 author_id 字段
+							localField: 'video_info.uploaderId', // 動画テーブルにauthor_idフィールドがあると仮定
 							foreignField: 'uid',
 							as: 'uploader_info',
 						},
@@ -131,7 +131,7 @@ export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHis
 					},
 					{
 						$sort: {
-							lastUpdateDateTime: -1, // 按 lastUpdateDateTime 降序排序
+							lastUpdateDateTime: -1, // lastUpdateDateTimeで降順ソート
 						},
 					},
 					{
@@ -159,36 +159,36 @@ export const getUserBrowsingHistoryWithFilterService = async (getUserBrowsingHis
 					const browsingHistory = result.result
 					if (result.success && browsingHistory) {
 						if (browsingHistory.length > 0) {
-							return { success: true, message: '获取用户浏览历史成功', result: browsingHistory }
+							return { success: true, message: 'ユーザーの閲覧履歴の取得に成功しました', result: browsingHistory }
 						} else {
-							return { success: true, message: '用户的浏览历史为空', result: [] }
+							return { success: true, message: 'ユーザーの閲覧履歴は空です', result: [] }
 						}
 					} else {
-						console.error('ERROR', '获取用户浏览历史时出错，未获取到数据')
-						return { success: false, message: '获取用户浏览历史时出错，未获取到数据' }
+						console.error('ERROR', 'ユーザーの閲覧履歴取得中にエラーが発生しました、データが取得できませんでした')
+						return { success: false, message: 'ユーザーの閲覧履歴取得中にエラーが発生しました、データが取得できませんでした' }
 					}
 				} catch (error) {
-					console.error('ERROR', '获取用户浏览历史时出错，获取用户浏览历史数据失败')
-					return { success: false, message: '获取用户浏览历史时出错，获取用户浏览历史数据失败' }
+					console.error('ERROR', 'ユーザーの閲覧履歴取得中にエラーが発生しました、ユーザーの閲覧履歴データの取得に失敗しました')
+					return { success: false, message: 'ユーザーの閲覧履歴取得中にエラーが発生しました、ユーザーの閲覧履歴データの取得に失敗しました' }
 				}
 			} else {
-				console.error('ERROR', '获取用户浏览历史时出错，用户校验失败')
-				return { success: false, message: '获取用户浏览历史时出错，用户校验失败' }
+				console.error('ERROR', 'ユーザーの閲覧履歴取得中にエラーが発生しました、ユーザーの検証に失敗しました')
+				return { success: false, message: 'ユーザーの閲覧履歴取得中にエラーが発生しました、ユーザーの検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '获取用户浏览历史时出错，请求参数不合法')
-			return { success: false, message: '获取用户浏览历史时出错，请求参数不合法' }
+			console.error('ERROR', 'ユーザーの閲覧履歴取得中にエラーが発生しました、リクエストパラメータが不正です')
+			return { success: false, message: 'ユーザーの閲覧履歴取得中にエラーが発生しました、リクエストパラメータが不正です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取用户浏览历史时出错，未知原因：', error)
-		return { success: false, message: '获取用户浏览历史时出错，未知原因' }
+		console.error('ERROR', 'ユーザーの閲覧履歴取得中にエラーが発生しました、原因不明：', error)
+		return { success: false, message: 'ユーザーの閲覧履歴取得中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * 校验创建用户浏览历史的请求参数
- * @param createBrowsingHistoryRequest 创建用户浏览历史的请求参数
- * @returns 合法返回 true, 不合法返回 false
+ * ユーザーの閲覧履歴作成リクエストのパラメータを検証する
+ * @param createBrowsingHistoryRequest ユーザーの閲覧履歴作成リクエストのパラメータ
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateOrUpdateBrowsingHistoryRequest = (createOrUpdateBrowsingHistoryRequest: CreateOrUpdateBrowsingHistoryRequestDto): boolean => {
 	return (
@@ -199,12 +199,12 @@ const checkCreateOrUpdateBrowsingHistoryRequest = (createOrUpdateBrowsingHistory
 }
 
 /**
- * 校验获取用户浏览历史的请求载荷
- * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * ユーザーの閲覧履歴取得リクエストのペイロードを検証する
+ * @param getUserBrowsingHistoryWithFilterRequest ユーザーの閲覧履歴取得リクエストのペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetUserBrowsingHistoryWithFilterRequest = (getUserBrowsingHistoryWithFilterRequest: GetUserBrowsingHistoryWithFilterRequestDto): boolean => {
-	if (getUserBrowsingHistoryWithFilterRequest.videoTitle && getUserBrowsingHistoryWithFilterRequest.videoTitle.length > 200) { // 视频标题过滤字段存在，且长度大于 200 视为不合法
+	if (getUserBrowsingHistoryWithFilterRequest.videoTitle && getUserBrowsingHistoryWithFilterRequest.videoTitle.length > 200) { // 動画タイトルのフィルタリングフィールドが存在し、かつ長さが200を超える場合は不正とみなす
 		return false
 	} else {
 		return true

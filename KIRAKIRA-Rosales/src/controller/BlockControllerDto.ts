@@ -1,302 +1,302 @@
 import { type VideoTag } from "./VideoTagControllerDto.js";
 
 /**
- * 屏蔽用户的请求载荷
+ * ユーザーブロックリクエストペイロード
  */
 export type BlockUserByUidRequestDto = {
-	/** 被屏蔽的用户的 UID - 非空 */
+	/** ブロックされるユーザーのUID - 空でないこと */
 	blockUid: number;
 }
 
 /**
- * 屏蔽用户的请求响应
+ * ユーザーブロックレスポンス
  */
 export type BlockUserByUidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 隐藏用户的请求载荷
+ * ユーザー非表示リクエストペイロード
  */
 export type HideUserByUidRequestDto = {
-	/** 被隐藏的用户的 UID - 非空 */
+	/** 非表示にされるユーザーのUID - 空でないこと */
 	hideUid: number;
 }
 
 /**
- * 隐藏用户的请求响应
+ * ユーザー非表示レスポンス
  */
 export type HideUserByUidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 屏蔽标签的请求载荷
+ * タグブロックリクエストペイロード
  */
 export type BlockTagRequestDto = {
-	/* 屏蔽的标签 ID - 非空 */
+	/* ブロックするタグID - 空でないこと */
 	tagId: number;
 }
 
 /**
- * 屏蔽标签的请求响应
+ * タグブロックレスポンス
  */
 export type BlockTagResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 屏蔽关键词的请求载荷
+ * キーワードブロックリクエストペイロード
  */
 export type BlockKeywordRequestDto = {
-	/* 屏蔽的关键词 - 非空 */
+	/* ブロックするキーワード - 空でないこと */
 	blockKeyword: string;
 }
 
 /**
- * 屏蔽关键词的请求响应
+ * キーワードブロックレスポンス
  */
 export type BlockKeywordResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 添加正则表达式的请求载荷
+ * 正規表現追加リクエストペイロード
  */
 export type AddRegexRequestDto = {
-	/** 正则表达式 - 非空 */
+	/** 正規表現 - 空でないこと */
 	blockRegex: string;
-	/** 正则表达式的标志 - 非空 */
+	/** 正規表現のフラグ - 空でないこと */
 	// flag: string;
 }
 
 /**
- * 添加正则表达式的请求响应
+ * 正規表現追加レスポンス
  */
 export type AddRegexResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 用户是否输入了一个不安全的正则表达式 */
+	/** ユーザーが安全でない正規表現を入力したか */
 	unsafeRegex: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 取消屏蔽用户的请求载荷
+ * ユーザーブロック解除リクエストペイロード
  */
 export type UnblockUserByUidRequestDto = {
-	/** 被屏蔽的用户的 UID - 非空 */
+	/** ブロックされるユーザーのUID - 空でないこと */
 	blockUid: number;
 }
 
 /**
- * 取消屏蔽用户的请求响应
+ * ユーザーブロック解除レスポンス
  */
 export type UnblockUserByUidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 显示用户的请求载荷
+ * ユーザー表示リクエストペイロード
  */
 export type ShowUserByUidRequestDto = {
-	/** 被显示的用户的 UID - 非空 */
+	/** 表示するユーザーのUID - 空でないこと */
 	hideUid: number;
 }
 
 /**
- * 显示用户的请求响应
+ * ユーザー表示レスポンス
  */
 export type ShowUserByUidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 取消屏蔽标签的请求载荷
+ * タグブロック解除リクエストペイロード
  */
 export type UnblockTagRequestDto = {
-	/* 屏蔽的标签 ID - 非空 */
+	/* ブロックするタグID - 空でないこと */
 	tagId: number;
 }
 
 /**
- * 取消屏蔽标签的请求响应
+ * タグブロック解除レスポンス
  */
 export type UnblockTagResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 取消屏蔽关键词的请求载荷
+ * キーワードブロック解除リクエストペイロード
  */
 export type UnblockKeywordRequestDto = {
-	/** 屏蔽的关键词 - 非空 */
+	/** ブロックするキーワード - 空でないこと */
 	blockKeyword: string;
 }
 
 /**
- * 删除正则表达式的请求载荷
+ * 正規表現削除リクエストペイロード
  */
 export type RemoveRegexRequestDto = {
-	/** 正则表达式 - 非空 */
+	/** 正規表現 - 空でないこと */
 	blockRegex: string;
-	/** 正则表达式的标志 - 非空 */
+	/** 正規表現のフラグ - 空でないこと */
 	// flag: string;
 }
 
 /**
- * 删除正则表达式的请求响应
+ * 正規表現削除レスポンス
  */
 export type RemoveRegexResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 取消屏蔽关键词的请求响应
+ * キーワードブロック解除レスポンス
  */
 export type UnblockKeywordResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 获取屏蔽用户列表的请求载荷
+ * ブロックリスト取得リクエストペイロード
  */
 export type GetBlockListRequestDto = {
-	/** 屏蔽的类型 - 非空 */
+	/** ブロックタイプ - 空でないこと */
 	type: string;
-	/** 分页查询 */
+	/** ページネーションクエリ */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページあたりの表示件数 */
 		pageSize: number;
 	};
 }
 
 export type GetBlocklistResult = {
-	/** 屏蔽类型 */
+	/** ブロックタイプ */
 	type: string;
-	/** 屏蔽值 */
+	/** ブロック値 */
 	value: string;
-	/** 屏蔽时间 */
+	/** ブロック日時 */
 	createDateTime: number;
-	/** 被屏蔽用户 UID */
+	/** ブロックされたユーザーのUID */
 	uid?: number;
-	/** 被屏蔽用户名 */
+	/** ブロックされたユーザー名 */
 	username?: string;
-	/** 被屏蔽用户昵称 */
+	/** ブロックされたユーザーのニックネーム */
 	userNickname?: string;
-	/** 被屏蔽用户头像 */
+	/** ブロックされたユーザーのアバター */
 	avatar?: string;
-	/** 被屏蔽的 TAG */
+	/** ブロックされたTAG */
 	tag?: VideoTag;
 }
 
 /**
- * 获取屏蔽用户列表的请求响应
+ * ブロックリスト取得レスポンス
  */
 export type GetBlockListResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 黑名单数量 */
+	/** ブラックリスト数 */
 	blocklistCount?: number;
-	/** 屏蔽用户列表 */
+	/** ブロックユーザーリスト */
 	result?: GetBlocklistResult[];
 }
 
 /**
- * 检查内容是否被屏蔽的请求载荷
+ * コンテンツがブロックされているか確認するリクエストペイロード
  */
 export type CheckContentIsBlockedRequestDto = {
-	/** 检查的内容 */
+	/** 確認するコンテンツ */
 	content: string;
 }
 
 /**
- * 检查标签是否被屏蔽的请求载荷
+ * タグがブロックされているか確認するリクエストペイロード
  */
 export type CheckTagIsBlockedRequestDto = {
-	/** 检查的标签 ID */
+	/** 確認するタグID */
 	tagId: number[];
 }
 
 /**
- * 检查用户是否被屏蔽的请求载荷
+ * ユーザーがブロックされているか確認するリクエストペイロード
  */
 export type CheckUserIsBlockedRequestDto = {
-	/** 检查的用户 UID */
+	/** 確認するユーザーUID */
 	uid: number;
 }
 
 /**
- * 检测是否被其他用户屏蔽的请求载荷
+ * 他のユーザーにブロックされているか確認するリクエストペイロード
  */
 export type CheckIsBlockedByOtherUserRequestDto = {
-	/** 检查的内容 */
+	/** 確認するコンテンツ */
 	targetUid: number;
 }
 
-/** 检测是否被其他用户屏蔽的请求响应 */
+/** 他のユーザーにブロックされているか確認するレスポンス */
 export type CheckIsBlockedByOtherUserResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 是否被屏蔽 */
+	/** ブロックされているか */
 	isBlocked: boolean;
 }
 /**
- * 检查是否被屏蔽的请求响应
+ * ブロックされているか確認するレスポンス
  */
 export type CheckIsBlockedResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 是否被屏蔽 */
+	/** ブロックされているか */
 	isBlocked: boolean;
 }
 
 /**
- * 检查用户是否被屏蔽的请求响应
+ * ユーザーがブロックされているか確認するレスポンス
  */
 export type CheckUserIsBlockedResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 是否被屏蔽 */
+	/** ブロックされているか */
 	isBlocked: boolean;
-	/** 是否被隐藏 */
+	/** 非表示にされているか */
 	isHidden: boolean;
 }

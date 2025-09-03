@@ -3,7 +3,7 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { AddRegexRequestDto, BlockKeywordRequestDto, BlockTagRequestDto, BlockUserByUidRequestDto, GetBlockListRequestDto, HideUserByUidRequestDto, RemoveRegexRequestDto, ShowUserByUidRequestDto, UnblockKeywordRequestDto, UnblockTagRequestDto, UnblockUserByUidRequestDto } from './BlockControllerDto.js'
 
 /**
- * 屏蔽用户
+ * ユーザーをブロック
  * @param ctx context
  * @param next context
  */
@@ -20,7 +20,7 @@ export const blockUserByUidController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 隐藏用户
+ * ユーザーを非表示
  * @param ctx context
  * @param next context
  */
@@ -37,7 +37,7 @@ export const hideUserByUidController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 屏蔽关键词
+ * キーワードをブロック
  * @param ctx context
  * @param next context
  */
@@ -54,7 +54,7 @@ export const blockKeywordController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 屏蔽标签
+ * タグをブロック
  * @param ctx context
  * @param next context
  */
@@ -71,7 +71,7 @@ export const blockTagController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 添加正则表达式
+ * 正規表現を追加
  * @param ctx context
  * @param next context
  */
@@ -88,7 +88,7 @@ export const addRegexController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 解封用户
+ * ユーザーのブロックを解除
  * @param ctx context
  * @param next context
  */
@@ -105,7 +105,7 @@ export const unblockUserByUidController = async (ctx: koaCtx, next: koaNext) => 
 }
 
 /**
- * 显示用户
+ * ユーザーを表示
  * @param ctx context
  * @param next context
  */
@@ -122,7 +122,7 @@ export const showUserByUidController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 解封关键词
+ * キーワードのブロックを解除
  * @param ctx context
  * @param next context
  */
@@ -139,7 +139,7 @@ export const unblockKeywordController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 解封标签
+ * タグのブロックを解除
  * @param ctx context
  * @param next context
  */
@@ -156,7 +156,7 @@ export const unblockTagController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 删除正则表达式
+ * 正規表現を削除
  * @param ctx context
  * @param next context
  */
@@ -172,7 +172,7 @@ export const removeRegexController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 获取用户的黑名单列表
+ * ユーザーのブラックリストを取得
  * @param ctx context
  * @param next context
  */

@@ -1,5 +1,5 @@
 
-# 同步文件的机制还不成熟，暂不同步
+# ファイル同期の仕組みが未熟なため、一時的に同期しません
 
 # name: Sync Dto Files to Front-end Repo
 

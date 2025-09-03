@@ -1,13 +1,13 @@
 /**
- * 判断一个对象是否为空
+ * オブジェクトが空かどうかを判断します
  */
 export const isEmptyObject = (obj: object) => typeof obj === 'object' && !(Array.isArray(obj)) && Object.keys(obj).length === 0
 
 /**
- * 删除一个对象中值为 undefined 的元素，返回一个新对象
- * 底层原理是（浅）拷贝所有不为 undefined 的元素到新对象 
- * @param obj 需要被清理的存在元素的值为 undefined 的对象
- * @returns 清理了值为 undefined 的元素的对象
+ * オブジェクトから値がundefinedの要素を削除し、新しいオブジェクトを返します
+ * 基本的な原理は、undefinedでないすべての要素を新しいオブジェクトに（浅く）コピーすることです
+ * @param obj 値がundefinedの要素をクリーンアップする必要があるオブジェクト
+ * @returns 値がundefinedの要素がクリーンアップされたオブジェクト
  */
 export const clearUndefinedItemInObject = <T extends Record<string, any> >(obj: T): Partial<T> => {
 	const newObj: Partial<T> = {};

@@ -4,35 +4,35 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { EmitDanmakuRequestDto, GetDanmakuByKvidRequestDto } from './DanmakuControllerDto.js'
 
 /**
- * 用户发送弹幕
+ * ユーザーが弾幕を送信
  * @param ctx context
  * @param next context
- * @returns 发送弹幕的结果
+ * @returns 弾幕送信結果
  */
 export const emitDanmakuController = async (ctx: koaCtx, next: koaNext) => {
 	const data = ctx.request.body as Partial<EmitDanmakuRequestDto>
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
 	const emitDanmakuRequest: EmitDanmakuRequestDto = {
-		/** 非空 - KVID 视频 ID */
+		/** 空でないこと - KVID 動画ID */
 		videoId: data.videoId,
-		/** 非空 - 弹幕发送的时机，单位：秒（支持小数） */
+		/** 空でないこと - 弾幕送信タイミング、単位：秒（小数をサポート） */
 		time: data.time,
-		/** 非空 - 弾幕文本 */
+		/** 空でないこと - 弾幕テキスト */
 		text: data.text,
-		/** 非空 - 弾幕颜色 */
+		/** 空でないこと - 弾幕色 */
 		color: data.color,
-		/** 非空 - 弹幕字体大小，后端只存储三种数据，在前端再根据类型映射为 css 可用的像素 */
+		/** 空でないこと - 弾幕フォントサイズ。バックエンドは3種類のデータのみを保存し、フロントエンドでタイプに応じてCSSで利用可能なピクセルにマッピングします */
 		fontSize: data.fontSize,
-		/** 非空 - 弹幕发射模式，默认 'rtl' —— 从右舷向左发射 */
+		/** 空でないこと - 弾幕モード。デフォルトは'rtl'（右から左へ） */
 		mode: data.mode,
-		/** 非空 - 是否启用彩虹弹幕，默认不启用 */
+		/** 空でないこと - 虹色弾幕を有効にするか。デフォルトは無効 */
 		enableRainbow: data.enableRainbow,
 	}
 	const emitDanmakuResponse = await emitDanmakuService(emitDanmakuRequest, uuid, token)

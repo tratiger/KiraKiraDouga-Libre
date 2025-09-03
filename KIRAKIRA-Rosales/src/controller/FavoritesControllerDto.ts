@@ -1,64 +1,64 @@
 /**
- * 浏览的内容的类型
+ * 閲覧コンテンツのタイプ
  */
 export type BrowsingHistoryCategory = 'video' | 'photo' | 'comment'
 
 /**
- * 收藏夹
+ * お気に入り
  */
 type Favorites = {
-	/** 收藏夹唯一 ID - 非空 - 唯一 */
+	/** お気に入りID - 空でないこと - ユニーク */
 	favoritesId: number;
-	/** 收藏夹创建者 - 非空 */
+	/** お気に入り作成者 - 空でないこと */
 	creator: number;
-	/** 收藏夹其他维护者 */
+	/** その他のお気に入りメンテナー */
 	editor?: number[];
-	/** 收藏夹标题 - 非空 */
+	/** お気に入りタイトル - 空でないこと */
 	favoritesTitle: string;
-	/** 收藏夹简介 */
+	/** お気に入り紹介 */
 	favoritesBio?: string;
-	/** 收藏夹封面 */
+	/** お気に入りカバー */
 	favoritesCover?: string;
-	/** 收藏夹可见性 - 非空 - 1 公开，0 仅关注者，-1 私有‘ */
+	/** お気に入りの公開設定 - 空でないこと - 1: 公開, 0: フォロワーのみ, -1: 非公開 */
 	favoritesVisibility: number;
-	/** 收藏夹创建时间 - 非空 */
+	/** お気に入り作成日時 - 空でないこと */
 	favoritesCreateDateTime: number;
 }
 
 /**
- * 创建收藏夹的请求载荷
+ * お気に入り作成リクエストペイロード
  */
 export type CreateFavoritesRequestDto = {
-	/** 收藏夹标题 - 非空 */
+	/** お気に入りタイトル - 空でないこと */
 	favoritesTitle: string;
-	/** 收藏夹简介 */
+	/** お気に入り紹介 */
 	favoritesBio?: string;
-	/** 收藏夹封面 */
+	/** お気に入りカバー */
 	favoritesCover?: string;
-	/** 收藏夹的可见性 - 非空 */
+	/** お気に入りの公開設定 - 空でないこと */
 	favoritesVisibility: number;
 }
 
 /**
- * 创建收藏夹的请求响应
+ * お気に入り作成レスポンス
  */
 export type CreateFavoritesResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 如果成功，返回创建的这个收藏夹数据 */
+	/** 成功した場合、作成されたお気に入りデータを返す */
 	result?: Favorites;
 }
 
 /**
- * 获取某个用户的收藏夹
+ * 特定ユーザーのお気に入り取得
  */
 export type GetFavoritesResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 如果成功，返回用户所有的收藏夹 */
+	/** 成功した場合、ユーザーの全てのお気に入りを返す */
 	result?: Favorites[];
 }

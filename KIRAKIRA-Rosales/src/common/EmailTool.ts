@@ -2,7 +2,7 @@ import { SMTPClient } from 'emailjs'
 import { resolve } from 'path'
 
 /**
- * 邮件正文数据， text 和 html 二者至少一个不能为空
+ * メール本文のデータ、textとhtmlのどちらかは空にできません
  */
 type EmailBodyType =
 	| { text: string; html?: string }
@@ -10,11 +10,11 @@ type EmailBodyType =
 	| { text: string; html: string }
 
 /**
- * 发送电子邮件
- * @param to 收件人
- * @param title 电子邮件的标题（subject）
- * @param body 电子邮件的正文，详见 EmailBodyType
- * @returns 发送电子邮件的结果
+ * 電子メールを送信する
+ * @param to 受信者
+ * @param title 電子メールの件名（subject）
+ * @param body 電子メールの本文、詳細はEmailBodyTypeを参照
+ * @returns 電子メールの送信結果
  */
 export const sendMail = async (to: string, title: string, body: EmailBodyType) => {
 	const smtpHost = process.env.SMTP_ENDPOINT
@@ -24,77 +24,77 @@ export const sendMail = async (to: string, title: string, body: EmailBodyType) =
 	const KIRAKIRA_EMAIL_SENDER_ADDRESS = 'KIRAKIRA <no-reply@kirakira.moe>'
 
 	if (!smtpHost) {
-		console.error('ERROR', '发送邮件失败，环境变量中的 smtpHost 为空')
+		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpHostが空です')
 		throw new Error('Unable send email because the smtpHost is null')
 	}
 
 	if (smtpPort === undefined || smtpPort === null) {
-		console.error('ERROR', '发送邮件失败，环境变量中的 smtpPort 为空或不是合法的端口')
+		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpPortが空か、不正なポートです')
 		throw new Error('Unable send email because the smtpPort is null')
 	}
 
 	if (!smtpUsername) {
-		console.error('ERROR', '发送邮件失败，环境变量中的 smtpUsername 为空')
+		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpUsernameが空です')
 		throw new Error('Unable send email because the smtpUsername is null')
 	}
 
 	if (!smtpPassword) {
-		console.error('ERROR', '发送邮件失败，环境变量中的 smtpPassword 为空')
+		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpPasswordが空です')
 		throw new Error('Unable send email because the smtpPassword is null')
 	}
 
 	if (!to) {
-		console.error('ERROR', '发送邮件失败，收件人为空')
+		console.error('ERROR', 'メールの送信に失敗しました。受信者が空です')
 		throw new Error('Unable to send the mail, Recipient(TO) is empty')
 	}
 
 	if (!title) {
-		console.error('ERROR', '发送邮件失败，邮件标题 (subject) 为空')
+		console.error('ERROR', 'メールの送信に失敗しました。メールの件名（subject）が空です')
 		throw new Error('Unable to send the mail, email title (subject) is empty')
 	}
 
 	if (title.length > 200) {
-		console.warn('WARN', 'WARNING', '警告：当前邮件标题 (subject) 长度超过 200 字，请降低长度，长度超过 1000 字的邮件无法发送。')
+		console.warn('WARN', 'WARNING', '警告：現在のメールの件名（subject）の長さが200文字を超えています。長さを短くしてください。1000文字を超えるとメールは送信できません。')
 	}
 
 	if (title.length > 1000) {
-		console.error('ERROR', '发送邮件失败，邮件标题 (subject) 过长')
+		console.error('ERROR', 'メールの送信に失敗しました。メールの件名（subject）が長すぎます')
 		throw new Error('Unable to send the mail, title (subject) is too long')
 	}
 
 	if (!body.text && !body.html) {
-		console.error('ERROR', '发送邮件失败，邮件体 body 中的 text 和 html 为空，请至少提供一个正文数据')
+		console.error('ERROR', 'メールの送信に失敗しました。メール本文のtextとhtmlが両方とも空です。少なくとも一方のデータを提供してください')
 		throw new Error('Unable to send the mail, text and html in body in null')
 	}
 
-	// 配置 SMTP 客户端，并指定端口
+	// SMTPクライアントを設定し、ポートを指定します
 	const client = new SMTPClient({
-		user: smtpUsername, // 你的 SMTP 用户名
-		password: smtpPassword, // 你的 SMTP 密码
-		host: smtpHost, // 根据你的区域选择合适的 SMTP 服务器地址
-		port: parseInt(smtpPort, 10), // 指定端口（例如 587 或 465）
-		tls: true, // 启用 TLS
+		user: smtpUsername, // あなたのSMTPユーザー名
+		password: smtpPassword, // あなたのSMTPパスワード
+		host: smtpHost, // あなたの地域に応じて適切なSMTPサーバーアドレスを選択してください
+		port: parseInt(smtpPort, 10), // ポートを指定します（例：587または465）
+		tls: true, // TLSを有効にする
 		ssl: false,
 	})
 
-	// 配置邮件内容
+	// メール内容を設定
 	const message = {
 		text: body.text,
-		from: KIRAKIRA_EMAIL_SENDER_ADDRESS, // 发件人邮箱地址
-		to, // 收件人邮箱地址
-		subject: title, // 邮件主题
+		from: KIRAKIRA_EMAIL_SENDER_ADDRESS, // 送信者のメールアドレス
+		to, // 受信者のメールアドレス
+		subject: title, // メールの件名
 		attachment: [
 			{
 				data: body.html,
 				alternative: true,
 			},
-			// #region 内嵌附件图片
+			// #region 添付画像を埋め込む
 			/* {
 				path: resolve(import.meta.dirname, "../assets/images", "background.png"),
 				type: "image/png",
 				headers: { "Content-ID": "<background>" },
 			}, */
-			// 糟糕，许多邮箱不支持 CSS background-image 的内嵌图片显示！
+			// 残念ながら、多くのメールクライアントはCSSのbackground-imageによる埋め込み画像表示をサポートしていません！
 			{
 				path: resolve(import.meta.dirname, "../assets/images", "banner.png"),
 				type: "image/png",
@@ -106,17 +106,17 @@ export const sendMail = async (to: string, title: string, body: EmailBodyType) =
 
 	try {
 		const result = await client.sendAsync(message)
-		return { success: true, result, message: '邮件发送成功' }
+		return { success: true, result, message: 'メールの送信に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '发送邮件失败，发送出错', error)
-		return { success: false, result: undefined, message: '邮件发送失败' }
+		console.error('ERROR', 'メールの送信に失敗しました、エラーが発生しました', error)
+		return { success: false, result: undefined, message: 'メールの送信に失敗しました' }
 	}
 }
 
 /**
- * 验证 Email 地址是否合法
- * @param email 被验证的 Email 地址
- * @returns 验证结果，不合法返回 true
+ * Emailアドレスが有効かどうかを検証します
+ * @param email 検証対象のEmailアドレス
+ * @returns 検証結果、無効な場合はtrueを返します
  */
 export function isInvalidEmail(email: string): boolean {
 	return !email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]{2,}$/)

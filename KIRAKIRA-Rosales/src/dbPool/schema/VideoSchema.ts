@@ -1,118 +1,118 @@
 import { Schema } from 'mongoose'
 
 /**
- * 分P 视频的数据
+ * パート別動画データ
  */
 const VideoPartSchema = {
-	/** 分P 视频的顺序 - 非空 */
+	/** パート動画の順序 - 空でないこと */
 	id: { type: Number, required: true },
-	/** 每 P 视频的标题 - 非空 */
+	/** 各パート動画のタイトル - 空でないこと */
 	videoPartTitle: { type: String, required: true },
-	/** 每 P 视频的链接 - 非空 */
+	/** 各パート動画のリンク - 空でないこと */
 	link: { type: String, required: true },
-	/** 系统专用字段-最后编辑时间 - 非空 */
+	/** システム専用フィールド - 最終編集日時 - 空でないこと */
 	editDateTime: { type: Number, required: true },
 }
 
 const VideoTagNameSchema = {
-	/** TAG 名称 - 非空 */
+	/** TAG名 - 空でないこと */
 	name: { type: String, required: true },
-	/** 是否为该语言默认名 - 非空 */
+	/** この言語のデフォルト名かどうか - 空でないこと */
 	isDefault: { type: Boolean, required: true },
-	/** 是否为 TAG 原名 - 非空 */
+	/** TAGの元の名前かどうか - 空でないこと */
 	isOriginalTagName: { type: Boolean, required: false },
 }
 
 /**
- * 不同语言所对应的 TAG 名
+ * 各言語に対応するTAG名
  */
 const MultilingualVideoTagNameSchema = {
-	/** TAG 的语言 - 非空，原则上应该唯一 // WARN: 无法指定指定子文档的唯一索引，只能在业务上避免并做校验 */
+	/** TAGの言語 - 空でないこと、原則としてユニークであるべき // WARN: サブドキュメントにユニークインデックスを指定できないため、ビジネスロジックで重複を回避し、検証を行う必要があります */
 	lang: { type: String, required: true },
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するTAG名 */
 	tagName: { type: [VideoTagNameSchema], required: true },
 }
 
 /**
- * 视频 TAG 数据
+ * 動画TAGデータ
  */
 const VideoTagSchema = {
-	/** TAG ID - 非空，唯一 */
+	/** TAG ID - 空でないこと、ユニーク */
 	tagId: { type: Number, required: true },
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するTAG名 */
 	tagNameList: { type: [MultilingualVideoTagNameSchema], required: true },
-	/** 系统专用字段-最后编辑时间 - 非空 */
+	/** システム専用フィールド - 最終編集日時 - 空でないこと */
 	editDateTime: { type: Number, required: true },
 }
 
 /**
- * 视频数据
+ * 動画データ
  */
 class VideoSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** KVID 视频 ID - 非空 - 唯一 */
+		/** KVID 動画ID - 空でないこと - ユニーク */
 		videoId: { type: Number, unique: true, required: true },
-		/** 视频标题 - 非空 */
+		/** 動画タイトル - 空でないこと */
 		title: { type: String, required: true },
-		/** 分 P 视频的数据 - 非空 */
+		/** パート別動画データ - 空でないこと */
 		videoPart: { type: [VideoPartSchema], required: true },
-		/** 封面图链接 - 非空 */
+		/** カバー画像リンク - 空でないこと */
 		image: { type: String, required: true },
-		/** 视频上传的日期，时间戳格式 - 非空 */
+		/** 動画アップロード日、タイムスタンプ形式 - 空でないこと */
 		uploadDate: { type: Number, required: true },
-		/** 视频播放量 - 非空 */
+		/** 動画再生数 - 空でないこと */
 		watchedCount: { type: Number, required: true },
-		/** 创作者 UUID - 非空 */
+		/** 作成者UUID - 空でないこと */
 		uploaderUUID: { type: String, required: true },
-		/** 创作者 UID - 非空 */
+		/** 作成者UID - 空でないこと */
 		uploaderId: { type: Number, required: true },
-		/** 视频时长，单位 ms - 非空 */
+		/** 動画時間、単位ms - 空でないこと */
 		duration: { type: Number, required: true },
-		/** 视频描述 */
+		/** 動画説明 */
 		description: String,
-		/** 视频分区 - 非空 */
+		/** 動画カテゴリ - 空でないこと */
 		videoCategory: { type: String, required: true },
-		/** 视频版权 - 非空 */
+		/** 動画著作権 - 空でないこと */
 		copyright: { type: String, required: true },
 		/** 原作者 */
 		originalAuthor: { type: String, required: false },
-		/** 原视频链接 */
+		/** 元動画リンク */
 		originalLink: { type: String, required: false },
-		/** 是否发布到动态 - 非空 */
+		/** フィードに投稿するかどうか - 空でないこと */
 		pushToFeed: { type: Boolean, required: true },
-		/** 声明为原创 - 非空 */
+		/** オリジナルとして宣言 - 空でないこと */
 		ensureOriginal: { type: Boolean, required: true },
-		/** 视频 TAG - 非空 */
+		/** 動画TAG - 空でないこと */
 		videoTagList: { type: [VideoTagSchema], required: true },
-		/** 是否待审核 - 非空 */
+		/** レビュー待ちかどうか - 空でないこと */
 		pendingReview: { type: Boolean, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'video'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const VideoSchema = new VideoSchemaFactory()
 
 /**
- * 已删除的视频数据表
+ * 削除済み動画データテーブル
  */
 class RemovedVideoSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 原来的视频数据集合 */
+		/** 元の動画データコレクション */
 		...VideoSchema.schema,
-		/** 操作者 UUID - 非空 */
+		/** 操作者UUID - 空でないこと */
 		_operatorUUID_: { type: String, required: true },
-		/** 操作者 UID - 非空 */
+		/** 操作者UID - 空でないこと */
 		_operatorUid_: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'removed-video'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const RemovedVideoSchema = new RemovedVideoSchemaFactory()
