@@ -1,19 +1,19 @@
-# 代码片段
-本项目已增加部分常用代码片段以便快速调用。
+# コードスニペット
+このプロジェクトには、素早く呼び出すための一般的なコードスニペットがいくつか追加されています。
 
-目前仅支持 Visual Studio Code，对于其它编辑器 / IDE，请您手动补充。
+現在、Visual Studio Codeのみをサポートしています。他のエディタ/IDEについては、手動で追加してください。
 
 ## 使用方法
-* 例如在 `*.vue` 文件中，仅需输入 `init`，然后按键盘上的 <kbd>TAB</kbd> 键，即可快速插入该代码片段。
-* 部分代码片段支持多个前缀指令，输入任意一个均可。
+* 例えば、`*.vue` ファイル内で `init` と入力し、キーボードの <kbd>TAB</kbd> キーを押すだけで、コードスニペットを素早く挿入できます。
+* 一部のコードスニペットは複数のプレフィックスコマンドをサポートしており、いずれかを入力すれば使用できます。
 
-## 范例
+## 例
 
 ### Vue
 
 #### `init`<br />`vue`
 
-快速初始化 Vue 组件模板。
+Vueコンポーネントのテンプレートを素早く初期化します。
 
 ```html
 <docs>
@@ -39,13 +39,13 @@
 	
 </i18n>
 ```
-`<i18n>` 代码块由于不方便字符串复用而暂停使用，改为在 locales 目录下单独文件存放语言。
+`<i18n>` コードブロックは、文字列の再利用が不便なため使用を中止し、代わりにlocalesディレクトリ内の個別ファイルに言語を格納するように変更しました。
 
 ### TypeScript
 
 #### `props`
 
-快速定义 Vue 组件属性。
+Vueコンポーネントのプロパティを素早く定義します。
 
 ```typescript
 const props = withDefaults(defineProps<{
@@ -57,7 +57,7 @@ const props = withDefaults(defineProps<{
 
 #### `emits`
 
-快速定义 Vue 组件事件。
+Vueコンポーネントのイベントを素早く定義します。
 
 ```typescript
 const emits = defineEmits<{
@@ -67,26 +67,26 @@ const emits = defineEmits<{
 
 #### `model`
 
-快速定义 Vue 组件双向绑定模型。
+Vueコンポーネントの双方向バインディングモデルを素早く定義します。
 
 ```typescript
 const model = defineModel<boolean>();
 const value = withOneWayProp(model, () => props.value);
 ```
 
-### 通用
+### 共通
 
 #### `#region`
 
-快速定义开始折叠节。
+折りたたみ領域の開始を素早く定義します。
 
 ```typescript
-// #region [输入节标题]
+// #region [セクションタイトルを入力]
 ```
 
 #### `#endregion`
 
-快速定义结束折叠节。
+折りたたみ領域の終了を素早く定義します。
 
 ```typescript
 // #endregion

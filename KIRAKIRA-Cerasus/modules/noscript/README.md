@@ -1,8 +1,8 @@
 # @KIRAKIRA-DOUGA/noscript
 
-KIRAKIRA 的未启用 JavaScript 警告提示。
+KIRAKIRA の JavaScript が有効でない場合の警告表示。
 
-由于 Vue 的特性，无法使用组件来实现这一效果。转而使用外部模块的方式来实现。
+Vue の特性上、コンポーネントを使用してこの効果を実現することはできません。代わりに外部モジュール方式で実現しています。
 
-### 样式范例：
+### スタイル例：
 ![example](example.png)

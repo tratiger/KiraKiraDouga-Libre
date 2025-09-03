@@ -1,4 +1,4 @@
-# [KIRAKIRA☆DOUGA](https://github.com/KIRAKIRA-DOUGA) 项目旗下仓库本地开发服务器端口声明
+# [KIRAKIRA☆DOUGA](https://github.com/KIRAKIRA-DOUGA) プロジェクト傘下リポジトリのローカル開発サーバーポート宣言
 
 ## [KIRAKIRA-Cerasus](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus)
 https://localhost:3000/
