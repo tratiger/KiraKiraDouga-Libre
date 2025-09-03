@@ -1,26 +1,24 @@
-# KIRAKIRA-Rosales 开发文档
+# KIRAKIRA-Rosales 開発ドキュメント
 
-## 一、前言
+## I. はじめに
 
-KIRAKIRA-Rosales（下文简称：“Rosales” 或 “后端”）是一个基于 Koa 框架的、RESTful 的后端 API.
+KIRAKIRA-Rosales（以下、「Rosales」または「バックエンド」）は、KoaフレームワークをベースにしたRESTfulなバックエンドAPIです。
 
-本文档主要内容如下：
-1. 如何针对现有代码进行二次开发。
-2. 与后端相关的基础设施的知识，例如数据库、搜索引擎和集群部署等。
+このドキュメントの主な内容は次のとおりです：
+1. 既存のコードを二次開発する方法。
+2. データベース、検索エンジン、クラスタ展開など、バックエンド関連のインフラ知識。
 
-在编写本文档时，我假设您已经具有一定的编程知识，包括：掌握 [JavaScript](https://developer.mozilla.org/docs/Web/JavaScript) & [TypeScript](https://www.typescriptlang.org/) 的基础语法、理解 [HTTP](https://developer.mozilla.org/docs/Web/HTTP/Overview) 工作原理，并且了解 [数据库](https://zh.wikipedia.org/wiki/%E6%95%B0%E6%8D%AE%E5%BA%93) 和 [NoSQL](https://zh.wikipedia.org/wiki/NoSQL) 概念。
+このドキュメントを執筆するにあたり、読者が[JavaScript](https://developer.mozilla.org/docs/Web/JavaScript)と[TypeScript](https://www.typescriptlang.org/)の基本的な構文をマスターし、[HTTP](https://developer.mozilla.org/docs/Web/HTTP/Overview)の動作原理を理解し、[データベース](https://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9)と[NoSQL](https://ja.wikipedia.org/wiki/NoSQL)の概念について理解しているなど、一定のプログラミング知識を持っていることを前提としています。
 
+### 技術スタック
+始める前に、KIRAKIRA-Rosalesとその関連インフラの技術アーキテクチャを理解することが非常に重要です。
 
+KIRAKIRA-RosalesはTypeScriptで書かれています。TypeScriptの型チェックはコードの品質を大幅に向上させることができるためです。
+具体的には、バックエンドはKoa.jsフレームワークを使用しています。Koa.jsはNode.jsのフレームワークであり、より優れた非同期処理とHTTPサポートを提供します。
+バックエンドの生産環境はAWSのEKSクラスタにデプロイされています。
+バックエンドはMongoDBデータベースクラスタとElasticsearch検索エンジンクラスタに依存しており、これらも同様にAWS EKSにデプロイされています。
 
-### 技术栈
-在开始前，了解 KIRAKIRA-Rosales 及其相关基础设施的技术架构是非常有必要的。
-
-KIRAKIRA-Rosales 由 TypeScript 编写。因为 TypeScript 的类型检查能够很好地提高代码质量。
-具体来说，后端使用了 Koa.js 框架，Koa.js 是一个 Node.js 框架，提供了更好的异步和 HTTP 支持。
-后端的生产环境部署在 AWS 的 EKS 集群中。
-后端依赖于一个 MongoDB 数据库集群和一个 Elasticsearch 搜索引擎集群，它们同样部署在 AWS EKS 中。
-
-对于存储，MongoDB 和 Elasticsearch 产生的数据被存储在挂载在 AWS EKS 上的 AWS EBS(Elastic Block Store) 块存储中，图片和视频文件则由 Cloudflare 的 R2、Images 和 Stream 存储。
+ストレージについては、MongoDBとElasticsearchが生成するデータはAWS EKSにマウントされたAWS EBS (Elastic Block Store)ブロックストレージに保存され、画像や動画ファイルはCloudflareのR2、Images、Streamによって保存されます。
 
 [![](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://tc39.es)
 [![](https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -31,100 +29,100 @@ KIRAKIRA-Rosales 由 TypeScript 编写。因为 TypeScript 的类型检查能够
 [![](https://img.shields.io/badge/-Kubernetes-0075e4?style=flat-square&logo=Kubernetes&logoColor=white)](https://kubernetes.io/)
 [![](https://img.shields.io/badge/-Cloudflare-f6821f?style=flat-square&logo=Cloudflare&logoColor=white)](https://www.cloudflare.com)
 
-## 二、安装和启动
-### 1. 克隆存储库。
-确保你安装了 [Git](https://git-scm.com/)，并且有权访问本存储库。
+## II. インストールと起動
+### 1. リポジトリのクローン
+[Git](https://git-scm.com/)がインストールされており、このリポジトリへのアクセス権があることを確認してください。
 
-使用以下命令克隆本存储库
+以下のコマンドを使用してこのリポジトリをクローンします
 ``` shell
-# 请将 <some-dir> 替换为你计算机上的一个目录。
+# <some-dir>をお使いのコンピュータのディレクトリに置き換えてください。
 cd <some-dir>
 
-# 克隆
+# クローン
 git clone https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales.git
 ```
-或者，你也可以使用具有图形化界面的 GitHub Desktop 或其他 Git 兼容工具来完成这一步骤。
+または、グラフィカルインターフェースを持つGitHub Desktopやその他のGit互換ツールを使用してこのステップを完了することもできます。
 
-### 2. 设置环境变量
+### 2. 環境変数の設定
 > [!IMPORTANT]
-> 下方的示例代码中并不包含全部环境变量，在实际使用时必须为每一个环境变量赋值。
-> 全部环境变量及其作用请参阅：[.env.powershell.temp](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/.env.powershell.temp)。
+> 以下のサンプルコードにはすべての環境変数が含まれているわけではなく、実際に使用する際には各環境変数に値を設定する必要があります。
+> すべての環境変数とその役割については、[.env.powershell.temp](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/.env.powershell.temp)を参照してください。
 ``` powershell
-# 对于不同操作系统，设置环境变量的方式也不同。以下为 Windows PowerShell 的示例
+# OSによって環境変数の設定方法は異なります。以下はWindows PowerShellの例です。
 $env:SERVER_PORT="9999"
 $env:SERVER_ENV="dev"
 $env:SERVER_ROOT_URL="kirakira.moe"
 ...
 ```
-在设置环境变量时有任何问题，请在 [议题](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues) 或 [讨论区](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/discussions) 中查找解答或提问。
+環境変数の設定で問題が発生した場合は、[Issue](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues)または[Discussion](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/discussions)で回答を探すか、質問してください。
 
-### 3. 启动后端开发服务器
+### 3. バックエンド開発サーバーの起動
 > [!IMPORTANT]
-> 以开发模式启动服务会将代码打包至项目根目录的 `.kirakira` 目录内。
+> 開発モードでサービスを起動すると、コードはプロジェクトのルートディレクトリにある`.kirakira`ディレクトリにパッケージ化されます。
 ```sh
-# 安装依赖
+# 依存関係のインストール
 npm install
 
-# 启动开发服务器
+# 開発サーバーの起動
 npm run dev
 
-# 或者,您可以以热重载方式启动开发服务器
+# または、ホットリロードモードで開発サーバーを起動することもできます
 npm run dev-hot
 ```
-如果您需要修改开发服务器的默认打包位置，需要修改 package.json 文件里 `scripts.start` 的值。
-`scripts.start` 的值是一句启动命令，您需要将该命令中所有 `.kirakira` 替换为您的自定义目录。
-例如 `tsc --noEmitOnError --sourceMap --outDir .foo && node ./.foo/app.js` 将会导致开发服务器的打包目录改为 `.foo`
+開発サーバーのデフォルトのパッケージ化場所を変更する必要がある場合は、package.jsonファイルの`scripts.start`の値を変更する必要があります。
+`scripts.start`の値は起動コマンドです。そのコマンド内のすべての`.kirakira`をカスタムディレクトリに置き換える必要があります。
+例えば、`tsc --noEmitOnError --sourceMap --outDir .foo && node ./.foo/app.js`は、開発サーバーのパッケージ化ディレクトリを`.foo`に変更します。
 
-### 4. 检查
-成功执行以上命令后，您应该会获得一个监听 9999（或您在环境变量中自定义的）端口的 KIRAKIRA-Rosales 开发服务器。🎉
-在您的浏览器中输入 https://localhost:9999 即可测试运行状态。如果已经正常启动完毕，应当可以看到 “Hello World” 或类似字样。
+### 4. 確認
+上記のコマンドを正常に実行すると、ポート9999（または環境変数でカスタマイズしたポート）でリッスンするKIRAKIRA-Rosales開発サーバーが起動します。🎉
+ブラウザで https://localhost:9999 を入力して実行状態をテストします。正常に起動していれば、「Hello World」などの文字が表示されるはずです。
 
-在此基础上，您可以编写、贡献代码，参与 KIRAKIRA 项目开发。
+これを基に、コードを記述、貢献し、KIRAKIRAプロジェクトの開発に参加できます。
 
-## 三、开发
-本章将会循序渐进地、介绍如何对 KIRAKIRA-Rosales 进行二次开发，改进功能。
-### 熟悉目录结构
-以下为项目目录结构简介
+## III. 開発
+この章では、KIRAKIRA-Rosalesを二次開発して機能を改善する方法を順を追って説明します。
+### ディレクトリ構造の理解
+以下はプロジェクトのディレクトリ構造の概要です
 ```
 ◌
-├ .github - GitHub 相关配置
-│  └ workflows - 存放 Github 工作流
-├ .vscode - VSCode 相关配置
-├ docs - 存放说明文档（本文档就存放于该目录下）
-├ old - 存放不舍得删除的旧代码
-├ src - 存放源代码
-│  ├ cloudflare - 存放了 Cloudflare 相关的共通代码
-│  ├ common - 存放了共通函数
-│  ├ controller - controller 层，用于处理接受的请求载荷数据和丰富请求响应数据
-│  ├ dbPool - 存放了 MongoDB 相关的共通代码
-│  ├ elasticsearchPool - 存放了 Elasticsearch 相关的共通代码
-│  ├ middleware - 存放了服务器中间件相关代码
-│  ├ route - 存放了路由代码
-│  ├ service - service 层，用于处理业务逻辑
-│  ├ ssl - SSL 相关配置
-│  ├ store - 存放了“状态管理”或“运行时全局变量”相关代码
-│  ├ type - 存放了共通的类型定义代码
-│  └ app.ts - 该文件为程序入口
-├ .dockerignore - 该文件用于配置执行 docker build 命令时忽略的文件
-├ .editorconfig - 该文件定义了编码风格
-├ .env.powershell.temp - 该文件是环境变量模板及说明文档
-├ .eslintignore - 该文件定义了 Eslint 忽略的内容
-├ .eslintrc.cjs - 该文件定义了 ESLint 配置
-├ .gitattributes - 该文件定义了 Git 相关配置
-├ .gitignore - 该文件定义了 Git 忽略的文件
-├ Dockerfile - 该文件描述了构建 Docker 容器镜像的过程
-├ LICENSE - 许可证
-├ README.md - 该文件为自述文件
-├ package-lock.json - 该文件固定了 npm install 是安装的依赖包的版本
-├ package.json - 该文件定义了元数据、脚本和依赖包列表
-├ tsconfig.json - 该文件为 TypeScript 配置文件
-└ ℩ɘvoↄ.svg - 该文件为封面图
+├ .github - GitHub関連の設定
+│  └ workflows - Githubワークフローを格納
+├ .vscode - VSCode関連の設定
+├ docs - ドキュメントを格納（このドキュメントもこのディレクトリにあります）
+├ old - 削除したくない古いコードを格納
+├ src - ソースコードを格納
+│  ├ cloudflare - Cloudflare関連の共通コードを格納
+│  ├ common - 共通関数を格納
+│  ├ controller - controller層。受け取ったリクエストペイロードデータを処理し、リクエストレスポンスデータを拡充するために使用
+│  ├ dbPool - MongoDB関連の共通コードを格納
+│  ├ elasticsearchPool - Elasticsearch関連の共通コードを格納
+│  ├ middleware - サーバーミドルウェア関連のコードを格納
+│  ├ route - ルーティングコードを格納
+│  ├ service - service層。ビジネスロジックの処理に使用
+│  ├ ssl - SSL関連の設定
+│  ├ store - 「状態管理」または「実行時グローバル変数」関連のコードを格納
+│  ├ type - 共通の型定義コードを格納
+│  └ app.ts - プログラムのエントリファイル
+├ .dockerignore - docker buildコマンド実行時に無視するファイルを設定
+├ .editorconfig - コーディングスタイルを定義
+├ .env.powershell.temp - 環境変数のテンプレートおよび説明ドキュメント
+├ .eslintignore - Eslintが無視する内容を定義
+├ .eslintrc.cjs - ESLintの設定を定義
+├ .gitattributes - Git関連の設定を定義
+├ .gitignore - Gitが無視するファイルを定義
+├ Dockerfile - Dockerコンテナイメージのビルドプロセスを記述
+├ LICENSE - ライセンス
+├ README.md - 自己紹介ファイル
+├ package-lock.json - npm installでインストールされる依存パッケージのバージョンを固定
+├ package.json - メタデータ、スクリプト、依存パッケージリストを定義
+├ tsconfig.json - TypeScriptの設定ファイル
+└ ℩ɘvoↄ.svg - カバー画像
 ```
-### 从 Hello World 开始
-第一个程序总是从 Hello World 开始，KIRAKIRA-Rosales 也不例外。
+### Hello Worldから始める
+最初のプログラムは常にHello Worldから始まりますが、KIRAKIRA-Rosalesも例外ではありません。
 
-在 `/src/controller` 目录中有一个名为 `HelloWorld.ts` 的特殊文件。
-该文件中有以下代码：
+`/src/controller`ディレクトリには、`HelloWorld.ts`という特別なファイルがあります。
+このファイルには以下のコードが含まれています：
 ``` TypeScript
 import { koaCtx, koaNext } from '../type/koaTypes.js'
 
@@ -134,323 +132,323 @@ export const helloWorld = async (ctx: koaCtx, next: koaNext): Promise<void> => {
 	await next()
 }
 ```
-让我们一行一行的分析这段代码：
-首先，第一行
+このコードを一行ずつ分析してみましょう：
+まず、一行目
 ``` TypeScript
 import { koaCtx, koaNext } from '../type/koaTypes.js'
 ```
-它从 koaTypes.js（koaTypes.ts）文件中导入了两个类型，koaCtx 和 koaNext
+これはkoaTypes.js（koaTypes.ts）ファイルからkoaCtxとkoaNextの2つの型をインポートしています。
 ```TypeScript
 export type koaCtx = Koa.ParameterizedContext<Koa.DefaultState, Koa.DefaultContext, unknown> & {elasticsearchClient?: Client}
 export type koaNext = Koa.Next
 ```
-这两个类型扩展自 Koa 提供的类型，koaCtx 是网络请求的上下文，koaNext 是一个可以被调用的异步函数。
-koaCtx 类型为一个对象。该对象内应当包含请求头、请求体、响应头、响应体以及中间件为其添加的其他参数。
-koaNext 类型为一个异步函数。该函数用于执行下一中间件，如果是最后一个，则完成请求并将响应返回给客户端。
-在通过 koa-router 编写路由时，会自动为传入的 Controller 函数添加上述两个变量。
+これら2つの型はKoaが提供する型を拡張したもので、koaCtxはネットワークリクエストのコンテキスト、koaNextは呼び出し可能な非同期関数です。
+koaCtx型はオブジェクトです。このオブジェクトには、リクエストヘッダー、リクエストボディ、レスポンスヘッダー、レスポンスボディ、およびミドルウェアによって追加されたその他のパラメータが含まれている必要があります。
+koaNext型は非同期関数です。この関数は次のミドルウェアを実行するために使用され、最後のミドルウェアであればリクエストを完了し、レスポンスをクライアントに返します。
+koa-routerを使用してルーティングを作成すると、渡されたController関数に上記の2つの変数が自動的に追加されます。
 
-目前，您不需要完全了解这两个类型，让我们接着往下看。
+現時点では、これら2つの型を完全に理解する必要はありません。次に進みましょう。
 ``` TypeScript
 export const helloWorld = async (ctx: koaCtx, next: koaNext): Promise<void> => {...}
 ```
-在这一行，我们导出了一个名为 `helloWorld` 的异步箭头函数，该函数接收两个参数：`ctx: koaCtx` 和 `next: koaNext`, 并返回一个空的 Promise.
-ctx 是 context 的缩写，代表上下文。
+この行では、`helloWorld`という名前の非同期アロー関数をエクスポートしています。この関数は`ctx: koaCtx`と`next: koaNext`の2つのパラメータを受け取り、空のPromiseを返します。
+ctxはcontextの略で、コンテキストを表します。
 
-接下来的两行代码：
+次の2行のコード：
 ``` TypeScript
 const something = ctx.query.something
 ctx.body = something === 'Beautiful' ? `Hello Beautiful World` : 'Hello World'
 ```
-这一部分用来存取网络请求上下文中的标头或 body（正文）。
+この部分は、ネットワークリクエストのコンテキストからヘッダーやボディ（本文）にアクセスするために使用されます。
 
-首先，从 `ctx` 上下文对象中匹配网络请求中名为 `something` 的“查询”参数，并赋值给 `something` 常量。
-紧接着是一个三元表达式，您可以将这个运算部分理解为“业务逻辑代码”。如果 `something` 的值是字符串 "Beautiful"，则将 "Hello Beautiful World" 赋值到 `ctx` 请求上下文对象的响应体中，否则将 "Hello World" 赋值到 `ctx` 请求上下文对象的响应体中。
+まず、`ctx`コンテキストオブジェクトから`something`という名前の「クエリ」パラメータを照合し、`something`定数に代入します。
+次に三項演算子があり、この演算部分を「ビジネスロジックコード」と理解できます。`something`の値が文字列 "Beautiful" の場合、`ctx`リクエストコンテキストオブジェクトのレスポンスボディに "Hello Beautiful World" を代入し、そうでなければ "Hello World" を代入します。
 
-在后端开发模式中，我们通常将整理请求载荷、整理请求响应的代码逻辑放置于 Controller 层，而将复杂的业务逻辑放置于 Service 层。
+バックエンド開発モードでは、通常、リクエストペイロードの整理やリクエストレスポンスの整理に関するコードロジックはController層に配置し、複雑なビジネスロジックはService層に配置します。
 
-接下来，看最后一行代码：
+次に、最後の行のコードを見てみましょう：
 ``` TypeScript
 await next()
 ```
-这一行代码的作用是等待下一个中间件执行完成，如果没有下一个，则完成请求并将响应返回给客户端。
+この行のコードは、次のミドルウェアの実行が完了するのを待つ役割を果たします。次のミドルウェアがなければ、リクエストを完了し、レスポンスをクライアントに返します。
 
-以上便是 KIRAKIRA-Rosales 通过 Koa 响应一个网络请求的最简单的流程。
-打开您的浏览器，在地址栏输入`https://localhost:9999?something=Beautiful` 后回车，您将会在页面中看到 `Hello Beautiful World` 字样。🎉
+以上が、KIRAKIRA-RosalesがKoaを介してネットワークリクエストに応答する最も簡単なプロセスです。
+ブラウザを開き、アドレスバーに`https://localhost:9999?something=Beautiful`と入力してEnterキーを押すと、ページに`Hello Beautiful World`という文字が表示されます。🎉
 
 
-### 路由
-与前端的路由类似，后端也存在“路由”的概念。
-前端通过路由匹配到正确的组件并渲染，而后端通过路由将网络请求发送（映射）到正确的 Controller 层并执行。
-我们在文件 `src\route\router.ts`  中集中编写、管理从 URL 到 Controller 函数的映射。
+### ルーティング
+フロントエンドのルーティングと同様に、バックエンドにも「ルーティング」の概念が存在します。
+フロントエンドはルーティングによって正しいコンポーネントを照合してレンダリングし、バックエンドはルーティングによってネットワークリクエストを正しいController層に送信（マッピング）して実行します。
+`src\route\router.ts`ファイルで、URLからController関数へのマッピングを一元的に記述・管理します。
 
-一个典型的接收 GET 请求的接口路由看起来像：
+GETリクエストを受け取る典型的なインターフェースルートは次のようになります：
 ``` typescript
-//      请求的 URL
+//      リクエストのURL
 //          ↓
 router.get(URL, controller)
 //                   ↑
-//      这个 URL 对应的 Controller 函数
+//      このURLに対応するController関数
 ```
-如果是接收 POST 请求的接口，则需要将 `router.get` 改为 `router.post`
+POSTリクエストを受け取るインターフェースの場合、`router.get`を`router.post`に変更する必要があります。
 ``` typescript
-//      请求的 URL
+//      リクエストのURL
 //          ↓
 router.post(URL, controller)
 //                   ↑
-//      这个 URL 对应的 Controller 函数
+//      このURLに対応するController関数
 ```
-以此类推，我们可以编写其他类型的请求，例如 PUT 请求或 DELETE 请求
+同様に、PUTリクエストやDELETEリクエストなど、他のタイプのリクエストも記述できます。
 ``` typescript
 router.put(URL, controller)
 router.delete(URL, controller)
 ...
 ```
 > [!IMPORTANT]
-> 传入的 controller 应为 Controller 函数本身，而非函数的调用（结果）。
-> 触发一个请求时，koa-router 会自动将 (ctx: koaCtx, next: koaNext) 传入到 Controller 函数中。
+> 渡されるcontrollerはController関数自体である必要があり、関数の呼び出し（結果）ではありません。
+> リクエストがトリガーされると、koa-routerは自動的に(ctx: koaCtx, next: koaNext)をController関数に渡します。
 ``` typescript
-router.get(URL, controller) // 正确用法
+router.get(URL, controller) // 正しい使い方
 
-router.get(URL, controller()) // ❌ 错误用法
+router.get(URL, controller()) // ❌ 間違った使い方
 ```
 
-### 请求参数（载荷）和返回结果
-在发送请求时，有时我们需要携带数据（被称为“请求参数”或“请求载荷”）给后端。当后端的程序执行结束后，应当将执行结果返回给请求者。
-例如，用户登录时需要将用户输入的邮箱和密码发送给后端执行验证，如果验证通过，则将用户 Token 返回给客户端。
+### リクエストパラメータ（ペイロード）と戻り値
+リクエストを送信する際、時にはデータ（「リクエストパラメータ」または「リクエストペイロード」と呼ばれる）をバックエンドに渡す必要があります。バックエンドのプログラムが実行を終えたら、実行結果をリクエスタに返す必要があります。
+例えば、ユーザーがログインする際には、ユーザーが入力したメールアドレスとパスワードをバックエンドに送信して検証を行い、検証が通ればユーザートークンをクライアントに返します。
 
-在传递数据时，可以选择“显式”的传递，也可以“隐式”的传递。
+データを渡す際には、「明示的」に渡すことも、「暗黙的」に渡すこともできます。
 
-#### “显式”传递请求参数（载荷）
-HTTP 请求的 URL 中可以传递数据。
-使用 URL 传递数据时，本项目倾向于使用 [Parameters (参数)](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#parameters) 而不是 [Path (路径)](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#path_to_resource)，因为 Path 需要动态路由匹配。
+#### 「明示的」なリクエストパラメータ（ペイロード）の受け渡し
+HTTPリクエストのURLでデータを渡すことができます。
+URLでデータを渡す場合、このプロジェクトでは[Path（パス）](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#path_to_resource)ではなく[Parameters（パラメータ）](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_URL#parameters)を使用する傾向があります。なぜなら、Pathは動的なルーティングマッチングが必要だからです。
 ``` shell
-# 使用 curl 命令向一个带有 Parameters 的 URL 发送 GET 请求
+# curlコマンドを使用して、Parameters付きのURLにGETリクエストを送信する
 curl https://localhost:9999?something=Beautiful
 ```
 
 > [!IMPORTANT]
-> URL 不宜过长，传递的数据长度有限，一般用于请求某些数据时传递简单的查询参数。
+> URLは長すぎてはいけません。渡せるデータの長さには限りがあり、通常は特定のデータをリクエストする際に簡単なクエリパラメータを渡すために使用されます。
 
-在后端 Controller 函数中，你可以从 ctx 对象中获取 something 所对应的值
+バックエンドのController関数では、ctxオブジェクトからsomethingに対応する値を取得できます。
 ``` typescript
 const something = ctx.query.something
 ```
 > [!IMPORTANT]
-> something 的类型为 string | string[], 因为 URL Parameters 会将重名的多个参数合并为一个数组。
-> 在继续之前，你需要判断是否是数组（推荐）或根据您的需求将其断言，然后执行进一步的数据校验。
+> somethingの型はstring | string[]です。なぜなら、URL Parametersは同名の複数のパラメータを一つの配列にまとめるからです。
+> 続行する前に、配列であるかどうかを判断する（推奨）か、要件に応じてアサーションを行い、さらなるデータ検証を実行する必要があります。
 
 
-除了 URL 的 Parameters 之外，还可以在 HTTP 请求的请求体中传递数据。
+URLのParameters以外にも、HTTPリクエストのリクエストボディでデータを渡すことができます。
 > [!IMPORTANT]
-> 某些 HTTP 协议的实现不支持某些请求方法（例如 GET 请求）包含请求体，详情请参考 [MDN 上的 HTTP 参考文档](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
-> 请求体中可以携带较多数据，但也并非无限制，上限取决于不同的 HTTP 实现。
+> 一部のHTTPプロトコルの実装では、GETリクエストなどの特定のリクエストメソッドがリクエストボディを含むことをサポートしていません。詳細については、[MDNのHTTPリファレンスドキュメント](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)を参照してください。
+> リクエストボディには比較的多くのデータを運ぶことができますが、無制限ではなく、上限は異なるHTTP実装によって異なります。
 
 ``` shell
-# 使用 curl 命令向一个 URL 发送带有请求体的 POST 请求
+# curlコマンドを使用して、リクエストボディ付きのPOSTリクエストをURLに送信する
 curl -d "param1=value1&param2=value2" -X POST https://localhost:9999/xxxxx
 ```
-在后端 Controller 函数中，你可以从 ctx 对象中获取请求体数据
+バックエンドのController関数では、ctxオブジェクトからリクエストボディのデータを取得できます。
 ``` typescript
 const data = ctx.request.body as { param1: string; param2: string }
 ```
 > [!IMPORTANT]
-> 在继续之前，您需要将其断言为与发送请求时传递的数据类型一致的类型，然后执行进一步的数据校验。
+> 続行する前に、リクエスト送信時に渡されたデータ型と一致する型にアサーションを行い、さらなるデータ検証を実行する必要があります。
 
-#### “隐式”传递数据
+#### 「暗黙的」なデータの受け渡し
 
-您可以使用 [HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) “隐式”的传递数据。每次发送请求时，Cookie 也会被发送给后端。
-KIRAKIRA 项目大量使用 Cookie 来存储用户 Token, 用户设置和用户样式等数据。在设置及发送 Cookie 时需要掌握其限制及技巧，本文档内不详细介绍，请自行参阅 [MDN HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) 文档，但有几点有必要说明：
-* Cookie 可以被限制仅限 HTTPS
-* HttpOnly 的 Cookie 只能通过请求的 set-cookie 设置/删除，不能通过 JavaScript 访问
-* 目前很多浏览器仅支持第一方（同站点） Cookie，即 `SameSite=Strict`。
-* fetch 函数使用 { credentials: "include" } 选项可以允许在发送跨源请求时包含 Cookie
+[HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)を使用して「暗黙的」にデータを渡すことができます。リクエストを送信するたびに、Cookieもバックエンドに送信されます。
+KIRAKIRAプロジェクトでは、ユーザートークン、ユーザー設定、ユーザースタイルなどのデータを保存するためにCookieを多用しています。Cookieを設定および送信する際には、その制限とテクニックを習得する必要があります。このドキュメントでは詳しく説明しませんので、[MDN HTTP Cookie](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)のドキュメントを各自参照してください。ただし、いくつか注意点があります：
+* CookieはHTTPSのみに制限できます。
+* HttpOnlyのCookieは、リクエストのset-cookieを介してのみ設定/削除でき、JavaScriptからはアクセスできません。
+* 現在、多くのブラウザはファーストパーティ（同一サイト）Cookieのみをサポートしています。つまり、`SameSite=Strict`です。
+* fetch関数で{ credentials: "include" }オプションを使用すると、クロスオリジンリクエストを送信する際にCookieを含めることができます。
 
-在后端 Controller 函数中，你可以从 ctx 对象中获取 Cookie 数据
+バックエンドのController関数では、ctxオブジェクトからCookieのデータを取得できます。
 ``` typescript
-ctx.cookies.get(cookieKey) // 获取名字为 cookieKey 的 Cookie 对应的值。
+ctx.cookies.get(cookieKey) // cookieKeyという名前のCookieに対応する値を取得します。
 ```
 > [!IMPORTANT]
-> 在继续之前，不要忘了执行进一步的数据校验。
+> 続行する前に、さらなるデータ検証を忘れないでください。
 
-#### 从服务端返回结果到客户端
-在后端逻辑执行完成之后，我们需要将结果返回给客户端。
+#### サーバーからクライアントへの結果の返却
+バックエンドのロジックが実行完了した後、結果をクライアントに返す必要があります。
 
-将结果赋值给 ctx 对象的 body 属性，然后执行下一步中间件，如果是最后一个中间件，则将 body 中的值返回给客户端。
+結果をctxオブジェクトのbodyプロパティに代入し、次のミドルウェアを実行します。最後のミドルウェアであれば、bodyの値をクライアントに返します。
 ``` typescript
 ctx.body = results
-await next() // 假设已经是最后一个中间件
+await next() // これが最後のミドルウェアであると仮定します
 ```
 
-### 访问 MongoDB 数据库和 Elasticsearch 搜索引擎
-用户产生的数据通常会存储到 MongoDB 中，但需要被搜索的数据会存储到 Elasticsearch 搜索引擎中。
-对数据库和搜索引擎的增删改查是后端代码的主要功能。
+### MongoDBデータベースとElasticsearch検索エンジンへのアクセス
+ユーザーが生成したデータは通常MongoDBに保存されますが、検索が必要なデータはElasticsearch検索エンジンに保存されます。
+データベースと検索エンジンのCRUD（作成、読み取り、更新、削除）操作は、バックエンドコードの主要な機能です。
 
 #### MongoDB
-后端使用 Mongoose 连接 MongoDB 数据库。
+バックエンドはMongooseを使用してMongoDBデータベースに接続します。
 
-在程序初始化时，会立即执行 `src\dbPool\DbClusterPool.ts` 文件中的 `connectMongoDBCluster` 函数，该函数首先会读取环境变量中的连接字符串和数据库账号密码等数据，然后创建数据库连接池。创建的连接池是在 Mongoose 内部维护的，Mongoose 暴露一个 `mongoose` 实例用来执行数据库增删改查操作，用户无需关心连接池的具体实现及负载均衡问题。
+プログラムの初期化時に、`src\dbPool\DbClusterPool.ts`ファイル内の`connectMongoDBCluster`関数が直ちに実行されます。この関数はまず環境変数から接続文字列やデータベースのアカウント、パスワードなどのデータを読み取り、次にデータベース接続プールを作成します。作成された接続プールはMongooseの内部で管理され、MongooseはデータベースのCRUD操作を実行するための`mongoose`インスタンスを公開します。ユーザーは接続プールの具体的な実装や負荷分散の問題を気にする必要はありません。
 
 > [!IMPORTANT]
-> 对于副本集，写操作总是向主分片提交，随后再由主分片同步至副本分片。
-> 而读操作偏好则由用户设置，本程序默认的数据库读偏好为优先从副本中读取，但在某些情况下会覆盖这个设置，比如说使用事务时会优先从主读取。
+> レプリカセットの場合、書き込み操作は常にプライマリシャードに送信され、その後プライマリシャードからレプリカシャードに同期されます。
+> 読み取り操作の優先度はユーザーが設定しますが、このプログラムのデフォルトのデータベース読み取り優先度はレプリカから優先的に読み取ることです。ただし、トランザクションを使用する場合など、特定の状況ではこの設定が上書きされ、プライマリから優先的に読み取られます。
 
-使用 Mongoose 暴露的 `mongoose` 实例，用户可以直接执行增删改查操作，本项目在 `src\dbPool\DbClusterPool.ts` 文件中也封装了带有类型约束的便捷函数来执行这些操作。
+Mongooseが公開する`mongoose`インスタンスを使用して、ユーザーは直接CRUD操作を実行できます。このプロジェクトでは、`src\dbPool\DbClusterPool.ts`ファイル内で、型制約付きの便利な関数もカプセル化してこれらの操作を実行します。
 
-以下是一个简单实例
+以下は簡単な例です。
 ``` typescript
 import mongoose, { InferSchemaType } from 'mongoose'
 
 /**
- * 用户数据
+ * ユーザーデータ
  */
 class UserSchemaFactory {
 	schema = {
-		uid: { type: Number, unique: true, required: true }, // 用户的 UID
-		username: { type: String }, // 用户名
-		editDateTime: { type: Number, required: true }, // 系统专用字段-最后编辑时间
+		uid: { type: Number, unique: true, required: true }, // ユーザーのUID
+		username: { type: String }, // ユーザー名
+		editDateTime: { type: Number, required: true }, // システム専用フィールド - 最終編集日時
 	}
-	collectionName = 'user' // MongoDB 集合名
-	schemaInstance = new Schema(this.schema) // Mongoose Schema 实例
+	collectionName = 'user' // MongoDBのコレクション名
+	schemaInstance = new Schema(this.schema) // MongooseのSchemaインスタンス
 }
 
-const UserSchema =  new UserSchemaFactory() // 实例化
-const { collectionName, schemaInstance } = UserSchema // 解构出集合名和集合 Schema 实例
+const UserSchema =  new UserSchemaFactory() // インスタンス化
+const { collectionName, schemaInstance } = UserSchema // コレクション名とコレクションのSchemaインスタンスをデストラクチャリング
 
-type User = InferSchemaType<typeof schemaInstance> // 使用 InferSchemaType 推到出用户数据的 TypeScript 类型
+type User = InferSchemaType<typeof schemaInstance> // InferSchemaTypeを使用してユーザーデータのTypeScript型を推論
 
-const user: User = { // 构建用户数据
+const user: User = { // ユーザーデータの構築
 	uid: 1,
 	username: 'foo',
 	editDateTime: new Date().getTime(),
 }
 
 try {
-	await insertData2MongoDB<User>(user, schemaInstance, collectionName) // 插入数据
+	await insertData2MongoDB<User>(user, schemaInstance, collectionName) // データの挿入
 } catch(error) {
-	console.error('ERROR', "插入数据出错：", error)
+	console.error('ERROR', "データの挿入に失敗しました：", error)
 }
 
 
-const userWhere: QueryType<User> = { uid: 1 } // 查询 UID 为 1 的用户数据
-const userSelect: SelectType<User> = { username: 1 } // 只查询 username 字段
+const userWhere: QueryType<User> = { uid: 1 } // UIDが1のユーザーデータをクエリ
+const userSelect: SelectType<User> = { username: 1 } // usernameフィールドのみをクエリ
 try {
-	const userResult = await selectDataFromMongoDB<User>(userWhere, userSelect, schemaInstance, collectionName) // 查询数据
+	const userResult = await selectDataFromMongoDB<User>(userWhere, userSelect, schemaInstance, collectionName) // データのクエリ
 	console.oog('RESULT', useResult)
 } catch (error) {
-	console.error('ERROR', "查询数据出错：", error)
+	console.error('ERROR', "データのクエリに失敗しました：", error)
 }
 ```
 > [!IMPORTANT]
-> UserSchemaFactory 和 UserSchema 通常是单独存放在一个文件中，然后将 UserSchema 导出并在其他文件中使用。
+> UserSchemaFactoryとUserSchemaは通常、別のファイルに保存され、UserSchemaをエクスポートして他のファイルで使用します。
 
 
 #### Elasticsearch
-Elasticsearch 是一个搜索引擎，部署在 Elasticsearch 集群需要通过 HTTP 请求来操作。
-官方提供了 SDK 来方便 Node.js 程序操作 Elasticsearch。
-无需手动构建 HTTP 请求。
+Elasticsearchは検索エンジンであり、ElasticsearchクラスタにデプロイするにはHTTPリクエストを介して操作する必要があります。
+公式はNode.jsプログラムがElasticsearchを簡単に操作できるようにSDKを提供しています。
+手動でHTTPリクエストを構築する必要はありません。
 
-同样的，程序在初始化时会执行 `src\elasticsearchPool\elasticsearchClusterPool.ts` 文件中的 `connectElasticSearchCluster` 函数，该函数会读取环境变量，然后创建与 Elasticsearch 集群的连接。在创建连接后，连接客户端实例会被添加至 Koa 的请求上下文 ctx 中。在 Controller 中，我们可以通过 `ctx.elasticsearchClient` 获取客户端连接，然后执行”增删改查“操作，本项目在 `src\elasticsearchPool\elasticsearchClusterPool.ts` 文件中也封装了带有类型约束的便捷函数来执行这些操作。
+同様に、プログラムの初期化時に`src\elasticsearchPool\elasticsearchClusterPool.ts`ファイル内の`connectElasticSearchCluster`関数が実行されます。この関数は環境変数を読み取り、Elasticsearchクラスタとの接続を作成します。接続が作成されると、接続クライアントインスタンスがKoaのリクエストコンテキストctxに追加されます。Controllerでは、`ctx.elasticsearchClient`を介してクライアント接続を取得し、CRUD操作を実行できます。このプロジェクトでは、`src\elasticsearchPool\elasticsearchClusterPool.ts`ファイル内で、型制約付きの便利な関数もカプセル化してこれらの操作を実行します。
 
-以下是一个简单的示例。
+以下は簡単な例です。
 ``` typescript
 import { EsSchema2TsType } from '../elasticsearchPool/ElasticsearchClusterPoolTypes.js'
 
 
-const esClient = ctx.elasticsearchClient // 假设已经正确创建了连接
+const esClient = ctx.elasticsearchClient // 接続が正しく作成されていると仮定
 
 /**
- * 视频数据
+ * 動画データ
  */
 const VideoDocument = {
 	schema: {
-		title: { type: String, required: true as const }, // 视频标题
-		kvid: { type: Number, required: true as const }, // KVID 视频 ID
+		title: { type: String, required: true as const }, // 動画のタイトル
+		kvid: { type: Number, required: true as const }, // KVID 動画ID
 	},
-	indexName: 'search-kirakira-video-elasticsearch', // Elasticsearch 索引名
+	indexName: 'search-kirakira-video-elasticsearch', // Elasticsearchのインデックス名
 }
 
-const { indexName: esIndexName, schema: videoEsSchema } = VideoDocument // 解构
+const { indexName: esIndexName, schema: videoEsSchema } = VideoDocument // デストラクチャリング
 
-const videoEsData: EsSchema2TsType<typeof videoEsSchema> = { // 构造视频数据
+const videoEsData: EsSchema2TsType<typeof videoEsSchema> = { // 動画データの構築
 	title: "foo bar baz",
 	kvid: 1,
 }
 try {
-	const refreshFlag = true // 是否立即刷新索引（刷新后该数据方能搜索，如果刷新过于频繁，可能会影响性能）
-	await insertData2ElasticsearchCluster(esClient, esIndexName, videoEsSchema, videoEsData, refreshFlag) // 插入数据
+	const refreshFlag = true // インデックスをすぐにリフレッシュするかどうか（リフレッシュ後、このデータは検索可能になります。リフレッシュが頻繁すぎるとパフォーマンスに影響する可能性があります）
+	await insertData2ElasticsearchCluster(esClient, esIndexName, videoEsSchema, videoEsData, refreshFlag) // データの挿入
 } catch (error) {
-	console.error("ERROR", "索引数据出错："，error)
+	console.error("ERROR", "データのインデックス作成に失敗しました：", error)
 }
 
-const esQuery = { // 构造搜索条件
+const esQuery = { // 検索条件の構築
 	query_string: {
 		query: 'foo',
 	},
 }
 
 try {
-	const esSearchResult = await searchDataFromElasticsearchCluster(esClient, esIndexName, videoEsSchema, esQuery) // 开始搜索数据
+	const esSearchResult = await searchDataFromElasticsearchCluster(esClient, esIndexName, videoEsSchema, esQuery) // データの検索を開始
 	console.log('RESULT', esSearchResult)
 } catch (error) {
-	console.error("ERROR", "搜索数据出错："，error)
+	console.error("ERROR", "データの検索に失敗しました：", error)
 }
 ```
 
-## 四、API 文档
-请参考路由文件 `src\route\router.ts`
+## IV. APIドキュメント
+ルーティングファイル `src\route\router.ts` を参照してください。
 
-## 五、构建与部署
-您可以在本地测试运行本项目，或者简单的将其构建并部署在一个服务器实例中。
-您可也可将其打包为容器镜像，然后在 Docker 或其他 Docker 兼容程序上运行。
+## V. ビルドとデプロイ
+このプロジェクトをローカルでテスト実行するか、単にビルドしてサーバーインスタンスにデプロイすることができます。
+また、コンテナイメージとしてパッケージ化し、Dockerやその他のDocker互換プログラムで実行することもできます。
 
-#### 构建，然后运行
-1.设置环境变量
+#### ビルドして実行
+1.環境変数の設定
 
-设置方法与 [上文描述](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop?tab=readme-ov-file#%E5%BC%80%E5%8F%91) 相同。
+設定方法は[上記の説明](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop?tab=readme-ov-file#%E5%BC%80%E5%8F%91)と同じです。
 
-2.构建并预览
+2.ビルドとプレビュー
 > [!IMPORTANT]
-> 默认会将代码打包至项目根目录的 `dist` 目录内
-> 如有必要，您可以在 tsconfig.json 中修改打包路径。相应地，也要修改下方第三步启动服务器命令中的路径。
+> デフォルトでは、コードはプロジェクトのルートディレクトリにある `dist` ディレクトリにパッケージ化されます。
+> 必要に応じて、tsconfig.jsonでパッケージ化パスを変更できます。その場合、以下の3番目の手順にあるサーバー起動コマンドのパスも変更する必要があります。
 ```sh
-# 1. 安装依赖
+# 1. 依存関係のインストール
 npm install
 
-# 2. 构建
+# 2. ビルド
 npm run build
 
-# 3. 运行
+# 3. 実行
 node ./dist/app.js
 ```
 
-#### 打包为容器镜像（最佳实践）
-部署 KIRAKIRA-Rosales 的最佳实践是将其运行在 K8s 集群中。您正在使用的 KIRAKIRA-Rosales 服务便是如此。
+#### コンテナイメージとしてのパッケージ化（ベストプラクティス）
+KIRAKIRA-Rosalesをデプロイするためのベストプラクティスは、K8sクラスタで実行することです。現在使用しているKIRAKIRA-Rosalesサービスもそのようにデプロイされています。
 
-首先确保你安装并运行了 Docker，执行以下命令，您应该可以看到 Docker 的版本号
+まず、Dockerがインストールされ実行されていることを確認し、以下のコマンドを実行するとDockerのバージョン番号が表示されるはずです。
 ``` shell
 docker --version
 ```
-使用 Docker 打包多平台容器镜像（以下示例为 AMD 架构的 Windows 平台，MacOS 与 Linux 平台可能不同）
+Dockerを使用してマルチプラットフォームのコンテナイメージをパッケージ化します（以下の例はAMDアーキテクチャのWindowsプラットフォーム用です。MacOSやLinuxプラットフォームでは異なる場合があります）。
 
 ``` shell
-# 创建并启用新的 builder 实例（如果以前创建过，则跳过这步）
+# 新しいbuilderインスタンスを作成して有効化する（以前に作成したことがある場合は、このステップをスキップ）
 docker buildx create --name mybuilder --use
 
-# 启动并检查 builder 实例
+# builderインスタンスを起動して確認する
 docker buildx inspect --bootstrap
 
-# 构建并推送多平台镜像到 Docker Hub
-# 请确保安装 docekr 并且 docker 已经登录/连接了远程容器镜像存储库，这里使用 cfdxkk01/kirakira
-# 请替换 <tag> 为正确的版本号，例如：3.21.1
-#                                                                              注意这里有个点「.」，复制时别落下
+# マルチプラットフォームイメージをビルドしてDocker Hubにプッシュする
+# docekrがインストールされ、dockerがリモートコンテナイメージリポジトリにログイン/接続していることを確認してください。ここでは cfdxkk01/kirakira を使用します
+# <tag> を正しいバージョン番号（例：3.21.1）に置き換えてください
+#                                                                              ここに「.」があることに注意してください。コピーする際に忘れないように
 #                                                                                             ↓
 docker buildx build --platform linux/amd64,linux/arm64 -t <username>/<repo-name>:<tag> --push .
 ```
-然后就可以部署该容器镜像到 K8s 或其他容器/集群环境中。
+その後、このコンテナイメージをK8sや他のコンテナ/クラスタ環境にデプロイできます。
 
 > [!IMPORTANT]
-> 生产环境及容器镜像环境也不要忘记配置环境变量！
+> 生産環境やコンテナイメージ環境でも環境変数の設定を忘れないでください！
 
-## 六、开源与安全
-* 本项目遵守 BSD-3-Clause license 开源协议。
-* 一般问题请创建 Issue，涉及隐私或报告安全问题请前往 [Discord 频道](https://discord.gg/maveEWn6VP)。
+## VI. オープンソースとセキュリティ
+* このプロジェクトはBSD-3-Clause licenseオープンソースライセンスに準拠しています。
+* 一般的な問題についてはIssueを作成してください。プライバシーに関する問題やセキュリティ問題の報告については、[Discordチャンネル](https.discord.gg/maveEWn6VP)までお願いします。
