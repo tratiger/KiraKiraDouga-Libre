@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="zh-CN">
+<!-- IE 不支持 zh-Hans-CN 或 zh-Hant-TW，它只支持老旧的 zh-CN 和 zh-TW。 -->
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+	<title>是时候更换你的浏览器了 - KIRAKIRA☆DOUGA</title>
+	<script>
+		/** @type Record<"lang" | "next", string> */
+		var params = (function () {
+			var search = location.search;
+			var paramArray = search.slice(search.indexOf("?") + 1).split("&");
+			var params = {};
+			for (var i = 0; i < paramArray.length; i++) {
+				var pair = paramArray[i].split("=");
+				params[pair[0]] = decodeURIComponent(pair[1]);
+			}
+			return params;
+		})();
+		(function () {
+			// 设置网页语言。
+			var lang = params.lang;
+			if (!lang) {
+				var isIe11 = navigator.userAgent.indexOf("Trident") >= 0;
+				lang = isIe11 ? navigator.browserLanguage : navigator.language;
+			}
+			if (lang.match(/^en/i)) lang = "en";
+			else if (lang.match(/^ja/i)) lang = "ja";
+			else if (lang.match(/^ko/i)) lang = "ko";
+			else if (lang.match(/^vi/i)) lang = "vi";
+			else if (lang.match(/^id/i)) lang = "id";
+			else if (lang.match(/^fr/i)) lang = "fr";
+			else if (lang.match(/^yue/i)) lang = "zh-HK"; // 没有早期系统支持粤语，因此回退到香港地区中文，否则没机会显示。
+			else if (lang.match(/^zh/i)) {
+				if (lang.match(/(CN|SG|MY)$/i) || lang === "zhs") lang = "zh-CN";
+				else if (lang.match(/(TW)$/i) || lang === "zht") lang = "zh-TW";
+				else if (lang.match(/(HK|MO)$/i)) lang = "zh-HK";
+				else return;
+			}
+			else return;
+			document.documentElement.lang = lang;
+			document.documentElement.className = lang;
+			var titles = {
+				"zh-CN": "是时候更换你的浏览器了",
+				"zh-TW": "是時候更換你的瀏覽器了",
+				en: "Time to Change Your Browser",
+				ja: "ブラウザを変える時だ",
+				ko: "{{!Time to Change Your Browser}}",
+				vi: "Đến lúc đổi trình duyệt rồi",
+				id: "{{!Time to Change Your Browser}}",
+				fr: "Il est temps de changer de navigateur",
+				"zh-HK": "係時候換咗你嘅Browser喇"
+			};
+			var title = titles[lang];
+			if (title) document.title = title + " - KIRAKIRA☆DOUGA";
+		})();
+	</script>
+	<style>
+		/* stylelint-disable function-disallowed-list */
+		/* stylelint-disable alpha-value-notation */
+		/* stylelint-disable color-function-notation */
+		/* stylelint-disable property-no-vendor-prefix */
+		/* stylelint-disable selector-class-pattern */
+
+		/* 使用垂直居中引号。（直接使用 Unicode 垂直居中引号则日语字体太丑。） */
+		@font-face {
+			font-family: "CJK Ellipsis";
+			src: local("SimSun");
+			unicode-range: U+2026;
+		}
+
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: "CJK Ellipsis", "Segoe UI", Verdana, Tahoma, "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei", SimHei, sans-serif;
+			background: #fafafa;
+			background-color: #fafafa;
+			cursor: default;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
+		html.zh-TW body,
+		html.zh-HK body {
+			font-family: "CJK Ellipsis", "Segoe UI", Verdana, Tahoma, "Helvetica Neue", Helvetica, Arial, "Microsoft JhengHei", "Microsoft YaHei", SimHei, sans-serif;
+		}
+
+		html.ja body {
+			font-family: "CJK Ellipsis", "Segoe UI", Verdana, Tahoma, "Helvetica Neue", Helvetica, Arial, "Yu Gothic", Meiryo, "MS Gothic", SimHei, sans-serif;
+		}
+
+		html.ko body {
+			font-family: "CJK Ellipsis", "Segoe UI", Verdana, Tahoma, "Helvetica Neue", Helvetica, Arial, "Malgun Gothic", Dotum, SimHei, sans-serif;
+		}
+
+		@keyframes intro {
+			from {
+				transform: scale(1.05);
+				opacity: 0;
+			}
+
+			to {
+				transform: scale(1);
+				opacity: 1;
+			}
+		}
+
+		.main-card {
+			position: absolute;
+			width: 1024px;
+			height: 600px;
+			background: white;
+			background-color: white;
+			border-radius: 6px;
+			box-shadow: 0 5px 10px rgba(193, 159, 168, 0.3);
+			animation: intro cubic-bezier(0.1, 0.9, 0.2, 1) 600ms backwards;
+		}
+
+		.main-card .right {
+			width: 506px;
+			padding-right: 72px;
+			text-align: justify;
+			vertical-align: middle;
+		}
+
+		.main-card h1 {
+			width: 506px;
+			margin: 0;
+			margin-bottom: 24px;
+			padding: 0;
+			color: #f06e8e;
+			font-size: 32px;
+			font-weight: bold;
+			line-height: 53px;
+			white-space: nowrap;
+		}
+
+		.main-card p {
+			color: #797173;
+			font-size: 14px;
+		}
+
+		html.en .main-card h1,
+		html.vi .main-card h1,
+		html.id .main-card h1,
+		html.fr .main-card h1 {
+			line-height: 45px;
+		}
+
+		html.vi .main-card h1,
+		html.id .main-card h1,
+		html.fr .main-card h1 {
+			font-size: 24px;
+		}
+
+		.browsers-title {
+			display: block;
+			width: 506px;
+			margin-top: 24px;
+			margin-bottom: 16px;
+			font-weight: bold;
+			text-align: center;
+		}
+
+		.browser-cards {
+			width: 506px;
+			margin: 0;
+			padding: 0;
+			text-decoration: none;
+		}
+
+		.browser-card {
+			display: block;
+			float: left;
+			width: 158px;
+			min-width: 158px;
+			height: 155px;
+			min-height: 155px;
+			margin: 0;
+			padding: 0;
+			list-style: none;
+			background-color: white;
+			border: 0;
+			border-radius: 6px;
+			box-shadow: 0 2px 4px rgba(193, 159, 168, 0.3);
+			cursor: pointer;
+			transition: box-shadow 0.2s;
+		}
+
+		.browser-card:hover {
+			box-shadow: 0 4px 8px rgba(193, 159, 168, 0.4);
+		}
+
+		.browser-card:active {
+			box-shadow: none;
+		}
+
+		.browser-card h4 {
+			margin-top: 4px;
+			padding: 0;
+			color: #797173;
+			font-weight: normal;
+			text-align: center;
+			text-decoration: none;
+		}
+
+		.browser-card a {
+			text-decoration: none;
+		}
+
+		#browser-card-2 {
+			margin: 0 16px;
+		}
+
+		#browser-card-4 {
+			margin-left: 172px;
+		}
+
+		#browser-card-4 h4 {
+			margin-top: 10px;
+		}
+
+		.browser-image {
+			display: block;
+			width: 66px;
+			height: 66px;
+			margin: 26px 46px 0;
+			padding: 0;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 64px;
+			border: 0;
+		}
+
+		.browser-image img {
+			width: 100%;
+			height: 100%;
+		}
+
+		.browser-image-1 {
+			background-image: url("/static/images/601/microsoft_edge.svg");
+		}
+
+		.browser-image-2 {
+			background-image: url("/static/images/601/google_chrome.svg");
+		}
+
+		.browser-image-3 {
+			background-image: url("/static/images/601/mozilla_firefox.svg");
+		}
+
+		.browser-image-4 {
+			background-image: url("/static/images/601/supermium.svg");
+		}
+
+		.browser-cards.old .browser-card.new,
+		.browser-cards.new .browser-card.old {
+			display: none;
+		}
+
+		.left {
+			width: 482px;
+		}
+
+		.left * {
+			cursor: url("/static/images/601/crying_face.cur"), default;
+		}
+
+		.recycle {
+			position: absolute;
+			top: 240px;
+			left: 97px;
+			width: 256px;
+			height: 256px;
+			background-image: url("/static/images/601/recycle_bin_back.svg");
+		}
+
+		.recycle-front {
+			position: absolute;
+			top: 240px;
+			left: 97px;
+			width: 256px;
+			height: 256px;
+			background-image: url("/static/images/601/recycle_bin_front.svg");
+		}
+
+		.ie-icon {
+			position: absolute;
+			top: 116px;
+			left: 102px;
+			width: 222px;
+			height: 217px;
+			background-image: url("/static/images/601/internet_explorer.svg");
+		}
+
+		.text {
+			display: none;
+		}
+
+		html.zh-CN .text.zh-CN,
+		html.zh-TW .text.zh-TW,
+		html.zh-HK .text.zh-HK,
+		html.en .text.en,
+		html.ja .text.ja,
+		html.ko .text.ko,
+		html.vi .text.vi,
+		html.id .text.id,
+		html.fr .text.fr {
+			display: block;
+		}
+	</style>
+
+	<!--[if lte IE 8]>
+		<style>
+			.browser-card {
+				background-color: #fafafa;
+			}
+
+			.browser-image-1 {
+				background-image: url("/static/images/601/microsoft_edge.png");
+			}
+
+			.browser-image-2 {
+				background-image: url("/static/images/601/google_chrome.png");
+			}
+
+			.browser-image-3 {
+				background-image: url("/static/images/601/mozilla_firefox.png");
+			}
+
+			.browser-image-4 {
+				background-image: url("/static/images/601/supermium.png");
+			}
+
+			.ie-icon {
+				background-image: url("/static/images/601/internet_explorer.png");
+			}
+
+			.browser-card:hover {
+				background-color: #fdfdfd;
+			}
+
+			.browser-card:active {
+				background-color: gray;
+			}
+
+			.recycle {
+				background-image: url("/static/images/601/recycle_bin.png");
+			}
+
+			.recycle-front {
+				background-image: url("/static/images/601/recycle_bin_front.png");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body>
+	<table class="main-card" id="main-card">
+		<td class="left">
+			<div class="recycle"></div>
+			<div class="ie-icon"></div>
+			<div class="recycle-front"></div>
+		</td>
+
+		<td class="right">
+			<div lang="zh-CN" class="text zh-CN">
+				<h1>是时候更换你的浏览器了</h1>
+				<p>
+					你乘坐着 Internet Explorer 来到了 ACG 的海洋，很可惜，你搁浅了……<br />
+					如此老旧的技术很难适应这片海洋环境，这个苍老的浏览器也难以使你扬帆起航。
+				</p>
+				<p>
+					Internet Explorer 代表了过去，代表了 21 世纪初互联网曾经的美好。<br />
+					虽然你可能和我们一样，厌恶新时代的狂躁、忙碌与封闭，<br />
+					怀念过去的欢笑、慢节奏与开放，但是我们要做的，是像这个网站一样，<br />
+					去改变时代，为这新时代添上一笔自己的色彩，而不是将自己困在过去。
+				</p>
+			</div>
+			<div lang="zh-TW" class="text zh-TW">
+				<h1>是時候更換你的瀏覽器了</h1>
+				<p>
+					你乘坐著 Internet Explorer 來到了 ACG 的海洋，很可惜，你擱淺了……<br />
+					如此老舊的技術很難適應這片海洋環境，這個蒼老的瀏覽器也難以使你揚帆起航。
+				</p>
+				<p>
+					Internet Explorer 代表了過去，代表了 21 世紀初互聯網曾經的美好。<br />
+					雖然你可能和我們一樣，厭惡新時代的狂躁、忙碌與封閉，<br />
+					懷念過去的歡笑、慢節奏與開放，但是我們要做的，是像這個網站一樣，<br />
+					去改變時代，為這新時代添上一筆自己的色彩，而不是將自己困在過去。
+				</p>
+			</div>
+			<div lang="en" class="text en">
+				<h1>It's time to change your browser</h1>
+				<p>
+					You arrived at the ocean of ACG by Internet Explorer, unfortunately, you ran aground...<br />
+					Such old technology is hard to adapt to this ocean environment, and this aged browser is also difficult for you to set sail.
+				</p>
+				<p>
+					Internet Explorer represents the past and the beauty of the Internet in the early 21<sup>st</sup>&nbsp;century.<br />
+					Although you may share our aversion to the madness, busyness, and isolation of the new era, as well as our nostalgia for the laughter, slow pace, and openness of the past, what we need to do is to change the times and add a touch of our own color to this new era, just like this website, rather than trapped in the past.
+				</p>
+			</div>
+			<div lang="ja" class="text ja">
+				<h1>ブラウザーを切り替える時期です</h1>
+				<p>
+					Internet Explorer という名の船に乗って ACG の海にやってきたが、残念ながら座礁してしまった……<br />
+					そんな古い技術はこの海の環境に適応するのが難しく、これからの旅にも役に立てないでしょう。
+				</p>
+				<p>
+					Internet Explorer は 21 世紀初頭のインターネットとその時代の素晴らしさを代表しています。<br />
+					あなたは私たちと同じように、新しい時代の狂騒、忙しさや閉鎖性を嫌って、過去の笑い、スローライフそしてその開放性を懐かしんでいるかもしれませんが、今やるべきことは、このサイトのように、過去に囚われず、時代を変え、この新しい時代に自分の色を残していきましょう。
+				</p>
+			</div>
+			<div lang="ko" class="text ko">
+				<h1>{{!It's time to change your browser}}</h1>
+				<p>
+					{{!You arrived at the ocean of ACG by Internet Explorer, unfortunately, you ran aground...<br />
+					Such old technology is hard to adapt to this ocean environment, and this aged browser is also difficult for you to set sail.
+				</p>
+				<p>
+					Internet Explorer represents the past and the beauty of the Internet in the early 21<sup>st</sup>&nbsp;century.<br />
+					Although you may share our aversion to the madness, busyness, and isolation of the new era, as well as our nostalgia for the laughter, slow pace, and openness of the past, what we need to do is to change the times and add a touch of our own color to this new era, just like this website, rather than trapped in the past.}}
+				</p>
+			</div>
+			<div lang="vi" class="text vi">
+				<h1>Đã đến lúc thay đổi trình duyệt của bạn</h1>
+				<p>
+					Bạn đã dong thuyền tới đại dương A.C.G (Anime-Comic-Game) bằng Internet Explorer nhưng không may bị mắc cạn...<br />
+					Công nghệ cũ như vậy khó có thể thích ứng với môi trường đại dương này và trình duyệt cũ kỹ này cũng khiến bạn khó tài nào ra khơi.
+				</p>
+				<p>
+					Internet Explorer tượng trưng cho quá khứ, vẻ đẹp của Internet đầu thế kỷ 21.<br />
+					Mặc dù bạn có thể có cùng sự ác cảm với chúng tôi đối với sự điên đảo, căng thẳng và đơn độc của thời đại mới,<br />
+					cũng như nỗi hoài niệm về tiếng cười, nhịp sống chậm rãi và sự cởi mở của quá khứ,<br />
+					nhưng chúng ta nên thay đổi trước thời cuộc<br />
+					và đưa màu sắc riêng ấy của chúng ta đến kỷ nguyên mới này,<br />
+					(giống như trang web này), thay vì kẹt lại mãi trong quá khứ.
+				</p>
+			</div>
+			<div lang="id" class="text id">
+				<h1>{{!It's time to change your browser}}</h1>
+				<p>
+					{{!You arrived at the ocean of ACG by Internet Explorer, unfortunately, you ran aground...<br />
+					Such old technology is hard to adapt to this ocean environment, and this aged browser is also difficult for you to set sail.
+				</p>
+				<p>
+					Internet Explorer represents the past and the beauty of the Internet in the early 21<sup>st</sup>&nbsp;century.<br />
+					Although you may share our aversion to the madness, busyness, and isolation of the new era, as well as our nostalgia for the laughter, slow pace, and openness of the past, what we need to do is to change the times and add a touch of our own color to this new era, just like this website, rather than trapped in the past.}}
+				</p>
+			</div>
+			<div lang="fr" class="text fr">
+				<h1>Il est temps de changer de navigateur</h1>
+				<p>
+					Vous êtes arrivé à l’océan d’ACG par Internet Explorer, malheureusement, vous vous êtes échoué...<br />
+					Une technologie aussi ancienne est difficile à adapter à cet environnement océanique, et ce navigateur vieillissant est également difficile à utiliser.
+				</p>
+				<p>
+					Internet Explorer représente le passé et la beauté d’Internet au début du 21<sup>e</sup>&nbsp;siècle.<br />
+					Même si vous partagez notre aversion pour la folie, l’agitation et l’isolement de la nouvelle ère, ainsi que notre nostalgie pour le rire, la lenteur et l’ouverture du passé, ce que nous devons faire, c’est changer les temps et ajouter une touche de notre propre couleur à cette nouvelle ère, tout comme ce site Web, plutôt que de rester coincés dans le passé.
+				</p>
+			</div>
+			<div lang="zh-HK" class="text zh-HK">
+				<h1>係時候換你嘅瀏覽器喇</h1>
+				<p>
+					你搭住 Internet Explorer 嚟到 ACG 嘅大海，好可惜，部船炒咗……<br />
+					咁舊嘅技術好難適應呢片海洋環境，呢個咁老嘅 Browser 亦都難以令你揚帆出海。
+				</p>
+				<p>
+					Internet Explorer 代表咗過去，代表住 21 世紀初互聯網曾經嘅美好。<br />
+					雖然你可能同我哋一樣好憎新時代嘅狂躁、忙碌同封閉，<br />
+					懷念過去嘅歡笑、慢節奏同開放，但係我哋要做嘅，係好似呢個網站噉，<br />
+					去改變呢個時代，爲呢個新時代畫上自己嘅一筆，而唔係留喺過去。
+				</p>
+			</div>
+			<div class="browers">
+				<span class="browsers-title">
+					<span lang="zh-CN" class="text zh-CN">
+						你可以尝试换乘
+					</span>
+					<span lang="zh-TW" class="text zh-TW">
+						你可以嘗試換乘
+					</span>
+					<span lang="en" class="text en">
+						You can try transferring
+					</span>
+					<span lang="ja" class="text ja">
+						乗換案内
+					</span>
+					<span lang="ko" class="text ko">
+						{{!You can try transferring}}
+					</span>
+					<span lang="vi" class="text vi">
+						Bạn có thể thử chuyển sang
+					</span>
+					<span lang="id" class="text id">
+						{{!You can try transferring}}
+					</span>
+					<span lang="fr" class="text fr">
+						Vous pouvez essayer de transférer
+					</span>
+					<span lang="zh-HK" class="text zh-HK">
+						你可以嘗試轉乘
+					</span>
+				</span>
+				<ul class="browser-cards new" id="browser-cards">
+					<li class="browser-card new" id="browser-card-1">
+						<div class="browser-image browser-image-1"></div>
+						<h4><b>Microsoft</b><br />Edge</h4>
+					</li>
+					<li class="browser-card new" id="browser-card-2">
+						<div class="browser-image browser-image-2"></div>
+						<h4><b>Google</b><br />Chrome</h4>
+					</li>
+					<li class="browser-card new" id="browser-card-3">
+						<div class="browser-image browser-image-3"></div>
+						<h4><b>Mozilla</b><br />Firefox</h4>
+					</li>
+					<li class="browser-card old" id="browser-card-4">
+						<div class="browser-image browser-image-4"></div>
+						<h4>Supermium</h4>
+					</li>
+				</ul>
+			</div>
+		</td>
+	</table>
+
+	<script>
+		(function () {
+			// 使 IE 9 及以下版本也可以禁用文字选中。
+			document.body.onselectstart = function () { return false; };
+			// 解决点击 browser-card 外边缘无效的问题。
+			var links = [
+				"https://www.microsoft.com/edge/download",
+				document.documentElement.lang === "zh-CN" ?
+					"https://www.google.cn/chrome/index.html" :
+					"https://www.google.com/chrome/index.html",
+				"https://www.mozilla.org/firefox/new",
+				"https://win32subsystem.live/supermium/"
+			];
+			for (var i = 0; i < links.length; i++) {
+				var id = "browser-card-" + (i + 1);
+				document.getElementById(id).onclick = (function (i) {
+					return function () {
+						window.open(links[i]);
+					};
+				})(i);
+			}
+			// Windows 8.1 及以下系统改为推荐 Supermium 浏览器。
+			var ua = navigator.userAgent;
+			var browserCardsEl = document.getElementById("browser-cards");
+			var matches = /Windows NT ([0-9.]+)/.exec(ua);
+			if (browserCardsEl && matches) {
+				var winver = parseFloat(matches[1]); // 6.1=Win7, 6.2=Win8, 6.3=Win8.1, 10.0+=Win10/11
+				if (winver < 10 && browserCardsEl.className.indexOf(" old") === -1)
+					browserCardsEl.className = browserCardsEl.className.replace(" new", "") + " old"; // 不直接将 new 替换为 old 是因为万一 new 不存在则替换操作不会被执行。
+			}
+			// 解决窗口过小导致纯 CSS 居中裁掉部分内容问题。
+			function centerMainCard() {
+				var mainCard = document.getElementById("main-card");
+				var minWidth = mainCard.clientWidth,
+					minHeight = mainCard.clientHeight,
+					windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
+					windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+				var left = windowWidth < minWidth ? 0 : (windowWidth - minWidth) / 2,
+					top = windowHeight < minHeight ? 0 : (windowHeight - minHeight) / 2;
+				mainCard.style.left = left + "px";
+				mainCard.style.top = top + "px";
+			}
+			centerMainCard();
+			window.onresize = centerMainCard;
+		})();
+	</script>
+	<script>
+		(function () {
+			// 该部分脚本仅在非 IE 浏览器下才会执行。
+			if (!(window.ActiveXObject || "ActiveXObject" in window))
+				if (params.next)
+					location.href = params.next;
+		})();
+	</script>
+</body>
+
+</html>

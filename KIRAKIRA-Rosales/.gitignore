@@ -1,0 +1,13 @@
+# Node modules
+node_modules/
+
+# 忽略开发及生产构建
+dist/
+.kirakira/
+
+# ignore some local file
+local/
+
+# macOS
+.DS_Store
+.envrc

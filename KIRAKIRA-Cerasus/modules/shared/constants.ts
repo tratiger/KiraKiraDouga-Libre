@@ -1,0 +1,5 @@
+const PREFERENTIAL = "prior";
+
+export const PREFERENTIAL_BASE_URL = `/${PREFERENTIAL}`;
+export const PREFERENTIAL_ROUTE = `/${PREFERENTIAL}/`;
+export const PREFERENTIAL_TEMPLATE_PATH = `${PREFERENTIAL}/`;

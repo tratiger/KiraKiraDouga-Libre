@@ -1,0 +1,79 @@
+@use "functions" as *;
+@use "sass:map";
+
+// 灰阶类颜色
+$grayscale-colors: (
+	gray-90: #212121 #fafafa,
+	gray-80: #424242 #f5f5f5,
+	gray-70: #616161 #eee,
+	gray-60: #757575 #e0e0e0,
+	gray-50: #9e9e9e #bdbdbd,
+	gray-40: #bdbdbd #9e9e9e,
+	gray-30: #e0e0e0 #757575,
+	gray-20: #eee #616161,
+	gray-10: #f5f5f5 #424242,
+	gray-5: #fafafa #212121,
+);
+
+// 中性色
+// 此处的颜色各主题色均通用。
+$neutral-colors: (
+	main-bg: white #171414,
+	main-fg: black white,
+	inset-bg: c(black, 2%) c(white, 5%),
+	acrylic-bg: map.get($grayscale-colors, gray-5),
+	divider: #505050,
+	text-color: map.get($grayscale-colors, gray-90),
+	hover-overlay: c(black, 4%) c(white, 6%),
+	surface-color: c(white, 75%) c(white, 5%),
+	ripple: c(black, 15%) c(white, 15%),
+	color-palette-stroke: c(black, 10%) c(white, 10%),
+	accented-selection: #fff9 #fff9,
+	placeholder-color: #757575 #9e9e9e,
+);
+
+// 如果定义为列表，则第一项为浅色主题颜色，第二项为深色主题颜色。
+// 如果定义为单个颜色，则自动识别为浅色主题颜色，深色主题颜色通过反转亮度自动计算得出。
+// 如果不想让它反转亮度，请定义为列表，并将列表两项设为相同的颜色。
+
+// 主要主题色的混合源色计算参数
+// 通过以下颜色与强调色混合得出主要主题色的其它颜色，因而计算得出的颜色会根据主题色自动变换。
+$mixed-colors: (
+	accent-90: (black 40%, white 80%),
+	accent-80: (black 30%, white 60%),
+	accent-70: (black 20%, white 40%),
+	accent-60: (black 10%, white 20%), // pressed
+	accent-50: (), // normal
+	accent-40: (white 20%, black 10%), // hover
+	accent-30: (white 40%, black 20%), // focus
+	accent-20: (white 60%, black 30%), // disabled
+	accent-10: (white 80%, black 40%),
+	accent-5: (white 90%, black 50%),
+	neutral-10: (#b3b3b3 80%, black), // card-shadow
+	neutral-50: (#666 93%, #eee 93%), // icon-color
+);
+
+// 预设颜色
+// 此处的颜色各主题色均保持固定不变。
+$palette: (
+	pink: #f06e8e,
+	blue: #4581e1,
+	purple: #b044b0,
+	green: #46a12f,
+	yellow: #f98d00,
+	cyan: #199bb6,
+	red: #dd1818,
+);
+
+// 各状态所用颜色值
+$state-colors: (
+	accent: accent-50,
+	accent-hover: accent-40,
+	accent-focus: accent-30,
+	accent-pressed: accent-60,
+	accent-disabled: accent-20,
+	accent-shadow: neutral-10,
+	accent-ripple: accent-pressed 15%,
+	accent-hover-overlay: accent-hover 8%,
+	icon-color: neutral-50,
+);

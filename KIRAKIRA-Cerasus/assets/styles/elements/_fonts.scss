@@ -1,0 +1,35 @@
+/// 英文标题字体 Montserrat
+@for $_weight from 1 through 9 {
+	$weight: $_weight * 100;
+
+	@for $style from 1 through 2 {
+		@font-face {
+			font-family: Montserrat;
+			font-weight: $weight;
+			font-style: if($style == 1, normal, italic);
+			src: url("assets/fonts/Montserrat/Montserrat_#{$weight}#{if($style == 1, '', _Italic)}.woff2") format("woff2");
+			font-display: block;
+		}
+	}
+}
+
+/// 修正字形字体 Monu
+/// https://github.com/MY1L/QuQi
+// @for $weight from 1 through 2 {
+// 	@font-face {
+// 		font-family: Monu;
+// 		font-weight: if($weight == 1, normal, bold);
+// 		font-style: normal;
+// 		src: url("assets/fonts/Monu/Monu#{if($weight == 1, '', _Bold)}.woff2") format("woff2");
+// 		font-display: swap;
+// 	}
+// }
+
+/// 修正字形字体 Yozora Sans
+@font-face {
+	font-family: "Yozora Sans";
+	font-weight: 250 900;
+	font-style: normal;
+	src: url("assets/fonts/Yozora Sans/YozoraSans-VF.woff2") format("woff2");
+	font-display: swap;
+}

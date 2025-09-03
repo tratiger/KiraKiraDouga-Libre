@@ -1,0 +1,310 @@
+@use "sass:map";
+@use "sass:list";
+@use "sass:math";
+@use "variables" as *;
+@use "internal" as *;
+@use "functions" as *;
+@use "eases";
+
+/// 一键弹性布局加居中元素 (flex - center - center)。
+/// @output display, align-items, justify-content
+@mixin flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/// 一键网格布局加居中元素 (grid - center)。
+/// @output display, place-items
+@mixin grid-center {
+	display: grid;
+	place-items: center;
+}
+
+/// 变成正方形。长宽均相等。
+/// @param {Number} $size - 长度。
+/// @param {Boolean} $with-size-var [false] - 是否生成一个名为 `--size` 的 CSS 自定义属性以使其它组件更方便地修改尺寸？
+/// @output width, height
+@mixin square($size, $with-size-var: false) {
+	@if not $with-size-var {
+		width: $size;
+		height: $size;
+	} @else {
+		--size: #{$size};
+		width: var(--size);
+		height: var(--size);
+	}
+}
+
+/// 变成椭圆形。
+/// 将 border-radius 设为一个非常大的值。
+/// @param {String} $position [full] - 圆角的位置。
+/// @output border-radius
+@mixin oval($position: full) {
+	@include set-border-radius(calc(infinity * 1px), $position);
+}
+
+/// 变成圆形。
+/// 将 border-radius 设为 100%。
+/// @param {String} $position [full] - 圆角的位置。
+/// @output border-radius
+@mixin circle($position: full) {
+	@include set-border-radius(100%, $position);
+}
+
+/// 画一个实心等边三角形。
+/// @param {type} $length - 边长。
+/// @param {type} $fill - 填充颜色。
+/// @param {type} $arrow [up] - 三角形箭头指向。可选的值为：up | down | left | right。
+/// @output width, height, border-top, border-right, border-bottom, border-left
+@mixin triangle($length, $fill, $arrow: up) {
+	@include square(0);
+
+	$arrow-to-border: (
+		up: border-bottom border-top,
+		down: border-top border-bottom,
+		top: border-bottom border-top,
+		bottom: border-top border-bottom,
+		left: border-right border-left,
+		right: border-left border-right,
+	);
+	$border-correct: map.get($arrow-to-border, $arrow);
+	$border-this: list.nth($border-correct, 1);
+	$border-that: list.nth($border-correct, 2);
+
+	@each $side in border-top, border-right, border-bottom, border-left {
+		@if $side == $border-this {
+			#{$side}: calc($length / 2 * math.sqrt(3)) solid $fill;
+		} @else if $side == $border-that {
+			#{$side}: none;
+		} @else {
+			#{$side}: calc($length / 2) solid transparent;
+		}
+	}
+}
+
+/// 将元素占满整个屏幕。
+/// 将长宽均设为 100% 视窗宽高度值。
+/// @param {String} $position [fixed] - 指定元素的 position 属性。
+/// @output width, height
+@mixin fullscreen($position: fixed) {
+	position: $position;
+	top: 0;
+	left: 0;
+	width: 100dvw;
+	height: 100dvh;
+	transition: $fallback-transitions, width 0s, height 0s;
+}
+
+/// 池沼 block 布局会恶意在元素之间加空隙，使用 flex 得永恒。
+/// @deprecated 已经确定是图片、视频等 inline 元素干扰了，因此已通过正确的方式解决了问题，并且弃用该混合。
+/// @output display, flex-direction
+// @mixin flex-block {
+// 	display: flex;
+// 	flex-direction: column;
+// }
+
+/// 去除垂直方向上的间距空隙，在高度变化动画中很有用。
+/// @param {Bool} $padding [true] - 调整内边距值。
+/// @param {Bool} $margin [true] - 调整外边距值。
+/// @output margin-top, margin-bottom, padding-top, padding-bottom
+@mixin no-vertical-spacing($padding: true, $margin: true) {
+	@if $margin {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+
+	@if $padding {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+}
+
+/// 去除水平方向上的间距空隙，在宽度变化动画中很有用。
+/// @param {Bool} $padding [true] - 调整内边距值。
+/// @param {Bool} $margin [true] - 调整外边距值。
+/// @output margin-right, margin-left, padding-right, padding-left
+@mixin no-horizontal-spacing($padding: true, $margin: true) {
+	@if $margin {
+		margin-right: 0;
+		margin-left: 0;
+	}
+
+	@if $padding {
+		padding-right: 0;
+		padding-left: 0;
+	}
+}
+
+/// 修复在 flex 布局 overflow 开启滚动之后，页面末尾的边距消失了的问题。
+/// 在 flex 布局的 after 伪元素中使用。
+/// @example scss
+/// 	.flex {
+/// 		@include fix-page-end-padding;
+/// 	}
+/// @param {Bool} $zero-height [true] - 设置零高度。在某些情况下关闭后也许可以解决界面错位问题。
+/// 但不能一概而论，因为如果一直关闭的话，另外一些界面又会错位，因此只能按需开启。这个东西反正就是很迷。
+/// @output display, clear, height, visibility, content
+@mixin fix-page-end-padding($zero-height: true) {
+	&::after {
+		content: "."; // 内容不能为空。
+		display: block;
+		clear: both;
+		visibility: hidden; // 占位但不可见。
+
+		@if $zero-height {
+			height: 0;
+		}
+	}
+}
+
+/// 未知宽/高度的绝对定位的居中。
+/// @param {String} $position [absolute] - 指定元素的 position 属性。必须为 absolute 或 fixed。
+/// @param {Bool} $use-translate [true] - 使用 translate 而不是 transform, 默认为是，如否可提供更多的自定义变换可能性。
+/// @output position, top, left, translate, transform
+@mixin absolute-center($position: absolute, $use-translate: true) {
+	position: $position;
+	top: 50%;
+	left: 50%;
+
+	@if $use-translate {
+		translate: -50% -50%;
+	} @else {
+		transform: translate(-50%, -50%);
+	}
+}
+
+/// 已知宽/高度的绝对定位的居中。
+/// NOTE: 使用此混合必须指定宽高度。
+/// @param {String} $position [absolute] - 指定元素的 position 属性。必须为 absolute 或 fixed。
+/// @output position, top, right, bottom, left, margin
+@mixin absolute-center-sized($position: absolute) {
+	position: $position;
+	inset: 0;
+	margin: auto;
+}
+
+/// 应用 Material Design 大水波纹按钮时，不要让大水波纹扩大了按钮的点击面积。
+/// @param {Number} $button-size - 点击区域按钮大小。
+/// @output pointer-events
+@mixin ripple-clickable-only-inside($button-size) {
+	> * {
+		pointer-events: none;
+
+		&:not([disabled])::before {
+			@include square($button-size);
+			content: "";
+			position: absolute;
+			display: block;
+			pointer-events: auto;
+		}
+	}
+}
+
+/// 使纯 CSS 具备宽/高度由 0 到 auto 变化的能力。
+/// @param {String} $specified [null] - 显式指定需要动画的是哪个方向。可能的值是 `height` | `width` |
+/// `both`。如留空则不会自动添加动画效果支持。
+/// @param {Bool} $adjust-padding [true] - 是否在动画时自动调整内边距值？
+/// @param {String} $transition-name [v] - Vue Transition 的名称，默认为默认值 `v`。
+/// @output display, grid-template-rows, overflow
+@mixin animated-auto-size($specified: null, $adjust-padding: true, $transition-name: v) {
+	display: grid;
+	grid-template-rows: 1fr;
+	grid-template-columns: 1fr;
+
+	> :deep(*) {
+		overflow: hidden;
+	}
+
+	@if $specified {
+		&.#{$transition-name}-enter-from,
+		&.#{$transition-name}-leave-to {
+			@if $specified == height or $specified == both {
+				@include no-vertical-spacing($adjust-padding);
+				grid-template-rows: 0fr;
+			}
+
+			@if $specified == width or $specified == both {
+				@include no-horizontal-spacing($adjust-padding);
+				grid-template-columns: 0fr;
+			}
+		}
+	}
+}
+
+/// 开启硬件 3D。用以解决某些可能会导致变换时闪动的问题。
+/// @remarks 这会替换或被替换掉现有的 transform 属性。
+/// @output transform
+@mixin enable-hardware-3d {
+	transform: translateZ(1px);
+}
+
+/// 声明一个超高优先级的选择器。
+/// @content 声明强化选择器下的定义。
+/// @output #{$enhanced-selector}
+@mixin enhanced-selector {
+	$enhanced-selector: string-repeat(":not(#\\#)", 10); // 用于强行提高优先级。
+
+	#{$enhanced-selector} {
+		&,
+		&::before,
+		&::after {
+			@content;
+		}
+	}
+}
+
+/// 为子元素开启逐个浮入动画。
+/// @param {String} $selector - 要动画元素的唯一父选择器。
+/// @param {Number} $length - 要动画元素的最小个数。
+/// @param {Number} $duration - 单个元素动画持续时间。
+/// @param {Number} $delay - 各元素开始动画间隔时间。
+/// @param {String} $ease - 动画缓动曲线。
+/// @param {Number} $distance - 各元素动画的移动距离。
+/// @output
+@mixin float-in-children($selector, $length, $duration: 600ms, $delay: 100ms, $ease: eases.$ease-out-expo, $distance: 200px) {
+	@for $j from 1 through 2 {
+		$placement: if($j == 1, top, bottom);
+		$keyframes-name: if($j == 1, float-up, float-down);
+		$direction: if($j == 1, 1, -1);
+		$-selector: string-replace($selector, "$placement", "." + $placement);
+
+		@for $i from 1 through $length {
+			$delay-index: if($j == 1, $i, $length + 1 - $i);
+
+			#{$-selector} > :nth-child(#{$i}) {
+				animation: #{$keyframes-name} $duration #{$delay-index * $delay} $ease backwards;
+			}
+		}
+
+		@keyframes #{$keyframes-name} {
+			from {
+				translate: 0 #{$direction * $distance};
+				opacity: 0;
+			}
+		}
+	}
+}
+
+/// 为元素设置最大宽高度到屏幕宽高度，防止元素超出到屏幕外面。
+/// @output max-width, max-height
+@mixin set-max-size {
+	max-width: 100dvw;
+	max-height: 100dvh;
+}
+
+/// 禁止显示滚动条，但仍可滚动。
+/// @output ::-webkit-scrollbar, width, height
+@mixin no-scrollar {
+	&::-webkit-scrollbar {
+		@include square(0);
+	}
+}
+
+/// 如果元素为空就隐藏它。
+/// @output :empty, display
+@mixin hide-if-empty {
+	&:empty {
+		display: none;
+	}
+}

@@ -1,0 +1,31 @@
+@use "../theme/functions" as *;
+
+a,
+a:any-link {
+	color: c(accent);
+	text-decoration: none;
+}
+
+:not(.lite-links) > a:not(.lite) {
+	text-decoration: underline;
+
+	&:any-hover,
+	&:focus,
+	&:active {
+		opacity: 0.7;
+		// text-decoration: none; // TODO: 波浪动画效果因 global-colors.scss 中暂时搁置而暂时禁用。
+		// background: var(--accent-hover-wave-link-background) repeat-x 0 100%;
+		// background-size: 20px auto;
+		// animation: wave-move 1s infinite linear;
+	}
+}
+
+// @keyframes wave-move {
+// 	from {
+// 		background-position: 0 100%;
+// 	}
+
+// 	to {
+// 		background-position: -20px 100%;
+// 	}
+// }

@@ -1,0 +1,27 @@
+@use "../theme/functions" as *;
+@use "../theme/effects" as *;
+
+table:not(.lite) {
+	@include round-large;
+	@include chip-shadow;
+	overflow: clip;
+	text-align: left;
+	border-spacing: 0;
+
+	&:not(.narrow) {
+		width: 100%;
+	}
+
+	th,
+	td {
+		padding: 8px 12px;
+	}
+
+	tr:nth-of-type(odd) > td {
+		background-color: c(main-fg, 4%);
+	}
+
+	tr:hover > td {
+		background-color: c(main-fg, 7%);
+	}
+}

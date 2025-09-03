@@ -1,0 +1,37 @@
+////
+/// 在此处重置一切 CSS 默认的垃圾设置。
+////
+
+@layer base {
+	// 拜拜，丑陋的按钮样式。
+	button {
+		margin: 0;
+		padding: 0;
+		font-family: inherit;
+		font-size: inherit;
+		line-height: inherit;
+		background: none;
+		border: none;
+		outline: none !important;
+		cursor: pointer;
+		appearance: none;
+	}
+
+	// 合计着图片和视频默认居然是行内元素，导致 block 下方的空隙就是你造成的是吧？
+	img,
+	video,
+	picture {
+		display: block;
+		vertical-align: bottom;
+	}
+
+	// 标签的鼠标光标应该使用继承的样式。
+	label {
+		cursor: inherit;
+	}
+
+	// 移除搜索框旁边的叉。
+	input[type="search" i]::-webkit-search-cancel-button {
+		display: none;
+	}
+}

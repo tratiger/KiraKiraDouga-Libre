@@ -1,0 +1,39 @@
+# Created by https://gitignore.io/
+
+# Nuxt
+.nuxt
+.nuxt-*
+
+# Build dirs
+dist
+.output
+.gen
+.husky/_*
+
+# After Effects
+Adobe After Effects 自动保存
+
+# Node dependencies
+node_modules
+
+# Log files
+logs
+*.log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+lerna-debug.log
+.pnpm-debug.log
+
+# macOS
+.DS_Store
+
+# Windows
+desktop.ini
+
+# Real-time generated files
+types/components-globalized.d.ts
+types/icons.d.ts
+
+# Env tokens
+scripts/crowdin/token.ts

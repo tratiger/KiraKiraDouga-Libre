@@ -1,0 +1,185 @@
+// stylelint-disable property-no-vendor-prefix
+
+@use "sass:map";
+@use "sass:list";
+@use "sass:color";
+@use "../../assets/styles/theme/functions" as *;
+@use "../../assets/styles/theme/eases" as *;
+@use "../../assets/styles/theme/mixins" as *;
+@use "../../assets/styles/theme/effects" as *;
+@use "../../assets/styles/theme/variables" as *;
+@import "../../assets/styles/global-colors";
+@import "../../assets/styles/elements/hyperlink";
+@import "../../assets/styles/elements/reset";
+@import "../../assets/styles/elements/animations";
+
+$animation-options: $ease-out-expo 600ms backwards;
+
+* {
+	outline: none !important;
+	user-select: none !important;
+}
+
+body {
+	font-family: "Segoe UI", "Microsoft YaHei", Tahoma, Geneva, Verdana, Arial, SimHei, sans-serif;
+
+	&:lang(ja) {
+		font-family: "Yu Gothic UI", "Meiryo UI", "MS UI Gothic", "Segoe UI", Tahoma, Geneva, Verdana, Arial, SimHei, sans-serif;
+	}
+}
+
+span {
+	display: none;
+}
+
+html:lang(zh-Hans) span:lang(zh-Hans),
+html:lang(zh-Hant) span:lang(zh-Hant),
+html:lang(en) span:lang(en),
+html:lang(ja) span:lang(ja),
+html:lang(ko) span:lang(ko),
+html:lang(vi) span:lang(vi),
+html:lang(id) span:lang(id),
+html:lang(fr) span:lang(fr),
+html:lang(yue) span:lang(yue) {
+	display: inline;
+}
+
+.mask {
+	@include flex-center;
+	@include fullscreen;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	background-color: c(white, 50%);
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+}
+
+.card {
+	@include square(100%);
+	@include round-large;
+	@include card-shadow;
+	position: relative;
+	width: 1024px;
+	height: 600px;
+	overflow: clip;
+	background-color: c(white, 75%);
+	animation: intro $animation-options;
+
+	.card-body {
+		position: relative;
+		z-index: 2;
+		display: grid;
+		grid-template-rows: auto 1fr auto;
+		grid-template-columns: auto 1fr;
+		gap: 36px 60px;
+		padding: 60px 70px;
+
+		h1.title {
+			grid-column: 1 / 3;
+			margin: 0;
+			color: c(accent);
+			font-size: 54px;
+			text-align: right;
+			animation: move-down $animation-options;
+
+			&:lang(zh),
+			&:lang(yue) {
+				font-size: 64px;
+			}
+		}
+
+		.logo {
+			grid-row: 2 / 4;
+			cursor: no-drop;
+			animation: move-right $animation-options 200ms; // LOGO 的出场动画如果不加上延迟会造成动画卡顿。
+		}
+
+		p.content {
+			margin: 0;
+			font-size: 20px;
+			line-height: 30px;
+			animation: move-left $animation-options;
+		}
+
+		div.refresh-area {
+			margin-bottom: 36px;
+			font-size: 16px;
+			animation: move-up $animation-options;
+
+			p {
+				margin-top: 0;
+			}
+
+			button {
+				min-width: 80px;
+			}
+		}
+	}
+
+	.card-back {
+		@include square(100%);
+		position: absolute;
+		z-index: 1;
+
+		.settings-icon {
+			position: absolute;
+			color: c(accent-10);
+			animation: rotation $ease-out-expo 16s infinite;
+
+			&:first-of-type {
+				@include square(450px);
+				top: -120px;
+				left: -100px;
+			}
+
+			&:last-of-type {
+				@include square(612px);
+				right: -100px;
+				bottom: -200px;
+			}
+		}
+	}
+}
+
+.settings-icon-template {
+	@include square(0);
+	display: none;
+}
+
+@keyframes move-down {
+	from {
+		translate: 0 -50px;
+	}
+}
+
+@keyframes move-left {
+	from {
+		translate: 50px;
+	}
+}
+
+@keyframes move-up {
+	from {
+		translate: 0 50px;
+	}
+}
+
+@keyframes move-right {
+	from {
+		translate: -50px;
+	}
+}
+
+@keyframes rotation {
+	$length: 16;
+
+	@for $i from 0 through $length {
+		$progress: calc($i / $length);
+
+		#{$progress * 100%} {
+			rotate: $progress * 1turn;
+		}
+	}
+}

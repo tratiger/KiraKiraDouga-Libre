@@ -1,0 +1,275 @@
+@use "sass:string";
+@use "functions" as *;
+@use "internal" as *;
+@use "variables" as *;
+
+// #region 圆角
+/// 大卡片/缩略图。
+/// 使用 6px 大小的圆角。
+/// @param {String} $position [full] - 圆角的位置。
+/// @output border-radius
+@mixin round-large($position: full) {
+	@include set-border-radius(6px, $position);
+}
+
+/// 按钮/控制组件。
+/// 使用 4px 大小的圆角。
+/// @param {String} $position [full] - 圆角的位置。
+/// @output border-radius
+@mixin round-small($position: full) {
+	@include set-border-radius(4px, $position);
+}
+// #endregion
+
+// #region 响应式布局
+/// 手机端布局。
+/// @content
+/// @output @media screen
+@mixin mobile {
+	@media (width <= #{$mobile-max-width}) {
+		@content;
+	}
+}
+
+/// 平板端布局。
+/// @content
+/// @output @media screen
+@mixin tablet {
+	@media (width <= #{$tablet-max-width}) {
+		@content;
+	}
+}
+
+/// 电脑端布局。
+/// @content
+/// @output @media screen
+@mixin computer {
+	@media (width > #{$tablet-max-width}) {
+		@content;
+	}
+}
+
+/// 非手机端布局。
+/// @content
+/// @output @media screen
+@mixin not-mobile {
+	@media (width > #{$mobile-max-width}) {
+		@content;
+	}
+}
+// #endregion
+
+// #region 中性色
+/// 控制球阴影 关闭
+@mixin control-ball-shadow-off {
+	box-shadow: 0 2px 4px c(accent-shadow, 50%), 0 0 2px c(accent-shadow, 25%);
+}
+
+@mixin control-ball-shadow-off-disabled {
+	box-shadow: 0 2px 4px c(black, 10%);
+}
+
+@mixin control-ball-shadow-off-hover {
+	box-shadow: 0 4px 8px c(accent-shadow, 50%), 0 0 4px c(accent-shadow, 25%), 0 0 0 10px c(gray-40, 50%);
+}
+
+@mixin page-normal {
+	box-shadow: 0 2px 4px c(black, 10%);
+}
+
+@mixin control-inner-shadow {
+	box-shadow: inset 0 4px 4px c(black, 4%);
+}
+
+@mixin button-shadow-unchecked-focus {
+	// box-shadow: 0 4px 4px c(unchecked, 30%), 0 0 0 3px c(unchecked-focus, 50%);
+	box-shadow: 0 4px 4px c(accent-shadow, 30%), 0 0 0 3px c(gray-40, 50%);
+}
+
+@mixin large-shadow-unchecked-focus {
+	// box-shadow: 0 4px 4px c(unchecked, 30%), 0 0 0 10px c(unchecked-focus, 50%);
+	box-shadow: 0 2px 4px c(accent-shadow, 50%), 0 0 0 10px c(gray-40, 50%);
+}
+
+@mixin button-shadow-unchecked-focus-only {
+	box-shadow: 0 0 0 transparent, 0 0 0 3px c(gray-40, 50%);
+}
+
+@mixin button-shadow-unchecked-hover {
+	box-shadow: 0 4px 4px c(accent-shadow, 30%);
+}
+
+@mixin button-shadow-unchecked-hover-deeper {
+	box-shadow: 0 9px 9px c(accent-shadow, 30%);
+}
+
+@mixin button-shadow-unchecked-hover-focus {
+	box-shadow: 0 9px 9px c(accent-shadow, 30%), 0 0 0 3px c(gray-40, 50%);
+}
+
+@mixin textbox-trailingicon-focus {
+	box-shadow: 0 0 0 3px c(gray-50, 30%) inset;
+}
+
+@mixin color-palette-stroke {
+	box-shadow: 0 0 0 2px c(color-palette-stroke) inset;
+}
+
+@mixin acrylic-background {
+	background-color: c(acrylic-bg, 75%);
+}
+
+@mixin accent-ripple {
+	:deep(.ripple-circle) {
+		background-color: c(accent-ripple);
+	}
+}
+// #endregion
+
+// #region 主要主题色
+@mixin button-shadow {
+	box-shadow: 0 4px 4px c(accent, 30%);
+}
+
+@mixin button-shadow-hover {
+	box-shadow: 0 9px 9px c(accent, 30%);
+}
+
+@mixin button-shadow-focus {
+	box-shadow: 0 4px 4px c(accent, 30%), 0 0 0 3px c(accent-focus, 50%);
+}
+
+@mixin button-shadow-hover-focus {
+	box-shadow: 0 9px 9px c(accent, 30%), 0 0 0 3px c(accent-focus, 50%);
+}
+
+@mixin large-shadow-focus {
+	box-shadow: 0 2px 4px c(accent, 50%), 0 0 0 10px c(accent-focus, 50%);
+}
+
+@mixin button-shadow-focus-only {
+	box-shadow: 0 0 0 transparent, 0 0 0 3px c(accent-focus, 50%);
+}
+
+@mixin scale-pressed {
+	scale: calc(35 / 36);
+}
+
+@mixin button-scale-pressed {
+	@include scale-pressed;
+	box-shadow: none !important;
+}
+
+@mixin sidebar-shadow {
+	box-shadow: 0 0 24px c(accent, 30%);
+}
+
+@mixin sidebar-shadow-colored {
+	box-shadow: 0 0 24px c(accent, 80%);
+}
+
+@mixin card-shadow {
+	box-shadow: 0 4px 8px c(accent-shadow, 25%), 0 0 6px c(accent-shadow, 10%);
+}
+
+@mixin card-shadow-with-blur {
+	@include card-shadow;
+	backdrop-filter: blur(16px);
+}
+
+@mixin player-shadow {
+	box-shadow: 0 2px 8px c(accent-shadow, 20%);
+}
+
+/// 控制球阴影
+@mixin control-ball-shadow {
+	box-shadow: 0 2px 4px c(accent, 50%), 0 0 2px c(accent, 35%);
+}
+
+@mixin control-ball-shadow-disabled {
+	box-shadow: 0 2px 4px c(accent-disabled, 80%);
+}
+
+@mixin control-ball-shadow-hover {
+	box-shadow: 0 4px 8px c(accent, 50%), 0 0 4px c(accent, 35%), 0 0 0 10px c(accent-focus, 50%);
+}
+
+@mixin page-active {
+	box-shadow: 0 2px 4px c(accent, 60%);
+}
+
+@mixin system-card {
+	box-shadow: 0 8px 16px c(accent-shadow, 30%);
+	backdrop-filter: blur(16px);
+}
+
+@mixin dropdown-flyouts($includes: shadow-blur) {
+	@if string.index($includes, shadow) {
+		box-shadow: 0 8px 16px c(accent-shadow, 50%);
+	}
+
+	@if string.index($includes, blur) {
+		backdrop-filter: blur(16px);
+	}
+}
+
+@mixin dropdown-flyouts-unhover {
+	box-shadow: 0 8px 16px c(accent-shadow, 30%);
+}
+
+@mixin dropdown-flyouts-unfocus {
+	box-shadow: 0 8px 12px c(accent-shadow, 30%);
+}
+
+@mixin chip-shadow {
+	box-shadow: 0 2px 6px c(accent-shadow, 25%), 0 0 4px c(accent-shadow, 10%);
+}
+
+@mixin chip-shadow-filter {
+	filter: drop-shadow(0 2px 6px c(accent-shadow, 30%)) drop-shadow(0 0 4px c(accent-shadow, 10%));
+}
+
+@mixin chip-shadow-checked {
+	box-shadow: 0 2px 6px c(accent-shadow, 30%), 0 0 4px c(accent-shadow, 10%), 0 0 0 2px c(accent);
+}
+
+@mixin chip-shadow-hover {
+	box-shadow: 0 7px 9px 2px c(accent-shadow, 30%), 0 0 7px c(accent-shadow, 10%);
+}
+
+@mixin chip-shadow-checked-hover {
+	box-shadow: 0 7px 9px 2px c(accent-shadow, 30%), 0 0 7px c(accent-shadow, 10%), 0 0 0 4px c(accent);
+}
+
+@mixin chip-shadow-focus {
+	box-shadow: 0 2px 6px c(accent-shadow, 30%), 0 0 4px c(accent-shadow, 10%), 0 0 0 4px c(gray-40, 50%);
+}
+
+@mixin chip-shadow-hover-focus {
+	box-shadow: 0 7px 9px 2px c(accent-shadow, 30%), 0 0 0 4px c(gray-40, 50%);
+}
+
+@mixin chip-shadow-checked-focus {
+	box-shadow: 0 2px 6px c(accent-shadow, 30%), 0 0 0 4px c(accent);
+}
+
+@mixin card-in-card-shadow {
+	box-shadow: 0 2px 8px c(accent-shadow, 8%);
+}
+
+@mixin mini-card-shadow {
+	box-shadow: 0 4px 8px c(accent-shadow, 30%);
+}
+// #endregion
+
+// #region 次要主题色
+@mixin toast-shadow($color) {
+	color: c($color);
+	box-shadow: 0 2px 10px c($color, 30%);
+	backdrop-filter: blur(16px);
+
+	.progress {
+		background-color: c($color);
+	}
+}
+// #endregion

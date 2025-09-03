@@ -1,0 +1,69 @@
+@use "../theme/effects" as *;
+@use "../theme/functions" as *;
+
+.toolbox-card {
+	@include round-large;
+	@include card-shadow;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	padding: 16px;
+	overflow: clip;
+	background-color: c(surface-color);
+
+	@each $pos in left, right {
+		.#{$pos} &,
+		&.#{$pos} {
+			width: 250px;
+
+			@include tablet {
+				width: 100%;
+			}
+		}
+	}
+
+	> main {
+		padding: 16px;
+	}
+
+	> section {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	> .accordion {
+		box-shadow: none !important;
+	}
+}
+
+@mixin settings-grid {
+	$min-width: 218px;
+	$gap: 12px;
+	--force-multi-column: false;
+	container: settings-grid / inline-size;
+
+	display: grid;
+	grid-gap: 0;
+	grid-template-columns: repeat(auto-fill, minmax($min-width, 1fr));
+	justify-content: space-between;
+	align-items: start;
+
+	&:has(.settings-grid-item) {
+		gap: $gap;
+	}
+
+	> * {
+		--column: multi;
+
+		@container settings-grid style(--force-multi-column: false) {
+			@container settings-grid (width < #{$min-width * 2 + $gap}) {
+				--column: single;
+			}
+
+			@container settings-grid (width < #{$min-width * 2}) {
+				--view: list;
+			}
+		}
+	}
+}

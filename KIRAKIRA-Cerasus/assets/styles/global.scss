@@ -1,0 +1,455 @@
+// stylelint-disable property-no-unknown
+// stylelint-disable declaration-block-no-duplicate-properties
+
+@layer base, theme, layout, props, utilities, components, special;
+
+*,
+::before,
+::after {
+	box-sizing: border-box;
+	margin-block: 0;
+	margin-inline: 0;
+	font-family: $simplified-chinese-fonts;
+	// font-feature-settings: "ss02" on, "ss01" on, "liga" on, "rlig" on, "dlig" on, "hlig" on, "onum" on, "kern" on; // 开多了有点过分了。
+	font-feature-settings: "ss03" on, "halt" on; // 圆形的逗号、引号。
+	font-kerning: normal;
+	font-optical-sizing: auto;
+	// font-variant-east-asian: proportional-width; // 苹方会恶意将全角逗号、冒号、分号等错误地变成半宽，但句号和顿号却莫名其妙地保持不变。
+	font-variant-ligatures: common-ligatures historical-ligatures contextual;
+	font-variant-numeric: proportional-nums;
+	white-space-collapse: collapse;
+	white-space-collapse: discard;
+	text-space-collapse: discard;
+	text-spacing: normal;
+	text-rendering: optimizeLegibility;
+	tab-size: 4;
+	user-select: none;
+	transition: $fallback-transitions;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	// -webkit-tap-highlight-color: c(accent, 30%); // 我还是觉得这个触摸样式很丑。
+	-webkit-tap-highlight-color: transparent;
+}
+
+:lang(zh-Hant) {
+	&,
+	&::before,
+	&::after {
+		font-family: $traditional-chinese-taiwan-fonts;
+	}
+}
+
+:lang(yue) {
+	&,
+	&::before,
+	&::after {
+		font-family: $traditional-chinese-hongkong-fonts;
+	}
+}
+
+:lang(ja) {
+	&,
+	&::before,
+	&::after {
+		font-family: $japanese-fonts;
+	}
+}
+
+:lang(ko) {
+	&,
+	&::before,
+	&::after {
+		font-family: $korean-fonts;
+	}
+}
+
+code,
+pre,
+samp,
+tt,
+xmp {
+	&,
+	* {
+		font-family: $monospace-fonts !important;
+	}
+}
+
+:focus,
+:focus-visible {
+	outline: none !important;
+}
+
+html,
+body {
+	overflow: hidden;
+	overscroll-behavior-y: none;
+	font-size: 14px;
+	interpolate-size: allow-keywords;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	color: c(text-color);
+	line-height: 1.4;
+	background-color: c(main-bg);
+	transition: background-color $ease-out-max 250ms;
+}
+
+a {
+	cursor: pointer !important;
+}
+
+[hidden] {
+	display: none !important;
+}
+
+time {
+	font-feature-settings: "case" on;
+	font-variant-numeric: tabular-nums;
+}
+
+.no-scroll {
+	overflow: hidden !important;
+}
+
+iframe.noscript-mask {
+	@include fullscreen;
+	z-index: 100;
+	border: none;
+
+	+ form {
+		position: fixed;
+		right: 32px;
+		bottom: 32px;
+		z-index: 101;
+		animation: noscript-refresh-enter 500ms 1s $ease-out-smooth both;
+
+		button {
+			@include square(96px);
+			@include circle;
+			@include button-shadow;
+			@include grid-center;
+			background-color: c(accent);
+
+			&::after {
+				@include square(48px);
+				content: "";
+				display: block;
+				background-image: url("/prior/static/icons/refresh.svg");
+				animation: noscript-refresh-rotation 1s linear infinite paused;
+			}
+
+			&:any-hover {
+				@include button-shadow-hover;
+				background-color: c(accent-hover);
+
+				&::after {
+					animation-play-state: running;
+				}
+			}
+
+			&:any-hover:focus-visible {
+				@include button-shadow-hover-focus;
+			}
+
+			&:active {
+				@include button-scale-pressed;
+				background-color: c(accent-pressed);
+			}
+
+			&:focus-visible {
+				@include button-shadow-focus;
+			}
+		}
+	}
+}
+
+@keyframes noscript-refresh-enter {
+	from {
+		scale: 0;
+	}
+}
+
+@keyframes noscript-refresh-rotation {
+	to {
+		rotate: 1turn;
+	}
+}
+
+kira-component {
+	display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: 0;
+}
+
+hr {
+	border: none;
+	border-top: c(divider, 10%) 1px solid;
+}
+
+::selection {
+	color: white;
+	background-color: c(accent); // WARN: Chromium 111 开始在 `::selection` 设定 `var()` 都会失效。包括 GitHub 和 Edge 的开发工具在内都有这种显示问题。https://bugs.chromium.org/p/chromium/issues/detail?id=1429546
+}
+
+#popovers {
+	display: contents;
+}
+
+// 禁用虚拟列表的过渡以免穿帮。
+// stylelint-disable-next-line selector-class-pattern
+.vue-recycle-scroller__item-view {
+	transition: none;
+}
+
+label {
+	@include hide-if-empty;
+	display: block;
+
+	&.details {
+		color: c(icon-color);
+		font-size: 12px;
+	}
+}
+
+img {
+	display: block;
+	user-select: none;
+	-webkit-user-drag: none;
+	user-drag: none;
+}
+
+// Crowdin 语境翻译工具标志
+img.jipt-loader-logo {
+	@include absolute-center-sized(fixed);
+}
+
+// Crowdin 语境翻译工具遮罩修正
+#crowdin-jipt-mask {
+	background-color: c(main-bg) !important;
+
+	&,
+	* {
+		transition: none;
+	}
+}
+
+// Crowdin 语境翻译工具右上角关闭按钮默认颜色在深色主题下看不清。
+#jipt-close-btn {
+	color: var(--icon-color) !important;
+}
+
+// 保持 Crowdin 语境翻译文本高亮可被选择和点击。
+// stylelint-disable-next-line selector-class-pattern
+.crowdin_phrase {
+	pointer-events: auto;
+}
+
+// 使 JS 获取 100lvh 高度。
+#large-viewport-size {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100lvw;
+	height: 100lvh;
+	visibility: hidden;
+}
+
+@layer base {
+	#popovers > * {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 35;
+	}
+}
+
+// 用户请求削弱动态效果。
+@media (prefers-reduced-motion: reduce) {
+	@include enhanced-selector {
+		transition-duration: 0s !important;
+		animation-duration: 0s !important;
+	}
+}
+
+// 移除颜色过渡。
+html.no-color-transition {
+	@include enhanced-selector {
+		transition: $fallback-transitions, color 0s, background 0s, fill 0s, border-color 0s, filter 0s !important;
+	}
+}
+
+// 强行指定光标声明。
+html[style*="--cursor"] {
+	&,
+	* {
+		&,
+		::before,
+		::after {
+			cursor: var(--cursor) !important;
+		}
+	}
+}
+
+// #region 自定义属性
+@property --view-transition-blurriness {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0;
+}
+
+@property --view-transition-halftone-gradient {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: calc(infinity * 1px);
+}
+// #endregion
+
+// #region 主题过渡
+::view-transition-old(root),
+::view-transition-new(root) {
+	mix-blend-mode: normal;
+	animation: none;
+}
+// #endregion
+
+// #region 页面过渡
+.page-forward-enter-active,
+.page-backward-enter-active,
+.settings-enter-active,
+.right-enter-active,
+.left-enter-active {
+	transition: all $ease-out-smooth 600ms !important;
+}
+
+.page-jump-in-enter-active,
+.page-jump-out-enter-active {
+	@media not (prefers-reduced-motion: reduce) {
+		> * {
+			$length: 20;
+			transition: all $ease-out-smooth !important;
+			transition-duration: (600ms + 50ms * ($length - 1)) !important;
+			transition-delay: (10ms * ($length - 1)) !important;
+
+			@for $i from 1 through $length {
+				&:nth-child(#{$i}) {
+					transition-duration: (600ms + 50ms * ($i - 1)) !important;
+					transition-delay: (10ms * ($i - 1)) !important;
+				}
+			}
+		}
+	}
+}
+
+.page-forward-leave-active,
+.page-backward-leave-active,
+.page-jump-in-leave-active,
+.page-jump-out-leave-active,
+.settings-leave-active,
+.right-leave-active,
+.left-leave-active {
+	transition: all $ease-in-expo 100ms !important;
+}
+
+.settings-enter-active,
+.settings-leave-active {
+	max-height: 100dvh;
+	overflow: clip;
+}
+
+.page-forward-enter-from,
+.page-backward-leave-to {
+	translate: 8rem;
+	opacity: 0;
+}
+
+.page-forward-leave-to,
+.page-backward-enter-from {
+	translate: -2rem;
+	opacity: 0;
+}
+
+.page-jump-in-enter-from {
+	> * {
+		translate: 0 8rem;
+		opacity: 0;
+	}
+}
+
+.page-jump-in-leave-to {
+	translate: 0 -2rem;
+	opacity: 0;
+}
+
+.page-jump-out-enter-from {
+	> * {
+		translate: 0 -2rem;
+		opacity: 0;
+	}
+}
+
+.page-jump-out-leave-to {
+	translate: 0 8rem;
+	opacity: 0;
+}
+
+.settings-leave-to,
+.settings-enter-from {
+	opacity: 0;
+
+	@at-root {
+		main#{&} {
+			scale: 0.9;
+		}
+	}
+
+	&.settings {
+		scale: 1.1;
+	}
+}
+
+.icon-enter-from,
+.icon-leave-to {
+	transform: scale(0.2);
+	opacity: 0;
+}
+
+.icon-enter-active {
+	transition: 500ms $ease-out-spring;
+}
+
+.icon-leave-active {
+	transition: 100ms $ease-in-max;
+}
+
+.right-enter-from,
+.left-leave-to {
+	translate: 2rem;
+	opacity: 0;
+}
+
+.right-leave-to,
+.left-enter-from {
+	translate: -2rem;
+	opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: all $ease-in-expo 250ms !important;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+// #endregion

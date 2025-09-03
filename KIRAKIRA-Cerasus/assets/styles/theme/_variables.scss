@@ -1,0 +1,87 @@
+@use "eases" as *;
+@use "sass:map";
+
+// #region 响应式布局
+$mobile-max-width: 639px;
+$tablet-max-width: 991px;
+// #endregion
+
+// #region 过渡动画
+$fallback-transitions: all $ease-out-expo 250ms, color $ease-out-expo 100ms, fill $ease-out-expo 100ms, accent-color 0ms;
+// #endregion
+
+// #region 字体
+/// 优先使用“思源黑体”系列字体以提供一致的体验。\
+/// lang 附标将自动切换区域字形，因此无需担心字形不匹配的问题。除了每个地区的字体家族样式那里都会写一大堆“思源黑体”系列字体之外。\
+/// 顺序：Adobe 语言特定版本可变字体、Google 语言特定版本可变或普通字体、Adobe 语言特定版本普通字体。\
+/// 仅安装地区子集版本字体会不断触发回退，故去除地区子集版本字体。
+$source-han-sans-fonts: (
+	simplified-chinese: ("Source Han Sans SC VF", "Noto Sans CJK SC", "Source Han Sans SC"),
+	traditional-chinese-taiwan: ("Source Han Sans TC VF", "Noto Sans CJK TC", "Source Han Sans TC"),
+	traditional-chinese-hongkong: ("Source Han Sans HC VF", "Noto Sans CJK HK", "Source Han Sans HC"),
+	japanese: ("Source Han Sans VF", "Noto Sans CJK JP", "Source Han Sans"),
+	korean: ("Source Han Sans K VF", "Noto Sans CJK KR", "Source Han Sans K"),
+);
+$source-han-sans-fonts: map.set($source-han-sans-fonts, merged, map.values($source-han-sans-fonts));
+/// 绘文字字体。
+$emoji-fonts: "Apple Color Emoji", "Noto Color Emoji", "Twemoji Mozilla", "Segoe UI Emoji", "Segoe UI Symbol", emoji;
+/// 泛 Unicode 字体。
+$pan-unicode-fonts: "Plangothic P1", "Plangothic P2", "MiSans L3", "WenJin Mincho Plane 0", "WenJin Mincho Plane 2", "WenJin Mincho Plane 3", "BabelStone Han", SimSun-ExtB, SimSun-ExtG, HanaMinA, HanaMinB, Jigmo, Jigmo2, Jigmo3, Unifont, "Unifont Upper";
+/// 回退字体顺序：英语字体、CJK 字体、无衬线体通用字体族、绘文字字体、泛 Unicode 字体。
+$fallback-fonts: sans-serif, $emoji-fonts, $pan-unicode-fonts;
+/// 英语字体。\
+/// Droid Sans、Open Sans、Tahoma、Geneva、Verdana、Helvetica Neue、Helvetica、Arial 为非现代字体，不应继续使用。\
+/// 注意：英语、越南语、印尼语等非中日韩语言会沿用简体中文字体。\
+/// 注意：我们听说在远东地区，当那里的人们在 Windows Vista / 7 中使用 Windows 经典主题时，默认字体会显示为如此古老而又复古的光栅字体宋体或明体，这简直糟透了。噢天呐，看在上帝的份上，千万不要使用 system-ui 通用字体族，否则整个界面就会变得和珍妮婶婶做的苹果派一样烂了，真是该死。因此我们决定，为了保证网站的一致性体验，我们不能将用户甩出复印机与窗口，我们必须将 system-ui 从字体堆栈中踢出去！见 https://github.com/twbs/bootstrap/issues/22328 和 https://github.com/w3c/csswg-drafts/issues/3658 。
+$english-fonts: "Yozora Sans", -apple-system, BlinkMacSystemFont, InterVariable, Inter, "Segoe UI", "Roboto Flex", Roboto, "Noto Sans", "Fira Sans";
+/// 简体中文字体。
+$simplified-chinese-fonts: $english-fonts, map.get($source-han-sans-fonts, simplified-chinese), map.get($source-han-sans-fonts, merged), "PingFang SC", "Microsoft YaHei", $fallback-fonts;
+/// 台湾繁体中文字体。
+$traditional-chinese-taiwan-fonts: $english-fonts, map.get($source-han-sans-fonts, traditional-chinese-taiwan), map.get($source-han-sans-fonts, merged), "PingFang TC", "Microsoft JhengHei", $fallback-fonts;
+/// 香港繁体中文字体。
+$traditional-chinese-hongkong-fonts: $english-fonts, map.get($source-han-sans-fonts, traditional-chinese-hongkong), map.get($source-han-sans-fonts, merged), "PingFang HK", "Microsoft JhengHei", $fallback-fonts;
+/// 日语字体。\
+/// 由于冬青黑体采用喇叭口、方形逗号等，与项目风格理念不合，故设为思源黑体优先。如未安装思源黑体则会显示为冬青黑体。\
+/// 注意：由于艾了个拉不喜欢窄假名字体，故没有使用 Yu Gothic UI、Meiryo UI、MS UI Gothic 字体，因此请日语翻译者注意控制一下译文字数，比如多用汉字词、少用“片假名语”之类的，否则字就跑到边框外面去了。
+$japanese-fonts: $english-fonts, map.get($source-han-sans-fonts, japanese), map.get($source-han-sans-fonts, merged), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", "Yu Gothic", Meiryo, $fallback-fonts;
+/// 韩语字体。\
+/// 苹果韩语字体对汉字的支持有限，不断触发回退的体验很糟糕，故设为思源黑体优先。
+$korean-fonts: $english-fonts, map.get($source-han-sans-fonts, korean), map.get($source-han-sans-fonts, merged), "Apple SD Gothic Neo", "Malgun Gothic", $fallback-fonts;
+/// 英语徽标字体。
+$english-logo-fonts: Montserrat, $english-fonts;
+/// 等宽字体。
+$monospace-fonts: "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+// #endregion
+
+// #region 渐变
+$hue-radial: conic-gradient(from 90deg at center, red 0deg, yellow 60deg, lime 120deg, cyan 180deg, blue 240deg, magenta 300deg, red 360deg);
+$luminance-radial: radial-gradient(closest-side, white 0%, #fff0 100%);
+$-sixth: calc(100% / 6);
+$hue-linear: linear-gradient(to right, red 0%, yellow $-sixth, lime $-sixth * 2, cyan $-sixth * 3, blue $-sixth * 4, magenta $-sixth * 5, red 100%);
+// #endregion
+
+/// 侧边栏宽度
+$sidebar-width: 48px;
+
+/// 移动端标题栏和导航栏高度
+$mobile-toolbar-height: 56px;
+
+/// 横幅高度
+$banner-height: 10rem;
+
+/// 菜单边距
+$menu-padding: 6px;
+$menu-item-padding-block: 8px;
+$menu-item-height: 36px;
+$menu-item-padding-block-mobile: 12px;
+$menu-item-height-mobile: 44px;
+
+// #region 页面水平方向边距
+$page-padding-x: 5dvw;
+$page-padding-x-tablet: 24px;
+$page-padding-x-mobile: 16px;
+// #endregion
+
+$drawer-padding: $page-padding-x-mobile;
+$drawer-width: 245px + 2 * $drawer-padding;
+$drawer-transition-duration: 500ms;

@@ -1,0 +1,13 @@
+diff --git a/dist/parser.js b/dist/parser.js
+index b4c75e3edc3fe6dfb9cc3ef5637d89e0b2173cd7..e225b8aac525fdf0f313e5a5700c71126220eda0 100644
+--- a/dist/parser.js
++++ b/dist/parser.js
+@@ -127,7 +127,7 @@ var Parser = /*#__PURE__*/function () {
+     var _this = this;
+     return function (message, errorOptions) {
+       if (typeof _this.rule === 'string') {
+-        return new Error(message);
++        return;
+       }
+       return _this.rule.error(message, errorOptions);
+     };

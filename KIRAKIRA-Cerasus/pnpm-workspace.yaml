@@ -1,0 +1,10 @@
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - protobufjs
+  - sharp
+  - vue-demi
+
+patchedDependencies:
+  nuxt: patches/nuxt.patch
+  shaka-player: patches/shaka-player.patch

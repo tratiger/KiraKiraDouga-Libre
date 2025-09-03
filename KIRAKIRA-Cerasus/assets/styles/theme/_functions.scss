@@ -1,0 +1,121 @@
+@use "sass:color";
+@use "sass:list";
+@use "sass:string";
+@use "sass:math";
+
+/// 将指定颜色反转亮度。
+/// @param {Color} $color - 颜色值。
+/// @return {Color} 反转亮度后的颜色值。
+@function invert-lightness($color) {
+	$lightness: 100% - color.lightness($color);
+	@return hsla(color.hue($color), color.saturation($color), $lightness, color.alpha($color));
+}
+
+/// 将 Sass 映射的键名转换为 CSS 属性的属性名。
+/// @param {String} $key - Sass 映射的键名。
+/// @return {String} CSS 属性的属性名。
+@function key-to-css-var($key) {
+	@return string.unquote($string: "--" + $key);
+}
+
+/// 将颜色值中的“#”号转义，放在 background url data svg 中。
+/// @param {Color} $color - 颜色值。
+/// @return {String} 转义 SVG 中的颜色值。
+@function color-to-svg-color($color) {
+	@return string.unquote("%23" + string.slice(#{$color}, -6)); // $color 变量是颜色类型，需要转换成字符串类型才可继续使用。
+}
+
+/// 将颜色（如 `#f00`）转换为 RGB 列表（如 `255, 0, 0`），方便用于调用 rgba 函数。
+/// @param {Color} $color - 颜色值。
+/// @return {List} RGB 三色的列表。
+@function color-to-rgb-list($color) {
+	@return color.red($color), color.green($color), color.blue($color);
+}
+
+/// 调用主题色。
+/// @param {String} $css-var-name - 颜色的 CSS 属性名称，不必加前面的“--”。也可以是 white 或 black。
+/// @param {Number | null} $alpha [null] - Alpha 值，可以是百分比值或零到一之间的小数，推荐用百分比值，如果留空表示不透明色。
+/// @return {Color} 返回由 var 调用的自定义属性纯色，或 rgba 封装的透明色。
+@function c($css-var-name, $alpha: null) {
+	$color: if($css-var-name == white or $css-var-name == black, $css-var-name, var(--#{$css-var-name}));
+
+	@if not $alpha {
+		@return $color;
+	} @else {
+		@return color-mix(in oklab, $color, transparent (100 - $alpha));
+	}
+}
+
+/// #### 不准温度计
+/// 即将一个数值从一个标度单位转移到另一个标度单位，新旧单位成线性关系，且不一定成正比关系，比如说摄氏度和华氏度的关系，返回对应的新值。
+/// 比如说，将一个取值范围为 0 ~ 255 的颜色值转到 0 ~ 100 的值。
+/// @param {Number} $x - 待转换的原标度数值。
+/// @param {Number} $min - 原标度值（小）。
+/// @param {Number} $max - 原标度值（大）。
+/// @param {Number} $a - 新标度值（小）。
+/// @param {Number} $b - 新标度值（大）。
+/// @param {Number} $css-calc [false] - 如是，则返回为基于 CSS 运行时的计算表达式。
+/// @return {Number} 转换后的新标度数值。
+@function map($x, $min, $max, $a, $b, $css-calc: false) {
+	@if not $css-calc {
+		@return calc(($b - $a) * ($x - $min) / ($max - $min)) + $a;
+	} @else {
+		@return calc((($b - $a) * ($x - $min) / ($max - $min)) + $a);
+	}
+}
+
+/// 将列表中的每一项取相反数。
+/// @example scss
+/// 	margin: list-negative(1rem 2rem);
+/// 	// result
+/// 	margin: -1rem -2rem;
+/// @param {List} $list - 列表。
+/// @return {List} 取负数后的列表。
+@function list-negative($list) {
+	@for $i from 1 through list.length($list) {
+		$list: list.set-nth($list, $i, -(list.nth($list, $i)));
+	}
+	@return $list;
+}
+
+/// 重复指定次数字符串。
+/// @param {String} $str - 字符串。
+/// @param {Number} $count - 重复次数。
+/// @return {String} 重复指定次数后的字符串。
+@function string-repeat($str, $count) {
+	$result: "";
+
+	@for $i from 1 through $count {
+		$result: $result + $str;
+	}
+
+	@return $result;
+}
+
+/// 将 `$string` 中的 `$search` 替换为 `$replace`。
+/// @param {String} $string - 初始字符串。
+/// @param {String} $search - 要更换的子字符串。
+/// @param {String} $replace [""] - 新值。
+/// @return {String} 更新后的字符串。
+@function string-replace($string, $search, $replace: "") {
+	$index: string.index($string, $search);
+
+	@if $index {
+		@return string.slice($string, 1, $index - 1) + $replace + string-replace(string.slice($string, $index + string.length($search)), $search, $replace);
+	}
+
+	@return $string;
+}
+
+/// 生成给定两个数之间随机数。
+/// @param {Number} $min - 最小值。
+/// @param {Number} $max - 最大值。
+/// @param {Bool} $is-int [true] - 是否必须返回一个整数而不是小数？默认是整数。
+/// @return {Number} 范围内的随机数。
+@function rand-between($min, $max, $is-int: true) {
+	@if $is-int {
+		@return math.random($max + 1 - $min) + $min;
+	} @else {
+		@return math.random() * ($max - $min) + $min;
+	}
+}
