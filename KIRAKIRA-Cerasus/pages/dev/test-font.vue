@@ -10,7 +10,7 @@
 
 <template>
 	<div class="container">
-		<span>提示：以下文字可以直接编辑。</span>
+		<span>ヒント：以下のテキストは直接編集できます。</span>
 		<p
 			:contenteditable="true"
 			class="text"
@@ -28,35 +28,35 @@
 			The quick brown fox jumps over a lazy dog.
 		</p>
 		<section>
-			<span>语言</span>
+			<span>言語</span>
 			<Segmented v-model="lang">
-				<SegmentedItem id="zh-Hans-CN">简中</SegmentedItem>
-				<SegmentedItem id="zh-Hant-TW">繁中</SegmentedItem>
+				<SegmentedItem id="zh-Hans-CN">簡体</SegmentedItem>
+				<SegmentedItem id="zh-Hant-TW">繁体</SegmentedItem>
 				<SegmentedItem id="ja">日</SegmentedItem>
-				<SegmentedItem id="ko">韩</SegmentedItem>
+				<SegmentedItem id="ko">韓</SegmentedItem>
 				<SegmentedItem id="en">英</SegmentedItem>
 				<SegmentedItem id="vi">越</SegmentedItem>
-				<SegmentedItem id="id">印尼</SegmentedItem>
+				<SegmentedItem id="id">尼</SegmentedItem>
 			</Segmented>
 		</section>
 
 		<section>
-			<span>大小</span>
+			<span>サイズ</span>
 			<TextBox v-model="size" type="number" :min="0" :max="128" />
 			<Slider v-model="size" :min="0" :max="128" :step="1" :defaultValue="24" />
 		</section>
 		<section>
-			<span>字重</span>
+			<span>ウェイト</span>
 			<TextBox v-model="weight" type="number" :min="1" :max="1000" />
 			<Slider v-model="weight" :min="1" :max="1000" :step="1" :defaultValue="400" />
 		</section>
 		<section>
-			<span>光学尺寸</span>
+			<span>オプティカルサイズ</span>
 			<TextBox v-model="opsz" type="number" :min="1" :max="50" />
 			<Slider v-model="opsz" :min="1" :max="50" :step="1" :defaultValue="10" />
 		</section>
 		<section>
-			<ToggleSwitch v-model="isForceFontFamily">强制字体家族</ToggleSwitch>
+			<ToggleSwitch v-model="isForceFontFamily">フォントファミリーを強制</ToggleSwitch>
 			<TextBox v-model="forceFontFamily" v-if="isForceFontFamily" />
 		</section>
 	</div>

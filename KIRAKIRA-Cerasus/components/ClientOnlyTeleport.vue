@@ -1,4 +1,4 @@
-<!-- DELETE: 自 Nuxt 3.11 开始即将弃用！ -->
+<!-- DELETE: Nuxt 3.11から非推奨になります！ -->
 
 <script setup lang="ts">
 	const props = defineProps<{

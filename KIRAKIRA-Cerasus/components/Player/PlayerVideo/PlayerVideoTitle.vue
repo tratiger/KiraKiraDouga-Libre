@@ -1,12 +1,12 @@
 <docs>
-	仅在视频全屏时在顶部显示视频的标题以及当前时间。
+	動画が全画面表示の時のみ、上部に動画のタイトルと現在時刻を表示します。
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 视频标题。 */
+		/** 動画タイトル。 */
 		title: string;
-		/** 是否隐藏？ */
+		/** 非表示にしますか？ */
 		hidden?: boolean;
 	}>();
 

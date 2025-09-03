@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 使用更强烈的色调表示选中聚焦项。 */
+		/** 選択されたフォーカス項目をより強い色調で表示します。 */
 		highlighted?: boolean;
 	}>();
 
@@ -9,7 +9,7 @@
 	const kaomoji = useSlots().default?.()[0]?.children?.toString();
 
 	onMounted(async () => {
-		await delay(100); // 等待过渡动画时间，使之计算更准确。
+		await delay(100); // トランジションアニメーション時間を待って、計算をより正確にします。
 		const buttonEl = button.value?.$el as HTMLButtonElement | undefined;
 		if (buttonEl && buttonEl.children[0])
 			requireShowTooltip.value = buttonEl.children[0].clientWidth > buttonEl.clientWidth;

@@ -1,5 +1,5 @@
 <docs>
-	# 时间码选择器
+	# タイムコードピッカー
 </docs>
 
 <script setup lang="ts">

@@ -1,10 +1,10 @@
 <docs>
-	# 卡片内复选框
+	# カード内チェックボックス
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 图片。 */
+		/** 画像。 */
 		image?: string;
 	}>(), {
 		image: undefined,
@@ -29,13 +29,13 @@
 <style scoped lang="scss">
 	@layer props {
 		:comp {
-			/// 卡片宽度。
+			/// カードの幅。
 			--width: 208px;
-			/// 卡片高度。
+			/// カードの高さ。
 			--height: 117px;
-			/// 卡片宽高比。
+			/// カードのアスペクト比。
 			--aspect-ratio: auto;
-			/// 复选框到卡片左上角的距离。
+			/// チェックボックスからカード左上隅までの距離。
 			--float-offset: 12px;
 		}
 	}

@@ -2,22 +2,22 @@
 	import NumberFlow from "@number-flow/vue";
 
 	const props = withDefaults(defineProps<{
-		/** 投稿日期？修改日期？ */ // TODO: 投稿日期？修改日期？两个日期我觉得应该都要显示。
+		/** 投稿日？修正日？ */ // TODO: 投稿日？修正日？両方の日付を表示すべきだと思います。
 		date: Date;
-		/** 分区。 */
+		/** カテゴリ。 */
 		category: string;
-		/** 版权。 */
+		/** 著作権。 */
 		copyright: Copyright;
-		/** 标题。 */
+		/** タイトル。 */
 		title: string;
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 标签们。 */
+		/** タグ。 */
 		tags?: DisplayVideoTag[];
-		/** 封面地址 */
+		/** カバーアドレス */
 		cover?: string;
 	}>(), {
-		tags: () => [], // （？）奇怪的写法
+		tags: () => [], // （？）奇妙な書き方
 		cover: undefined,
 	});
 
@@ -40,7 +40,7 @@
 	});
 
 	/**
-	 * 喜欢。
+	 * いいね。
 	 */
 	function like() {
 		if (interactionState.like) {
@@ -53,7 +53,7 @@
 	}
 
 	/**
-	 * 不喜欢。
+	 * よくないね。
 	 */
 	function dislike() {
 		if (interactionState.dislike) {
@@ -66,54 +66,54 @@
 	}
 
 	/**
-	 * 收藏。
+	 * コレクション。
 	 */
 	function saveToCollection() {
 		if (selfUserInfoStore.isLogined)
-			useToast(t.under_construction.feature, "warning", 5000); // DELETE 请在收藏功能完成后删除该提示
+			useToast(t.under_construction.feature, "warning", 5000); // DELETE コレクション機能が完成したら、このヒントを削除してください
 		else
 			useEvent("app:requestLogin");
 	}
 
 	/**
-	 * 收藏。
+	 * コレクション。
 	 */
 	function watchLater() {
 		if (selfUserInfoStore.isLogined)
-			useToast(t.under_construction.feature, "warning", 5000); // DELETE 请在收藏功能完成后删除该提示
+			useToast(t.under_construction.feature, "warning", 5000); // DELETE コレクション機能が完成したら、このヒントを削除してください
 		else
 			useEvent("app:requestLogin");
 	}
 
 	/**
-	 * 分享。
+	 * 共有。
 	 */
 	function share() {
 		navigator.share({
 			title: document.title,
-			text: "KIRAKIRA☆DOUGA", // XXX: 这里得放页面的 title。
+			text: "KIRAKIRA☆DOUGA", // XXX: ここにページのタイトルを配置する必要があります。
 			url: location.href,
 		});
 	}
 
 	/**
-	 * 下载封面。
+	 * カバーをダウンロード。
 	 */
 	function downloadCover() {
 		if (props.cover) {
 			const image = useImage();
 			const IMAGE_MAX_WIDTH = 999999;
-			window.open(image(props.cover, { width: IMAGE_MAX_WIDTH }, { provider: environment.cloudflareImageProvider }), "_blank"); // TODO: 先暂时改为在新标签页中直接打开图片的样式，而非下载图片
+			window.open(image(props.cover, { width: IMAGE_MAX_WIDTH }, { provider: environment.cloudflareImageProvider }), "_blank"); // TODO: まず、画像をダウンロードするのではなく、新しいタブで画像を直接開くスタイルに一時的に変更します
 			// downloadFile(props.cover, `${props.title} (kv${props.videoId})`);
 		} else useToast(t.toast.something_went_wrong, "error");
 	}
 
 	/**
-	 * 举报。
+	 * 報告。
 	 */
 	function report() {
 		if (selfUserInfoStore.isLogined)
-			useToast(t.under_construction.feature, "warning", 5000); // DELETE 请在举报功能完成后删除该提示
+			useToast(t.under_construction.feature, "warning", 5000); // DELETE 報告機能が完成したら、このヒントを削除してください
 		else
 			useEvent("app:requestLogin");
 	}

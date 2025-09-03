@@ -5,111 +5,111 @@ const BACK_END_URI = environment.backendUri;
 const BLOCK_API_URI = `${BACK_END_URI}block`;
 
 /**
- * 获取用户的黑名单
- * @param getBlockListRequest - 获取用户的黑名单的请求载荷
- * @returns 获取用户的黑名单的请求响应
+ * ユーザーのブロックリストを取得します
+ * @param getBlockListRequest - ユーザーのブロックリストを取得するためのリクエストペイロード
+ * @returns ユーザーのブロックリスト取得リクエストのレスポンス
  */
 export const getBlockListController = async (getBlockListRequest: GetBlockListRequestDto): Promise<GetBlockListResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await GET(`${BLOCK_API_URI}/list?type=${getBlockListRequest.type}&page=${getBlockListRequest.pagination.page}&pageSize=${getBlockListRequest.pagination.pageSize}`, { credentials: "include" }) as GetVideoCommentByKvidResponseDto;
 };
 
 /**
- * 屏蔽用户
- * @param blockUserByUidRequest - 屏蔽用户的请求载荷
- * @returns 屏蔽用户的请求响应
+ * ユーザーをブロックします
+ * @param blockUserByUidRequest - ユーザーをブロックするためのリクエストペイロード
+ * @returns ユーザーをブロックするリクエストのレスポンス
  */
 export const blockUserController = async (blockUserByUidRequest: BlockUserByUidRequestDto): Promise<BlockUserByUidResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await POST(`${BLOCK_API_URI}/user`, blockUserByUidRequest, { credentials: "include" }) as BlockUserByUidResponseDto;
 };
 
 /**
- * 取消屏蔽用户
- * @param unblockUserByUidRequest - 取消屏蔽用户的请求载荷
- * @returns 取消屏蔽用户的请求响应
+ * ユーザーのブロックを解除します
+ * @param unblockUserByUidRequest - ユーザーのブロックを解除するためのリクエストペイロード
+ * @returns ユーザーのブロックを解除するリクエストのレスポンス
  */
 export const unblockUserController = async (unblockUserByUidRequest: UnblockUserByUidRequestDto): Promise<UnblockUserByUidResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await DELETE(`${BLOCK_API_URI}/delete/user`, unblockUserByUidRequest, { credentials: "include" }) as UnblockUserByUidResponseDto;
 };
 
 /**
- * 隐藏用户
- * @param hideUserByUidRequest - 隐藏用户的请求载荷
- * @returns 隐藏用户的请求响应
+ * ユーザーを非表示にします
+ * @param hideUserByUidRequest - ユーザーを非表示にするためのリクエストペイロード
+ * @returns ユーザーを非表示にするリクエストのレスポンス
  */
 export const hideUserController = async (hideUserByUidRequest: HideUserByUidRequestDto): Promise<HideUserByUidResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await POST(`${BLOCK_API_URI}/hideuser`, hideUserByUidRequest, { credentials: "include" }) as HideUserByUidResponseDto;
 };
 
 /**
- * 取消隐藏用户
- * @param showUserByUidRequest - 显示用户的请求载荷
- * @returns 显示用户的请求响应
+ * ユーザーの非表示を解除します
+ * @param showUserByUidRequest - ユーザーを表示するためのリクエストペイロード
+ * @returns ユーザーを表示するリクエストのレスポンス
  */
 export const showUserController = async (showUserByUidRequest: ShowUserByUidRequestDto): Promise<ShowUserByUidResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await DELETE(`${BLOCK_API_URI}/delete/hideuser`, showUserByUidRequest, { credentials: "include" }) as ShowUserByUidResponseDto;
 };
 
 /**
- * 屏蔽 TAG
- * @param blockTagRequest - 屏蔽 TAG 的请求载荷
- * @returns 屏蔽 TAG 的请求响应
+ * タグをブロックします
+ * @param blockTagRequest - タグをブロックするためのリクエストペイロード
+ * @returns タグをブロックするリクエストのレスポンス
  */
 export const blockTagController = async (blockTagRequest: BlockTagRequestDto): Promise<BlockTagResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await POST(`${BLOCK_API_URI}/tag`, blockTagRequest, { credentials: "include" }) as BlockTagResponseDto;
 };
 
 /**
- * 取消屏蔽 TAG
- * @param unblockTagRequest - 取消屏蔽 TAG 的请求载荷
- * @returns 取消屏蔽 TAG 的请求响应
+ * タグのブロックを解除します
+ * @param unblockTagRequest - タグのブロックを解除するためのリクエストペイロード
+ * @returns タグのブロックを解除するリクエストのレスポンス
  */
 export const unblockTagController = async (unblockTagRequest: UnblockTagRequestDto): Promise<UnblockTagResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await DELETE(`${BLOCK_API_URI}/delete/tag`, unblockTagRequest, { credentials: "include" }) as UnblockTagResponseDto;
 };
 
 /**
- * 屏蔽关键词
- * @param blockKeywordRequest - 屏蔽关键词的请求载荷
- * @returns 屏蔽关键词的请求响应
+ * キーワードをブロックします
+ * @param blockKeywordRequest - キーワードをブロックするためのリクエストペイロード
+ * @returns キーワードをブロックするリクエストのレスポンス
  */
 export const blockKeywordController = async (blockKeywordRequest: BlockKeywordRequestDto): Promise<BlockKeywordResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await POST(`${BLOCK_API_URI}/keyword`, blockKeywordRequest, { credentials: "include" }) as BlockKeywordResponseDto;
 };
 
 /**
- * 取消屏蔽关键词
- * @param unblockKeywordRequest - 取消屏蔽关键词的请求载荷
- * @returns 取消屏蔽关键词的请求响应
+ * キーワードのブロックを解除します
+ * @param unblockKeywordRequest - キーワードのブロックを解除するためのリクエストペイロード
+ * @returns キーワードのブロックを解除するリクエストのレスポンス
  */
 export const unblockKeywordController = async (unblockKeywordRequest: UnblockKeywordRequestDto): Promise<UnblockKeywordResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await DELETE(`${BLOCK_API_URI}/delete/keyword`, unblockKeywordRequest, { credentials: "include" }) as UnblockKeywordResponseDto;
 };
 
 /**
- * 添加用于屏蔽内容的正则表达式
- * @param addRegexRequest - 添加用于屏蔽内容的正则表达式的请求载荷
- * @returns 添加用于屏蔽内容的正则表达式的请求响应
+ * コンテンツをブロックするための正規表現を追加します
+ * @param addRegexRequest - コンテンツをブロックするための正規表現を追加するリクエストペイロード
+ * @returns コンテンツをブロックするための正規表現を追加するリクエストのレスポンス
  */
 export const addRegexController = async (addRegexRequest: AddRegexRequestDto): Promise<AddRegexResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await POST(`${BLOCK_API_URI}/regex`, addRegexRequest, { credentials: "include" }) as AddRegexResponseDto;
 };
 
 /**
- * 移除用于屏蔽内容的正则表达式
- * @param removeRegexRequest - 移除用于屏蔽内容的正则表达式的请求载荷
- * @returns 移除用于屏蔽内容的正则表达式的请求响应
+ * コンテンツをブロックするための正規表現を削除します
+ * @param removeRegexRequest - コンテンツをブロックするための正規表現を削除するリクエストペイロード
+ * @returns コンテンツをブロックするための正規表現を削除するリクエストのレスポンス
  */
 export const removeRegexController = async (removeRegexRequest: RemoveRegexRequestDto): Promise<RemoveRegexResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return await DELETE(`${BLOCK_API_URI}/delete/regex`, removeRegexRequest, { credentials: "include" }) as RemoveRegexResponseDto;
 };

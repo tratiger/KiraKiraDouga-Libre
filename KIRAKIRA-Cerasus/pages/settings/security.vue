@@ -8,7 +8,7 @@
 	const appSettingsStore = useAppSettingsStore();
 	const selfUserInfo = useSelfUserInfoStore();
 
-	// 修改邮箱相关
+	// メールアドレス変更関連
 	const showChangeEmail = ref(false);
 	const changeEmailVerificationCode = ref("");
 	const newEmail = ref("");
@@ -16,7 +16,7 @@
 	const changeEmailPassword = ref("");
 	const isChangingEmail = ref(false);
 
-	// 修改密码相关
+	// パスワード変更関連
 	const showChangePassword = ref(false);
 	const changePasswordVerificationCode = ref("");
 	const oldPassword = ref("");
@@ -24,21 +24,21 @@
 	const confirmNewPassword = ref("");
 	const isChangingPassword = ref(false);
 
-	// 2FA 相关
-	const checkUser2FAResult = ref<CheckUserHave2FAResponseDto>(); // 获取到的用户 2FA 类型
+	// 2FA関連
+	const checkUser2FAResult = ref<CheckUserHave2FAResponseDto>(); // 取得したユーザーの2FAタイプ
 	const authenticatorAddDateDisplay = computed(() => formatDateWithLocale(new Date(checkUser2FAResult.value?.totpCreationDateTime ?? 0)));
 	type AuthenticatorType = "none" | "email" | "totp";
-	const categoryOf2FAComputed = computed<AuthenticatorType>({ // 2FA 的类型，带有副作用
+	const categoryOf2FAComputed = computed<AuthenticatorType>({ // 2FAのタイプ、副作用あり
 		get() {
 			return appSettingsStore.authenticatorType === "email" || appSettingsStore.authenticatorType === "totp" ? appSettingsStore.authenticatorType : "none";
 		},
 		set(newValue: string) {
 			if (appSettingsStore.authenticatorType === "totp" && newValue !== "totp" && checkUser2FAResult.value?.type === "totp") {
-				// 当响应式变量从 totp 改变为其他非 totp 的值，且用户的 2FA 类型为 totp 时，打开解绑 TOTP 的模态框，且不会导致导致响应式变量的变更
+				// リアクティブ変数がtotpから他の非totpの値に変更され、かつユーザーの2FAタイプがtotpの場合、TOTPのバインド解除モーダルを開き、リアクティブ変数の変更は行わない
 				useToast(t.toast.must_remove_totp_first, "warning", 5000);
 				openDeleteTotpModel();
 			} else if (appSettingsStore.authenticatorType === "email" && newValue !== "email" && checkUser2FAResult.value?.type === "email") {
-				// 当响应式变量从 email 改变为其他非 email 的值，且用户的 2FA 类型为 email 时，打开删除 Email 2FA 的模态框，且不会导致导致响应式变量的变更
+				// リアクティブ変数がemailから他の非emailの値に変更され、かつユーザーの2FAタイプがemailの場合、Email 2FAの削除モーダルを開き、リアクティブ変数の変更は行わない
 				openDeleteEmail2FAModel();
 				useToast(t.toast.must_verify_email_first, "warning", 5000);
 			} else if (newValue === "email" && appSettingsStore.authenticatorType !== "email" && checkUser2FAResult.value?.type !== "email")
@@ -47,43 +47,43 @@
 				appSettingsStore.authenticatorType = newValue;
 		},
 	});
-	const hasBoundTotp = computed(() => checkUser2FAResult.value?.success && checkUser2FAResult.value.have2FA && checkUser2FAResult.value?.type === "totp"); // 是否已经有 TOTP，当 2FA 存在且类型为 totp 时，开启编辑 TOTP 的模态框，否则开启创建 TOTP 的模态框
+	const hasBoundTotp = computed(() => checkUser2FAResult.value?.success && checkUser2FAResult.value.have2FA && checkUser2FAResult.value?.type === "totp"); // TOTPが既に存在するかどうか。2FAが存在し、タイプがtotpの場合、TOTP編集モーダルを開き、そうでない場合はTOTP作成モーダルを開く
 	const isEmail2FADisable = computed(() => checkUser2FAResult.value?.type === "totp" || categoryOf2FAComputed.value === "totp");
 	const isTotp2FADisable = computed(() => checkUser2FAResult.value?.type === "email" || categoryOf2FAComputed.value === "email");
 
-	// 警告相关
+	// 警告関連
 	const isUnsafeAccount = computed(() => selfUserInfo.isLogined && (appSettingsStore.authenticatorType === "none" || !checkUser2FAResult.value?.have2FA));
 
-	// 创建 TOTP 2FA 相关
-	const showCreateTotpModel = ref(false); // 是否显示创建 TOTP 模态框
-	const otpAuth = ref<string>(""); // TOTP AUTH（也就是二维码中的值）
-	const totpQrcodeLevel = ref<Level>("M"); // 二维码等级
-	const totpQrcodeRenderAs = ref<RenderAs>("svg"); // 二维码渲染格式
-	const totpQrcodeSize = ref<number>(200); // 二维码尺寸（px）
-	const confirmTotpVerificationCode = ref(""); // 确认绑定 TOTP 时用户输入的验证码
-	const isConfirmTotp = ref(false); // 是否正在确认绑定 TOTP
-	const backupCode = ref<string[]>([]); // 备份码
-	const displayBackupCode = computed(() => backupCode.value.join("\t")); // 用于显示的备份码，中间用 TAB 隔开
-	const recoveryCode = ref(""); // 恢复码
+	// TOTP 2FA作成関連
+	const showCreateTotpModel = ref(false); // TOTP作成モーダルを表示するか
+	const otpAuth = ref<string>(""); // TOTP AUTH（QRコード内の値）
+	const totpQrcodeLevel = ref<Level>("M"); // QRコードレベル
+	const totpQrcodeRenderAs = ref<RenderAs>("svg"); // QRコードレンダリング形式
+	const totpQrcodeSize = ref<number>(200); // QRコードサイズ（px）
+	const confirmTotpVerificationCode = ref(""); // TOTPバインド確認時にユーザーが入力する確認コード
+	const isConfirmTotp = ref(false); // TOTPバインド確認中か
+	const backupCode = ref<string[]>([]); // バックアップコード
+	const displayBackupCode = computed(() => backupCode.value.join("\t")); // 表示用のバックアップコード、タブで区切る
+	const recoveryCode = ref(""); // リカバリーコード
 
-	// 删除 TOTP 2FA 相关
-	const showDeleteTotpModel = ref(false); // 是否显示删除 TOTP 的模态框
-	const deleteTotpVerificationCode = ref(""); // 删除 TOTP 时用户输入的验证码
-	const deleteTotpPassword = ref(""); // 删除 TOTP 时用户输入的密码
-	const isDeletingTotp = ref(false); // 是否正在删除 TOTP
+	// TOTP 2FA削除関連
+	const showDeleteTotpModel = ref(false); // TOTP削除モーダルを表示するか
+	const deleteTotpVerificationCode = ref(""); // TOTP削除時にユーザーが入力する確認コード
+	const deleteTotpPassword = ref(""); // TOTP削除時にユーザーが入力するパスワード
+	const isDeletingTotp = ref(false); // TOTP削除中か
 
-	// 创建 Email 2FA 相关
-	const showCreateEmail2FAModel = ref(false); // 是否显示创建 Email 2FA 的模态框
-	const isCreatingEmail2FA = ref(false); // 是否正在创建 Email 2FA
+	// Email 2FA作成関連
+	const showCreateEmail2FAModel = ref(false); // Email 2FA作成モーダルを表示するか
+	const isCreatingEmail2FA = ref(false); // Email 2FA作成中か
 
-	// 删除 Email 2FA 相关
-	const showDeleteEmail2FAModel = ref(false); // 是否显示删除 Email 2FA 的模态框
-	const deleteEmail2FAVerificationCode = ref(""); // 删除 Email 2FA 时用户输入的验证码
-	const deleteEmail2FAPassword = ref(""); // 删除 Email 2FA 时用户输入的密码
-	const isDeletingEmail2FA = ref(false); // 是否正在删除 Email 2FA
+	// Email 2FA削除関連
+	const showDeleteEmail2FAModel = ref(false); // Email 2FA削除モーダルを表示するか
+	const deleteEmail2FAVerificationCode = ref(""); // Email 2FA削除時にユーザーが入力する確認コード
+	const deleteEmail2FAPassword = ref(""); // Email 2FA削除時にユーザーが入力するパスワード
+	const isDeletingEmail2FA = ref(false); // Email 2FA削除中か
 
 	/**
-	 * 修改 Email
+	 * メールアドレスを変更
 	 */
 	async function updateUserEmail() {
 		const oldEmail = selfUserInfoStore.userInfo.email ?? "";
@@ -118,7 +118,7 @@
 	}
 
 	/**
-	 * 修改 Email
+	 * メールアドレスを変更
 	 */
 	async function updateUserPassword() {
 		if (!oldPassword.value || !newPassword.value || !changePasswordVerificationCode.value) {
@@ -149,7 +149,7 @@
 	}
 
 	/**
-	 * 通过 Cookie 中的 UUID 检查用户是否已开启 2FA 身份验证器
+	 * CookieのUUIDを介してユーザーが2FA認証を有効にしているか確認します
 	 */
 	async function checkUserHave2FAByUUID() {
 		const headerCookie = useRequestHeaders(["cookie"]);
@@ -161,21 +161,21 @@
 	}
 
 	/**
-	 * 开启创建 Email 2FA 的模态框
+	 * Email 2FA作成モーダルを開きます
 	 */
 	function openCreateEmail2FAModel() {
 		showCreateEmail2FAModel.value = true;
 	}
 
 	/**
-	 * 关闭创建 Email 2FA 的模态框
+	 * Email 2FA作成モーダルを閉じます
 	 */
 	function closeCreateEmail2FAModel() {
 		showCreateEmail2FAModel.value = false;
 	}
 
 	/**
-	 * 用户创建 Email 身份验证器
+	 * ユーザーがEmail認証を作成します
 	 */
 	async function createEmail2FA() {
 		isCreatingEmail2FA.value = true;
@@ -205,14 +205,14 @@
 	}
 
 	/**
-	 * 开启删除 Email 2FA 的模态框
+	 * Email 2FA削除モーダルを開きます
 	 */
 	function openDeleteEmail2FAModel() {
 		showDeleteEmail2FAModel.value = true;
 	}
 
 	/**
-	 * 关闭删除 Email 2FA 的模态框，并清除相关状态
+	 * Email 2FA削除モーダルを閉じ、関連ステータスをクリアします
 	 */
 	function closeDeleteEmail2FAModel() {
 		showDeleteEmail2FAModel.value = false;
@@ -222,7 +222,7 @@
 	}
 
 	/**
-	 * 删除 Email 2FA
+	 * Email 2FAを削除
 	 */
 	async function deleteEmail2FAByVerification() {
 		isDeletingEmail2FA.value = true;
@@ -255,7 +255,7 @@
 	}
 
 	/**
-	 * 开启 TOTP 模态框
+	 * TOTPモーダルを開きます
 	 */
 	function openTotpModel() {
 		if (hasBoundTotp.value)
@@ -265,13 +265,13 @@
 	}
 
 	/**
-	 * 开启创建 TOTP 的模态框
+	 * TOTP作成モーダルを開きます
 	 */
 	async function openCreateTotpModel() {
 		/**
-		 * 0. 开启模态框
-		 * 1. 请求创建 TOTP
-		 * 2. 根据创建结果渲染二维码、显示备份码、恢复码
+		 * 0. モーダルを開く
+		 * 1. TOTP作成をリクエスト
+		 * 2. 作成結果に基づいてQRコードをレンダリングし、バックアップコードとリカバリーコードを表示
 		 */
 
 		showCreateTotpModel.value = true;
@@ -282,7 +282,7 @@
 	}
 
 	/**
-	 * 关闭创建 TOTP 的模态框，并清除二维码数据和备份码/恢复码数据
+	 * TOTP作成モーダルを閉じ、QRコードデータとバックアップ/リカバリーコードデータをクリアします
 	 */
 	async function closeCreateTotpModel() {
 		isConfirmTotp.value = true;
@@ -297,7 +297,7 @@
 	}
 
 	/**
-	 * 确认绑定 TOTP
+	 * TOTPのバインドを確認
 	 */
 	async function handleClickConfirmTotp() {
 		if (!confirmTotpVerificationCode.value) {
@@ -329,7 +329,7 @@
 	}
 
 	/**
-	 * 下载 TOTP 生成的备份码和恢复码。
+	 * TOTPで生成されたバックアップコードとリカバリーコードをダウンロードします。
 	 */
 	function downloadBackupCodeAndRecoveryCode() {
 		const backupCodeAndRecoveryCode = `${t.two_factor_authentication.add_totp.backup_code}\n${displayBackupCode.value}\n\n${t.two_factor_authentication.add_totp.recovery_code}\n${recoveryCode.value}`;
@@ -338,14 +338,14 @@
 	}
 
 	/**
-	 * 开启删除 TOTP 的模态框
+	 * TOTP削除モーダルを開きます
 	 */
 	function openDeleteTotpModel() {
 		showDeleteTotpModel.value = true;
 	}
 
 	/**
-	 * 关闭删除 TOTP 的模态框，并清除相关状态
+	 * TOTP削除モーダルを閉じ、関連ステータスをクリアします
 	 */
 	function closeDeleteTotpModel() {
 		showDeleteTotpModel.value = false;
@@ -355,7 +355,7 @@
 	}
 
 	/**
-	 * 删除 TOTP 身份验证器
+	 * TOTP認証を削除
 	 */
 	async function deleteTotpByVerification() {
 		if (!deleteTotpPassword.value) {

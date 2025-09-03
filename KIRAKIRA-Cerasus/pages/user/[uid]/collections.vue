@@ -14,7 +14,7 @@
 	});
 
 	/**
-	 * 页面尺寸改变事件。
+	 * ページサイズ変更イベント。
 	 */
 	function onResize() {
 		if (!toolbar.value) return;
@@ -81,11 +81,11 @@
 						v-for="i in 5"
 						:key="i"
 						link="video"
-						uploader="艾了个拉"
+						uploader="Aira"
 						:date="new Date()"
 						:watchedCount="233_0000"
 						:duration="new Duration(2, 33)"
-					>{{ "测试视频".repeat(10) }}</ThumbVideo> -->
+					>{{ "テスト動画".repeat(10) }}</ThumbVideo> -->
 				</ThumbGrid>
 			</main>
 		</div>

@@ -1,15 +1,15 @@
 <docs>
-	# 文件选择器
+	# ファイルピッカー
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 接受的文件类型。 */
+		/** 受け入れるファイルタイプ。 */
 		accept: string;
 		/**
-		 * #### 封面模式？
-		 * * 开启后，图片将填充整个窗格。适用于照片、封面、艺术作品等。
-		 * * 关闭后，图片将适应整个窗格以保证图片不被裁切。适用于截图、纸质扫描件、证件照等。
+		 * #### カバーモード？
+		 * * オンにすると、画像はペイン全体に塗りつぶされます。写真、カバー、アートワークなどに適しています。
+		 * * オフにすると、画像はペイン全体に合わせて調整され、画像が切り取られないようにします。スクリーンショット、紙のスキャン、証明写真などに適しています。
 		 */
 		cover?: boolean;
 		unselectedText?: string;
@@ -25,11 +25,11 @@
 	const isImageType = computed(() => !!file.value?.type.startsWith("image"));
 	const imageSource = ref<string>();
 
-	// TODO: 使用 showOpenFilePicker() 函数，从此以后就不用再使用那个愚蠢的 input 元素了。
+	// TODO: showOpenFilePicker() 関数を使用すると、今後はその愚かなinput要素を使用する必要がなくなります。
 
 	/**
-	 * 成功上传文件。
-	 * @param fileList - 文件列表。
+	 * ファイルのアップロードに成功しました。
+	 * @param fileList - ファイルリスト。
 	 */
 	async function uploaded(fileList: File[]) {
 		succeed.value = true;
@@ -39,7 +39,7 @@
 	}
 
 	/**
-	 * 上传文件无效。
+	 * 無効なファイルをアップロードしました。
 	 */
 	function invalidUploaded() {
 		succeed.value = false;
@@ -48,9 +48,9 @@
 	}
 
 	/**
-	 * 获取合法的文件列表。
-	 * @param fileList - 原生文件列表。
-	 * @returns 合法的文件列表。
+	 * 有効なファイルリストを取得します。
+	 * @param fileList - ネイティブファイルリスト。
+	 * @returns 有効なファイルリスト。
 	 */
 	function getValidFiles(fileList?: FileList | null) {
 		if (!fileList || fileList.length === 0) return [];
@@ -62,8 +62,8 @@
 	}
 
 	/**
-	 * 拖放事件。
-	 * @param e - 拖放事件。
+	 * ドラッグアンドドロップイベント。
+	 * @param e - ドラッグアンドドロップイベント。
 	 */
 	function onDrop(e: DragEvent) {
 		dragover.value = false;
@@ -77,8 +77,8 @@
 	}
 
 	/**
-	 * 上传文件事件。
-	 * @param e - 普通事件。
+	 * ファイルアップロードイベント。
+	 * @param e - 通常のイベント。
 	 */
 	function onChangeFile(e: Event) {
 		const input = e.target as HTMLInputElement;
@@ -90,7 +90,7 @@
 	}
 
 	/**
-	 * 取消本次上传。
+	 * 今回のアップロードをキャンセルします。
 	 */
 	function removePicked() {
 		startViewTransition(() => {
@@ -101,7 +101,7 @@
 	}
 
 	/**
-	 * 更新图片链接。
+	 * 画像リンクを更新します。
 	 */
 	async function updateImageSrc() {
 		imageSource.value = file.value && await fileToData(file.value);

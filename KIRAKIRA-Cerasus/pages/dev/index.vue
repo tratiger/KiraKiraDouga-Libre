@@ -4,21 +4,21 @@
 	type Page = { name: string; link: string };
 
 	/**
-	 * 获取页面列表。
-	 * @param pages - 页面数组。
-	 * @returns 页面对象。
+	 * ページリストを取得します。
+	 * @param pages - ページ配列。
+	 * @returns ページオブジェクト。
 	 */
 	function getPages(...pages: [string, string][]): Page[];
 	/**
-	 * 获取页面列表。
-	 * @param httpCodes - HTTP 代码数组。
-	 * @returns 页面对象。
+	 * ページリストを取得します。
+	 * @param httpCodes - HTTPコード配列。
+	 * @returns ページオブジェクト。
 	 */
 	function getPages(...httpCodes: number[]): Page[];
 	/**
-	 * 获取页面列表。
-	 * @param pages - 页面数组。
-	 * @returns 页面对象。
+	 * ページリストを取得します。
+	 * @param pages - ページ配列。
+	 * @returns ページオブジェクト。
 	 */
 	function getPages(...pages: ([string, string] | number)[]): Page[] {
 		return pages.map(page => (typeof page === "number" ? { name: String(page), link: String(page) } :
@@ -26,28 +26,28 @@
 	}
 
 	const pages = getPages(
-		["组件测试页", "/dev/components"],
-		["富文本测试页", "/dev/test-rich-text-editor"],
-		["动态图标测试页", "/dev/test-lottie"],
-		["字体测试页", "/dev/test-font"],
-		["滚动测试页", "/dev/test-scroll"],
-		["滑块测试页", "/dev/test-slider"],
-		["颜色测试页", "/dev/test-color"],
-		["指针类型检测", "/dev/pointer-type"],
-		["示例视频", "/video/kvtest"],
+		["コンポーネントテストページ", "/dev/components"],
+		["リッチテキストテストページ", "/dev/test-rich-text-editor"],
+		["動的アイコンテストページ", "/dev/test-lottie"],
+		["フォントテストページ", "/dev/test-font"],
+		["スクロールテストページ", "/dev/test-scroll"],
+		["スライダーテストページ", "/dev/test-slider"],
+		["カラーテストページ", "/dev/test-color"],
+		["ポインタータイプ検出", "/dev/pointer-type"],
+		["サンプル動画", "/video/kvtest"],
 		["kv1", "/video/kv1"],
-		["kv3000", "/video/kv3000"], // FIXME: 以路由形式进入不存在的页面不会跳转到对应的 404 或 301 等错误页面，以新窗口打开时则正常。
-		["示例音频", "/audio"],
-		["示例相簿", "/photo"],
-		["搜索", "/search"],
+		["kv3000", "/video/kv3000"], // FIXME: ルーティングで存在しないページにアクセスしても、対応する404や301などのエラーページにリダイレクトされず、新しいウィンドウで開くと正常に動作します。
+		["サンプル音声", "/audio"],
+		["サンプルアルバム", "/photo"],
+		["検索", "/search"],
 		["投稿", "/upload"],
-		["稿件编辑", "/upload/edit"],
-		["个人主页", "/user"],
+		["投稿編集", "/upload/edit"],
+		["マイページ", "/user"],
 		["uid2", "/user/2"],
-		["uid3000", "/user/3000"], // FIXME: 以路由形式进入不存在的页面不会跳转到对应的 404 或 301 等错误页面，以新窗口打开时则正常。
-		["首次登录欢迎页", "/welcome"],
-		["内容", "/hello"],
-		["下一页", "/next"],
+		["uid3000", "/user/3000"], // FIXME: ルーティングで存在しないページにアクセスしても、対応する404や301などのエラーページにリダイレクトされず、新しいウィンドウで開くと正常に動作します。
+		["初回ログイン歓迎ページ", "/welcome"],
+		["コンテンツ", "/hello"],
+		["次のページ", "/next"],
 	);
 
 	const httpCodes = getPages(
@@ -64,11 +64,11 @@
 
 <template>
 	<div class="container">
-		<Subheader icon="science" :badge="233">测试</Subheader>
+		<Subheader icon="science" :badge="233">テスト</Subheader>
 		<div class="pages">
 			<LocaleLink v-for="page in pages" :key="page.name" class="link lite" :to="page.link">{{ page.name }}</LocaleLink>
 		</div>
-		<Subheader icon="error" :badge="233">错误页</Subheader>
+		<Subheader icon="error" :badge="233">エラーページ</Subheader>
 		<div class="pages">
 			<a v-for="page in httpCodes" :key="page.name" class="link lite" :href="'/error/' + page.link">{{ page.name }}</a>
 		</div>

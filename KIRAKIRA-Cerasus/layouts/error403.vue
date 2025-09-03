@@ -5,7 +5,7 @@
 	}>();
 
 	const iconWrapper = ref<HTMLDivElement>();
-	const resizeObserver = ref<ResizeObserver>(); // 改用纯 CSS 来实现可能会更好，但不知道怎样做。
+	const resizeObserver = ref<ResizeObserver>(); // 純粋なCSSで実装する方が良いかもしれませんが、方法がわかりません。
 	const narrow = ref(false);
 
 	onMounted(() => {

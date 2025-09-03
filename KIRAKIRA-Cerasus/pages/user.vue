@@ -1,11 +1,11 @@
 <script lang="ts">
 	export const tabs = [
-		{ id: "", icon: "home" }, // 首页，Markdown自我介绍放在顶部（类似GitHub），下方为显示用户发布的所有内容，类似于「关注（/feed/following）」页面
-		{ id: "videos", name: "video", icon: "movie" }, // 视频
-		// { id: "series", icon: "video_library" }, // 系列
-		// { id: "posts", name: "post", icon: "post" }, // 帖子
-		// { id: "audios", icon: "music" }, // 音频
-		// { id: "albums", icon: "photo_library" }, // 相簿或者相册，类似QQ空间相册，所有帖子配图默认也会放在这里，相簿名称可以直接叫「帖子」。
+		{ id: "", icon: "home" }, // ホーム、Markdown自己紹介を上部に配置（GitHubのように）、下にはユーザーが投稿したすべてのコンテンツを表示し、「フォロー（/feed/following）」ページに似た形式
+		{ id: "videos", name: "video", icon: "movie" }, // 動画
+		// { id: "series", icon: "video_library" }, // シリーズ
+		// { id: "posts", name: "post", icon: "post" }, // 投稿
+		// { id: "audios", icon: "music" }, // 音声
+		// { id: "albums", icon: "photo_library" }, // アルバムまたはフォトアルバム。QQスペースのアルバムに似ており、すべての投稿の画像はデフォルトでここに配置されます。アルバム名は直接「投稿」とすることができます。
 		{ id: "collections", name: "collection", icon: "star" },
 	];
 </script>
@@ -36,39 +36,39 @@
 	const headerCookie = useRequestHeaders(["cookie"]);
 	await api.user.getSelfUserInfo({ getSelfUserInfoRequest: undefined, appSettingsStore: useAppSettingsStore(), selfUserInfoStore, headerCookie });
 
-	const isSelf = ref(false); // 当前页面是否是自己
-	const isFollowing = ref(false); // 当前页面中的用户是否已经关注
-	const userInfo = ref<GetUserInfoByUidResponseDto>(); // 用户信息（并非自己的用户信息）
+	const isSelf = ref(false); // 現在のページが自分自身か
+	const isFollowing = ref(false); // 現在のページのユーザーをフォローしているか
+	const userInfo = ref<GetUserInfoByUidResponseDto>(); // ユーザー情報（自分自身の情報ではない）
 	const actionMenu = ref<FlyoutModel>();
 	const currentTab = computed(() => currentUserTab());
 
-	const urlUid = ref(); // URL 中的 UID
+	const urlUid = ref(); // URL内のUID
 	urlUid.value = currentUserUid(); // SSR
 	const nuxtApp = useNuxtApp();
 	nuxtApp.hook("page:finish", () => {
 		urlUid.value = currentUserUid(); // CSR
 	});
 
-	const selfUid = computed(() => selfUserInfoStore.userInfo.uid); // 自己的 UID（如果已经登陆）
+	const selfUid = computed(() => selfUserInfoStore.userInfo.uid); // 自分のUID（ログイン済みの場合）
 
 	/**
-	 * 屏蔽一个用户
+	 * ユーザーをブロックします
 	 */
 	async function blockUser() {
 		try {
 			const blockUid = urlUid.value;
 
 			if (blockUid === undefined || blockUid === null || blockUid < 1) {
-				console.error("ERROR", "屏蔽用户的 UID 格式不正确，不能为空或小于零");
+				console.error("ERROR", "ブロックするユーザーのUID形式が正しくありません。空または0未満にすることはできません");
 				// TODO: 使用多语言
-				useToast("屏蔽用户的 UID 格式不正确", "error", 5000);
+				useToast("ブロックするユーザーのUID形式が正しくありません", "error", 5000);
 				return;
 			}
 
 			if (selfUserInfoStore.userInfo.uid === blockUid) {
-				console.error("ERROR", "不能屏蔽自己");
+				console.error("ERROR", "自分自身をブロックすることはできません");
 				// TODO: 使用多语言
-				useToast("不能屏蔽自己", "error", 5000);
+				useToast("自分自身をブロックすることはできません", "error", 5000);
 				return;
 			}
 
@@ -78,17 +78,17 @@
 			const blockUserResult = await api.block.blockUserController(blockUserByUidRequest);
 			if (blockUserResult.success) {
 				// TODO: 使用多语言
-				useToast("屏蔽用户成功", "success");
+				useToast("ユーザーをブロックしました", "success");
 				navigate("/");
 			} else {
-				console.error("ERROR", "屏蔽用户失败");
+				console.error("ERROR", "ユーザーのブロックに失敗しました");
 				// TODO: 使用多语言
-				useToast("屏蔽用户失败", "error", 5000);
+				useToast("ユーザーのブロックに失敗しました", "error", 5000);
 			}
 		} catch (error) {
-			console.error("ERROR", "屏蔽用户时出错", error);
+			console.error("ERROR", "ユーザーをブロック中にエラーが発生しました", error);
 			// TODO: 使用多语言
-			useToast("屏蔽用户时出错", "error", 5000);
+			useToast("ユーザーをブロック中にエラーが発生しました", "error", 5000);
 		}
 	}
 
@@ -106,7 +106,7 @@
 			const headerCookie = useRequestHeaders(["cookie"]);
 			const userInfoResult = await api.user.getUserInfo(getUserInfoByUidRequest, headerCookie);
 			if (!userInfoResult.success)
-				useToast("获取用户信息失败", "error", 5000); // TODO: 使用多语言
+				useToast("ユーザー情報の取得に失敗しました", "error", 5000); // TODO: 使用多语言
 
 			if (userInfoResult.isBlocked)
 				navigateToErrorPage(404);
@@ -145,7 +145,7 @@
 						</template>
 					</UserContent>
 					<div class="actions">
-						<!-- <SoftButton v-tooltip:top="'私信'" icon="email" /> -->
+						<!-- <SoftButton v-tooltip:top="'ダイレクトメッセージ'" icon="email" /> -->
 						<SoftButton v-if="!isSelf" v-tooltip:top="t.more" icon="more_vert" @click="e => actionMenu = [e, 'y']" />
 						<Menu v-if="!isSelf" v-model="actionMenu">
 							<MenuItem icon="groups">{{ t.add_to_group }}</MenuItem>

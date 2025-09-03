@@ -2,57 +2,57 @@
 	import NumberFlow from "@number-flow/vue";
 
 	const props = withDefaults(defineProps<{
-		/** 评论唯一 ID */
+		/** コメントの一意のID */
 		commentId: string;
-		/** 评论所在的视频的 ID */
+		/** コメントが属する動画のID */
 		videoId: number;
-		/** 评论发布者头像网址。 */
+		/** コメント投稿者のアバターURL。 */
 		avatar?: string;
-		/** 评论发布者昵称。 */
+		/** コメント投稿者のニックネーム。 */
 		nickname?: string;
-		/** 评论发布者用户名。 */
+		/** コメント投稿者のユーザー名。 */
 		username?: string;
-		/** 评论发布者角色 */
+		/** コメント投稿者のロール */
 		roles?: string[];
-		/** 评论序号。 */
-		index?: number; // 我不赞成在序号前导 0，因为你怎敢假定评论数在绝大多数情况下小于或等于两位数？
-		/** 评论发布日期。 */
+		/** コメントのシーケンス番号。 */
+		index?: number; // コメント数がほとんどの場合2桁以下であると仮定することはできないため、シーケンス番号の前に0を付けることには賛成しません。
+		/** コメントの投稿日。 */
 		date?: Date;
-		/** 用户 UID。 */
+		/** ユーザーUID。 */
 		uid: number;
-		/** 评论的路由 */
+		/** コメントのルート */
 		commentRoute: string;
 	}>(), {
 		avatar: undefined,
-		username: "匿名",
+		username: "匿名ユーザー",
 		index: undefined,
 		date: () => new Date(),
 		uid: undefined,
 	});
 
-	/** 为该评论加分的值。 */
+	/** このコメントに加算される値。 */
 	const upvote = defineModel("upvote", { default: 0 });
-	/** 是否已点击加分？ */
+	/** すでに賛成票をクリックしましたか？ */
 	const isUpvoted = defineModel("isUpvoted", { default: false });
-	/** 为该评论减分的值。 */
+	/** このコメントから減算される値。 */
 	const downvote = defineModel("downvote", { default: 0 });
-	/** 是否已点击减分？ */
+	/** すでに反対票をクリックしましたか？ */
 	const isDownvoted = defineModel("isDownvoted", { default: false });
 	const menu = ref<FlyoutModel>();
-	/** 是否已置顶？ */
+	/** ピン留めされていますか？ */
 	const pinned = defineModel("pinned", { default: false });
 	const unpinnedCaption = computed(() => pinned.value ? "unpin" : "pin");
 
 	const voteLock = ref(false);
 
 	const userSelfInfoStore = useSelfUserInfoStore();
-	const isSelfComment = computed(() => props.uid === userSelfInfoStore.userInfo.uid); // 这条评论是否是自己发送的
-	const isAdmin = computed(() => userSelfInfoStore.userInfo.roles?.includes("administrator")); // 用户是否是管理员
+	const isSelfComment = computed(() => props.uid === userSelfInfoStore.userInfo.uid); // このコメントが自分で送信したものかどうか
+	const isAdmin = computed(() => userSelfInfoStore.userInfo.roles?.includes("administrator")); // ユーザーが管理者かどうか
 
 	/**
-	 * 点击加分、减分按钮事件。
-	 * @param button - 点击的按钮是加分还是减分。
-	 * @param [noNestingDolls] - 禁止套娃，防止递归调用。
+	 * 賛成票、反対票ボタンのクリックイベント。
+	 * @param button - クリックされたボタンが賛成票か反対票か。
+	 * @param [noNestingDolls] - 再帰呼び出しを防ぐための入れ子禁止。
 	 */
 	function onClickVotes(button: "upvote" | "downvote", noNestingDolls: boolean = false) {
 		// const states = { upvote, isUpvoted, downvote, isDownvoted };
@@ -62,132 +62,132 @@
 		// value.value += gain;
 		// if (isActive && states[`${another}Clicked`].value && !noNestingDolls) onClickUpvote(another, true);
 
-		const commentId = props.commentId; // 视频评论 ID
-		const videoId = props.videoId; // 视频 ID
+		const commentId = props.commentId; // 動画コメントID
+		const videoId = props.videoId; // 動画ID
 
-		if (!props.index || !commentId || videoId === undefined || videoId === null) { // 非空验证
+		if (!props.index || !commentId || videoId === undefined || videoId === null) { // nullでないことの検証
 			useToast(t.toast.something_went_wrong, "error");
 			return;
 		}
 
-		if (voteLock.value) { // 如果请求的“悲观锁”处于锁定状态，则弹出错误提示并停止
+		if (voteLock.value) { // リクエストの「ペシミスティックロック」がロック状態の場合、エラープロンプトを表示して停止します
 			useToast(t.toast.too_many_requests, "error");
 			return;
 		}
 
-		if (!userSelfInfoStore.isLogined) { // 如果用户未登录，则不允许加分/减分
+		if (!userSelfInfoStore.isLogined) { // ユーザーがログインしていない場合、賛成/反対票を投じることはできません
 			useEvent("app:requestLogin");
 			return;
 		}
 
-		if (button === "upvote") // 判断是加分还是减分
-			if (isUpvoted.value) // 如果被加分的视频评论此前已经被加分，则取消加分，否则加分
-				// 取消加分
+		if (button === "upvote") // 賛成票か反対票かを判断
+			if (isUpvoted.value) // 賛成票が投じられた動画コメントが以前に賛成票を投じられていた場合は、賛成票を取り消し、そうでない場合は賛成票を投じます
+				// 賛成票を取り消す
 				cancelVideoCommentUpvote(commentId, videoId);
 			else
-				// 加分
+				// 賛成票
 				emitVideoCommentUpvote(commentId, videoId);
 		else
-			if (isDownvoted.value) // 如果被减分的视频评论此前已经被减分，则取消减分，否则减分
-				// 取消减分
+			if (isDownvoted.value) // 反対票が投じられた動画コメントが以前に反対票を投じられていた場合は、反対票を取り消し、そうでない場合は反対票を投じます
+				// 反対票を取り消す
 				cancelVideoCommentDownvote(commentId, videoId);
 			else
-				// 减分
+				// 反対票
 				emitVideoCommentDownvote(commentId, videoId);
 	}
 
 	/**
-	 * 视频评论加分
-	 * @param commentId - 视频评论 ID
-	 * @param videoId - 视频 ID
+	 * 動画コメントの賛成票
+	 * @param commentId - 動画コメントID
+	 * @param videoId - 動画ID
 	 */
 	function emitVideoCommentUpvote(commentId: string, videoId: number) {
-		voteLock.value = true; // 请求锁：锁定
+		voteLock.value = true; // リクエストロック：ロック
 		const emitVideoCommentUpvoteRequest: EmitVideoCommentUpvoteRequestDto = { id: commentId, videoId };
 		api.videoComment.emitVideoCommentUpvote(emitVideoCommentUpvoteRequest).catch(error => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 			useToast(t.toast.something_went_wrong, "error");
 			console.error("ERROR", "Failed to upvote:", error);
 		}).finally(() => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 		});
 
-		isUpvoted.value = true; // 设置加分图标高亮
-		upvote.value++; // 加分数增加
-		if (isDownvoted.value) { // 如果用户在加分操作前，已经有减分，则取消减分的高亮，并减少减分数量
+		isUpvoted.value = true; // 賛成票アイコンをハイライトに設定
+		upvote.value++; // 賛成票数を増やす
+		if (isDownvoted.value) { // ユーザーが賛成票を投じる前にすでに反対票を投じていた場合は、反対票のハイライトをキャンセルし、反対票の数を減らします
 			isDownvoted.value = false;
 			downvote.value--;
 		}
 	}
 
 	/**
-	 * 取消视频评论加分
-	 * @param commentId - 视频评论 ID
-	 * @param videoId - 视频 ID
+	 * 動画コメントの賛成票を取り消す
+	 * @param commentId - 動画コメントID
+	 * @param videoId - 動画ID
 	 */
 	function cancelVideoCommentUpvote(commentId: string, videoId: number) {
-		voteLock.value = true; // 请求锁：锁定
+		voteLock.value = true; // リクエストロック：ロック
 		const cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto = { id: commentId, videoId };
 		api.videoComment.cancelVideoCommentUpvote(cancelVideoCommentUpvoteRequest).catch(error => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 			useToast(t.toast.something_went_wrong, "error");
 			console.error("ERROR", "Failed to undo upvote:", error);
 		}).finally(() => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 		});
 
-		isUpvoted.value = false; // 取消加分图标高亮
-		upvote.value--; // 加分数减少
+		isUpvoted.value = false; // 賛成票アイコンのハイライトをキャンセル
+		upvote.value--; // 賛成票数を減らす
 	}
 
 	/**
-	 * 视频评论减分
-	 * @param commentId - 视频评论 ID
-	 * @param videoId - 视频 ID
+	 * 動画コメントの反対票
+	 * @param commentId - 動画コメントID
+	 * @param videoId - 動画ID
 	 */
 	function emitVideoCommentDownvote(commentId: string, videoId: number) {
-		voteLock.value = true; // 请求锁：锁定
+		voteLock.value = true; // リクエストロック：ロック
 		const emitVideoCommentDownvoteRequest: EmitVideoCommentDownvoteRequestDto = { id: commentId, videoId };
 		api.videoComment.emitVideoCommentDownvote(emitVideoCommentDownvoteRequest).catch(error => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 			useToast(t.toast.something_went_wrong, "error");
 			console.error("ERROR", "Failed to downvote:", error);
 		}).finally(() => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 		});
 
-		isDownvoted.value = true; // 设置减分图标高亮
-		downvote.value++; // 减分数增加
-		if (isUpvoted.value) { // 如果用户在减分操作前，已经有加分，则取消加分的高亮，并减少加分数量
+		isDownvoted.value = true; // 反対票アイコンをハイライトに設定
+		downvote.value++; // 反対票数を増やす
+		if (isUpvoted.value) { // ユーザーが反対票を投じる前にすでに賛成票を投じていた場合は、賛成票のハイライトをキャンセルし、賛成票の数を減らします
 			upvote.value--;
 			isUpvoted.value = false;
 		}
 	}
 
 	/**
-	 * 取消视频评论减分
-	 * @param commentId - 视频评论 ID
-	 * @param videoId - 视频 ID
+	 * 動画コメントの反対票を取り消す
+	 * @param commentId - 動画コメントID
+	 * @param videoId - 動画ID
 	 */
 	function cancelVideoCommentDownvote(commentId: string, videoId: number) {
-		voteLock.value = true; // 请求锁：锁定
+		voteLock.value = true; // リクエストロック：ロック
 		const cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto = { id: commentId, videoId };
 		api.videoComment.cancelVideoCommentDownvote(cancelVideoCommentDownvoteRequest).catch(error => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 			useToast(t.toast.something_went_wrong, "error");
 			console.error("ERROR", "Failed to undo downvote:", error);
 		}).finally(() => {
-			voteLock.value = false; // 请求锁：释放
+			voteLock.value = false; // リクエストロック：解放
 		});
 
-		isDownvoted.value = false; // 取消减分图标高亮
-		downvote.value--; // 减分数减少
+		isDownvoted.value = false; // 反対票アイコンのハイライトをキャンセル
+		downvote.value--; // 反対票数を減らす
 	}
 
 	/**
-	 * 删除自己的评论
-	 * @param commentRoute - 评论的路由
-	 * @param videoId - KVID 视频 ID
+	 * 自分のコメントを削除する
+	 * @param commentRoute - コメントのルート
+	 * @param videoId - KVID 動画ID
 	 */
 	async function deleteSelfComment(commentRoute?: string, videoId?: number) {
 		if (!commentRoute || !videoId) return;
@@ -201,13 +201,13 @@
 			useEvent("videoComment:deleteVideoComment", commentRoute);
 		} else
 			useToast(t.toast.something_went_wrong, "error", 5000);
-			// TODO: 性能问题
+			// TODO: パフォーマンスの問題
 	}
 
 	/**
-	 * 管理员删除评论
-	 * @param commentRoute - 评论的路由
-	 * @param videoId - KVID 视频 ID
+	 * 管理者がコメントを削除する
+	 * @param commentRoute - コメントのルート
+	 * @param videoId - KVID 動画ID
 	 */
 	async function adminDeleteVideoComment(commentRoute?: string, videoId?: number) {
 		if (!commentRoute || !videoId) return;
@@ -221,7 +221,7 @@
 			useEvent("videoComment:deleteVideoComment", commentRoute);
 		} else
 			useToast(t.toast.something_went_wrong, "error", 5000);
-			// TODO: 性能问题
+			// TODO: パフォーマンスの問題
 	}
 </script>
 

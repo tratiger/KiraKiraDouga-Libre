@@ -7,7 +7,7 @@ const confettiColors = [
 ];
 
 /**
- * 显示五彩纸屑。
+ * 紙吹雪を表示します。
  */
 export function showConfetti() {
 	if (environment.server) return;

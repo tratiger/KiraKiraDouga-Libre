@@ -1,5 +1,5 @@
 <docs>
-	# 迷你颜文字浮窗
+	# ミニ顔文字フローティングウィンドウ
 </docs>
 
 <script setup lang="ts">
@@ -12,18 +12,18 @@
 	const grid = ref<HTMLDivElement>();
 	const hide = () => model.value = undefined;
 	const recentKaomoji = useRecentKaomojiStore();
-	const selectedItem = () => grid.value?.querySelector(":focus"); // 使用 computed 时结果会出错，为什么？
+	const selectedItem = () => grid.value?.querySelector(":focus"); // computedを使用すると結果が間違ってしまいますが、なぜですか？
 
 	/**
-	 * 当浮窗显示时的事件。
+	 * フローティングウィンドウが表示されたときのイベント。
 	 */
 	function onShowFlyout() {
 		(grid.value?.children[0] as HTMLElement)?.focus();
 	}
 
 	/**
-	 * 移动选中位置。
-	 * @param displacement - 位移值，正数为右，负数为左。
+	 * 選択位置を移動します。
+	 * @param displacement - 変位値、正数は右、負数は左。
 	 */
 	function moveSelectedPosition(displacement: number) {
 		const current = elementIndex(selectedItem());
@@ -39,8 +39,8 @@
 	}
 
 	/**
-	 * 插入颜文字回调函数。
-	 * @param kaomoji - 输入的颜文字。
+	 * 顔文字を挿入するコールバック関数。
+	 * @param kaomoji - 入力された顔文字。
 	 */
 	function input(kaomoji: string) {
 		emits("insert", kaomoji);
@@ -49,8 +49,8 @@
 	}
 
 	/**
-	 * 按下键盘事件。
-	 * @param e - 键盘事件。
+	 * キーボードが押されたときのイベント。
+	 * @param e - キーボードイベント。
 	 */
 	function onKeydown(e: KeyboardEvent) {
 		switch (e.code) {
@@ -66,7 +66,7 @@
 				moveSelectedPosition(-1);
 				stopEvent(e);
 				break;
-			// 我没有 case "Enter" 哦，它直接就可以用。
+			// "Enter"のケースはありませんが、直接使用できます。
 			default:
 				break;
 		}

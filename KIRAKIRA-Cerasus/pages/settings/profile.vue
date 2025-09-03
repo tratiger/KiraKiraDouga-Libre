@@ -5,14 +5,14 @@
 	const selfUserInfoStore = useSelfUserInfoStore();
 	const appSettingsStore = useAppSettingsStore();
 
-	const newAvatar = ref<string>(); // 新上传的头像
-	const correctAvatar = computed(() => newAvatar.value ?? selfUserInfoStore.userInfo.avatar); // 正确显示的头像（如果用户没有新上传头像，则使用全局变量中的旧头像）
-	const userAvatarUploadFile = ref<string | undefined>(); // 用户上传的头像文件 Blob
-	const isAvatarCropperOpen = ref(false); // 用户头像图片裁剪器是否开启
-	const newAvatarImageBlob = ref<Blob>(); // 用户裁剪后的头像
-	const userAvatarFileInput = ref<HTMLInputElement>(); // 隐藏的图片上传 Input 元素
-	const isUpdateUserInfo = ref<boolean>(false); // 是否正在上传用户信息
-	const isResetUserInfo = ref<boolean>(false); // 是否正在重置用户信息
+	const newAvatar = ref<string>(); // 新しくアップロードされたアバター
+	const correctAvatar = computed(() => newAvatar.value ?? selfUserInfoStore.userInfo.avatar); // 正しく表示されるアバター（ユーザーが新しいアバターをアップロードしていない場合は、グローバル変数の古いアバターを使用）
+	const userAvatarUploadFile = ref<string | undefined>(); // ユーザーがアップロードしたアバターファイルのBlob
+	const isAvatarCropperOpen = ref(false); // ユーザーアバター画像トリミングツールが開いているか
+	const newAvatarImageBlob = ref<Blob>(); // ユーザーがトリミングした後のアバター
+	const userAvatarFileInput = ref<HTMLInputElement>(); // 非表示の画像アップロードInput要素
+	const isUpdateUserInfo = ref<boolean>(false); // ユーザー情報をアップロード中か
+	const isResetUserInfo = ref<boolean>(false); // ユーザー情報をリセット中か
 	const profile = reactive({
 		name: selfUserInfoStore.userInfo.username?.normalize() ?? "",
 		nickname: selfUserInfoStore.userInfo.userNickname?.normalize() ?? "",
@@ -27,22 +27,22 @@
 		})(),
 		tags: selfUserInfoStore.userInfo.label?.map(label => label.labelName?.normalize()) ?? [],
 	});
-	const cropper = ref<InstanceType<typeof ImageCropper>>(); // 图片裁剪器实例
-	const isUploadingUserAvatar = ref(false); // 是否正在上传头像
-	const showConfirmResetAlert = ref(false); // 是否显示重置警告框
+	const cropper = ref<InstanceType<typeof ImageCropper>>(); // 画像トリミングツールのインスタンス
+	const isUploadingUserAvatar = ref(false); // アバターをアップロード中か
+	const showConfirmResetAlert = ref(false); // リセット警告ダイアログを表示するか
 
 	/**
-	 * 点击头像事件，模拟点击文件上传并唤起文件资源管理器
+	 * アバタークリックイベント。ファイルアップロードのクリックをシミュレートし、ファイルエクスプローラーを呼び出します
 	 */
 	function handleUploadAvatarImage() {
 		userAvatarFileInput.value?.click();
 	}
 
 	/**
-	 * 如果有上传图片，则开启图片裁切器。
+	 * アップロードされた画像がある場合、画像トリミングツールを開きます。
 	 *
-	 * 即：用户选择了本地文件的事件。
-	 * @param e - 应为用户上传文件的 `<input>` 元素的 change 事件。
+	 * つまり、ユーザーがローカルファイルを選択したイベントです。
+	 * @param e - ユーザーがファイルをアップロードする `<input>` 要素のchangeイベントである必要があります。
 	 */
 	async function handleOpenAvatarCropper(e?: Event) {
 		e?.stopPropagation();
@@ -58,12 +58,12 @@
 
 			userAvatarUploadFile.value = await fileToBlob(image);
 			isAvatarCropperOpen.value = true;
-			fileInput.value = ""; // 读取完用户上传的文件后，需要清空 input，以免用户在下次上传同一个文件时无法触发 change 事件。
+			fileInput.value = ""; // ユーザーがアップロードしたファイルを読み取った後、inputをクリアする必要があります。これにより、ユーザーが次回同じファイルをアップロードしたときにchangeイベントがトリガーされないのを防ぎます。
 		}
 	}
 
 	/**
-	 * 点击裁剪头像
+	 * アバターをトリミングするためにクリックします
 	 */
 	async function handleChangeAvatarImage() {
 		isUploadingUserAvatar.value = true;
@@ -84,7 +84,7 @@
 	}
 
 	/**
-	 * 修改头像事件，向服务器提交新的图片。
+	 * アバター変更イベント。サーバーに新しい画像を送信します。
 	 */
 	async function handleSubmitAvatarImage() {
 		try {
@@ -97,7 +97,7 @@
 					const uploadResult = await api.user.uploadUserAvatar(userAvatarUploadFilename, blobImageData, userAvatarUploadSignedUrl);
 					if (uploadResult) {
 						newAvatar.value = userAvatarUploadFilename;
-						clearBlobUrl(); // 释放内存
+						clearBlobUrl(); // メモリを解放
 					}
 				}
 			} else {
@@ -111,21 +111,21 @@
 	}
 
 	/**
-	 * 根据 cookie 中的 uid 和 token 来获取用户信息。
+	 * cookieのuidとtokenに基づいてユーザー情報を取得します。
 	 *
-	 * 同时具有验证用户 token 的功能。
+	 * 同時にユーザートークンの検証機能も持ちます。
 	 */
 	async function getSelfUserInfoController() {
 		try {
 			const headerCookie = useRequestHeaders(["cookie"]);
 			await api.user.getSelfUserInfo({ getSelfUserInfoRequest: undefined, appSettingsStore, selfUserInfoStore, headerCookie });
 		} catch (error) {
-			console.error("无法获取用户信息，请尝试重新登录", error);
+			console.error("ユーザー情報を取得できません。再ログインしてみてください", error);
 		}
 	}
 
 	/**
-	 * 清除已经上传完成的图片，释放内存。
+	 * アップロードが完了した画像をクリアし、メモリを解放します。
 	 */
 	function clearBlobUrl() {
 		if (userAvatarUploadFile.value) {
@@ -175,7 +175,7 @@
 	}
 
 	/**
-	 * 弹出确认重置的警告框
+	 * リセット確認の警告ダイアログを表示します
 	 */
 	function resetConfirm() {
 		showConfirmResetAlert.value = true;
@@ -183,8 +183,8 @@
 
 	/**
 	 * reset all user info.
-	 * 重置用户设置
-	 * 请求旧用户信息，并修改 Pinia 中的用户数据，然后触发上方的监听
+	 * ユーザー設定をリセット
+	 * 古いユーザー情報をリクエストし、Piniaのユーザーデータを変更してから、上記のリスナーをトリガーします
 	 */
 	async function reset() {
 		isResetUserInfo.value = true;
@@ -214,7 +214,7 @@
 	}
 
 	/**
-	 * 将 Pinia 中的用户数据拷贝到当前组件的响应式变量 "profile" 中
+	 * Piniaのユーザーデータを現在のコンポーネントのリアクティブ変数 "profile" にコピーします
 	 */
 	function copyPiniaUserInfoToProfile() {
 		profile.name = selfUserInfoStore.userInfo.username?.normalize() ?? "";
@@ -224,12 +224,12 @@
 		profile.tags = selfUserInfoStore.userInfo.label?.map(label => label.labelName?.normalize()) ?? [];
 	}
 
-	useEventListener(userAvatarFileInput, "change", handleOpenAvatarCropper); // 监听头像文件变化事件
+	useEventListener(userAvatarFileInput, "change", handleOpenAvatarCropper); // アバターファイルの変更イベントを監視
 
 	onMounted(async () => await getSelfUserInfoController());
-	onBeforeUnmount(clearBlobUrl); // 释放内存
-	watch(selfUserInfoStore, copyPiniaUserInfoToProfile); // 监听 Pinia 中的用户数据，一定发生改变，则拷贝到当前组件的响应式变量 "profile" 中
-	useListen("user:login", async loginStatus => { // 发生用户登录事件，请求最新用户信息，并修改 Pinia 中的用户数据，然后触发上方的监听
+	onBeforeUnmount(clearBlobUrl); // メモリを解放
+	watch(selfUserInfoStore, copyPiniaUserInfoToProfile); // Piniaのユーザーデータを監視し、変更があれば現在のコンポーネントのリアクティブ変数 "profile" にコピーします
+	useListen("user:login", async loginStatus => { // ユーザーログインイベントが発生したら、最新のユーザー情報をリクエストし、Piniaのユーザーデータを変更してから、上記のリスナーをトリガーします
 		if (loginStatus)
 			await getSelfUserInfoController();
 	});
@@ -364,7 +364,7 @@
 
 		@media (width <= 450px) {
 			--size: 80dvw;
-			// 对于图片切割器，不建议使用响应式，因为切割器内部被切割的图片不会随之改变尺寸，但考虑到极端小尺寸的适配问题，且在上传图片时浏览器宽度发生剧烈变化的概率较小，故保留本功能。
+			// 画像トリミングツールについては、レスポンシブ対応は推奨されません。トリミングツール内部の画像はサイズが変更されないためです。しかし、極端に小さいサイズへの対応や、画像アップロード時にブラウザの幅が急激に変化する可能性は低いため、この機能は残しています。
 		}
 	}
 </style>

@@ -1,303 +1,303 @@
 /**
- * 基础视频评论数据
+ * 基本的な動画コメントデータ
  */
 type BasicVideoCommentDto = {
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
-	/** 评论正文 */
+	/** コメント本文 */
 	text: string;
 };
 
 /**
- * 发送视频评论的请求数据
+ * 動画コメント送信のリクエストデータ
  */
 export type EmitVideoCommentRequestDto = BasicVideoCommentDto;
 
 /**
- * 发送视频评论的响应的数据
+ * 動画コメント送信のレスポンスデータ
  */
 export type EmitVideoCommentResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 发送成功的话，返回发送时的评论的数据 */
+	/** 送信成功の場合、送信時のコメントデータを返す */
 	videoComment?: VideoCommentResult;
 };
 
 /**
- * 获取某个用户在对某个视频的评论的点赞情况的参数
+ * 特定のユーザーの特定動画へのコメントに対する高評価状況を取得するパラメータ
  */
 export type GetVideoCommentUpvotePropsDto = {
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
-	/** 视频评论点赞者的用户的 UID */
+	/** 動画コメントを高評価したユーザーのUID */
 	uid: number;
 };
 
 /**
- * 获取某个用户在对某个视频的评论的点赞情况的结果
+ * 特定のユーザーの特定動画へのコメントに対する高評価状況の取得結果
  */
 export type GetVideoCommentUpvoteResultDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 某个用户在对某个视频的评论的点赞情况 */
+	/** 特定のユーザーの特定動画へのコメントに対する高評価状況 */
 	videoCommentUpvoteResult: {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: number;
-		/** 评论的ID */
+		/** コメントID */
 		commentId: string;
-		/** 评论点赞者的用户的 UID */
+		/** コメントを高評価したユーザーのUID */
 		uid: number;
-		/** 系统专用字段-最后编辑时间 */
+		/** システム専用フィールド - 最終編集日時 */
 		editDateTime: number;
 	}[];
 };
 
 /**
- * 获取某个用户在对某个视频的评论的点踩情况的参数
+ * 特定のユーザーの特定動画へのコメントに対する低評価状況を取得するパラメータ
  */
 export type GetVideoCommentDownvotePropsDto = {
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
-	/** 视频评论点踩者的用户的 UID */
+	/** 動画コメントを低評価したユーザーのUID */
 	uid: number;
 };
 
 /**
- * 获取某个用户在对某个视频的评论的点踩情况的结果
+ * 特定のユーザーの特定動画へのコメントに対する低評価状況の取得結果
  */
 export type GetVideoCommentDownvoteResultDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 某个用户在对某个视频的评论的点踩情况 */
+	/** 特定のユーザーの特定動画へのコメントに対する低評価状況 */
 	videoCommentDownvoteResult: {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: number;
-		/** 评论的ID */
+		/** コメントID */
 		commentId: string;
-		/** 评论点踩者的用户的 UID */
+		/** コメントを低評価したユーザーのUID */
 		uid: number;
-		/** 系统专用字段-最后编辑时间 */
+		/** システム専用フィールド - 最終編集日時 */
 		editDateTime: number;
 	}[];
 };
 
 /**
- * 根据 KVID 获取视频评论的请求的参数
+ * KVIDに基づいて動画コメントを取得するリクエストのパラメータ
  */
 export type GetVideoCommentByKvidRequestDto = {
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
-	/** 分页查询 */
+	/** ページネーションクエリ */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページに表示する件数 */
 		pageSize: number;
 	};
 };
 
 /**
- * 视频评论 ID 的类型（用作主评论的子评论）
+ * 動画コメントIDのタイプ（メインコメントの子コメントとして使用）
  */
 type VideoCommentIdDto = {
-	/** 评论的路由 */ /** 如：1.2.3（第一号视频的第二个评论的第三个子回复） */
+	/** コメントのルート */ /** 例：1.2.3（1番目の動画の2番目のコメントの3番目の返信） */
 	commentRoute: string;
-	/** 评论 ID */
+	/** コメントID */
 	upvoteCount: string;
-	/** 评论楼层数 */
+	/** コメント番号 */
 	commentIndex: number;
 };
 
 /**
- * 评论发送者的用户信息
+ * コメント投稿者のユーザー情報
  */
 type CommentSenderUserInfo = {
-	/** 用户昵称 */
+	/** ユーザーニックネーム */
 	userNickname?: string;
-	/** 用户名 */
+	/** ユーザー名 */
 	username?: string;
-	/** 用户头像的链接 */
+	/** ユーザーアイコンのリンク */
 	avatar?: string;
-	/** 用户背景图片的链接 */
+	/** ユーザー背景画像のリンク */
 	userBannerImage?: string;
-	/** 用户的个性签名 */
+	/** ユーザーの自己紹介 */
 	signature?: string;
-	/** 用户的性别，男、女和自定义（字符串） */
+	/** ユーザーの性別、男性、女性、カスタム（文字列） */
 	gender?: string;
 };
 
 /**
- * 一条请求到视频评论
+ * リクエストされた1件の動画コメント
  */
 export type VideoCommentResult = {
-	/** MongoDB 生成的唯一 ID */
+	/** MongoDBが生成した一意のID */
 	_id: string;
-	/** 评论的路由 */ /** 如：1.2.3（第一号视频的第二个评论的第三个子回复） */
+	/** コメントのルート */ /** 例：1.2.3（1番目の動画の2番目のコメントの3番目の返信） */
 	commentRoute: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
-	/** 评论发送者的用户的 UID */
+	/** コメント投稿者のUID */
 	uid: number;
-	/** 评论发送者的信息，如 用户名、头像 等 */
+	/** コメント投稿者の情報（ユーザー名、アイコンなど） */
 	userInfo?: CommentSenderUserInfo;
-	/** 发送评论的时间 */
+	/** コメント投稿日時 */
 	emitTime: number;
-	/** 评论正文 */
+	/** コメント本文 */
 	text: string;
-	/** 是否已点赞 */
+	/** 高評価済みか */
 	isUpvote: boolean;
-	/** 是否已点踩 */
+	/** 低評価済みか */
 	isDownvote: boolean;
-	/** 评论点赞数 */
+	/** コメント高評価数 */
 	upvoteCount: number;
-	/** 评论点踩数 */
+	/** コメント低評価数 */
 	downvoteCount: number;
-	/** 评论楼层数 */
+	/** コメント番号 */
 	commentIndex: number;
-	/** 子评论 */
+	/** 子コメント */
 	subComments: VideoCommentIdDto[];
-	/** 该评论的下一级子评论数量 */
+	/** このコメントの次のレベルの子コメント数 */
 	subCommentsCount: number;
-	/** 系统专用字段-最后编辑时间 */
+	/** システム専用フィールド - 最終編集日時 */
 	editDateTime: number;
 };
 
 /**
- * 获取视频评论的响应结果
+ * 動画コメント取得のレスポンス結果
  */
 export type GetVideoCommentByKvidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 视频评论总数量 */
+	/** 動画コメント総数 */
 	videoCommentCount: number;
-	/** 视频评论 */
+	/** 動画コメント */
 	videoCommentList: (VideoCommentResult & { isBlockedByOther?: boolean })[];
 };
 
 /**
- * 为视频评论点赞的请求的请求参数
+ * 動画コメントに高評価するためのリクエストパラメータ
  */
 export type EmitVideoCommentUpvoteRequestDto = {
-	/** 评论的唯一 ID */
+	/** コメントの一意のID */
 	id: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 为视频评论点赞的请求的响应结果
+ * 動画コメントに高評価するためのリクエストのレスポンス結果
  */
 export type EmitVideoCommentUpvoteResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 为视频评论点赞的请求的请求参数
+ * 動画コメントに高評価するためのリクエストパラメータ
  */
 export type CancelVideoCommentUpvoteRequestDto = {
-	/** 评论的唯一 ID */
+	/** コメントの一意のID */
 	id: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 取消视频评论点赞的请求的响应结果
+ * 動画コメントの高評価を取り消すリクエストのレスポンス結果
  */
 export type CancelVideoCommentUpvoteResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 为视频评论点踩的请求的请求参数
+ * 動画コメントに低評価するためのリクエストパラメータ
  */
 export type EmitVideoCommentDownvoteRequestDto = {
-	/** 评论的唯一 ID */
+	/** コメントの一意のID */
 	id: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 为视频评论点踩的请求的响应结果
+ * 動画コメントに低評価するためのリクエストのレスポンス結果
  */
 export type EmitVideoCommentDownvoteResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 为视频评论点踩的请求的请求参数
+ * 動画コメントに低評価するためのリクエストパラメータ
  */
 export type CancelVideoCommentDownvoteRequestDto = {
-	/** 评论的唯一 ID */
+	/** コメントの一意のID */
 	id: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 取消视频评论点踩的请求的响应结果
+ * 動画コメントの低評価を取り消すリクエストのレスポンス結果
  */
 export type CancelVideoCommentDownvoteResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 删除一个自己的视频评论的请求载荷
+ * 自分の動画コメントを削除するリクエストペイロード
  */
 export type DeleteSelfVideoCommentRequestDto = {
-	/** 评论的路由 */
+	/** コメントのルート */
 	commentRoute: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 删除一个自己的视频评论的请求响应
+ * 自分の動画コメントを削除するリクエストのレスポンス
  */
 export type DeleteSelfVideoCommentResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 管理员删除一个视频评论的请求载荷
+ * 管理者が動画コメントを削除するリクエストペイロード
  */
 export type AdminDeleteVideoCommentRequestDto = {
-	/** 评论的路由 */
+	/** コメントのルート */
 	commentRoute: string;
-	/** KVID 视频 ID */
+	/** KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 管理员删除一个视频评论的请求响应
+ * 管理者が動画コメントを削除するリクエストのレスポンス
  */
 export type AdminDeleteVideoCommentResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };

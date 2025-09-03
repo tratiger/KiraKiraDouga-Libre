@@ -3,26 +3,26 @@
 @use "internal" as *;
 @use "variables" as *;
 
-// #region 圆角
-/// 大卡片/缩略图。
-/// 使用 6px 大小的圆角。
-/// @param {String} $position [full] - 圆角的位置。
+// #region 角丸
+/// 大きなカード/サムネイル。
+/// 6pxの角丸を使用します。
+/// @param {String} $position [full] - 角丸の位置。
 /// @output border-radius
 @mixin round-large($position: full) {
 	@include set-border-radius(6px, $position);
 }
 
-/// 按钮/控制组件。
-/// 使用 4px 大小的圆角。
-/// @param {String} $position [full] - 圆角的位置。
+/// ボタン/コントロールコンポーネント。
+/// 4pxの角丸を使用します。
+/// @param {String} $position [full] - 角丸の位置。
 /// @output border-radius
 @mixin round-small($position: full) {
 	@include set-border-radius(4px, $position);
 }
 // #endregion
 
-// #region 响应式布局
-/// 手机端布局。
+// #region レスポンシブレイアウト
+/// モバイル向けレイアウト。
 /// @content
 /// @output @media screen
 @mixin mobile {
@@ -31,7 +31,7 @@
 	}
 }
 
-/// 平板端布局。
+/// タブレット向けレイアウト。
 /// @content
 /// @output @media screen
 @mixin tablet {
@@ -40,7 +40,7 @@
 	}
 }
 
-/// 电脑端布局。
+/// PC向けレイアウト。
 /// @content
 /// @output @media screen
 @mixin computer {
@@ -49,7 +49,7 @@
 	}
 }
 
-/// 非手机端布局。
+/// 非モバイル向けレイアウト。
 /// @content
 /// @output @media screen
 @mixin not-mobile {
@@ -59,8 +59,8 @@
 }
 // #endregion
 
-// #region 中性色
-/// 控制球阴影 关闭
+// #region ニュートラルカラー
+/// コントロールボールの影 オフ
 @mixin control-ball-shadow-off {
 	box-shadow: 0 2px 4px c(accent-shadow, 50%), 0 0 2px c(accent-shadow, 25%);
 }
@@ -126,7 +126,7 @@
 }
 // #endregion
 
-// #region 主要主题色
+// #region プライマリテーマカラー
 @mixin button-shadow {
 	box-shadow: 0 4px 4px c(accent, 30%);
 }
@@ -181,7 +181,7 @@
 	box-shadow: 0 2px 8px c(accent-shadow, 20%);
 }
 
-/// 控制球阴影
+/// コントロールボールの影
 @mixin control-ball-shadow {
 	box-shadow: 0 2px 4px c(accent, 50%), 0 0 2px c(accent, 35%);
 }
@@ -262,7 +262,7 @@
 }
 // #endregion
 
-// #region 次要主题色
+// #region セカンダリテーマカラー
 @mixin toast-shadow($color) {
 	color: c($color);
 	box-shadow: 0 2px 10px c($color, 30%);

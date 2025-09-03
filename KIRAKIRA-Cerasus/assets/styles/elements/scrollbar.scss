@@ -39,7 +39,7 @@
 	}
 }
 
-// 滚动条滑块本体
+// スクロールバーのサム（つまみ）本体
 ::-webkit-scrollbar-thumb {
 	@include oval;
 	background-color: transparent;
@@ -51,12 +51,12 @@
 	}
 }
 
-// 滚动条滑块本体可滚动范围的背景
+// スクロールバーのサム（つまみ）が可動する範囲の背景
 ::-webkit-scrollbar-track-piece {
 	display: none;
 }
 
-// 滚动条两端的控制按钮
+// スクロールバー両端のコントロールボタン
 ::-webkit-scrollbar-button:single-button {
 	@include square(12px);
 	@include oval;
@@ -69,10 +69,10 @@
 		width: 14px;
 	}
 
-	// TODO: 滚动条两端按钮缺少按下后变小的样式。
+	// TODO: スクロールバー両端のボタンに、押下時に小さくなるスタイルがありません。
 }
 
-// 垂直滚动条与水平滚动条右下角相交的角
+// 垂直スクロールバーと水平スクロールバーが右下で交わる角
 ::-webkit-scrollbar-corner {
 	display: none;
 }

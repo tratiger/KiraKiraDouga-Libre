@@ -3,16 +3,16 @@
 		inheritAttrs: true,
 		props: {
 			/**
-			 * 指示其元素是否可以聚焦，以及它是否/在何处参与顺序键盘导航。
+			 * 要素がフォーカス可能かどうか、また、シーケンシャルキーボードナビゲーションに参加するかどうか/どこで参加するかを示します。
 			 *
-			 * 因为标签透传功能似乎不支持该标签，因此手动添加一个属性来实现。
+			 * タグのパススルー機能がこのタグをサポートしていないようなので、手動で属性を追加して実装します。
 			 */
 			tabindex: {
 				type: [Number, String] as PropType<Numberish>,
 				default: undefined,
 			},
 			/**
-			 * 使用 `role` 可以增强组件的可读性和语义化。值得注意的是这个属性是枚举而并非任意填写的。
+			 * `role` を使用すると、コンポーネントの可読性とセマンティックが向上します。この属性は列挙型であり、任意に記入するものではないことに注意してください。
 			 */
 			role: {
 				type: String as PropType<Role>,
@@ -27,7 +27,7 @@
 				const parent = useParentByScopeId();
 				let componentName = parent?.type.__name;
 				if (!componentName) {
-					// 注意该块内容无法在生产环境下运行。暂时没有更好的解决方法，有待优化。
+					// 注意：このブロックの内容は本番環境では実行できません。現在、より良い解決策はなく、最適化が必要です。
 					const componentPath = parent?.type.__file;
 					if (!componentPath) break;
 					componentName = path.fileRoot(componentPath);

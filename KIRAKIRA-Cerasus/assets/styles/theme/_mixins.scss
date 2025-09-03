@@ -6,7 +6,7 @@
 @use "functions" as *;
 @use "eases";
 
-/// 一键弹性布局加居中元素 (flex - center - center)。
+/// ワンキーでflexレイアウトと中央揃え (flex - center - center)。
 /// @output display, align-items, justify-content
 @mixin flex-center {
 	display: flex;
@@ -14,16 +14,16 @@
 	align-items: center;
 }
 
-/// 一键网格布局加居中元素 (grid - center)。
+/// ワンキーでgridレイアウトと中央揃え (grid - center)。
 /// @output display, place-items
 @mixin grid-center {
 	display: grid;
 	place-items: center;
 }
 
-/// 变成正方形。长宽均相等。
-/// @param {Number} $size - 长度。
-/// @param {Boolean} $with-size-var [false] - 是否生成一个名为 `--size` 的 CSS 自定义属性以使其它组件更方便地修改尺寸？
+/// 正方形にします。幅と高さが等しくなります。
+/// @param {Number} $size - 長さ。
+/// @param {Boolean} $with-size-var [false] - 他のコンポーネントがサイズを簡単に変更できるように、`--size` という名前のCSSカスタムプロパティを生成しますか？
 /// @output width, height
 @mixin square($size, $with-size-var: false) {
 	@if not $with-size-var {
@@ -36,26 +36,26 @@
 	}
 }
 
-/// 变成椭圆形。
-/// 将 border-radius 设为一个非常大的值。
-/// @param {String} $position [full] - 圆角的位置。
+/// 楕円形にします。
+/// border-radiusを非常に大きな値に設定します。
+/// @param {String} $position [full] - 角丸の位置。
 /// @output border-radius
 @mixin oval($position: full) {
 	@include set-border-radius(calc(infinity * 1px), $position);
 }
 
-/// 变成圆形。
-/// 将 border-radius 设为 100%。
-/// @param {String} $position [full] - 圆角的位置。
+/// 円形にします。
+/// border-radiusを100%に設定します。
+/// @param {String} $position [full] - 角丸の位置。
 /// @output border-radius
 @mixin circle($position: full) {
 	@include set-border-radius(100%, $position);
 }
 
-/// 画一个实心等边三角形。
-/// @param {type} $length - 边长。
-/// @param {type} $fill - 填充颜色。
-/// @param {type} $arrow [up] - 三角形箭头指向。可选的值为：up | down | left | right。
+/// 塗りつぶされた正三角形を描画します。
+/// @param {type} $length - 辺の長さ。
+/// @param {type} $fill - 塗りつぶしの色。
+/// @param {type} $arrow [up] - 三角形の矢印の向き。選択可能な値：up | down | left | right。
 /// @output width, height, border-top, border-right, border-bottom, border-left
 @mixin triangle($length, $fill, $arrow: up) {
 	@include square(0);
@@ -83,9 +83,9 @@
 	}
 }
 
-/// 将元素占满整个屏幕。
-/// 将长宽均设为 100% 视窗宽高度值。
-/// @param {String} $position [fixed] - 指定元素的 position 属性。
+/// 要素を画面全体に広げます。
+/// 幅と高さを両方ともビューポートの幅と高さの100%に設定します。
+/// @param {String} $position [fixed] - 要素のpositionプロパティを指定します。
 /// @output width, height
 @mixin fullscreen($position: fixed) {
 	position: $position;
@@ -96,17 +96,17 @@
 	transition: $fallback-transitions, width 0s, height 0s;
 }
 
-/// 池沼 block 布局会恶意在元素之间加空隙，使用 flex 得永恒。
-/// @deprecated 已经确定是图片、视频等 inline 元素干扰了，因此已通过正确的方式解决了问题，并且弃用该混合。
+/// blockレイアウトは要素間に意図しない隙間を作ることがあるので、flexを使いましょう。
+/// @deprecated 画像や動画などのインライン要素が原因であることが判明したため、正しい方法で問題を解決し、このミックスインは非推奨となりました。
 /// @output display, flex-direction
 // @mixin flex-block {
 // 	display: flex;
 // 	flex-direction: column;
 // }
 
-/// 去除垂直方向上的间距空隙，在高度变化动画中很有用。
-/// @param {Bool} $padding [true] - 调整内边距值。
-/// @param {Bool} $margin [true] - 调整外边距值。
+/// 垂直方向の余白をなくします。高さのアニメーションに便利です。
+/// @param {Bool} $padding [true] - padding値を調整します。
+/// @param {Bool} $margin [true] - margin値を調整します。
 /// @output margin-top, margin-bottom, padding-top, padding-bottom
 @mixin no-vertical-spacing($padding: true, $margin: true) {
 	@if $margin {
@@ -120,9 +120,9 @@
 	}
 }
 
-/// 去除水平方向上的间距空隙，在宽度变化动画中很有用。
-/// @param {Bool} $padding [true] - 调整内边距值。
-/// @param {Bool} $margin [true] - 调整外边距值。
+/// 水平方向の余白をなくします。幅のアニメーションに便利です。
+/// @param {Bool} $padding [true] - padding値を調整します。
+/// @param {Bool} $margin [true] - margin値を調整します。
 /// @output margin-right, margin-left, padding-right, padding-left
 @mixin no-horizontal-spacing($padding: true, $margin: true) {
 	@if $margin {
@@ -136,21 +136,21 @@
 	}
 }
 
-/// 修复在 flex 布局 overflow 开启滚动之后，页面末尾的边距消失了的问题。
-/// 在 flex 布局的 after 伪元素中使用。
+/// flexレイアウトでoverflowを有効にしてスクロールした後、ページの末尾のマージンが消える問題を修正します。
+/// flexレイアウトのafter疑似要素で使用します。
 /// @example scss
 /// 	.flex {
 /// 		@include fix-page-end-padding;
 /// 	}
-/// @param {Bool} $zero-height [true] - 设置零高度。在某些情况下关闭后也许可以解决界面错位问题。
-/// 但不能一概而论，因为如果一直关闭的话，另外一些界面又会错位，因此只能按需开启。这个东西反正就是很迷。
+/// @param {Bool} $zero-height [true] - 高さをゼロに設定します。場合によっては、これを無効にするとレイアウトの崩れを解決できることがあります。
+/// しかし、一概には言えません。常に無効にすると、他の部分でレイアウトが崩れる可能性があるため、必要に応じて有効にするしかありません。とにかく、この部分は謎です。
 /// @output display, clear, height, visibility, content
 @mixin fix-page-end-padding($zero-height: true) {
 	&::after {
-		content: "."; // 内容不能为空。
+		content: "."; // 内容は空にできません。
 		display: block;
 		clear: both;
-		visibility: hidden; // 占位但不可见。
+		visibility: hidden; // プレースホルダーですが、非表示です。
 
 		@if $zero-height {
 			height: 0;
@@ -158,9 +158,9 @@
 	}
 }
 
-/// 未知宽/高度的绝对定位的居中。
-/// @param {String} $position [absolute] - 指定元素的 position 属性。必须为 absolute 或 fixed。
-/// @param {Bool} $use-translate [true] - 使用 translate 而不是 transform, 默认为是，如否可提供更多的自定义变换可能性。
+/// 幅/高さが不明な要素の絶対配置による中央揃え。
+/// @param {String} $position [absolute] - 要素のpositionプロパティを指定します。absoluteまたはfixedである必要があります。
+/// @param {Bool} $use-translate [true] - transformの代わりにtranslateを使用します。デフォルトはtrueで、falseにするとより多くのカスタム変換が可能になります。
 /// @output position, top, left, translate, transform
 @mixin absolute-center($position: absolute, $use-translate: true) {
 	position: $position;
@@ -174,9 +174,9 @@
 	}
 }
 
-/// 已知宽/高度的绝对定位的居中。
-/// NOTE: 使用此混合必须指定宽高度。
-/// @param {String} $position [absolute] - 指定元素的 position 属性。必须为 absolute 或 fixed。
+/// 幅/高さが既知の要素の絶対配置による中央揃え。
+/// NOTE: このミックスインを使用するには、幅と高さを指定する必要があります。
+/// @param {String} $position [absolute] - 要素のpositionプロパティを指定します。absoluteまたはfixedである必要があります。
 /// @output position, top, right, bottom, left, margin
 @mixin absolute-center-sized($position: absolute) {
 	position: $position;
@@ -184,8 +184,8 @@
 	margin: auto;
 }
 
-/// 应用 Material Design 大水波纹按钮时，不要让大水波纹扩大了按钮的点击面积。
-/// @param {Number} $button-size - 点击区域按钮大小。
+/// Material Designの大きなリップル効果をボタンに適用する際、リップルがボタンのクリック領域を広げないようにします。
+/// @param {Number} $button-size - クリック領域のボタンサイズ。
 /// @output pointer-events
 @mixin ripple-clickable-only-inside($button-size) {
 	> * {
@@ -201,11 +201,11 @@
 	}
 }
 
-/// 使纯 CSS 具备宽/高度由 0 到 auto 变化的能力。
-/// @param {String} $specified [null] - 显式指定需要动画的是哪个方向。可能的值是 `height` | `width` |
-/// `both`。如留空则不会自动添加动画效果支持。
-/// @param {Bool} $adjust-padding [true] - 是否在动画时自动调整内边距值？
-/// @param {String} $transition-name [v] - Vue Transition 的名称，默认为默认值 `v`。
+/// 純粋なCSSで、幅/高さを0からautoに変化させるアニメーションを可能にします。
+/// @param {String} $specified [null] - アニメーションさせる方向を明示的に指定します。指定可能な値は `height` | `width` |
+/// `both` です。空の場合は自動的にアニメーション効果は追加されません。
+/// @param {Bool} $adjust-padding [true] - アニメーション中にpadding値を自動調整しますか？
+/// @param {String} $transition-name [v] - Vue Transitionの名前。デフォルトは `v` です。
 /// @output display, grid-template-rows, overflow
 @mixin animated-auto-size($specified: null, $adjust-padding: true, $transition-name: v) {
 	display: grid;
@@ -232,18 +232,18 @@
 	}
 }
 
-/// 开启硬件 3D。用以解决某些可能会导致变换时闪动的问题。
-/// @remarks 这会替换或被替换掉现有的 transform 属性。
+/// ハードウェアアクセラレーションを有効にします。変換時にちらつきが発生する問題を解決するために使用します。
+/// @remarks これは既存のtransformプロパティを置き換えるか、置き換えられます。
 /// @output transform
 @mixin enable-hardware-3d {
 	transform: translateZ(1px);
 }
 
-/// 声明一个超高优先级的选择器。
-/// @content 声明强化选择器下的定义。
+/// 非常に高い優先度を持つセレクタを宣言します。
+/// @content 強化されたセレクタの下で定義を宣言します。
 /// @output #{$enhanced-selector}
 @mixin enhanced-selector {
-	$enhanced-selector: string-repeat(":not(#\\#)", 10); // 用于强行提高优先级。
+	$enhanced-selector: string-repeat(":not(#\\#)", 10); // 優先度を強制的に上げるために使用します。
 
 	#{$enhanced-selector} {
 		&,
@@ -254,13 +254,13 @@
 	}
 }
 
-/// 为子元素开启逐个浮入动画。
-/// @param {String} $selector - 要动画元素的唯一父选择器。
-/// @param {Number} $length - 要动画元素的最小个数。
-/// @param {Number} $duration - 单个元素动画持续时间。
-/// @param {Number} $delay - 各元素开始动画间隔时间。
-/// @param {String} $ease - 动画缓动曲线。
-/// @param {Number} $distance - 各元素动画的移动距离。
+/// 子要素に順次フェードインアニメーションを適用します。
+/// @param {String} $selector - アニメーションさせる要素の唯一の親セレクタ。
+/// @param {Number} $length - アニメーションさせる要素の最小数。
+/// @param {Number} $duration - 個々の要素のアニメーション時間。
+/// @param {Number} $delay - 各要素のアニメーション開始間隔。
+/// @param {String} $ease - アニメーションのイージングカーブ。
+/// @param {Number} $distance - 各要素のアニメーション移動距離。
 /// @output
 @mixin float-in-children($selector, $length, $duration: 600ms, $delay: 100ms, $ease: eases.$ease-out-expo, $distance: 200px) {
 	@for $j from 1 through 2 {
@@ -286,14 +286,14 @@
 	}
 }
 
-/// 为元素设置最大宽高度到屏幕宽高度，防止元素超出到屏幕外面。
+/// 要素に最大幅と最大高さを設定し、画面外にはみ出さないようにします。
 /// @output max-width, max-height
 @mixin set-max-size {
 	max-width: 100dvw;
 	max-height: 100dvh;
 }
 
-/// 禁止显示滚动条，但仍可滚动。
+/// スクロールバーを非表示にしますが、スクロールは可能です。
 /// @output ::-webkit-scrollbar, width, height
 @mixin no-scrollar {
 	&::-webkit-scrollbar {
@@ -301,7 +301,7 @@
 	}
 }
 
-/// 如果元素为空就隐藏它。
+/// 要素が空の場合は非表示にします。
 /// @output :empty, display
 @mixin hide-if-empty {
 	&:empty {

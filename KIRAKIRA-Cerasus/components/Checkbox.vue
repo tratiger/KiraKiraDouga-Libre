@@ -1,17 +1,17 @@
 <script setup lang="ts" generic="T extends string">
 	/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-	// BUG: 上面那个是 typescript-eslint 的 bug，如果去掉，则会触发 typescript 的报错。简而言之就是目前 typescript-eslint 和 typescript 在互相打架。
+	// BUG: 上記は typescript-eslint のバグです。削除すると typescript のエラーが発生します。要するに、現在 typescript-eslint と typescript が競合しています。
 
 	const props = withDefaults(defineProps<{
-		/** 禁用？ */
+		/** 無効？ */
 		disabled?: boolean;
-		/** 值。 */
+		/** 値。 */
 		value?: T;
-		/** 复选状态，单向绑定使用。 */
+		/** チェック状態、一方向バインディングで使用。 */
 		checkState?: CheckState;
-		/** 详细信息。 */
+		/** 詳細情報。 */
 		details?: Readable;
-		/** 只读？ */
+		/** 読み取り専用？ */
 		readonly?: boolean;
 	}>(), {
 		checkState: "unchecked",
@@ -26,7 +26,7 @@
 	const model = defineModel<T[]>();
 	const single = defineModel<boolean>("single", { default: undefined });
 	const isChecked = computed(() => {
-		// NOTE: 由于期望在点击半选状态后应该切换到选中状态，因此在二元的定义下半选应该归纳于未选中状态下。
+		// NOTE: 半選択状態をクリックした後に選択状態に切り替えることが期待されるため、バイナリの定義では半選択は未選択状態に分類されるべきです。
 		if (single.value !== undefined)
 			return single.value;
 		else if (model.value && props.value)
@@ -38,7 +38,7 @@
 	const hasLabel = hasContentInDefaultSlot() || !!props.details;
 
 	/**
-	 * 数据改变事件。
+	 * データ変更イベント。
 	 */
 	function onChange() {
 		if (!checkbox.value) return;
@@ -53,7 +53,7 @@
 		emits("change", { value: checkbox.value.value as T, checkState: nextState, checked: nextChecked });
 	}
 
-	// 如果复选框勾选情况与 prop 不同，就强制使其相同。
+	// チェックボックスのチェック状態が prop と異なる場合は、強制的に同じにします。
 	watch([() => checkbox.value?.checked, () => checkbox.value?.indeterminate], () => {
 		if (!checkbox.value) return;
 		if (isChecked.value !== checkbox.value.checked)
@@ -63,9 +63,9 @@
 	}, { immediate: true });
 
 	/**
-	 * 当键盘按下方向键时移动到前一个或后一个复选框仅聚焦不选中。
-	 * 当键盘按下空格键时不要下滑页面。
-	 * @param e - 键盘事件。
+	 * キーボードの矢印キーが押されたときに、前または次のチェックボックスに移動してフォーカスのみを合わせ、選択はしません。
+	 * キーボードのスペースキーが押されたときにページをスクロールしません。
+	 * @param e - キーボードイベント。
 	 */
 	function onKeydown(e: KeyboardEvent) {
 		if (e.code === "Space") {
@@ -307,7 +307,7 @@
 
 	@each $key in "", "-back" {
 
-		// 故意把动画写两遍，让 CSS 以为是两个动画。
+		// CSSに2つのアニメーションだと思わせるために、意図的にアニメーションを2回記述します。
 		@keyframes outer-border-change#{$key} {
 			from {
 				box-shadow: inset 0 0 0 $border-size c(icon-color);

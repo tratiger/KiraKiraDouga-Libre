@@ -19,7 +19,7 @@
 	const transitionName = ref("page-jump-in");
 	const title = computed(() => videoDetails.value?.title ?? "");
 	const thumbnail = computed(() => videoDetails.value?.image || defaultThumbnail);
-	const currentLanguage = computed(getCurrentLocale); // 当前用户的语言
+	const currentLanguage = computed(getCurrentLocale); // 現在のユーザーの言語
 	// const recommendations = ref<Videos200ResponseVideosInner[]>();
 
 	const playing = ref(false);
@@ -51,7 +51,7 @@
 
 			isBlockedByUploader.value = videoDataResponse.isBlockedByOther;
 			const videoData = videoDataResponse.video;
-			const videoPartData = videoData?.videoPart?.[0]; // TODO: 因为要做 分P 视频，所以这里获取到的视频是一个数组，这里暂时取了数组第 0 位。应改进为读取数组中的所有视频，并根据 id 排序渲染成 分P 列表
+			const videoPartData = videoData?.videoPart?.[0]; // TODO: パート分け動画に対応するため、ここで取得する動画は配列になります。現在は tạm thờiに配列の0番目を取得していますが、配列内のすべての動画を読み込み、IDでソートしてパートリストとしてレンダリングするように改善する必要があります。
 			if (videoData?.title && videoPartData?.link) {
 				videoSource.value = videoPartData.link;
 				videoDetails.value = {

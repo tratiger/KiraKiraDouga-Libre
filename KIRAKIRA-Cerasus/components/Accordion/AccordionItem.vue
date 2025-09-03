@@ -1,16 +1,16 @@
 <docs>
-	垂直折叠手风琴。
+	垂直アコーディオン。
 </docs>
 
 <script setup lang="ts">
 	import Accordion from "./Accordion.vue";
 
 	const props = defineProps<{
-		/** 标题。 */
+		/** タイトル。 */
 		title: Readable;
-		/** 是否展示而非折叠？单向绑定使用。 */
+		/** 折りたたまずに表示しますか？一方向バインディングで使用。 */
 		shown?: boolean;
-		/** 是否**不**向手风琴内容部分加内边距？ */
+		/** アコーディオンのコンテンツ部分にパディングを追加**しない**か？ */
 		noPadding?: boolean;
 	}>();
 
@@ -20,7 +20,7 @@
 	watch(() => props.shown, requireShown => shown.value = requireShown, { immediate: true });
 
 	/**
-	 * 切换展示与折叠状态。
+	 * 表示と折りたたみの状態を切り替えます。
 	 */
 	async function toggle() {
 		const prevShown = shown.value;
@@ -62,7 +62,7 @@
 
 		> * {
 			padding: $padding;
-			// border-bottom: c(gray-30) 1px solid; // 有一说一，边框线确实丑。
+			// border-bottom: c(gray-30) 1px solid; // 正直なところ、境界線は確かに醜い。
 			transition: $fallback-transitions, padding $ease-out-smooth 500ms;
 		}
 

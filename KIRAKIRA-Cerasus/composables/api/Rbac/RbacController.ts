@@ -5,12 +5,12 @@ const BACK_END_URI = environment.backendUri;
 const BROWSING_HISTORY_API_URI = `${BACK_END_URI}rbac`;
 
 /**
- * 管理员更新用户角色
- * @param adminUpdateUserRoleRequest - 管理员更新用户角色的请求载荷
- * @returns 管理员更新用户角色的请求响应
+ * 管理者がユーザーロールを更新します
+ * @param adminUpdateUserRoleRequest - 管理者がユーザーロールを更新するためのリクエストペイロード
+ * @returns 管理者がユーザーロールを更新するリクエストのレスポンス
  */
 export const adminUpdateUserRoleController = async (adminUpdateUserRoleRequest: AdminUpdateUserRoleRequestDto): Promise<AdminUpdateUserRoleResponseDto> => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	const adminUpdateUserRoleResult = await POST(`${BROWSING_HISTORY_API_URI}/adminUpdateUserRole`, adminUpdateUserRoleRequest, { credentials: "include" });
 	return adminUpdateUserRoleResult as AdminUpdateUserRoleResponseDto;
 };

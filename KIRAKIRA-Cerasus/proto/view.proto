@@ -1,7 +1,7 @@
 /**
- * 视频弹幕的一些设置
- * 接口：GET https://api.bilibili.com/x/v2/dm/web/view?type=1&oid=${AV号}&pid=${分P编号}
- * 仓库：https://github.com/MoyuScript/bilibili-protobuf
+ * 動画弾幕に関する設定
+ * インターフェース：GET https://api.bilibili.com/x/v2/dm/web/view?type=1&oid=${AV番号}&pid=${パート番号}
+ * リポジトリ：https://github.com/MoyuScript/bilibili-protobuf
  * 作者：MoyuScript
  */
 
@@ -10,17 +10,17 @@ syntax = "proto3";
 package bilibili.view;
 
 /** 
- * 弹幕分段设置
+ * 弾幕セグメント設定
  */
 message SegmentConfig {
-	// 每段时长（毫秒）
+	// 各セグメントの長さ（ミリ秒）
 	optional int64 page_size = 1;
-	// 共有几段
+	// 合計セグメント数
 	optional int64 total = 2;
 }
 
 /** 
- * 暂不清楚作用
+ * 現在用途不明
  */
 message FlagConfig {
 	optional int32 rec_flag = 1;
@@ -29,97 +29,97 @@ message FlagConfig {
 }
 
 /**
- * 弹幕样式设置
+ * 弾幕スタイル設定
  */
 message WebPlayerConfig {
-	// 是否开启弹幕
+	// 弾幕を有効にするか
 	optional bool dm_switch = 1;
-	// 是否开启智能云屏蔽弹幕
+	// スマートクラウド弾幕フィルターを有効にするか
 	optional bool ai_switch = 2;
-	// 智能云屏蔽等级
+	// スマートクラウドフィルターレベル
 	optional int32 ai_level = 3;
-	// 是否显示顶部弹幕
+	// 上部固定弾幕を表示するか
 	optional bool display_top = 4;
-	// 是否显示飞行弹幕
+	// スクロール弾幕を表示するか
 	optional bool display_scroll = 5;
-	// 是否显示底部弹幕
+	// 下部固定弾幕を表示するか
 	optional bool display_bottom = 6;
-	// 是否显示彩色弹幕
+	// カラー弾幕を表示するか
 	optional bool display_color = 7;
-	// 是否显示高级弹幕
+	// 高度な弾幕を表示するか
 	optional bool display_special = 8;
-	// 是否开启防挡字幕
+	// 字幕保護を有効にするか
 	optional bool prevent_shade = 9;
-	// 是否开启弹幕蒙版（不挡住人像）
+	// 弾幕マスク（人物を隠さない）を有効にするか
 	optional bool dmask = 10;
-	// 弹幕不透明度
+	// 弾幕の不透明度
 	optional float opacity = 11;
-	// 弹幕显示区域
+	// 弾幕表示エリア
 	optional int32 dm_area = 12;
-	// 弹幕速度
+	// 弾幕速度
 	optional float speed_plus = 13;
-	// 弹幕字体大小
+	// 弾幕フォントサイズ
 	optional float font_size = 14;
-	// 是否弹幕大小跟随屏幕等比缩放
+	// 画面サイズに応じて弾幕サイズをスケーリングするか
 	optional bool screen_sync = 15;
-	// 是否弹幕速度同步播放倍数
+	// 再生速度に弾幕速度を同期させるか
 	optional bool speed_sync = 16;
-	// 弹幕字体
+	// 弾幕フォント
 	optional string font_family = 17;
-	// 是否开启粗体
+	// 太字を有効にするか
 	optional bool bold = 18;
-	// 描边类型
+	// 縁取りタイプ
 	optional int32 font_border = 19;
-	// 渲染类型
+	// レンダリングタイプ
 	optional string draw_type = 20;
 }
 
 /**
- * 命令弹幕内容
+ * コマンド弾幕内容
  */
 message CommandDanmaku {
-	// 弹幕数字 ID
+	// 弾幕数値ID
 	optional int64 id = 1;
-	// 所在视频分 P 编号
+	// 所属動画のパート番号
 	optional int64 oid = 2;
-	// 发送者 UID
+	// 送信者UID
 	optional int64 mid = 3;
-	// 命令
+	// コマンド
 	optional string command = 4;
 	// 内容
 	optional string content = 5;
-	// 出现进度
+	// 出現プログレス
 	optional int32 progress = 6;
-	// 发送时间
+	// 送信時間
 	optional string ctime = 7;
-	// 修改时间
+	// 修正時間
 	optional string mtime = 8;
-	// 额外 JSON 信息
+	// 追加JSON情報
 	optional string extra = 9;
-	// 弹幕字符串 ID
+	// 弾幕文字列ID
 	optional string id_str = 10;
 }
 
 /**
- * 总设置根节点
+ * 全体設定ルートノード
  */
 message Root {
-	// 状态，为 1 时视频弹幕被关闭
+	// 状態。1の場合、動画弾幕はオフ
 	optional int32 state = 1;
-	// 弹幕输入框占位符文本
+	// 弾幕入力欄のプレースホルダーテキスト
 	optional string text = 2;
-	// 弹幕列表占位符文本
+	// 弾幕リストのプレースホルダーテキスト
 	optional string text_side = 3;
-	// 弹幕分段设置
+	// 弾幕セグメント設定
 	optional SegmentConfig dm_seg = 4;
 	optional FlagConfig flag = 5;
-	// 高级弹幕资源地址数组
+	// 高度な弾幕リソースアドレス配列
 	repeated string special_dms = 6;
 	optional bool check_box = 7;
-	// 当前弹幕数量
+	// 現在の弾幕数
 	optional int64 count = 8;
-	// 命令弹幕数组
+	// コマンド弾幕配列
 	repeated CommandDanmaku command_dms = 9;
-	// 弹幕样式设置
+	// 弾幕スタイル設定
 	optional WebPlayerConfig dm_settings = 10;
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 标识符。 */
+		/** 識別子。 */
 		id: string;
 	}>();
 </script>

@@ -1,10 +1,10 @@
 <docs>
-	# 浮动操作按钮
+	# フローティングアクションボタン
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 图标。 */
+		/** アイコン。 */
 		icon: string;
 	}>();
 </script>
@@ -18,9 +18,9 @@
 <style scoped lang="scss">
 	@layer props {
 		:comp {
-			/// 容器大小。
+			/// コンテナのサイズ。
 			--wrapper-size: 56px;
-			/// 图标大小。
+			/// アイコンのサイズ。
 			--icon-size: 24px;
 		}
 	}

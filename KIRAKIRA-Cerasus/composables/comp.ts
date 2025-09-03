@@ -1,9 +1,9 @@
 type CompInstance = InstanceType<typeof Comp>;
 
 /**
- * 指向 Comp DOM 的引用。
- * @param value - 初始化传递过来的数据。
- * @returns 指向 Comp DOM 的引用。
+ * Comp DOMへの参照。
+ * @param value - 初期化時に渡されるデータ。
+ * @returns Comp DOMへの参照。
  */
 export function refComp(value?: CompInstance) {
 	return customRef((track, trigger) => ({
@@ -19,18 +19,18 @@ export function refComp(value?: CompInstance) {
 }
 
 /**
- * 指向 Flyout 组件的引用。
- * @deprecated 想不到吧，该函数没写多久就标记为弃用了，请使用更强大的 v-model 来实现传参。
- * @returns 指向 Flyout 组件的引用。
+ * Flyoutコンポーネントへの参照。
+ * @deprecated 驚いたことに、この関数は作成後すぐに非推奨となりました。より強力なv-modelを使用してパラメータを渡してください。
+ * @returns Flyoutコンポーネントへの参照。
  */
 export function refFlyout() {
 	return ref<InstanceType<typeof Flyout>>();
 }
 
 /**
- * 指向 Menu 组件的引用。
- * @deprecated 想不到吧，该函数没写多久就标记为弃用了，请使用更强大的 v-model 来实现传参。
- * @returns 指向 Menu 组件的引用。
+ * Menuコンポーネントへの参照。
+ * @deprecated 驚いたことに、この関数は作成後すぐに非推奨となりました。より強力なv-modelを使用してパラメータを渡してください。
+ * @returns Menuコンポーネントへの参照。
  */
 export function refMenu() {
 	return ref<InstanceType<typeof Menu>>();
@@ -40,10 +40,10 @@ export function refMenu() {
 type UnknownFunctionType = (...args: any[]) => any;
 
 /**
- * 获取基类组件的显示、隐藏函数。
- * @deprecated 想不到吧，该函数没写多久就标记为弃用了，请使用更强大的 v-model 来实现传参。
- * @param base - 基类组件。如果未提供，则会创建一个新的空引用。
- * @returns 基类组件及其显示、隐藏函数。
+ * 基本コンポーネントの表示・非表示関数を取得します。
+ * @deprecated 驚いたことに、この関数は作成後すぐに非推奨となりました。より強力なv-modelを使用してパラメータを渡してください。
+ * @param base - 基本コンポーネント。提供されない場合は、新しい空の参照が作成されます。
+ * @returns 基本コンポーネントとその表示・非表示関数。
  */
 export function useBaseComponentShowHide<T extends { show: UnknownFunctionType; hide: UnknownFunctionType }>(base?: Ref<T | undefined>) {
 	if (!base) base = ref<T>();

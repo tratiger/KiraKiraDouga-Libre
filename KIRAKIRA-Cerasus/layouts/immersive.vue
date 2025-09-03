@@ -1,5 +1,5 @@
 <docs>
-	# 沉浸式布局
+	# イマーシブレイアウト
 </docs>
 
 <script setup lang="ts">

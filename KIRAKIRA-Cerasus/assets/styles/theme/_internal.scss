@@ -4,13 +4,13 @@
 @use "colors" as *;
 @use "functions" as *;
 
-// #region 主题色设定部分
-/// 给定一个颜色值，可以是单个浅色主题颜色（深色主题颜色自动反转颜色获得），也可以是由浅色主题颜色和深色主题颜色组成的列表。
-/// 根据当前的主题返回所需的颜色值。
+// #region テーマカラー設定部分
+/// カラー値を指定します。単一のライトテーマカラー（ダークテーマカラーは自動的に反転して取得）または、ライトテーマカラーとダークテーマカラーのリストを指定できます。
+/// 現在のテーマに基づいて必要なカラー値を返します。
 /// @access private
-/// @param {Color | List} $color - 颜色值。
-/// @param {Bool} $is-light - 当前是否是浅色主题？
-/// @return {Color} 返回所需的主题颜色。
+/// @param {Color | List} $color - カラー値。
+/// @param {Bool} $is-light - 現在はライトテーマですか？
+/// @return {Color} 必要なテーマカラーを返します。
 @function themed-color($color, $is-light) {
 	$light-color: null;
 	$dark-color: null;
@@ -25,11 +25,11 @@
 	@return if($is-light, $light-color, $dark-color);
 }
 
-/// 生成十六进制表示的本色。（~~“或 RGB 三色的列表”~~已被删除。）
+/// 16進数表現のカラーを生成します。（~~「またはRGB3色のリスト」~~は削除されました。）
 /// @access private
-/// @param {String} $name - 颜色名称（Sass 映射键名）。
-/// @param {Color} $color - 浅色主题的颜色，或是由浅色主题颜色和深色主题颜色组成的列表。
-/// @param {Bool} $is-light - 当前是否是浅色主题？
+/// @param {String} $name - カラー名（Sassマップのキー名）。
+/// @param {Color} $color - ライトテーマのカラー、またはライトテーマカラーとダークテーマカラーのリスト。
+/// @param {Bool} $is-light - 現在はライトテーマですか？
 /// @output $property
 @mixin hex-or-rgb-color($name, $color, $is-light) {
 	$property: key-to-css-var($name);
@@ -37,11 +37,11 @@
 	#{$property}: $result-color;
 }
 
-/// 根据指定的键名确定是否生成波浪下划线链接背景。
+/// 指定されたキー名に基づいて、波線の下線リンク背景を生成するかどうかを決定します。
 /// @access private
-/// @param {String | Bool} $key - 当前颜色键名，如果传入 true 可以绕过检查。
-/// @param {String} $color - 当前颜色值。
-/// @param {Bool} $is-light - 当前是否是浅色主题？
+/// @param {String | Bool} $key - 現在のカラーキー名。trueを渡すとチェックをバイパスできます。
+/// @param {String} $color - 現在のカラー値。
+/// @param {Bool} $is-light - 現在はライトテーマですか？
 /// @output --accent-hover-wave-link-background
 @mixin wave-link($key, $color, $is-light) {
 	@if $key == true or map.get($state-colors, accent-hover) == $key {
@@ -51,10 +51,10 @@
 }
 // #endregion
 
-/// 在指定的位置上设定圆角大小。
+/// 指定された位置に角丸のサイズを設定します。
 /// @access private
-/// @param {Number} $radius - 圆角大小。
-/// @param {String} $position [full] - 圆角的位置。
+/// @param {Number} $radius - 角丸の半径。
+/// @param {String} $position [full] - 角丸の位置。
 /// @output border-radius
 @mixin set-border-radius($radius, $position: full) {
 	$positions: (
@@ -78,8 +78,8 @@
 		sharp-right-bottom: $radius $radius 0 $radius,
 		sharp-bottom-left: $radius $radius $radius 0,
 		sharp-left-bottom: $radius $radius $radius 0,
-		nwse: $radius 0, // 这种情况真不知道用什么词称呼，暂且用这个代替。
-		nesw: 0 $radius 0, // 这种情况真不知道用什么词称呼，暂且用这个代替。
+		nwse: $radius 0, // この状況を何と呼べばいいかわからないので、とりあえずこれで代用します。
+		nesw: 0 $radius 0, // この状況を何と呼べばいいかわからないので、とりあえずこれで代用します。
 		full: $radius,
 	);
 	border-radius: map.get($positions, $position);

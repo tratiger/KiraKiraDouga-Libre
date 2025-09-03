@@ -1,12 +1,12 @@
 <docs>
-	首次登录且没有昵称时、或昵称违规后显示的页面。
+	初回ログイン時、ニックネームがない場合、またはニックネームがルール違反の場合に表示されるページ。
 </docs>
 
 <script setup lang="ts">
-	useHead({ title: "欢迎加入KIRAKIRA☆DOUGA大家庭" }); // TODO: 多语言
+	useHead({ title: "KIRAKIRA☆DOUGAファミリーへようこそ" }); // TODO: 多言語
 	const next = Array.isArray(useRoute().query.next) ?
 		useRoute().query.next?.[0] ?? "/" :
-		useRoute().query.next as string ?? "/"; // FIXME: Array.isArray 为什么推断不出来问号表达式第三位一定不是 Array 类型
+		useRoute().query.next as string ?? "/"; // FIXME: なぜArray.isArrayは三項演算子の三番目が絶対にArray型でないと推論できないのか
 
 	const container = ref<HTMLDivElement>();
 
@@ -21,17 +21,17 @@
 	});
 	const isRead = ref(false);
 	const showWelcome = ref(false);
-	const avatarBlob = ref<string>(); // 头像文件
-	const cropper = ref<InstanceType<typeof ImageCropper>>(); // 图片裁剪器实例
-	const isAvatarCropperOpened = ref(false); // 用户头像图片裁剪器是否开启
-	const isUploadingUserAvatar = ref(false); // 是否正在上传头像
-	const userAvatarUploadFile = ref<string | undefined>(); // 用户上传的头像文件 Blob
-	const userAvatarFileInput = ref<HTMLInputElement>(); // 隐藏的图片上传 Input 元素
-	const isUpdatingUserInfo = ref<boolean>(false); // 是否正在上传用户信息
+	const avatarBlob = ref<string>(); // アバターファイル
+	const cropper = ref<InstanceType<typeof ImageCropper>>(); // 画像トリミングインスタンス
+	const isAvatarCropperOpened = ref(false); // ユーザーアバター画像トリミングが有効か
+	const isUploadingUserAvatar = ref(false); // アバターをアップロード中か
+	const userAvatarUploadFile = ref<string | undefined>(); // ユーザーがアップロードしたアバターファイルのBlob
+	const userAvatarFileInput = ref<HTMLInputElement>(); // 非表示の画像アップロードInput要素
+	const isUpdatingUserInfo = ref<boolean>(false); // ユーザー情報をアップロード中か
 	const validData = computed(() => isRead.value && profile.nameValid && profile.gender);
 
 	/**
-	 * 完成注册。
+	 * 登録完了。
 	 */
 	async function finish() {
 		isUpdatingUserInfo.value = true;
@@ -52,8 +52,8 @@
 			}
 		} catch (error) {
 			isUpdatingUserInfo.value = false;
-			useToast("用户信息更新失败！", "error"); // TODO: 使用多语言
-			console.error("用户信息更新失败！", error);
+			useToast("ユーザー情報の更新に失敗しました！", "error"); // TODO: 多言語
+			console.error("ユーザー情報の更新に失敗しました！", error);
 		}
 
 		const main = container.value?.parentElement;
@@ -67,7 +67,7 @@
 	}
 
 	/**
-	 * 修改头像事件，向服务器提交新的图片。
+	 * アバター変更イベント。サーバーに新しい画像を送信します。
 	 */
 	async function handleSubmitAvatarImage() {
 		try {
@@ -82,33 +82,33 @@
 					if (uploadResult) {
 						avatarBlob.value = userAvatarUploadFilename;
 						isAvatarCropperOpened.value = false;
-						clearBlobUrl(); // 释放内存
+						clearBlobUrl(); // メモリを解放
 					}
 					isUploadingUserAvatar.value = false;
 				}
 			} else {
-				useToast("无法获取裁切后的图片！", "error"); // TODO: 使用多语言
-				console.error("ERROR", "无法获取裁切后的图片");
+				useToast("トリミング後の画像を取得できません！", "error"); // TODO: 多言語
+				console.error("ERROR", "トリミング後の画像を取得できません");
 			}
 		} catch (error) {
-			useToast("头像上传失败！", "error"); // TODO: 使用多语言
-			console.error("ERROR", "在上传用户头像时出错", error);
+			useToast("アバターのアップロードに失敗しました！", "error"); // TODO: 多言語
+			console.error("ERROR", "ユーザーアバターのアップロード中にエラーが発生しました", error);
 			isUploadingUserAvatar.value = false;
 		}
 	}
 
 	/**
-	 * 点击头像事件，模拟点击文件上传并唤起文件资源管理器
+	 * アバタークリックイベント。ファイルアップロードのクリックをシミュレートし、ファイルエクスプローラーを呼び出します
 	 */
 	function handleUploadAvatarImage() {
 		userAvatarFileInput.value?.click();
 	}
 
 	/**
-	 * 如果有上传图片，则开启图片裁切器。
+	 * アップロードされた画像がある場合、画像トリミングツールを開きます。
 	 *
-	 * 即：用户选择了本地文件的事件。
-	 * @param e - 应为用户上传文件的 `<input>` 元素的 change 事件。
+	 * つまり、ユーザーがローカルファイルを選択したイベントです。
+	 * @param e - ユーザーがファイルをアップロードする `<input>` 要素のchangeイベントである必要があります。
 	 */
 	async function handleOpenAvatarCropper(e?: Event) {
 		e?.stopPropagation();
@@ -117,19 +117,19 @@
 
 		if (image) {
 			if (!/\.(a?png|jpe?g|jfif|pjp(eg)?|gif|svg|webp)$/i.test(fileInput.value)) {
-				useToast("只能上传图片文件！", "error"); // TODO: 使用多语言
-				console.error("ERROR", "不支持所选头像图片格式！");
+				useToast("画像ファイルのみアップロードできます！", "error"); // TODO: 多言語
+				console.error("ERROR", "選択されたアバター画像の形式はサポートされていません！");
 				return;
 			}
 
 			userAvatarUploadFile.value = await fileToBlob(image);
 			isAvatarCropperOpened.value = true;
-			fileInput.value = ""; // 读取完用户上传的文件后，需要清空 input，以免用户在下次上传同一个文件时无法触发 change 事件。
+			fileInput.value = ""; // ユーザーがアップロードしたファイルを読み取った後、inputをクリアする必要があります。これにより、ユーザーが次回同じファイルをアップロードしたときにchangeイベントがトリガーされないのを防ぎます。
 		}
 	}
 
 	/**
-	 * 清除已经上传完成的图片，释放内存。
+	 * アップロードが完了した画像をクリアし、メモリを解放します。
 	 */
 	function clearBlobUrl() {
 		if (userAvatarUploadFile.value) {
@@ -138,12 +138,12 @@
 		}
 	}
 
-	useEventListener(userAvatarFileInput, "change", handleOpenAvatarCropper); // 监听头像文件变化事件
+	useEventListener(userAvatarFileInput, "change", handleOpenAvatarCropper); // アバターファイルの変更イベントを監視
 </script>
 
 <template>
-	<!-- TODO: 使用多语言 -->
-	<Modal v-model="isAvatarCropperOpened" title="更新头像">
+	<!-- TODO: 多言語対応 -->
+	<Modal v-model="isAvatarCropperOpened" title="アバターを更新">
 		<div class="avatar-cropper">
 			<ImageCropper
 				ref="cropper"
@@ -157,33 +157,33 @@
 			/>
 		</div>
 		<template #footer-right>
-			<!-- TODO: 使用多语言 -->
-			<Button class="secondary" @click="isAvatarCropperOpened = false">取消</Button>
-			<!-- TODO: 使用多语言 -->
-			<Button :loading="isUploadingUserAvatar" @click="handleSubmitAvatarImage">更新头像</Button>
+			<!-- TODO: 多言語対応 -->
+			<Button class="secondary" @click="isAvatarCropperOpened = false">キャンセル</Button>
+			<!-- TODO: 多言語対応 -->
+			<Button :loading="isUploadingUserAvatar" @click="handleSubmitAvatarImage">アバターを更新</Button>
 		</template>
 	</Modal>
 
 	<div class="banner">
 		<LogoCover noAnimation noTitle />
-		<h1>欢迎加入<LogoText />大家庭</h1>
+		<h1><LogoText />ファミリーへようこそ</h1>
 	</div>
 	<div ref="container" class="container">
 		<div class="card">
 			<div class="card-rectangle"></div>
-			<h2>完善个人信息</h2>
+			<h2>個人情報を入力</h2>
 			<div class="items">
 				<div class="avatar">
 					<UserAvatar :avatar="avatarBlob" @click="handleUploadAvatarImage" />
-					<span>上传头像</span>
+					<span>アバターをアップロード</span>
 					<input ref="userAvatarFileInput" type="file" accept="image/*" hidden />
 				</div>
 
 				<SettingsUserProfile v-model="profile" />
 
-				<Checkbox v-model:single="isRead">我已阅读并同意<PopupWindowLink href="https://otomad.github.io/cssc/license.htm">《KIRAKIRA☆DOUGA用户协议》</PopupWindowLink></Checkbox>
+				<Checkbox v-model:single="isRead"><PopupWindowLink href="https://otomad.github.io/cssc/license.htm">「KIRAKIRA☆DOUGA利用規約」</PopupWindowLink>を読み、同意します</Checkbox>
 
-				<Button icon="check" :disabled="!validData || isUpdatingUserInfo" :loading="isUpdatingUserInfo" @click="finish">开始畅游KIRAKIRA☆DOUGA</Button>
+				<Button icon="check" :disabled="!validData || isUpdatingUserInfo" :loading="isUpdatingUserInfo" @click="finish">KIRAKIRA☆DOUGAの旅を始めよう</Button>
 			</div>
 		</div>
 	</div>
@@ -195,7 +195,7 @@
 			</div>
 			<div class="content-wrapper">
 				<div v-for="i in 2" :key="i" class="content" :class="{ 'content-visible': i === 2 }">
-					<p class="welcome-text">欢迎加入</p>
+					<p class="welcome-text">ようこそ</p>
 					<p class="name">{{ profile.name }}</p>
 				</div>
 			</div>
@@ -415,7 +415,7 @@
 
 		@media (width <= 450px) {
 			--size: 80dvw;
-			// 对于图片切割器，不建议使用响应式，因为切割器内部被切割的图片不会随之改变尺寸，但考虑到极端小尺寸的适配问题，且在上传图片时浏览器宽度发生剧烈变化的概率较小，故保留本功能。
+			// 画像トリミングツールについては、レスポンシブ対応は推奨されません。トリミングツール内部の画像はサイズが変更されないためです。しかし、極端に小さいサイズへの対応や、画像アップロード時にブラウザの幅が急激に変化する可能性は低いため、この機能は残しています。
 		}
 	}
 </style>

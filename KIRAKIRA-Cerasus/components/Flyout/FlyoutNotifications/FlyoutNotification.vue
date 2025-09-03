@@ -1,5 +1,5 @@
 <docs>
-	# 通知浮窗
+	# 通知フローティングウィンドウ
 </docs>
 
 <script setup lang="ts">
@@ -23,10 +23,10 @@
 				<div class="page-wrapper">
 					<Transition :name="transitionName" mode="out-in">
 						<div v-if="currentPage === 'reply'">
-							<FlyoutNotificationItem nickname="哇" username="wow" :uid="8" :date="new Date()" quote="阿斯顿法国红酒快乐阿斯顿法国红酒快乐阿斯顿法国红酒快乐阿斯顿法国红酒快乐">自行车VB你们🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲</FlyoutNotificationItem>
+							<FlyoutNotificationItem nickname="わ" username="wow" :uid="8" :date="new Date()" quote="アストンマーティンのフランス赤ワインハッピーアストンマーティンのフランス赤ワインハッピーアストンマーティンのフランス赤ワインハッピーアストンマーティンのフランス赤ワインハッピー">自転車VBあなたたち🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲🚲</FlyoutNotificationItem>
 						</div>
 						<div v-else-if="currentPage === 'mention'">
-							<FlyoutNotificationItem nickname="啊" username="ahh" :uid="8" :date="new Date()">感谢<a class="link lite">@被提及的人</a>制作的新设计！</FlyoutNotificationItem>
+							<FlyoutNotificationItem nickname="あ" username="ahh" :uid="8" :date="new Date()">新しいデザインを作成してくれてありがとう<a class="link lite">@言及された人</a>！</FlyoutNotificationItem>
 						</div>
 					</Transition>
 				</div>

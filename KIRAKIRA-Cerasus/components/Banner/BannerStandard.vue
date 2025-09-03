@@ -1,5 +1,5 @@
 <docs>
-	标准样式的 Banner（横幅）。
+	標準スタイルのバナー。
 </docs>
 
 <script setup lang="ts">

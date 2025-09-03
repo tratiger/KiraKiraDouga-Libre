@@ -1,5 +1,5 @@
 <docs>
-	# 颜色选取器
+	# カラーピッカー
 </docs>
 
 <script lang="ts">
@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 是否允许带不透明度的颜色。 */
+		/** 不透明度のある色を許可しますか。 */
 		enableAlpha?: boolean;
 	}>();
 
@@ -42,8 +42,8 @@
 	const isUpdating = reactive({}) as Record<ChangedParam, boolean>;
 	const maxValue = computed<ThreeD>(() => model.value === "rgb" ? [255, 255, 255] : [359, 100, 100]);
 	const getHexInvalidMessage = (hex: string) => !props.enableAlpha ?
-		[3, 6].includes(hex.length) ? "" : "HEX颜色值的长度必须为3位数或6位数。" :
-		[3, 4, 6, 8].includes(hex.length) ? "" : "HEX颜色值的长度必须为3位数、4位数、6位数或8位数。";
+		[3, 6].includes(hex.length) ? "" : "HEXカラー値の長さは3桁または6桁である必要があります。" :
+		[3, 4, 6, 8].includes(hex.length) ? "" : "HEXカラー値の長さは3桁、4桁、6桁、または8桁である必要があります。";
 	const hexInvalidMessage = computed(() => getHexInvalidMessage(hex.value));
 	const spectrums = computed({
 		get: () => [...main.value, auxiliary.value, opacity.value] as FourD,
@@ -120,8 +120,8 @@
 	watch(specificModel, specificModel => specificModel && (model.value = specificModel));
 
 	/**
-	 * 按下主要调节平面逻辑处理。
-	 * @param e - 指针事件（包括鼠标和触摸）。
+	 * メイン調整平面を押したときのロジック処理。
+	 * @param e - ポインターイベント（マウスとタッチを含む）。
 	 */
 	function onPlaneDown(e: PointerEvent) {
 		const plane = e.currentTarget as HTMLDivElement;
@@ -145,10 +145,10 @@
 	type ChangedParam = "hex" | "values" | "spectrums" | "update";
 
 	/**
-	 * 监测要不改变的参数。
-	 * @param param - 要改变的参数名称。
-	 * @param callback - 回调函数。
-	 * @returns 产生的 watch 回调函数。
+	 * 変更しないパラメーターを監視します。
+	 * @param param - 変更するパラメーター名。
+	 * @param callback - コールバック関数。
+	 * @returns 生成されたwatchコールバック関数。
 	 */
 	function useChange<T>(param: ChangedParam, callback: (current: T, previous: T) => void) {
 		return async (current: T, previous: T) => {
@@ -160,7 +160,7 @@
 		};
 	}
 
-	// TODO: 方形区域滑块在外面，但滑轨区域滑块又在里面，很丑，需要统一样式。
+	// TODO: 四角い領域のスライダーは外側にありますが、スライドレールの領域のスライダーは内側にあり、見栄えが悪いため、スタイルを統一する必要があります。
 </script>
 
 <template>
@@ -298,7 +298,7 @@
 			> * {
 				position: absolute;
 				inset: 0;
-				border-radius: 8px; // 与下方滑动条的圆角大小一致，因此使用特殊值。
+				border-radius: 8px; // 下のスライダーの角の丸みと一致させるため、特別な値を使用します。
 			}
 		}
 

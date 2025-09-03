@@ -1,7 +1,7 @@
 /**
- * 弹幕数据包格式
- * 接口：GET https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=${AV号}&pid=${分P编号}&segment_index=${视频分段序号}
- * 仓库：https://github.com/MoyuScript/bilibili-protobuf
+ * 弾幕データパッケージフォーマット
+ * インターフェース：GET https://api.bilibili.com/x/v2/dm/web/seg.so?type=1&oid=${AV番号}&pid=${パート番号}&segment_index=${動画セグメントインデックス}
+ * リポジトリ：https://github.com/MoyuScript/bilibili-protobuf
  * 作者：MoyuScript
  */
 
@@ -10,26 +10,26 @@ syntax = "proto3";
 package bilibili.danmaku;
 
 /**
- * 单个弹幕信息
+ * 個別弾幕情報
  */
 message Danmaku {
-	// 弹幕数字 ID
+	// 弾幕数値ID
 	required int64 id = 1;
-	// 弹幕在视频的出现位置
+	// 動画内での弾幕出現位置
 	required int32 progress = 2;
-	// 弹幕模式
+	// 弾幕モード
 	enum Mode {
-		// 飞行弹幕
+		// スクロール弾幕
 		SCROLL = 1;
-		// 顶部固定弹幕
+		// 上部固定弾幕
 		TOP = 5;
-		// 底部固定弹幕
+		// 下部固定弾幕
 		BOTTOM = 4;
-		// 逆向飞行弹幕
+		// 逆スクロール弾幕
 		REVERSED = 6;
 	}
 	required Mode mode = 3;
-	// 弹幕大小
+	// 弾幕サイズ
 	enum Fontsize {
 		XXS = 12;
 		XS = 16;
@@ -40,32 +40,32 @@ message Danmaku {
 		XXL = 64;
 	}
 	required Fontsize font_size = 4;
-	// 弹幕 RGBA 颜色
+	// 弾幕のRGBAカラー
 	required uint32 color = 5;
-	// 弹幕发送者经过 crc32 计算摘要后的值
+	// 弾幕送信者のcrc32計算後のハッシュ値
 	required string mid_hash = 6;
-	// 弹幕内容
+	// 弾幕内容
 	required string content = 7;
-	// 弹幕发送时间戳
+	// 弾幕送信タイムスタンプ
 	required int64 ctime = 8;
-	// 弹幕在弹幕列表显示的权重，数字越大越靠上
+	// 弾幕リストでの表示ウェイト。数値が大きいほど上に表示される
 	required int32 weight = 9;
-	// 目前不清楚
+	// 現在不明
 	optional string action = 10;
-	// 目前不清楚
+	// 現在不明
 	optional int32 pool = 11;
-	// 弹幕字符串 ID 
+	// 弾幕文字列ID
 	required string id_str = 12;
-	// 目前不清楚
+	// 現在不明
 	optional int32 attr = 13;
 }
 
 /**
- * 根节点
+ * ルートノード
  */
 message Root {
-	// 弹幕数组
+	// 弾幕配列
 	repeated Danmaku danmakus = 1;
-	// 弹幕是否被关闭，仅当被关闭时会有这个选项
+	// 弾幕がオフになっているか。オフの場合のみこのオプションが存在する
 	optional bool is_close = 1;
 }

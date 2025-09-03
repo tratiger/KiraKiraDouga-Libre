@@ -1,12 +1,12 @@
 <docs>
-	# 日期/时间/时间码选择器的基础选择器
+	# 日付/時刻/タイムコードピッカーの基本ピッカー
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 基础日期时间选择器字段。 */
+		/** 基本的な日時ピッカーフィールド。 */
 		fields: (BaseDateTimePickerField | BaseDateTimePickerFieldPlain)[];
-		/** 缺省分隔符。默认为间隔号。 */
+		/** デフォルトの区切り文字。デフォルトは中点です。 */
 		defaultSep?: string;
 	}>(), {
 		defaultSep: "·",
@@ -32,7 +32,7 @@
 		if (!menu.value || !showMenu.value) return;
 		const clickOutside = !isInPath(e, menu);
 		if (clickOutside) {
-			restoreValue(); // 去掉该行，则点击屏幕外缘将会保存设置而不是恢复设置。
+			restoreValue(); // この行を削除すると、画面の外側をクリックすると設定が復元されるのではなく保存されます。
 			hide();
 		}
 	});
@@ -129,7 +129,7 @@
 						<div v-for="key in menuValuesKeys" :key="key" class="items" :class="key">
 							<template v-for="({ name, sep, minWidth, ...field }, index) in fields" :key="name">
 								<div v-if="'values' in field" :ref="el => menuValues[key][name] = el as HTMLDivElement" class="values" :style="{ minWidth: toValue(minWidth) }" @wheel="e => onWheel(e, name)">
-									<!-- 虽说不推荐将数组索引值作为 key，但是假如元素太少（例如12小时制），则会出现一轮包含多个相同的 key，从而导致出现异常。 -->
+									<!-- 配列のインデックスをキーとして使用することは推奨されませんが、要素が少なすぎる場合（例：12時間制）、1ラウンドに複数の同じキーが含まれ、異常が発生する可能性があります。 -->
 									<template v-for="(value, i) in visibleValues[name]" :key="getOffsetFromIndex(i)">
 										<p v-if="value !== undefined" v-ripple class="item" @click="setField(name, value); spining(name, getOffsetFromIndex(i))">
 											{{ field.getDisplayValue?.(value) ?? value }}
@@ -197,7 +197,7 @@
 
 	* {
 		font-weight: 500;
-		font-feature-settings: "case" on; // 使冒号和负号等与数字和大写字母等高（不需要比号）。
+		font-feature-settings: "case" on; // コロンやマイナス記号などを数字や大文字と同じ高さにします（比較記号は不要）。
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -224,7 +224,7 @@
 		width: $width;
 		height: $height;
 
-		// 使用绝对定位而不是和 ComboBox 一样的相对定位是因为，我想到一个用例是视频跳时间。要是用相对定位的话，如果视频全屏显示，那么必然会有半边菜单显示在屏幕之外。
+		// ComboBoxのような相対配置ではなく絶対配置を使用するのは、ビデオのタイムジャンプというユースケースを考えたからです。相対配置を使用すると、ビデオが全画面表示の場合、メニューの半分が必然的に画面外に表示されます。
 		> * {
 			position: fixed;
 			top: var(--top-value);

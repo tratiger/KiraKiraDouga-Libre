@@ -14,28 +14,28 @@
 	const paletteSection = ref<HTMLElement>();
 	const DEFAULT_PALETTE = "pink" satisfies PaletteType;
 
-	// HACK: 16 请参照此部分 ↓ ↓ ↓
+	// HACK: 16 この部分を参照してください ↓ ↓ ↓
 
-	// 允许同步的 kira cookie 设置
+	// 同期可能なKiraクッキー設定
 	const useSyncKiraCookieOptions = { isWatchCookieRef: true, isSyncSettings: true, isListenLoginEvent: true };
 
-	// 主题
+	// テーマ
 	const cookieThemeType = useKiraCookie<ThemeSetType>(COOKIE_KEY.themeTypeCookieKey, SyncUserSettings.updateOrCreateUserThemeTypeSetting, useSyncKiraCookieOptions);
-	// 个性色
+	// カスタムカラー
 	const cookieThemeColor = useKiraCookie<string>(COOKIE_KEY.themeColorCookieKey, SyncUserSettings.updateOrCreateUserThemeColorSetting, useSyncKiraCookieOptions);
-	// 自定义个性色
-	const cookieThemeCustomColor = useKiraCookie<string>(COOKIE_KEY.themeColorCustomCookieKey, SyncUserSettings.updateOrCreateUserThemeColorCustomSetting, { ...useSyncKiraCookieOptions, debounceWait: 500 }); // 自定义颜色增加了防抖
-	// 彩色侧边栏
+	// カスタムカラー
+	const cookieThemeCustomColor = useKiraCookie<string>(COOKIE_KEY.themeColorCustomCookieKey, SyncUserSettings.updateOrCreateUserThemeColorCustomSetting, { ...useSyncKiraCookieOptions, debounceWait: 500 }); // カスタムカラーにデバウンスを追加
+	// カラーサイドバー
 	const cookieColoredSidebar = useKiraCookie<boolean>(COOKIE_KEY.coloredSidebarCookieKey, SyncUserSettings.updateOrCreateUserColoredSidebarSetting, useSyncKiraCookieOptions);
 
-	// HACK: 16 请参照此部分 ↑ ↑ ↑
+	// HACK: 16 この部分を参照してください ↑ ↑ ↑
 
-	// 当使用自定义颜色时，使用 style="--accent-50: #000" 的格式将颜色放置在根元素上，并将内容存储且允许同步。
+	// カスタムカラーを使用する場合、style="--accent-50: #000" の形式でカラーをルート要素に配置し、内容を保存して同期を許可します。
 	const customColor = reactive(Color.fromHex(`#${cookieThemeCustomColor.value}`));
 	const flyoutColorPicker = ref<FlyoutModel>();
 	watch(customColor, customColor => cookieThemeCustomColor.value = customColor.hex);
 
-	// 背景图片
+	// 背景画像
 	const backgroundImageSettingsStore = useAppSettingsStore().backgroundImage;
 	const backgroundSliderDisplayValue = (value: number) => value.toFixed(2);
 	const backgroundImages = useBackgroundImages();
@@ -49,10 +49,10 @@
 	}
 
 	const useCookieAndLocalStorageOptions = { isWatchCookieRef: true, isSyncSettings: false };
-	// 在 cookie 和 localStorage 中同步的 Cookie，是否开启主题同步
+	// cookieとlocalStorageで同期するCookie、テーマ同期を有効にするか
 	const isAllowSyncThemeSettings = useKiraCookie<boolean>(COOKIE_KEY.isAllowSyncThemeSettings, undefined, useCookieAndLocalStorageOptions);
 	watch(isAllowSyncThemeSettings, () => {
-		// 用户选择开启或关闭 isAllowSyncThemeSettings 的时候会载入数据
+		// ユーザーがisAllowSyncThemeSettingsを有効または無効にすると、データが読み込まれます
 		api.user.getUserSettings().then(userSettings => {
 			saveUserSetting2BrowserCookieStore(userSettings);
 			cookieBinding();
@@ -217,9 +217,9 @@
 			</section>
 
 			<Menu v-model="backgroundImageItemMenu[0]">
-				<!-- TODO: 多语言。 -->
-				<MenuItem icon="arrow_left" :disabled="backgroundImageItemMenu[1].displayIndex <= 0" @click="backgroundImages.reorder(backgroundImageItemMenu[1].key, backgroundImageItemMenu[1].displayIndex - 1)">往前挪</MenuItem>
-				<MenuItem icon="arrow_right" :disabled="backgroundImageItemMenu[1].displayIndex >= backgroundImages.items.length - 2" @click="backgroundImages.reorder(backgroundImageItemMenu[1].key, backgroundImageItemMenu[1].displayIndex + 1)">往后挪</MenuItem>
+				<!-- TODO: 多言語対応。 -->
+				<MenuItem icon="arrow_left" :disabled="backgroundImageItemMenu[1].displayIndex <= 0" @click="backgroundImages.reorder(backgroundImageItemMenu[1].key, backgroundImageItemMenu[1].displayIndex - 1)">前に移動</MenuItem>
+				<MenuItem icon="arrow_right" :disabled="backgroundImageItemMenu[1].displayIndex >= backgroundImages.items.length - 2" @click="backgroundImages.reorder(backgroundImageItemMenu[1].key, backgroundImageItemMenu[1].displayIndex + 1)">後ろに移動</MenuItem>
 				<hr />
 				<MenuItem icon="delete" @click="confirmDeleteBackgroundImageFlyout = [[backgroundImageItemMenu[2], 'y'], () => backgroundImages.delete(backgroundImageItemMenu[1].key)]">{{ t.delete }}</MenuItem>
 			</Menu>
@@ -227,8 +227,8 @@
 			<Flyout v-model="confirmDeleteBackgroundImageFlyout[0]">
 				<div class="flyout-content">
 					<h4>{{ t.delete }}</h4>
-					<!-- TODO: 多语言。 -->
-					<p>确定要删除该背景图像吗？</p>
+					<!-- TODO: 多言語対応。 -->
+					<p>この背景画像を削除してもよろしいですか？</p>
 					<div class="flyout-buttons">
 						<Button @click="confirmDeleteBackgroundImageFlyout[0] = undefined">{{ t.step.cancel }}</Button>
 						<Button @click="confirmDeleteBackgroundImageFlyout[0] = undefined; confirmDeleteBackgroundImageFlyout[1]();" :style="{ '--appearance': 'secondary' }">{{ t.step.ok }}</Button>

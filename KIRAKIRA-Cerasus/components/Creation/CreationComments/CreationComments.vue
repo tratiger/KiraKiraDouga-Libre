@@ -1,46 +1,46 @@
 <docs>
-	### 稿件评论
+	### 動画コメント
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 是否可以编辑（用户如果被屏蔽等情况下无法编辑） */
+		/** 編集可能かどうか（ユーザーがブロックされている場合などは編集できません） */
 		editable?: boolean;
 	}>(), {
 		editable: true,
 	});
 
-	const pageSize = 20; // 每页评论数
-	const comments = ref<GetVideoCommentByKvidResponseDto["videoCommentList"]>([]); // 评论数据
-	const commentsCount = ref(0); // 评论数目。
-	const currentPage = ref(1); // 当前页码
-	const loading = ref(false); // 是否正在加载评论？
-	const error = ref(false); // 是否加载失败？
+	const pageSize = 20; // 1ページあたりのコメント数
+	const comments = ref<GetVideoCommentByKvidResponseDto["videoCommentList"]>([]); // コメントデータ
+	const commentsCount = ref(0); // コメント数。
+	const currentPage = ref(1); // 現在のページ番号
+	const loading = ref(false); // コメントを読み込み中ですか？
+	const error = ref(false); // 読み込みに失敗しましたか？
 	const pinned = ref(false);
 	const search = ref("");
 	const pageCount = computed(() => Math.max(1, Math.ceil(commentsCount.value / pageSize)));
 	const selfUserInfoStore = useSelfUserInfoStore();
-	const sort = ref<SortModel>(["rating", "descending"]); // 排序方式
+	const sort = ref<SortModel>(["rating", "descending"]); // 並べ替え方法
 
 	/**
-	 * 发送评论，将发送的评论添加到评论列表中
+	 * コメントを送信し、送信されたコメントをコメントリストに追加します
 	 */
 	useListen("videoComment:emitVideoComment", videoComment => {
 		comments.value.push(videoComment);
 	});
 
 	/**
-	 * 删除评论，根据被删除的评论路由来过滤评论列表
-	 * // TODO: 性能改进
+	 * コメントを削除し、削除されたコメントのルートに基づいてコメントリストをフィルタリングします
+	 * // TODO: パフォーマンスの改善
 	 */
 	useListen("videoComment:deleteVideoComment", commentRoute => {
 		comments.value = comments.value.filter(comment => comment.commentRoute !== commentRoute);
 	});
 
 	/**
-	 * 获取视频的评论数据
+	 * 動画のコメントデータを取得します
 	 */
 	async function fetchVideoCommentData() {
 		const getVideoCommentByKvidRequest: GetVideoCommentByKvidRequestDto = {
@@ -110,7 +110,7 @@
 				>
 					<!-- eslint-disable-next-line vue/no-v-html -->
 					<!-- <div v-html="comment.text"></div> -->
-					<!-- TODO: 评论支持富文本。 -->
+					<!-- TODO: コメントはリッチテキストをサポートします。 -->
 					<div>{{ comment.text }}</div>
 				</CreationCommentsItem>
 			</div>

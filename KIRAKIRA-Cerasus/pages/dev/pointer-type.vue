@@ -1,15 +1,15 @@
 <docs>
-	# 指针事件类型检测。
-	临时测试 Apple Pencil、数位板等特殊设备用。
+	# ポインターイベントタイプ検出。
+	Apple Pencilやペンタブレットなどの特殊なデバイスを一時的にテストするために使用します。
 </docs>
 
 <script setup lang="ts">
-	useHead({ title: "指针事件类型检测" });
+	useHead({ title: "ポインターイベントタイプ検出" });
 	const pointerType = ref("");
 
 	/**
-	 * 点击事件。
-	 * @param e - 指针点击事件。
+	 * クリックイベント。
+	 * @param e - ポインタークリックイベント。
 	 */
 	function onPointerUp(e: PointerEvent) {
 		pointerType.value = e.pointerType;
@@ -18,9 +18,9 @@
 
 <template>
 	<div>
-		<h1>指针事件类型检测</h1>
-		<span>点击以下按钮可以检测是由何种输入设备点击的</span>
-		<Button @pointerup="onPointerUp">点我</Button>
+		<h1>ポインターイベントタイプ検出</h1>
+		<span>以下のボタンをクリックすると、どの入力デバイスでクリックされたかを検出できます</span>
+		<Button @pointerup="onPointerUp">クリックして</Button>
 		<p>{{ pointerType }}</p>
 	</div>
 </template>

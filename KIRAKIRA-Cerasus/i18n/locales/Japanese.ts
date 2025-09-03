@@ -450,10 +450,10 @@ export default {
 		bilibili: "Bilibili",
 		niconico: "ニコニコ",
 		youtube: "YouTube",
-		otomad_wiki: "OtomadWiki",
-		weibo: "新浪微博",
-		tieba: "百度貼吧",
-		cloudmusic: "網易雲音楽",
+		otomad_wiki: "音MAD Wiki",
+		weibo: "Weibo",
+		tieba: "Tieba",
+		cloudmusic: "Cloud Music",
 		discord: {
 			_: "Discord",
 			server: "Discord サーバー",
@@ -468,7 +468,7 @@ export default {
 		github: "GitHub",
 		bluesky: "Bluesky",
 		kwai: "Kwai",
-		rednote: "小紅書",
+		rednote: "REDnote",
 	},
 	modify_memo: "メモの編集",
 	add_to_group: "グループに追加",
@@ -644,7 +644,7 @@ export default {
 	info: "情報",
 	calendar: {
 		gregory: "西暦",
-		chinese: "中国語",
+		chinese: "農暦",
 	},
 	file_picker: {
 		choose: "ファイルを選択",

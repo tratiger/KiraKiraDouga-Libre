@@ -2,7 +2,7 @@
 	import AccordionItem from "./AccordionItem.vue";
 
 	const props = defineProps<{
-		/** 是否在打开其它手风琴项目时自动折叠已打开的手风琴项目？ */
+		/** 他のアコーディオン項目を開いたときに、すでに開いているアコーディオン項目を自動的に折りたたみますか？ */
 		autoCollapse?: boolean;
 	}>();
 
@@ -13,7 +13,7 @@
 	const { Slot, children } = useFactory(AccordionItem);
 
 	/**
-	 * 关闭所有手风琴项目。
+	 * すべてのアコーディオン項目を閉じます。
 	 */
 	function collaspeAll() {
 		if (!props.autoCollapse || !children.value) return;
