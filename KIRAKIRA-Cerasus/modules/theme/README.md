@@ -2,38 +2,38 @@
 
 # @KIRAKIRA-DOUGA/theme
 
-> 原项目名称：**@nuxtjs/color-mode**
+> 元のプロジェクト名：**@nuxtjs/color-mode**
 >
-> 使用 Nuxt 轻松实现自动检测的🌑深色和🌕浅色模式。
+> Nuxtを使用して、自動検出される🌑ダークモードと🌕ライトモードを簡単に実装します。
 
-KIRAKIRA 的主题配色模式模块基于官方 Nuxt Color Mode 模块修改而成。
+KIRAKIRAのテーマカラーモードモジュールは、公式のNuxt Color Modeモジュールを基に改造したものです。
 
-除深浅色和系统自动外，增加了主题色改变的设置。
+ダーク/ライトモードとシステム自動設定に加えて、テーマカラーの変更設定が追加されています。
 
-原版官网地址：[@nuxtjs/color-mode](https://color-mode.nuxtjs.org/)
+オリジナル版公式サイト：[@nuxtjs/color-mode](https://color-mode.nuxtjs.org/)
 
 [![nuxt-color-mode](https://user-images.githubusercontent.com/904724/79349768-f09cf080-7f36-11ea-93bb-20fae8c94811.gif)](https://color-mode.nuxtjs.app/)
 
 ---
 
 ### 注意：
-20240209 @cfdxkk 重写了这一部分
+20240209 @cfdxkk がこの部分を書き直しました
 
-现在，如果你想要添加一个新的，可同步的、持久化的、（尽可能）不闪烁的用户主题设置项，必须要按照以下步骤在正确位置上编写代码，以免造成状态管理混乱。
+現在、新しい、同期可能で、永続的で、（可能な限り）ちらつきのないユーザーテーマ設定項目を追加したい場合は、状態管理の混乱を避けるため、以下の手順に従って正しい場所にコードを記述する必要があります。
 
-1. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 1 在此处添加` 的注释前创建空行，并添加全局变量，变量名和值需要和 `HACK 3 在此处添加` 位置添加的局部变量一致
-2. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 2 在此处添加` 的注释前创建空行，并添加全局变量，变量名和值需要和 `HACK 4 在此处添加` 位置添加的局部变量一致
-3. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 3 在此处添加` 的注释前创建空行，并添加局部变量，变量名和值需要和 `HACK 1 在此处添加` 位置添加的全局变量一致
-4. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 4 在此处添加` 的注释前创建空行，并添加局部变量，变量名和值需要和 `HACK 2 在此处添加` 位置添加的全局变量一致
-5. 在 `modules\theme\composables.ts` 中标有 `HACK 5 在此处添加` 的注释前创建空行，并编写一个获取 nuxt 响应式 cookie 对象的代码
-6. 在 `modules\theme\composables.ts` 中标有 `HACK 6 在此处添加` 的注释前创建空行，并编写一个把后端请求结果赋值给 nuxt 响应式 cookie 对象的代码
-7. 在 `modules\theme\composables.ts` 中标有 `HACK 7 在此处添加` 的注释前创建空行，并编写一个后端请求结果赋值的代码，别忘记设置默认值
-8. 在 `modules\theme\composables.ts` 中标有 `HACK 8 在此处添加` 的注释前创建空行，并编写一个把后端请求结果存放到 cookie 中的代码
-9. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 9 在此处添加` 的注释前创建空行，并定义一个正确的变量名
-10. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 10 在此处添加` 的注释前创建空行，并编写一个从 localStorage 中获取用户设置的代码，并赋值给变量，不要忘记默认值
-11. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 11 在此处添加` 的注释前创建空行，并编写一个将变量添加到 cookie 的代码，不要忘记非空验证
-12. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 12 在此处添加` 的注释前创建空行，并编写一个从 cookie 中获取用户设置的代码，并赋值给变量，不要忘记默认值
-13. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 13 在此处添加` 的注释前创建空行，并编写一个将变量添加到 localStorage 的代码，不要忘记非空验证
-14. 在 `modules\theme\cookieBinding.ts` 中标有 `HACK 14 在此处添加` 的注释前创建空行，并编写一个根据变量值，将正确样式绑定到正确位置的代码
-15. 参照 `modules\theme\composables.ts` 中标有 `HACK 15 请参照此部分 ↓ ↓ ↓` 和 `HACK 15 请参照此部分 ↑ ↑ ↑` 的注释中间的代码，在 `HACK 15 在此处添加` 的注释前创建空行，并编写一个像后端发送修改用户设置请求的方法
-16. 参照 `pages\settings\appearance.vue` 中标有 `HACK 16 请参照此部分 ↓ ↓ ↓` 和 `HACK 16 请参照此部分 ↑ ↑ ↑` 的注释中间的代码，创建 nuxt cookie 对象，并绑定（v-model）到在你想要添加的设置项所对应的 vue 模板的开关或其他选择器上
+1. `modules\theme\cookieBinding.ts` の `HACK 1 在此处添加` とマークされたコメントの前に空行を作成し、グローバル変数を追加します。変数名と値は `HACK 3 在此处添加` の位置に追加するローカル変数と一致させる必要があります。
+2. `modules\theme\cookieBinding.ts` の `HACK 2 在此处添加` とマークされたコメントの前に空行を作成し、グローバル変数を追加します。変数名と値は `HACK 4 在此处添加` の位置に追加するローカル変数と一致させる必要があります。
+3. `modules\theme\cookieBinding.ts` の `HACK 3 在此处添加` とマークされたコメントの前に空行を作成し、ローカル変数を追加します。変数名と値は `HACK 1 在此处添加` の位置に追加したグローバル変数と一致させる必要があります。
+4. `modules\theme\cookieBinding.ts` の `HACK 4 在此处添加` とマークされたコメントの前に空行を作成し、ローカル変数を追加します。変数名と値は `HACK 2 在此处添加` の位置に追加したグローバル変数と一致させる必要があります。
+5. `modules\theme\composables.ts` の `HACK 5 在此处添加` とマークされたコメントの前に空行を作成し、nuxtのリアクティブなcookieオブジェクトを取得するコードを記述します。
+6. `modules\theme\composables.ts` の `HACK 6 在此处添加` とマークされたコメントの前に空行を作成し、バックエンドからのリクエスト結果をnuxtのリアクティブなcookieオブジェクトに代入するコードを記述します。
+7. `modules\theme\composables.ts` の `HACK 7 在此处添加` とマークされたコメントの前に空行を作成し、バックエンドからのリクエスト結果を代入するコードを記述します。デフォルト値を設定することを忘れないでください。
+8. `modules\theme\composables.ts` の `HACK 8 在此处添加` とマークされたコメントの前に空行を作成し、バックエンドからのリクエスト結果をcookieに保存するコードを記述します。
+9. `modules\theme\cookieBinding.ts` の `HACK 9 在此处添加` とマークされたコメントの前に空行を作成し、正しい変数名を定義します。
+10. `modules\theme\cookieBinding.ts` の `HACK 10 在此处添加` とマークされたコメントの前に空行を作成し、localStorageからユーザー設定を取得して変数に代入するコードを記述します。デフォルト値を忘れないでください。
+11. `modules\theme\cookieBinding.ts` の `HACK 11 在此处添加` とマークされたコメントの前に空行を作成し、変数をcookieに追加するコードを記述します。nullチェックを忘れないでください。
+12. `modules\theme\cookieBinding.ts` の `HACK 12 在此处添加` とマークされたコメントの前に空行を作成し、cookieからユーザー設定を取得して変数に代入するコードを記述します。デフォルト値を忘れないでください。
+13. `modules\theme\cookieBinding.ts` の `HACK 13 在此处添加` とマークされたコメントの前に空行を作成し、変数をlocalStorageに追加するコードを記述します。nullチェックを忘れないでください。
+14. `modules\theme\cookieBinding.ts` の `HACK 14 在此处添加` とマークされたコメントの前に空行を作成し、変数の値に基づいて正しいスタイルを正しい場所にバインドするコードを記述します。
+15. `modules\theme\composables.ts` の `HACK 15 请参照此部分 ↓ ↓ ↓` と `HACK 15 请参照此部分 ↑ ↑ ↑` の間のコードを参照し、`HACK 15 在此处添加` のコメントの前に空行を作成して、ユーザー設定の変更をバックエンドに送信するリクエストメソッドを記述します。
+16. `pages\settings\appearance.vue` の `HACK 16 请参照此部分 ↓ ↓ ↓` と `HACK 16 请参照此部分 ↑ ↑ ↑` の間のコードを参照し、nuxt cookieオブジェクトを作成し、追加したい設定項目に対応するvueテンプレートのスイッチや他のセレクタにバインド（v-model）します。

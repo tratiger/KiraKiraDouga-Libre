@@ -1,17 +1,17 @@
-# CSS 选择器和 XPath
+# CSS セレクタと XPath
 
 <table>
 <thead>
-<th>描述</th>
+<th>説明</th>
 <th>CSS Selector</th>
 <th>XPath</th>
-<th>对应 HTML</th>
+<th>対応するHTML</th>
 </thead>
 <tbody>
 <tr>
-<td colspan="4">组合器</td>
+<td colspan="4">コンビネータ</td>
 <tr>
-<td>群组元素</td>
+<td>グループ化された要素</td>
 <td>
 
 ```css
@@ -34,7 +34,7 @@ div, a
 </td>
 </tr>
 <tr>
-<td>子元素</td>
+<td>子要素</td>
 <td>
 
 ```css
@@ -56,7 +56,7 @@ div > a
 </td>
 </tr>
 <tr>
-<td>子孙元素</td>
+<td>子孫要素</td>
 <td>
 
 ```css
@@ -80,7 +80,7 @@ div >> a
 </td>
 </tr>
 <tr>
-<td>弟弟元素</td>
+<td>後続の兄弟要素</td>
 <td>
 
 ```css
@@ -102,7 +102,7 @@ div + a
 </td>
 </tr>
 <tr>
-<td>弟弟们元素</td>
+<td>後続の全兄弟要素</td>
 <td>
 
 ```css
@@ -125,7 +125,7 @@ div ~ a
 </td>
 </tr>
 <tr>
-<td>父元素</td>
+<td>親要素</td>
 <td>
 
 ```css
@@ -147,7 +147,7 @@ div:has(> a)
 </td>
 </tr>
 <tr>
-<td>祖先元素</td>
+<td>祖先要素</td>
 <td>
 
 ```css
@@ -170,7 +170,7 @@ div:has(a)
 </td>
 </tr>
 <tr>
-<td>哥哥元素</td>
+<td>先行する兄弟要素</td>
 <td>
 
 ```css
@@ -192,7 +192,7 @@ div:has(+ a)
 </td>
 </tr>
 <tr>
-<td>哥哥们元素</td>
+<td>先行する全兄弟要素</td>
 <td>
 
 ```css

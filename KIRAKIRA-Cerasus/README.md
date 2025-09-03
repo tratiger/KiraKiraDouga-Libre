@@ -1,6 +1,6 @@
 ![Cover](cover.svg)
 
-# 项目代号 ｢<ruby>Cerasus<rp>（</rp><rt>[第13都市](https://zh.moegirl.org.cn/zh-hans/DARLING_in_the_FRANXX#cite_ref-10:~:text=%E7%AC%AC13%E9%83%BD%E5%B8%82%EF%BC%88Plantation%EF%BC%89%5B9%5D%E2%80%9C%E6%A8%B1%EF%BC%88Cerasus%EF%BC%89%E2%80%9D)</rt><rp>）</rp></ruby>｣
+# プロジェクトコードネーム「<ruby>Cerasus<rp>（</rp><rt>[第13都市](https://zh.moegirl.org.cn/zh-hans/DARLING_in_the_FRANXX#cite_ref-10:~:text=%E7%AC%AC13%E9%83%BD%E5%B8%82%EF%BC%88Plantation%EF%BC%89%5B9%5D%E2%80%9C%E6%A8%B1%EF%BC%88Cerasus%EF%BC%89%E2%80%9D)</rt><rp>）</rp></ruby>」
 ![State][state-shield]
 ![Tag][tag-shield]
 [![LICENSE-BSD 3‐Clause][license-shield]][license-url]
@@ -18,76 +18,76 @@
 [![French Translation][fr-translation-shield]][fr-translation-url]
 [![Cantonese Translation][yue-translation-shield]][yue-translation-url]
 
-KIRAKIRA 的前端
+KIRAKIRA のフロントエンド
 
-**简体中文** | [English](README_en-US.md)
+**日本語** | [English](README_en-US.md)
 
-[![Figma 设计文稿][figma-design-shield]][figma-design-url]
-[![Discord 服务器][discord-server-shield]][discord-server-url]
+[![Figma デザイン][figma-design-shield]][figma-design-url]
+[![Discord サーバー][discord-server-shield]][discord-server-url]
 
-## 标星历史
+## スター履歴
 
 <a href="https://star-history.com/#KIRAKIRA-DOUGA/KIRAKIRA-Cerasus&Date">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=KIRAKIRA-DOUGA/KIRAKIRA-Cerasus&type=Date&theme=dark" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=KIRAKIRA-DOUGA/KIRAKIRA-Cerasus&type=Date" />
-   <img alt="标星历史图表" src="https://api.star-history.com/svg?repos=KIRAKIRA-DOUGA/KIRAKIRA-Cerasus&type=Date" />
+   <img alt="スター履歴グラフ" src="https://api.star-history.com/svg?repos=KIRAKIRA-DOUGA/KIRAKIRA-Cerasus&type=Date" />
  </picture>
 </a>
 
-## 架构图
+## アーキテクチャ図
 
 ```mermaid
 
 flowchart TD
-    %% 核心应用
-    NuxtApp["Nuxt 应用"]:::frontend
+    %% コアアプリケーション
+    NuxtApp["Nuxt アプリケーション"]:::frontend
 
-    %% 表现层
-    subgraph "表现层"
-        Pages["页面和路由"]:::presentation
-        UIComponents["界面组件"]:::presentation
+    %% プレゼンテーション層
+    subgraph "プレゼンテーション層"
+        Pages["ページとルーティング"]:::presentation
+        UIComponents["UIコンポーネント"]:::presentation
     end
 
-    %% 业务逻辑层
-    subgraph "业务逻辑层"
-        ComposablesStores["组合式函数和状态库"]:::business
-        Modules["模块"]:::business
-        PluginsProviders["插件和供给"]:::business
+    %% ビジネスロジック層
+    subgraph "ビジネスロジック層"
+        ComposablesStores["コンポーザブル関数と状態ライブラリ"]:::business
+        Modules["モジュール"]:::business
+        PluginsProviders["プラグインとプロバイダー"]:::business
     end
 
-    %% 工具类函数和国际化
-    subgraph "工具类函数和国际化"
-        AssetsStyling["资产和样式"]:::utilities
-        Internationalization["国际化"]:::utilities
+    %% ユーティリティ関数と国際化
+    subgraph "ユーティリティ関数と国際化"
+        AssetsStyling["アセットとスタイル"]:::utilities
+        Internationalization["国際化"]:::utilities
     end
 
-    %% 服务器和环境设置
-    subgraph "服务器和环境设置"
-        ServerEnv["服务器和配置文件"]:::server
+    %% サーバーと環境設定
+    subgraph "サーバーと環境設定"
+        ServerEnv["サーバーと設定ファイル"]:::server
     end
 
-    %% 外部系统
-    subgraph "外部系统"
-        Backend["KIRAKIRA-Rosales 后端"]:::external
-        CloudflareImages["Cloudflare 图片"]:::external
-        CloudflareStream["Cloudflare 流媒体"]:::external
+    %% 外部システム
+    subgraph "外部システム"
+        Backend["KIRAKIRA-Rosales バックエンド"]:::external
+        CloudflareImages["Cloudflare 画像"]:::external
+        CloudflareStream["Cloudflare ストリーミング"]:::external
     end
 
     %% Connections between layers
-    NuxtApp -->|"路由"| Pages
-    NuxtApp -->|"渲染"| UIComponents
-    Modules -->|"影响"| NuxtApp
-    PluginsProviders -->|"中间件"| NuxtApp
-    ComposablesStores -->|"获取接口"| Backend
-    PluginsProviders -->|"整合"| CloudflareImages
-    PluginsProviders -->|"整合"| CloudflareStream
-    UIComponents -->|"指令绑定"| PluginsProviders
-    AssetsStyling -->|"妆饰"| UIComponents
-    Internationalization -->|"翻译"| UIComponents
-    ComposablesStores -->|"状态同步"| UIComponents
-    Modules -->|"扩展"| PluginsProviders
-    ServerEnv -->|"配置"| NuxtApp
+    NuxtApp -->|"ルーティング"| Pages
+    NuxtApp -->|"レンダリング"| UIComponents
+    Modules -->|"影響"| NuxtApp
+    PluginsProviders -->|"ミドルウェア"| NuxtApp
+    ComposablesStores -->|"API取得"| Backend
+    PluginsProviders -->|"統合"| CloudflareImages
+    PluginsProviders -->|"統合"| CloudflareStream
+    UIComponents -->|"ディレクティブバインド"| PluginsProviders
+    AssetsStyling -->|"装飾"| UIComponents
+    Internationalization -->|"翻訳"| UIComponents
+    ComposablesStores -->|"状態同期"| UIComponents
+    Modules -->|"拡張"| PluginsProviders
+    ServerEnv -->|"設定"| NuxtApp
 
     %% Class definitions with colors
     classDef frontend fill:#f9c,stroke:#333,stroke-width:2px;
@@ -117,274 +117,274 @@ flowchart TD
     click ServerEnv "https://github.com/kirakira-douga/kirakira-cerasus/blob/develop/pnpm-lock.yaml"
 ```
 
-想了解更多？[阅读 Wiki][deepwiki-url]！
+もっと知りたいですか？[Wikiを読む][deepwiki-url]！
 
 ## Nuxt
 
-首先，Nuxt 读作 **/nʌkst/**（
+まず、Nuxt は **/nʌkst/** と読みます（
 
-查看 [Nuxt 文档](https://nuxt.com/)以了解更多信息。
+詳細は [Nuxt ドキュメント](https://nuxt.com/)をご覧ください。
 
-### 安装
-克隆本存储库，您可以使用如下命令，或其他 Git 兼容工具。
+### インストール
+このリポジトリをクローンするには、以下のコマンドまたは他のGit互換ツールを使用できます。
 ```
 git clone https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus.git
 ```
 
-完成克隆后，在程序根目录执行以下命令安装依赖包。
+クローンが完了したら、プロジェクトのルートディレクトリで以下のコマンドを実行して、依存パッケージをインストールします。
 
 ```bash
 pnpm install
 ```
 
 
-### 开发服务器
-KIRAKIRA Cerasus 的开发服务器具有多种模式供您选择。\
-您可以使用快捷命令启动常用的开发模式，也可以根据偏好自定义启动命令。
+### 開発サーバー
+KIRAKIRA Cerasus の開発サーバーには、複数のモードがあります。\
+ショートカットコマンドを使用して一般的な開発モードを起動することも、好みに応じて起動コマンドをカスタマイズすることもできます。
 
 > [!IMPORTANT]
-> 1. 部分功能需要启用 HTTPS 方可正常工作，KIRAKRIA Cerasus 默认使用[该路径](server/)中的自签名证书。在首次访问时浏览器会弹出“此站点不安全”警告，这是正常现象，选择“仍然访问”即可。
-> 2. 如果您本地的 3000 端口已被其它应用程序或设备占用，开发服务器会自动将端口号调整为 3001，以此类推。请务必仔细观察控制台输出的正确网址。
+> 1. 一部の機能は HTTPS を有効にしないと正常に動作しません。KIRAKIRA Cerasus はデフォルトで[このパス](server/)にある自己署名証明書を使用します。初回アクセス時にブラウザに「このサイトは安全ではありません」という警告が表示されることがありますが、これは正常な現象です。「そのまま進む」などを選択してください。
+> 2. ローカルの3000番ポートが他のアプリケーションやデバイスによって既に使用されている場合、開発サーバーは自動的にポート番号を3001に調整します（以降同様）。コンソールに出力される正しいURLを必ず確認してください。
 
 
-#### 与本地后端一起运行
+#### ローカルバックエンドと連携して実行
 
-启动一个带有 HTTPS 支持的开发服务器，并使用**本地**后端 API。
+HTTPS をサポートする開発サーバーを起動し、**ローカル**のバックエンドAPIを使用します。
 
-通过此方式启动的开发服务器，连接的是您本地的后端 API。您产生的数据由您自行管理，与 KIRAKIRA 无关。\
-您需要额外运行 [KIRAKIRA-Rosales 后端服务](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales)，否则程序将不会如期工作。
+この方法で起動した開発サーバーは、ローカルのバックエンドAPIに接続します。生成されたデータはご自身で管理し、KIRAKIRAとは無関係です。\
+別途 [KIRAKIRA-Rosales バックエンドサービス](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales) を実行する必要があります。実行しない場合、プログラムは期待通りに動作しません。
 
-请按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: dev local`。
+キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: dev local` を選択してください。
 
-您也可以在程序根目录中执行以下命令来启动：
+または、プロジェクトのルートディレクトリで以下のコマンドを実行して起動することもできます。
 
 ```bash
 pnpm dev-local
 ```
 
 > [!WARNING]\
-> 虽然您连接了本地后端，但仍会向官方提供的预生产环境 Cloudflare Images 服务请求图片资源文件，并在视频上传时使用官方预生产环境的 Cloudflare Stream 子域名模板。如果您想要使用您自己的 Cloudflare Images 和 Cloudflare Stream 服务，请参考下方的“自定义启动命令”章节。
+> ローカルバックエンドに接続していても、画像リソースファイルは公式のステージング環境のCloudflare Imagesサービスにリクエストされ、動画アップロード時には公式ステージング環境のCloudflare Streamサブドメインテンプレートが使用されます。ご自身のCloudflare ImagesおよびCloudflare Streamサービスを使用したい場合は、下記の「カスタム起動コマンド」セクションを参照してください。
 
 > [!WARNING]\
-> 对于有生产环境访问权限的开发者，您也可以使用 `pnpm run dev-local-prod` 命令来连接生产环境的 Cloudflare Images 和 Cloudflare Stream 服务。
+> 本番環境へのアクセス権を持つ開発者は、`pnpm run dev-local-prod` コマンドを使用して、本番環境のCloudflare ImagesおよびCloudflare Streamサービスに接続することもできます。
 
-启动后，您应该能够在这个地址访问：https://localhost:3000/
+起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
 
-#### 与线上后端一起运行
+#### オンラインバックエンドと連携して実行
 
-您可以在本地启动前端开发服务器，并连接**线上**后端 API，无需在本地启动后端服务。\
-KIRAKIRA 拥有**预**生产环境和生产环境两个线上后端，预生产环境包含测试数据和正在开发中的功能，而生产环境就是您访问的 kirakira.moe 官网。
+ローカルでフロントエンド開発サーバーを起動し、**オンライン**のバックエンドAPIに接続することができます。ローカルでバックエンドサービスを起動する必要はありません。\
+KIRAKIRAには**ステージング**環境と本番環境の2つのオンラインバックエンドがあります。ステージング環境にはテストデータや開発中の機能が含まれており、本番環境はあなたがアクセスする kirakira.moe 公式サイトです。
 
-**无论如何，请务必阅读下方使用限制：**
-
-> [!WARNING]\
-> 对于**预生产环境**演示模式的使用限制：
-> 1. 预生产环境演示模式，除开发团队成员外，任何测试、篡改行为仍将被视为滥用。
-> 2. 用户在预生产环境中产生的数据皆授权 KIRAKIRA 开发团队使用，不得撤销。
-> 3. 用户因使用预生产环境造成的任何人身及财产损失与 KIRAKIRA 无关。
+**いずれの場合も、必ず以下の利用制限をお読みください：**
 
 > [!WARNING]\
-> 对于**生产环境**演示模式的使用限制：
-> 1. 您仍然与 KIRAKIRA 官方线上环境交互，KIRAKIRA 用户协议及免责条款仍然适用。
+> **ステージング環境**デモモードの利用制限：
+> 1. ステージング環境デモモードでは、開発チームメンバー以外によるいかなるテスト、改ざん行為も乱用と見なされます。
+> 2. ユーザーがステージング環境で生成したデータは、すべてKIRAKIRA開発チームが使用することを許諾したものとし、撤回はできません。
+> 3. ユーザーがステージング環境を使用したことによって生じたいかなる人的・財産的損害についても、KIRAKIRAは一切関係ありません。
+
+> [!WARNING]\
+> **本番環境**デモモードの利用制限：
+> 1. 引き続きKIRAKIRAの公式オンライン環境とやり取りするため、KIRAKIRAの利用規約および免責事項が適用されます。
 
 > [!NOTE]\
-> 目前演示模式存在 Cookie 跨域问题，您无法登录您的账户。
+> 現在、デモモードにはCookieのクロスドメイン問題があり、アカウントにログインできません。
 
-启动**预生产环境**演示模式的命令为：
+**ステージング環境**デモモードを起動するコマンド：
 
 ```bash
 pnpm dev-stg-demo
 ```
 
-启动**生产环境**演示模式的命令为：
+**本番環境**デモモードを起動するコマンド：
 
 ```bash
 pnpm dev-live-demo
 ```
 
-启动后，您应该能够在这个地址访问：https://localhost:3000/
+起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
 
 
-#### 自定义启动命令
+#### カスタム起動コマンド
 
-很多时候，预设的快速启动命令并不能满足您的需求。此时，您可以通过原始启动命令来启动服务器，并使用您的自定义参数。
+多くの場合、プリセットされたクイックスタートコマンドではニーズを満たせません。その場合、元の起動コマンドを使用してサーバーを起動し、カスタムパラメータを使用することができます。
 
-一个典型的自定义启动命令看起来像：
+典型的なカスタム起動コマンドは次のようになります：
 ```bash
-# 以下命令等价于 'pnpm dev-local'
+# 以下のコマンドは 'pnpm dev-local' と同等です
 pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
 ```
 
-启动后，您应该能够在这个地址访问：https://localhost:3000/
+起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
 
-上述命令的解析：
+上記のコマンドの解説：
 1. `cross-env`\
-  设置跨平台的环境变量，确保命令在不同操作系统（如 Windows 和 Linux）下都能正常执行。
+  クロスプラットフォームの環境変数を設定し、コマンドが異なるOS（WindowsやLinuxなど）で正常に実行されることを保証します。
 2. `VITE_BACKEND_URI=https://localhost:9999`\
-  注入一个名为 `VITE_BACKEND_URI` 的环境变量，其值为 `https://localhost:9999`，即后端 API 的 URI。
+  `VITE_BACKEND_URI` という名前の環境変数を注入します。その値はバックエンドAPIのURIである `https://localhost:9999` です。
 3. `VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg`\
-  注入一个名为 `VITE_CLOUDFLARE_IMAGES_PROVIDER` 的环境变量，其值为 `cloudflare-stg`。\
-  这代表您使用名为 `cloudflare-stg` 的 [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider)。\
-  如需修改 NuxtImage Custom Provider 的配置，请前往根目录中的 `nuxt.config.ts` 中 `image.providers` 部分。
+  `VITE_CLOUDFLARE_IMAGES_PROVIDER` という名前の環境変数を注入します。その値は `cloudflare-stg` です。\
+  これは、`cloudflare-stg` という名前の [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider) を使用することを意味します。\
+  NuxtImage Custom Provider の設定を変更する必要がある場合は、ルートディレクトリの `nuxt.config.ts` 内の `image.providers` セクションに移動してください。
 4. `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://custom...stream.com/`\
-  注入一个名为 `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` 的环境变量，其值为 `https://custom...stream.com/`。\
-  该环境变量指定了 Cloudflare Stream 服务的自定义子域名。
+  `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` という名前の環境変数を注入します。その値は `https://custom...stream.com/` です。\
+  この環境変数は、Cloudflare Stream サービスのカスタムサブドメインを指定します。
 5. `nuxi dev`\
-  启动 Nuxt 的开发服务器。可选参数可以参考[这篇官方文档](https://nuxt.com/docs/api/commands/dev)。
+  Nuxt の開発サーバーを起動します。オプションのパラメータについては、[こちらの公式ドキュメント](https://nuxt.com/docs/api/commands/dev) を参照してください。
 6. `--host`\
-  在 `--host` 后没有指定参数，表示开发服务器监听所有主机。详情请参见下方”在移动端网页测试和预览“章节
+  `--host` の後にパラメータが指定されていない場合、開発サーバーはすべてのホストをリッスンします。詳細は下記の「モバイルデバイスでのテストとプレビュー」セクションを参照してください。
 7. `--https --ssl-cert server/server.cer --ssl-key server/server.key`\
-  其中，`--https` 表明启动 HTTPS。`--ssl-cert XXX.cer --ssl-key YYY.key` 指定了证书的路径。
+  ここで、`--https` は HTTPS の起動を示します。`--ssl-cert XXX.cer --ssl-key YYY.key` は証明書のパスを指定します。
 
 
-#### 在移动端网页测试和预览
+#### モバイルデバイスでのテストとプレビュー
 
-在启动开发服务器时，请确保以下任意一种情况成立：未指定 `--host` 参数，未为 `--host` 参数赋值，或将 `--host` 参数的值设置为 `0.0.0.0`。
+開発サーバーを起動する際、次のいずれかの条件が満たされていることを確認してください：`--host` パラメータが指定されていない、`--host` パラメータに値が割り当てられていない、または `--host` パラメータの値が `0.0.0.0` に設定されている。
 
-确保手机/平板与您的电脑位于同一个局域网下（如果条件不允许请开热点），然后使用您移动设备中的二维码扫描器扫描控制台中显示的二维码即可访问。
+スマートフォン/タブレットがPCと同じローカルエリアネットワーク内にあることを確認し（条件が許さない場合はテザリングを使用）、モバイルデバイスのQRコードスキャナーでコンソールに表示されるQRコードをスキャンしてアクセスします。
 
-您也可以使用移动端浏览器访问开发服务器主机的 IP 地址，例如：[https://192.168.\*.\*:3000/](https://192.168.*.*:3000/) 。通常该地址会在启动开发服务器后显示在控制台输出中。
+または、モバイルブラウザで開発サーバーホストのIPアドレスにアクセスすることもできます。例：[https://192.168.\*.\*:3000/](https://192.168.*.*:3000/) 。通常、このアドレスは開発サーバー起動後にコンソールに出力されます。
 
 > [!NOTE]\
-> **Windows 主机查询 IP 的方法：**<wbr />按 <kbd>Win</kbd> + <kbd>R</kbd>，输入 `cmd` 打开命令提示符，输入 `ipconfig` 即可查询当前电脑的 IP 地址。
+> **WindowsホストでIPを調べる方法：**<wbr />按 <kbd>Win</kbd> + <kbd>R</kbd> を押し、`cmd` と入力してコマンドプロンプトを開き、`ipconfig` と入力すると現在のコンピュータのIPアドレスを照会できます。
 
-### 生产
+### 本番環境
 
-#### 为生产生成应用程序
+#### 本番環境向けアプリケーションの生成
 
-这将会完整地生成每一个静态路由页面。
+これにより、すべての静的ルートページが完全に生成されます。
 
-按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: generate`。
+キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: generate` を選択してください。
 
 ```bash
 pnpm generate
 ```
 
-#### 为生产构建应用程序
+#### 本番環境向けアプリケーションのビルド
 
-这只会构建最小的根路由页面。
+これは最小限のルートページのみをビルドします。
 
-按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: build`。
+キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: build` を選択してください。
 
 ```bash
 pnpm build
 ```
 
-#### 本地预览生产版本
+#### 本番ビルドのローカルプレビュー
 
 ```bash
 pnpm preview
 ```
 
 > [!IMPORTANT]\
-> 以生产模式运行时，连接的后端服务接口是：https://rosales.kirakira.moe/ \
-> 此时您将与线上环境交互。\
-> 这和通过我们的官方网站或 APP 使用 KIRAKIRA 服务没有区别，在这种情况下 KIRAKIRA 用户协议及免责条款仍然适用。
+> 本番モードで実行する場合、接続されるバックエンドサービスAPIは：https://rosales.kirakira.moe/ です。\
+> この時、あなたはオンライン環境とやり取りすることになります。\
+> これは、公式サイトやアプリを通じてKIRAKIRAサービスを利用する場合と何ら変わりなく、この場合もKIRAKIRAの利用規約および免責事項が適用されます。
 
-有关更多详细信息，请参阅[部署文档](https://nuxt.com/docs/getting-started/deployment)。
+詳細については、[デプロイメントドキュメント](https://nuxt.com/docs/getting-started/deployment)を参照してください。
 
-## 其它脚本功能
+## その他のスクリプト機能
 
-依次选择菜单 *终端(<ins>T</ins>) > 运行任务...*，然后即可访问其它脚本功能。
+メニューから *ターミナル(<ins>T</ins>) > タスクの実行...* を順に選択すると、その他のスクリプト機能にアクセスできます。
 
-### 检查 StyleLint
+### StyleLintのチェック
 
 ```bash
 npm: lint:css
 ```
 
-### 更新缓动值样式 *(_eases.scss)* 声明文件
+### イージング値スタイル *(_eases.scss)* 宣言ファイルの更新
 
-这将会根据 `_eases.scss` 文件的更改自动更新 `eases.module.scss`、`eases.module.scss.d.ts` 额外两个文件。
+これにより、`_eases.scss` ファイルの変更に応じて、`eases.module.scss` と `eases.module.scss.d.ts` の2つの追加ファイルが自動的に更新されます。
 
 ```bash
 npm: update-eases
 ```
 
-### 压缩 SVG
+### SVGの圧縮
 
-这将会压缩 SVG，删除 SVG 的多余部分，如裁切区域、填充颜色等。
+SVGを圧縮し、トリミング領域や塗りつぶしの色など、SVGの不要な部分を削除します。
 
 ```bash
 Compact SVG
 ```
 
-## 自定义指令（语法糖）
+## カスタムディレクティブ（シンタックスシュガー）
 
-项目利用各种特性、冷知识、甚至修改底层代码等，添加了许多语法糖以方便开发人员使用。
+このプロジェクトでは、開発者の利便性を高めるために、さまざまな機能、豆知識、さらには低レベルコードの変更などを活用して、多くのシンタックスシュガーが追加されています。
 
-### 水波纹
+### リップル効果
 
-使用 `v-ripple` 自定义指令快速创建 Material 水波纹效果。其接受一个布尔类型的值，用于表示是否开启水波纹。如果留空则自动表示开启。
+`v-ripple` カスタムディレクティブを使用して、マテリアルデザインのリップル効果を素早く作成します。ブール値を受け取り、リップル効果を有効にするかどうかを示します。空のままにすると、自動的に有効になります。
 
 ```html
-<!-- 直接开启 -->
+<!-- 直接有効化 -->
 <div v-ripple>
-<!-- 显式开启 -->
+<!-- 明示的に有効化 -->
 <div v-ripple="true">
-<!-- 根据 foo 变量的值而开启 -->
+<!-- foo 変数の値に応じて有効化 -->
 <div v-ripple="foo">
 ```
 
-### 依次动画优先级
+### 逐次アニメーションの優先度
 
-如果你希望实现各条目依次出现的动画（具体动画仍需自行手动实现），请使用 `v-i` 自定义指令。其接受一个数字类型的值，用于表示其优先级。其以 0 起始或以 1 起始具体表现根据你的动画实现而决定。
+各項目が順番に表示されるアニメーション（具体的なアニメーションは別途実装が必要）を実現したい場合は、`v-i` カスタムディレクティブを使用してください。これは優先度を示す数値を受け取ります。0から始まるか1から始まるかは、アニメーションの実装によって決まります。
 
 ```html
 <div v-i="1">
 ```
 
-这将会转变成如下效果：
+これは次のように変換されます：
 
-* Vue SFC 语法
+* Vue SFC 構文
   ```vue
   <div :style="{ '--i': 1 }">
   ```
-* JSX 语法
+* JSX 構文
   ```jsx
   <div style={{ '--i': 1 }}>
   ```
-* HTML 语法
+* HTML 構文
   ```html
   <div style="--i: 1;">
   ```
 
-### 工具提示
+### ツールチップ
 
-使用 `v-tooltip` 创建自定义的工具提示，旨在取代原生丑陋的 `title` 属性。
+ネイティブの醜い `title` 属性を置き換えることを目的とした、カスタムツールチップを作成するには `v-tooltip` を使用します。
 
 ```html
-<!-- 自动决定工具提示的位置方向 -->
-<div v-tooltip="'那只敏捷的棕毛狐狸跳过了一只懒惰的狗'">
-<!-- 显式指定工具提示的位置方向 -->
-<div v-tooltip:top="'那只敏捷的棕毛狐狸跳过了一只懒惰的狗'">
-<!-- 高级设定工具提示 -->
+<!-- ツールチップの位置を自動決定 -->
+<div v-tooltip="'素早い茶色のキツネはのろまな犬を飛び越える'">
+<!-- ツールチップの位置を明示的に指定 -->
+<div v-tooltip:top="'素早い茶色のキツネはのろまな犬を飛び越える'">
+<!-- ツールチップの高度な設定 -->
 <div v-tooltip="{
-    title: '那只敏捷的棕毛狐狸跳过了一只懒惰的狗', // 工具提示文本
-    placement: 'top', // 指定四个位置方向
-    offset: 10, // 工具提示与元素之间的距离
+    title: '素早い茶色のキツネはのろまな犬を飛び越える', // ツールチップテキスト
+    placement: 'top', // 4つの方向を指定
+    offset: 10, // 要素とツールチップの間の距離
 }">
 ```
 
-### 本地化
+### ローカライゼーション
 
-如果您想要为本项目的本地化提供建议，请发布一个[议题](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/issues)来通知我们；如果您想要为本项目贡献本地化，请发布一个[拉取请求](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/pulls)。非常感谢！\
+このプロジェクトのローカライゼーションに関する提案がある場合は、[Issue](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/issues) を立ててお知らせください。ローカライゼーションに貢献したい場合は、[Pull Request](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/pulls) を送ってください。ご協力ありがとうございます！\
 Please post an [Issue](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/issues) to let us know you would like to provide some localization suggestions to this project; Please post an [Pull Request](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/pulls) to contribute localization to this project. Thank you!
 
 > [!IMPORTANT]\
-> **注意：**<wbr />翻译字典文件的每个标识符均应使用蛇形命名法（下划线命名法）；且多门语言若任意一门语言比其它语言多或少字符串声明，均会报错，这意味着必须为这些语言同时指定完整的字符串声明，以防遗漏。
+> **注意：**<wbr />翻訳辞書ファイルの各識別子はスネークケース（アンダースコア記法）を使用する必要があります。また、ある言語が他の言語より文字列宣言が多かったり少なかったりするとエラーが発生します。これは、漏れを防ぐために、すべての言語に対して完全な文字列宣言を同時に指定する必要があることを意味します。
 
-项目强化了 Vue-i18n 的原生翻译函数，使其使用起来更方便。
+このプロジェクトでは、Vue-i18nのネイティブな翻訳関数を強化し、より使いやすくしています。
 
 <table>
 <thead>
-<th>功能</th>
-<th>当前强化语法</th>
-<th>原版语法</th>
+<th>機能</th>
+<th>現在の強化構文</th>
+<th>元の構文</th>
 </thead>
 <tbody>
 <tr>
-<td>直接声明</td>
+<td>直接宣言</td>
 <td>
 
 ```typescript
@@ -401,7 +401,7 @@ $t("welcome")
 </td>
 </tr>
 <tr>
-<td>变量声明</td>
+<td>変数宣言</td>
 <td>
 
 ```typescript
@@ -418,7 +418,7 @@ $t(variable)
 </td>
 </tr>
 <tr>
-<td>位置参数</td>
+<td>位置引数</td>
 <td>
 
 ```typescript
@@ -435,7 +435,7 @@ $t("welcome", ["hello", "world"])
 </td>
 </tr>
 <tr>
-<td>命名参数</td>
+<td>名前付き引数</td>
 <td>
 
 ```typescript
@@ -452,7 +452,7 @@ $t("welcome", { foo: "hello", bar: "world" })
 </td>
 </tr>
 <tr>
-<td>复数</td>
+<td>複数形</td>
 <td>
 
 ```typescript
@@ -471,23 +471,23 @@ $tc("car", 2)
 </tbody>
 </table>
 
-### 组件根节点
+### コンポーネントのルートノード
 
-为使各组件的元素界限更清晰明显，且避免样式泄露等麻烦问题。请在项目中使用 `<Comp>` 作为组件的根节点。
+各コンポーネントの要素の境界をより明確にし、スタイルの漏洩などの問題を回避するため、プロジェクトではコンポーネントのルートノードとして `<Comp>` を使用してください。
 
-假设组件名为 `TextBox.vue`：
+コンポーネント名が `TextBox.vue` であると仮定します：
 
 ```html
 <Comp />
 ```
 
-这将会自动编译为：
+これは自動的に次のようにコンパイルされます：
 
 ```html
 <kira-component class="text-box"></kira-component>
 ```
 
-同时，在样式表中，可以使用 `:comp` 来更方便地指代组件的根节点。
+同時に、スタイルシートでは、`:comp` を使用してコンポーネントのルートノードをより便利に参照できます。
 
 ```css
 :comp {
@@ -495,7 +495,7 @@ $tc("car", 2)
 }
 ```
 
-这将会自动编译为：
+これは自動的に次のようにコンパイルされます：
 
 ```css
 kira-component.text-box {
@@ -503,13 +503,13 @@ kira-component.text-box {
 }
 ```
 
-此外，在其它地方调用该组件时，亦可根据组件的名称而为该组件设定样式，而不必再额外添加多余的类名。
+さらに、他の場所でこのコンポーネントを呼び出す際も、コンポーネントの名前に基づいてスタイルを設定できるため、余分なクラス名を追加する必要はありません。
 
-### 触摸屏禁用 `:hover` 伪类
+### タッチスクリーンでの `:hover` 疑似クラスの無効化
 
-众所周知鼠标才有悬停功能，将鼠标指针悬浮在按钮上，按钮就会响应为 `:hover` 伪类所表示的样式。然而触摸屏通过手指操作，并不存在“悬停”功能，而浏览器为了实现所谓的“悬停”功能，当触摸按钮时，浏览器会将一个无形的指针放置在该按钮上，以呈现“悬停”样式状态。当手指离开屏幕时，指针并不会消失，按钮仍然呈现为悬停样式。这会使用户觉得奇怪，用户必须点击其它空白处才能使该按钮的悬停样式消失。这并不是我们所期望的。
+周知の通り、ホバー機能はマウスにしかありません。マウスカーソルをボタンの上に置くと、ボタンは `:hover` 疑似クラスで示されるスタイルに反応します。しかし、タッチスクリーンは指で操作するため、「ホバー」機能は存在しません。ブラウザは所謂「ホバー」機能を実現するため、ボタンをタッチすると、ブラウザはそのボタンの上に目に見えないポインターを配置し、「ホバー」スタイル状態を呈します。指がスクリーンから離れてもポインターは消えず、ボタンはホバーされたスタイルのままです。これはユーザーに奇妙な印象を与え、ユーザーは他の空白部分をクリックしてボタンのホバースタイルを消す必要があります。これは我々が望む挙動ではありません。
 
-请在项目中使用 `:any-hover` 伪类替换掉原本的 `:hover` 伪类，这将会使用户通过鼠标指针进行操作时才会出现悬停样式，而触摸屏则不会触发悬停样式。此外由于触摸屏没有 `:hover` 样式，请务必设定 `:active` 样式以为触摸屏用户带来更好的体验。
+プロジェクトでは、元の `:hover` 疑似クラスを `:any-hover` 疑似クラスに置き換えてください。これにより、ユーザーがマウスポインターで操作した場合にのみホバースタイルが表示され、タッチスクリーンではホバースタイルがトリガーされなくなります。さらに、タッチスクリーンには `:hover` スタイルがないため、タッチスクリーンユーザーにより良い体験を提供するために、必ず `:active` スタイルを設定してください。
 
 ```css
 button:any-hover {
@@ -517,7 +517,7 @@ button:any-hover {
 }
 ```
 
-这将会自动编译为：
+これは自動的に次のようにコンパイルされます：
 
 ```css
 @media (any-hover: hover) {
@@ -528,33 +528,33 @@ button:any-hover {
 ```
 
 > [!NOTE]\
-> 除了 `@media (any-hover: hover)` 规则之外，还有一个 `@media (hover: hover)` 规则。它们的区别是：`hover` 只检测主要输入设备是否支持悬停功能，而 `any-hover` 检测是否至少一个输入设备支持悬停功能。
+> `@media (any-hover: hover)` ルール以外に、`@media (hover: hover)` ルールもあります。これらの違いは、`hover` は主要な入力デバイスがホバー機能をサポートしているかどうかのみを検出するのに対し、`any-hover` は少なくとも1つの入力デバイスがホバー機能をサポートしているかどうかを検出する点です。
 
-### 菜单、浮窗等的双向绑定模型参数
+### メニュー、フライアウトなどの双方向バインディングモデルパラメータ
 
-* 通过向菜单组件的 `v-model` 传递鼠标/指针事件 `MouseEvent` / `PointerEvent` 来在对应位置显示菜单，传递 `null` 则表示显示占位菜单而非上下文菜单，传递 `undefined` 表示隐藏菜单。
+* メニューコンポーネントの `v-model` にマウス/ポインターイベント `MouseEvent` / `PointerEvent` を渡すことで、対応する位置にメニューを表示します。`null` を渡すとコンテキストメニューではなくプレースホルダーメニューが表示され、`undefined` を渡すとメニューが非表示になります。
 
-* 通过向浮窗组件的 `v-model` 传递一个元组（推荐）或对象均可表示显示浮窗，传递 `undefined` 表示隐藏浮窗。
-  * 对象写法：
+* フライアウトコンポーネントの `v-model` にタプル（推奨）またはオブジェクトを渡すとフライアウトが表示され、`undefined` を渡すと非表示になります。
+  * オブジェクト記法：
     ```typescript
     {
-        target: MouseEvent | PointerEvent; // 鼠标/指针事件
-        placement?: "top" | "bottom" | ...; // 指定四个位置方向
-        offset?: number; // 工具提示与元素之间的距离
+        target: MouseEvent | PointerEvent; // マウス/ポインターイベント
+        placement?: "top" | "bottom" | ...; // 4つの方向を指定
+        offset?: number; // 要素とツールチップの間の距離
     }
     ```
-  * 元组写法
+  * タプル記法
     ```typescript
     [target, placement?, offset?]
     ```
 
-### 与样式相关的组件 Prop
+### スタイルに関連するコンポーネントのProp
 
-以 `<SoftButton>` 组件为例，你可能会很好奇，该组件在 Prop 里居然不能自定义按钮大小，难道按钮的大小只能是固定的吗？
+`<SoftButton>` コンポーネントを例にとると、Propでボタンのサイズをカスタマイズできないことに驚くかもしれません。ボタンのサイズは固定なのでしょうか？
 
-并不是，`<LogoCover>` 组件也是一样的，不能在 Prop 中设定封面的大小。
+いいえ、そうではありません。`<LogoCover>` コンポーネントも同様に、Propでカバーのサイズを設定することはできません。
 
-正确方法是在样式表中，使用以下方式（自定义属性）进行设置：
+正しい方法は、スタイルシートで以下の方法（カスタムプロパティ）を使用して設定することです：
 
 ```scss
 .soft-button {
@@ -562,9 +562,9 @@ button:any-hover {
 }
 ```
 
-这样就能完美应用样式了。
+これでスタイルが完璧に適用されます。
 
-除此之外，它也可以支持布尔或枚举类型。
+それに加えて、ブール型や列挙型もサポートしています。
 
 ```scss
 .logo-text {
@@ -576,11 +576,11 @@ button:any-hover {
 }
 ```
 
-毕竟设定样式，在 CSS/SCSS 中批量设定不比在 HTML/template 中单独设定要更好么？
+結局のところ、スタイルを設定するなら、HTML/templateで個別に設定するよりも、CSS/SCSSで一括設定する方が良いのではないでしょうか？
 
 ## IDE
 
-建议使用以下任意平台进行开发：
+以下のいずれかのプラットフォームでの開発を推奨します：
 
 [![VSCode](https://img.shields.io/badge/-Visual%20Studio%20Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)\
 [![WebStorm](https://img.shields.io/badge/-WebStorm-000000?style=flat-square&logo=webstorm&logoColor=white)](https://www.jetbrains.com/webstorm/)\
@@ -588,7 +588,7 @@ button:any-hover {
 [![Fleet](https://img.shields.io/badge/-Fleet-000000?style=flat-square&logo=jetbrains&logoColor=white)](https://www.jetbrains.com/fleet/)
 
 <details>
-<summary>不要使用</summary>
+<summary>使用しないでください</summary>
 
 <!-- * EditPlus -->
 * Atom
@@ -599,13 +599,13 @@ button:any-hover {
 * HBuilder
 * HBuilderX
 * Vim
-* 记事本
-* 写字板
+* メモ帳
+* ワードパッド
 * Word
 </details>
 
-## 使用技术
-前端开发中所使用了的技术栈有：
+## 使用技術
+フロントエンド開発で使用されている技術スタックは次のとおりです：
 
 [![Nuxt](https://img.shields.io/badge/-Nuxt-00DC82?style=flat-square&logo=nuxt&logoColor=white)](https://nuxt.com/)
 [![Vue](https://img.shields.io/badge/-Vue-4FC08D?style=flat-square&logo=vue.js&logoColor=white)](https://vuejs.org/)
@@ -629,22 +629,22 @@ button:any-hover {
 [![Figma](https://img.shields.io/badge/-Figma-F24E1E?style=flat-square&logo=figma&logoColor=white)](https://www.figma.com/)
 [![KIRAKIRA](https://img.shields.io/badge/-KIRAKIRA☆DOUGA-F06E8E?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAxIiBoZWlnaHQ9IjIwMSIgZmlsbD0ibm9uZSIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMjAxIDIwMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im02My45ODQgMTEuMTI3Yy04LjAzNzItMC4xMTU4Mi0xNC4wODggMy40NTUzLTE0LjY0MSAxMy4wNy0wLjAwNjcgMC4xMTYxIDAuMDA4NTA2IDAuMjMzMzEgMC4wMDM5MDYgMC4zNDk2MS0wLjExMzgtMC4wMzE5LTAuMjI1NTQtMC4wNzU1NjktMC4zMzk4NC0wLjEwNTQ3LTUuMDE1Ny0xLjMxNjktOC44NTQ4LTAuNTc3MDYtMTEuNzAzIDEuNTg1OS0xMC4xNjYgNy43MTk5LTcuNjc4MyAzMy41NTktMC43NSA0OC42NTYtMTguNTM3IDEwLjQxOS00MS41NDUgMzkuMzY4LTE5LjQ2NSA0Ny45NzMgMC4xMDg0IDAuMDQyIDAuMjI0NzggMC4wNjQ0NyAwLjMzMzk4IDAuMTA1NDctMC4wNjU1IDAuMDk4LTAuMTQxMzggMC4xOTAwNi0wLjIwNTA4IDAuMjg5MDYtMi44MDI0IDQuMzY0LTMuMjg0MyA4LjI0MzEtMi4xMDc0IDExLjYyMSA0LjE5OTEgMTIuMDQ5IDI5LjUyNCAxNy42NjggNDYuMDIzIDE1Ljc1IDQuMTk1MiAyMC44NDkgMjQuNjA1IDUxLjYzNCAzOS42MDQgMzMuMzAzIDAuMDczLTAuMDkgMC4xMzExMy0wLjE5NDE2IDAuMjAzMTMtMC4yODUxNiAwLjA3MyAwLjA5MiAwLjEzNzg5IDAuMTk0MTYgMC4yMTI4OSAwLjI4NTE2IDMuMjg0IDQuMDEzIDYuODI0NCA1LjY3MTcgMTAuNCA1LjU5NTcgMTIuNzUzLTAuMjY5NjMgMjUuOTE5LTIyLjYwMyAyOS4xOTktMzguODg3IDE2LjUwMiAxLjg3NzUgNDEuNzEyLTMuNzQyMiA0NS45LTE1Ljc2MiAxLjE3Ny0zLjM3OCAwLjY5NTU3LTcuMjU3MS0yLjEwNzQtMTEuNjIxLTAuMDYzLTAuMDk5LTAuMTQwMDgtMC4xOTEwNi0wLjIwNTA4LTAuMjg5MDYgMC4xMDktMC4wNDEgMC4yMjQ5OC0wLjA2MzQ3IDAuMzMzOTgtMC4xMDU0NyAyMi4wNzgtOC42MDM4LTAuOTIyNjMtMzcuNTQ3LTE5LjQ1OS00Ny45NjkgOC44NzEzLTE5LjMyNiAxMC40NjctNTYuMjYzLTEyLjQ1MS01MC4yNDYtMC4xMTI5OSAwLjAyOTUtMC4yMTkwMyAwLjA3OTkyOC0wLjMzMjAzIDAuMTExMzMtNWUtMyAtMC4xMTc5IDAuMDAyMS0wLjIzNzg3LTAuMDAzOS0wLjM1NTQ3LTAuMjk4LTUuMTc3My0yLjE4Ny04LjYwMDEtNS4xMjUtMTAuNjQxLTEwLjQ1OC03LjI2NTQtMzQuMTczIDMuMDE4Ni00Ni40MTYgMTQuMjQyLTkuMjk1Ny04LjUyMjEtMjUuMjA0LTE2LjUwMy0zNi45MDQtMTYuNjcyem0zNi45MDIgMTYuODY5YzkuMzY3OCA3LjA1OTcgMTQuMDExIDQxLjEyNyAxMy43MDkgNDguNjA3IDcuMDQ0Mi0yLjYwNzEgNDEuMTA1LTguNzQwMiA1MC41ODQtMS45MDQzLTMuNjQ5MyAxMS4xMDItMzQuODExIDI2LjE2Mi00Mi4wNDMgMjguMTkzIDQuNjUyNSA1Ljg4NzIgMjAuOTg1IDM2LjMwNiAxNy40NTcgNDcuNDYxLTExLjczNy0wLjI0MDkxLTM1LjQ4NS0yNS4wMzktMzkuNjM1LTMxLjI2NC00LjE2NDYgNi4yNDYyLTI4LjA5MSAzMS4yMDEtMzkuNzg1IDMxLjI3MS0zLjUzNzktMTEuMTQ4IDEyLjgwMi00MS41OCAxNy40NTUtNDcuNDY5LTcuMjMwNy0yLjAzMTEtMzguMzg2LTE3LjA4OC00Mi4wNDEtMjguMTg5IDkuNDcxMS02Ljg0MjMgNDMuNTI0LTAuNjkzOSA1MC41NyAxLjkxNDEtMC4zMDE1NS03LjQ4MDMgNC4zNjA1LTQxLjU2MSAxMy43MjktNDguNjIxeiIgZmlsbD0iI2ZmZiIvPgo8L3N2Zz4K&logoColor=white)](https://www.kirakira.moe/)
 
-## 测试用浏览器
+## テスト用ブラウザ
 [![Google Chrome](https://img.shields.io/badge/-Google%20Chrome-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://www.google.cn/chrome/index.html)\
 [![Microsoft Edge](https://img.shields.io/badge/-Microsoft%20Edge-0078D7?style=for-the-badge&logo=microsoft-edge&logoColor=white)](https://www.microsoft.com/edge/download)\
 [![Firefox Browser](https://img.shields.io/badge/-Firefox%20Browser-FF7139?style=for-the-badge&logo=firefox-browser&logoColor=white)](https://www.mozilla.org/firefox/new)\
 [![Opera](https://img.shields.io/badge/-Opera-FF1B2D?style=for-the-badge&logo=opera&logoColor=white)](https://www.opera.com/)\
 [![Safari](https://img.shields.io/badge/-Safari-000000?style=for-the-badge&logo=safari&logoColor=white)](https://www.apple.com/safari/)
 
-## 格式规范
-* **缩进：**<wbr />TAB
-* **行尾：**<wbr />LF
-* **引号：**<wbr />双引号
-* **文件末尾**加空行
-* **语句末尾**加分号
-* **Vue API 风格：**<wbr />组合式
+## フォーマット規約
+* **インデント：**<wbr />TAB
+* **行末：**<wbr />LF
+* **引用符：**<wbr />ダブルクォート
+* **ファイル末尾**に空行を追加
+* **文末**にセミコロンを追加
+* **Vue API スタイル：**<wbr />Composition API
 
-## 贡献者
+## 貢献者
 
 [![Contributors](https://contrib.rocks/image?repo=KIRAKIRA-DOUGA/KIRAKIRA-Cerasus)](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/graphs/contributors)
 
@@ -665,13 +665,13 @@ button:any-hover {
 [issues-shield]: https://img.shields.io/github/issues/kIRAKIRA-DOUGA/KIRAKIRA-Cerasus.svg?label=ISSUES&style=flat-square
 [issues-url]: https://github.com/kIRAKIRA-DOUGA/KIRAKIRA-Cerasus/issues
 
-[zh-cn-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=简体中文&style=flat-square&logo=crowdin&query=%24.progress.6.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
+[zh-cn-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=日本語&style=flat-square&logo=crowdin&query=%24.progress.6.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [zh-cn-translation-url]: https://crowdin.com/project/kirakira/zh-CN
-[zh-tw-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=繁體中文&style=flat-square&logo=crowdin&query=%24.progress.7.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
+[zh-tw-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=繁体字中国語&style=flat-square&logo=crowdin&query=%24.progress.7.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [zh-tw-translation-url]: https://crowdin.com/project/kirakira/zh-TW
 [ja-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=日本語&style=flat-square&logo=crowdin&query=%24.progress.2.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [ja-translation-url]: https://crowdin.com/project/kirakira/ja
-[ko-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=한국인&style=flat-square&logo=crowdin&query=%24.progress.3.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
+[ko-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=韓国語&style=flat-square&logo=crowdin&query=%24.progress.3.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [ko-translation-url]: https://crowdin.com/project/kirakira/ko
 [vi-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=Tiếng%20Việt&style=flat-square&logo=crowdin&query=%24.progress.4.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [vi-translation-url]: https://crowdin.com/project/kirakira/vi
@@ -679,10 +679,10 @@ button:any-hover {
 [id-translation-url]: https://crowdin.com/project/kirakira/id
 [fr-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=Français&style=flat-square&logo=crowdin&query=%24.progress.0.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [fr-translation-url]: https://crowdin.com/project/kirakira/fr
-[yue-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=粵語&style=flat-square&logo=crowdin&query=%24.progress.5.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
+[yue-translation-shield]: https://img.shields.io/badge/dynamic/json?color=blue&label=広東語&style=flat-square&logo=crowdin&query=%24.progress.5.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-14133121-613305.json
 [yue-translation-url]: https://crowdin.com/project/kirakira/yue
 
-[figma-design-shield]: https://img.shields.io/badge/设计文稿-white?style=for-the-badge&logo=figma&logoColor=white&label=figma&labelColor=F24E1E
+[figma-design-shield]: https://img.shields.io/badge/デザイン-white?style=for-the-badge&logo=figma&logoColor=white&label=figma&labelColor=F24E1E
 [figma-design-url]: https://www.figma.com/file/S5mM7zW5iMo560xnQ4cmbL/KIRAKIRA-Douga-PC?node-id=0%3A1
 [discord-server-shield]: https://dcbadge.limes.pink/api/server/https://discord.gg/uVd9ZJzEy7
 [discord-server-url]: https://discord.gg/uVd9ZJzEy7

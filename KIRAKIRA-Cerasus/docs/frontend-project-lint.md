@@ -1,26 +1,26 @@
-﻿# KIRAKIRA☆DOUGA 前端项目规范
+﻿# KIRAKIRA☆DOUGA フロントエンドプロジェクト規約
 
-## 简要
-1. **JavaScript 框架：**<wbr>Vue
-1. **Vue API 风格：**<wbr>组合式 [(?)](https://cn.vuejs.org/guide/introduction.html#single-file-components)
-1. **使用类型系统：**<wbr>TypeScript
-1. **Vue 服务器渲染工具：**<wbr>Nuxt
-1. **Vue 路由：**<wbr>Vue Router
-1. **打包工具：**<wbr>Vite
-1. **代码混淆工具：**<wbr>terser、esbuild
-1. **代码规范工具：**<wbr>ESLint、Stylelint
-1. **CSS 预处理器：**<wbr>SCSS\
-注：如不会 SCSS，可照常写纯 CSS，但是声明为 SCSS 格式。即可以按需使用 SCSS 的功能。
-1. **ECMAScript 标准：**<wbr>ESNext，即使用最新的标准。如果不会可使用旧标准。
-1. **模块化规范：**<wbr>ES Module。即使用 import 而不是 require 或其它来导入模块。
-1. **包管理器：**<wbr>NPM（**NEVER USE Yarn!**）
-1. **协议：**<wbr>BSD 3‐Clause
-1. **不需要 Babel！**
-## Vue 文件模板
-所有内容均缩进一个层级。
+## 概要
+1. **JavaScript フレームワーク：**<wbr>Vue
+1. **Vue API スタイル：**<wbr>Composition API [(?)](https://ja.vuejs.org/guide/introduction.html#single-file-components)
+1. **型システムの使用：**<wbr>TypeScript
+1. **Vue サーバーサイドレンダリングツール：**<wbr>Nuxt
+1. **Vue ルーティング：**<wbr>Vue Router
+1. **バンドルツール：**<wbr>Vite
+1. **コード難読化ツール：**<wbr>terser、esbuild
+1. **コード規約ツール：**<wbr>ESLint、Stylelint
+1. **CSS プリプロセッサ：**<wbr>SCSS\
+注：SCSSが分からなくても、純粋なCSSを書いてSCSS形式として宣言することができます。つまり、必要に応じてSCSSの機能を使用できます。
+1. **ECMAScript 標準：**<wbr>ESNext、つまり最新の標準を使用します。分からなければ古い標準を使用しても構いません。
+1. **モジュール化規約：**<wbr>ES Module。つまり、requireやその他ではなくimportを使用してモジュールをインポートします。
+1. **パッケージマネージャ：**<wbr>NPM（**NEVER USE Yarn!**）
+1. **ライセンス：**<wbr>BSD 3-Clause
+1. **Babelは不要！**
+## Vueファイルテンプレート
+すべての内容は1レベルインデントします。
 ```html
 <script lang="ts">
-	// 本段 script 标签仅在需要时
+	// このscriptタグは必要な場合のみ
 </script>
 
 <script setup lang="ts">
@@ -37,99 +37,99 @@
 
 ```
 
-## 项目目录结构
+## プロジェクトのディレクトリ構造
 ```
-kirakira-douga               # 项目名称
-	node_modules             # NPM 模块，记得放进 .gitignore
-	dist                     # 打包目录
-	static                   # 静态目录
-		favicon.ico          # 网站图标
-		index.html           # 单页面的 HTML
-		robots.txt           # 搜索引擎索引
-		apple-touch-icon.png # 苹果图标（这真的需要吗？）
-		CNAME                # GitHub 域名解析
-		sitemap.xml          # 网站地图
-	.nuxt                    # Nuxt 工作目录
-	assets                   # 资源目录：如图片、音效、GIF
-		img                  # 图片目录
-		icon                 # 图标目录
-		svg                  # SVG 目录
-		fonts                # 字体目录
-	components               # 用户控件组件：如滑块、输入框
-	composables              # 可复用组合逻辑
-	content                  # 内容目录
-	layouts                  # 布局目录
-	middleware               # 中间件目录
-	modules                  # 自定义模块目录？
-	pages                    # 路由页面组件：如首页、播放页
-	plugins                  # 插件目录
-	utils                    # 工具目录，杂项 ts 函数方法等
-	styles                   # 全局样式目录
-		global.scss          # 公共样式
-		reset.scss           # 重置样式
-	server                   # 服务器目录
-	store                    # vuex 存储目录
-	App.vue                  # 根组件
-	main.ts                  # 项目入口
-	test                     # 测试目录（可选）
-	types                    # TypeScript 类型补充目录
-		vue-shims.d.ts       # 让 TypeScript 识别 Vue 文件
-	package.json             # 项目信息、依赖模块
+kirakira-douga               # プロジェクト名
+	node_modules             # NPM モジュール、.gitignoreに入れるのを忘れずに
+	dist                     # バンドルディレクトリ
+	static                   # 静的ディレクトリ
+		favicon.ico          # ファビコン
+		index.html           # シングルページのHTML
+		robots.txt           # 検索エンジンインデックス
+		apple-touch-icon.png # Appleアイコン（本当に必要？）
+		CNAME                # GitHub ドメイン解決
+		sitemap.xml          # サイトマップ
+	.nuxt                    # Nuxt 作業ディレクトリ
+	assets                   # アセットディレクトリ：画像、音声、GIFなど
+		img                  # 画像ディレクトリ
+		icon                 # アイコンディレクトリ
+		svg                  # SVG ディレクトリ
+		fonts                # フォントディレクトリ
+	components               # UIコンポーネント：スライダー、入力ボックスなど
+	composables              # 再利用可能なコンポジションロジック
+	content                  # コンテンツディレクトリ
+	layouts                  # レイアウトディレクトリ
+	middleware               # ミドルウェアディレクトリ
+	modules                  # カスタムモジュールディレクトリ？
+	pages                    # ルーティングページコンポーネント：ホームページ、再生ページなど
+	plugins                  # プラグインディレクトリ
+	utils                    # ユーティリティディレクトリ、雑多なts関数メソッドなど
+	styles                   # グローバルスタイルディレクトリ
+		global.scss          # 共通スタイル
+		reset.scss           # リセットスタイル
+	server                   # サーバーディレクトリ
+	store                    # vuex ストアディレクトリ
+	App.vue                  # ルートコンポーネント
+	main.ts                  # プロジェクトのエントリポイント
+	test                     # テストディレクトリ（任意）
+	types                    # TypeScript 型定義追加ディレクトリ
+		vue-shims.d.ts       # TypeScriptがVueファイルを認識できるようにする
+	package.json             # プロジェクト情報、依存モジュール
 	package-lock.json
-	tsconfig.json            # TypeScript 配置文件
-	.eslintrc.json           # ESLint 配置文件
-	.eslintignore            # ESLint 忽略文件
-	.gitignore               # Git 忽略文件
-	.browserslistrc          # 浏览器兼容配置文件
-	LICENSE                  # 协议，我们使用 GPL 协议
-	README.MD                # 项目描述，展示在 GitHub 上
-	nuxt.config.js           # Nuxt、Vue 和 Webpack 配置文件
+	tsconfig.json            # TypeScript 設定ファイル
+	.eslintrc.json           # ESLint 設定ファイル
+	.eslintignore            # ESLint 無視ファイル
+	.gitignore               # Git 無視ファイル
+	.browserslistrc          # ブラウザ互換性設定ファイル
+	LICENSE                  # ライセンス、我々はGPLライセンスを使用
+	README.MD                # プロジェクト説明、GitHubで表示
+	nuxt.config.js           # Nuxt、Vue、Webpack 設定ファイル
 ```
 
-## 插件
-1. autoprefixer：自动加 CSS 前缀
-1. 待填……
-## 命名规范
-### 文件名
-1. **项目名：**<wbr>全部小写，短横线分隔。例如：*kirakira-douga*。
-1. **目录名：**<wbr>全部小写，短横线分隔。如果是完整的单词且单词可数则采用复数形式，如果是缩略词则不用复数。例如：*docs、assets、components*。
-1. **图像文件名：**<wbr>全部小写，下划线分隔。例如：*menu_aboutus.gif、menutitle_news.gif、pic_people.jpg、pic_TV.jpg*。
-1. **HTML 文件名：**<wbr>全部小写，下划线分隔。例如：*error_report.html、success_report.html*。
-1. **SCSS 文件名：**<wbr>全部小写，短横线分隔。例如：*normalize.scss、base.scss*。
-1. **TypeScript 无默认导出模块文件名：**<wbr>全部小写，短横线分隔。例如：*index.ts、transition-variables.ts、export-plugin.ts*。
-1. **TypeScript 有默认导出模块文件名：**<wbr>以默认导出模块的变量名称及其形式命名。
-1. **TypeScript 类 / 枚举类 / 抽象类 / 接口模块名：**<wbr>大驼峰形式。以默认导出类模块名称命名。
-1. **Vue 组件名：**<wbr>大驼峰形式。以组件名称命名。例如：*MyComponent.vue、CustomCard.vue*。
-### 变量名
+## プラグイン
+1. autoprefixer：CSSプレフィックスを自動追加
+1. 追記待ち……
+## 命名規則
+### ファイル名
+1. **プロジェクト名：**<wbr />すべて小文字、ハイフン区切り。例：*kirakira-douga*。
+1. **ディレクトリ名：**<wbr />すべて小文字、ハイフン区切り。完全な単語で複数形にできる場合は複数形にし、略語の場合は複数形にしない。例：*docs、assets、components*。
+1. **画像ファイル名：**<wbr />すべて小文字、アンダースコア区切り。例：*menu_aboutus.gif、menutitle_news.gif、pic_people.jpg、pic_TV.jpg*。
+1. **HTML ファイル名：**<wbr />すべて小文字、アンダースコア区切り。例：*error_report.html、success_report.html*。
+1. **SCSS ファイル名：**<wbr />すべて小文字、ハイフン区切り。例：*normalize.scss、base.scss*。
+1. **デフォルトエクスポートがないTypeScriptモジュールファイル名：**<wbr />すべて小文字、ハイフン区切り。例：*index.ts、transition-variables.ts、export-plugin.ts*。
+1. **デフォルトエクスポートがあるTypeScriptモジュールファイル名：**<wbr />デフォルトエクスポートされるモジュールの変数名とその形式で命名。
+1. **TypeScript クラス / enum / 抽象クラス / インターフェースモジュール名：**<wbr />パスカルケース。デフォルトエクスポートされるクラスモジュール名で命名。
+1. **Vue コンポーネント名：**<wbr />パスカルケース。コンポーネント名で命名。例：*MyComponent.vue、CustomCard.vue*。
+### 変数名
 #### TypeScript
-1. **类 (class) 名：**<wbr>大驼峰形式。例如：*Video、Json、Midi*。
-1. **方法 (method) / 函数 (function) / 箭头函数 (lambda) 名：**<wbr>小驼峰形式。使用动词形式或动词加名词形式。例如：*play()、getValue()、setName()*。
-1. **变量名：**<wbr>小驼峰形式。例如：*title、age、password*。
-1. **布尔型变量名：**<wbr>小驼峰形式。使用 is 加名词 / 形容词 / 副词或动词的过去分词形式。例如：*isMale、isShown、isWatched、isVip、isPoorVip*。
-1. **数组变量名：**<wbr>小驼峰形式。使用名词的复数形式。例如：*videos、songs、controls*。
-1. **抽象类 (abstract) 名：**<wbr>大驼峰形式。以 Base 开头。例如：*BaseButton、BaseFile*。
-1. **接口 (interface) 名：**<wbr>大驼峰形式。以 I 开头。例如：*IConfig、IController*。注意必须是用作类实现的接口，不是可与类型名互换的接口，对于后者，与类型名命名一致。
-1. **类型 (type) 名：**<wbr>大驼峰形式。例如：*Prop、State、ControlType*。
-1. **枚举类型 (enum) 名：**<wbr>大驼峰形式。以 Type 结尾。例如：*UserType、ImageType*。
-1. **常量名：**<wbr>全部大写，下划线分隔。例如：*MAX_COUNT、GUEST_USER_NAME*。
-1. **私有类成员、方法名：**<wbr>以 # 开头。例如：*#privateValue、#getSomethingPrivately()*。
-1. **自定义命名空间：**<wbr>大驼峰形式。以 NS 结尾。例如：*MyVueNS、ConfigNS*。
+1. **クラス (class) 名：**<wbr />パスカルケース。例：*Video、Json、Midi*。
+1. **メソッド (method) / 関数 (function) / アロー関数 (lambda) 名：**<wbr />キャメルケース。動詞または動詞+名詞の形式を使用。例：*play()、getValue()、setName()*。
+1. **変数名：**<wbr />キャメルケース。例：*title、age、password*。
+1. **ブール型変数名：**<wbr />キャメルケース。is + 名詞 / 形容詞 / 副詞または動詞の過去分詞の形式を使用。例：*isMale、isShown、isWatched、isVip、isPoorVip*。
+1. **配列変数名：**<wbr />キャメルケース。名詞の複数形を使用。例：*videos、songs、controls*。
+1. **抽象クラス (abstract) 名：**<wbr />パスカルケース。Baseで始まる。例：*BaseButton、BaseFile*。
+1. **インターフェース (interface) 名：**<wbr />パスカルケース。Iで始まる。例：*IConfig、IController*。注意：クラス実装として使用されるインターフェースのみ。型名と交換可能なインターフェースについては、型名と同じ命名規則に従う。
+1. **型 (type) 名：**<wbr />パスカルケース。例：*Prop、State、ControlType*。
+1. **enum 名：**<wbr />パスカルケース。Typeで終わる。例：*UserType、ImageType*。
+1. **定数名：**<wbr />すべて大文字、アンダースコア区切り。例：*MAX_COUNT、GUEST_USER_NAME*。
+1. **プライベートクラスメンバー、メソッド名：**<wbr />#で始まる。例：*#privateValue、#getSomethingPrivately()*。
+1. **カスタム名前空間：**<wbr />パスカルケース。NSで終わる。例：*MyVueNS、ConfigNS*。
 #### SCSS
-1. **class 名：**<wbr>全部小写，短横线分隔。（有待商议，因为在对象中需要额外加引号。）
-1. **id 和 ref 名：**<wbr>小驼峰形式。例如：*videoSidebar*。
-1. **key 名：**<wbr>全部小写，短横线分隔。例如：*list-item-1、menu-item-2*。
-1. **CSS 自定义属性名：**<wbr>全部小写，短横线分隔。以 “--” 开头。例如：*-&#8288;-&#8288;accent-color、--title-font-size*。
-1. **SCSS 自定义变量名：**<wbr>全部小写，短横线分隔。以 “$” 开头。例如：*\$&#8288;accent-color、$title-font-size*。
+1. **class 名：**<wbr />すべて小文字、ハイフン区切り。（検討の余地あり。オブジェクト内で引用符が別途必要になるため。）
+1. **id と ref 名：**<wbr />キャメルケース。例：*videoSidebar*。
+1. **key 名：**<wbr />すべて小文字、ハイフン区切り。例：*list-item-1、menu-item-2*。
+1. **CSS カスタムプロパティ名：**<wbr />すべて小文字、ハイフン区切り。「--」で始まる。例：*--accent-color、--title-font-size*。
+1. **SCSS カスタム変数名：**<wbr />すべて小文字、ハイフン区切り。「$」で始まる。例：*$accent-color、$title-font-size*。
 #### Vue
-1. **name：**<wbr>大驼峰形式。例如：*TodoList、LoginWindow*。
-1. **prop：**<wbr>在命名中使用小驼峰形式；在模板中使用全部小写，短横线分隔。
-1. **router：**<wbr>全部小写，短横线分隔。例如：*/user-info*。
-1. **自定义事件方法/子通信父回调函数：**<wbr>小驼峰形式。~~使用 on 加对应事件的名称。例如：*onClick、onHover、onKeydown、onMenuItemClick*。~~<wbr>不要加 on 了，要不然会变成 onOn*。
+1. **name：**<wbr />パスカルケース。例：*TodoList、LoginWindow*。
+1. **prop：**<wbr />命名にはキャメルケースを使用し、テンプレート内ではすべて小文字のハイフン区切りを使用。
+1. **router：**<wbr />すべて小文字、ハイフン区切り。例：*/user-info*。
+1. **カスタムイベントメソッド/子から親へのコールバック関数：**<wbr />キャメルケース。~~on + 対応するイベント名を使用。例：*onClick、onHover、onKeydown、onMenuItemClick*。~~<wbr />onを付けないでください。onOn*になってしまいます。
 
-**注意：**<wbr>将缩略词视为一个单词，例如：*XmlHttpRequest、getElementById、getJson*。
-## 代码规范（Lint）
+**注意：**<wbr />略語は1つの単語として扱う。例：*XmlHttpRequest、getElementById、getJson*。
+## コーディング規約（Lint）
 ### HTML
-1. 所有空元素标签需要自闭合。
+1. すべての空要素タグは自己終了させる。
 	```html
 	<!-- bad -->
 	<input type="text">
@@ -138,41 +138,41 @@ kirakira-douga               # 项目名称
 	<input type="text" />
 	```
 1. `<html lang="zh-cmn-Hans-CN">`\
-为了保证兼容性，应该写完整。其中 zh 表示中文，cmn 表示普通话，Hans 表示简体字，CN 表示大陆地区。
+互換性を確保するため、完全に記述すべき。zhは中国語、cmnは北京語、Hansは簡体字、CNは中国大陸を意味する。
 
-1. 自定义 Vue 组件应该以大驼峰形式命名，以和 HTML 内置标签区分开。HTML 内置标签应当全部小写。
-1. 属性不得省略引号。
-1. 当标签属性在 xxx(待填) 字符内时应该写成单行，否则写成多行，一个属性占一行。
+1. カスタムVueコンポーネントはパスカルケースで命名し、HTML組み込みタグと区別する。HTML組み込みタグはすべて小文字にすべき。
+1. 属性の引用符は省略してはならない。
+1. タグの属性がxxx(追記待ち)文字以内の場合は1行で書き、それ以上の場合は複数行に分けて1行に1属性を書く。
 	```html
 	<!-- one line -->
 	<MyComponent width="320" height="180" />
 
 	<!-- multi lines -->
 	<MyComponent
-		width="320" 不要将第一个属性放在标签名之后
+		width="320" <!-- 最初の属性をタグ名の後に置かない -->
 		height="180"
 		title="Some Title"
 		background-color="green"
 		:style="myStyle"
-	/> <!-- 关尖括号放在单独一行 -->
+	/> <!-- 閉じ括弧は単独の行に置く -->
 	```
-1. 在 template 内，如果可以写成自闭合标签，不要分开写关标签。
+1. template内で、自己終了タグとして書ける場合は、閉じタグを分けて書かない。
 	```html
 	<!-- bad -->
 	<MyComponent></MyComponent>
 	<!-- good -->
 	<MyComponent />
 	```
-1. 注释的箭头内侧各增加一个空格。
+1. コメントの矢印の内側にそれぞれ1つのスペースを追加する。
 	```html
 	<!--bad-->
 	<!-- good -->
 	```
 
 ### SCSS
-1. 如果可以，请尽量使用 SCSS 变量而不是 CSS 属性。如与元素相关、TS 动态调整时才使用 CSS 属性。
+1. 可能であれば、CSSプロパティではなくSCSS変数を使用する。要素に関連する場合や、TSで動的に調整する場合にのみCSSプロパティを使用する。
 	```scss
-	// SCSS 变量仅在作用域内生效即可，不需要依赖元素。
+	// SCSS変数はスコープ内でのみ有効で、要素に依存する必要はない。
 	.my-component {
 		$size: 100px;
 		width: $size;
@@ -186,7 +186,7 @@ kirakira-douga               # 项目名称
 		}
 	}
 
-	// 此时 SCSS 变量无法生效，只能依靠对应元素的 CSS 属性生效。
+	// この場合、SCSS変数は有効にならず、対応する要素のCSSプロパティに依存する必要がある。
 	@keyframes my-animation {
 		from {
 			transform: rotate(var(--angle));
@@ -197,7 +197,7 @@ kirakira-douga               # 项目名称
 	}
 	```
 
-1. 如果 `@keyframes` 动画仅有起止两个关键帧，应当依次命名为 from 和 to，否则命名为 0% 和 100%。
+1. `@keyframes` アニメーションが開始と終了の2つのキーフレームしかない場合は、それぞれfromとtoと命名し、それ以外の場合は0%と100%と命名する。
 	```scss
 	@keyframe two-keyframes {
 		from { /* */ }
@@ -210,23 +210,23 @@ kirakira-douga               # 项目名称
 	}
 	```
 
-1. 不要使用 `@import` 导入外部 CSS 文件，但是可以导入 SCSS 文件。前者将会额外产生异步网络获取开销，而后者会在编译时自动打包在一起。
-1. 对于数值 0，不要在其后写任何单位。反例：0px、0rem。例外：0s、0ms。
-1. 不要使用空规则集，这会在 VSCode 中抛出一个警告。如果非要使用，请改用如下 good 形式。
+1. `@import` を使って外部CSSファイルをインポートしない。ただし、SCSSファイルはインポートできる。前者は追加の非同期ネットワーク取得コストが発生するが、後者はコンパイル時に自動的にバンドルされる。
+1. 数値0については、単位を付けない。反例：0px、0rem。例外：0s、0ms。
+1. 空のルールセットを使用しない。VSCodeで警告が表示される。どうしても使用する必要がある場合は、以下のgood形式に変更する。
 	```scss
 	// bad
 	div {
-		/* 一些被全部注释掉的规则声明 */
+		/* すべてコメントアウトされたルール宣言 */
 	}
 
 	// good
 	/* div {
-		一些被全部注释掉的规则声明
+		すべてコメントアウトされたルール宣言
 	} */
 	```
 
-1. 在块注释符号内侧各增加一个空格，在行注释前后方（位于代码后）或后方（位于行首）增加一个空格。
-1. 对于颜色值，请写成 16 进制格式。且如果可以，请尽量写成三位或四位颜色值。
+1. ブロックコメント記号の内側にそれぞれ1つのスペースを追加し、行コメントの前（コードの後）または後（行頭）に1つのスペースを追加する。
+1. 色の値は16進数形式で書く。可能であれば、3桁または4桁の色値で書く。
 	```scss
 	* {
 		// bad
@@ -248,37 +248,37 @@ kirakira-douga               # 项目名称
 	}
 	```
 
-1. 不需要添加各浏览器私有属性（`-webkit、-moz、-ms、-o`），有插件来做这一切。
+1. 各ブラウザのプライベートプロパティ（`-webkit、-moz、-ms、-o`）を追加する必要はない。これらはプラグインが処理する。
 ### Vue
-1. data（数据）。对于按引用传递（`typeof obj === "object"`，除 `null` 外）的数据用 reactive()，对于按值传递（原始类型）的数据用 ref()。
+1. data（データ）。参照渡し（`typeof obj === "object"`、`null`を除く）のデータにはreactive()を、値渡し（プリミティブ型）のデータにはref()を使用する。
 	```typescript
-	// 对象，使用 reactive()
+	// オブジェクト、reactive()を使用
 	const user = reactive({
 		name: "Aira",
 		age: new Date().getFullYear() - 2003,
 	});
 
-	// 原始类型，使用 ref()
+	// プリミティブ型、ref()を使用
 	const year = ref<number | string>("2023");
 
-	// 不指定初始值
+	// 初期値を指定しない
 	const value = ref<number>();
-	// 此时 value 类型为 number | undefined。
+	// この時、valueの型は number | undefined。
 	```
 
-1. methods（方法）。直接定义函数即可。
+1. methods（メソッド）。直接関数を定義する。
 	```typescript
 	function increment() {
 		state.count++;
 	}
 	```
 
-1. computed（计算属性）。
+1. computed（算出プロパティ）。
 	```typescript
-	// 只读属性
+	// 読み取り専用プロパティ
 	const now = computed(() => Date.now());
 
-	// 可写属性
+	// 書き込み可能プロパティ
 	const realQiaobiluoAge = ref(58);
 	const qiaobiluoAge = computed({
 		get(): number {
@@ -290,42 +290,42 @@ kirakira-douga               # 项目名称
 	});
 	```
 
-1. mounted、unmounted、updated 等内置函数。从 vue 命名空间中**由插件自动**获取。
+1. mounted、unmounted、updatedなどの組み込み関数。vue名前空間から**プラグインによって自動的に**取得される。
 	```typescript
 	import { onMounted } from "vue";
 
 	onMounted(() => {
-		// 对 DOM 的直接操作，或第三方不支持 Vue 的模块的调用。如 videojs。
+		// DOMの直接操作、またはVueをサポートしていないサードパーティモジュールの呼び出し。例：videojs。
 	});
 	```
 
-1. components（组件）、composables（可复用组合逻辑）。不用 import 直接使用。
+1. components（コンポーネント）、composables（再利用可能なコンポジションロジック）。importせずに直接使用する。
 
-1. props（属性，类似于 HTML tag 的 attr）。使用 TypeScript 的类型注解，不要使用 Vue 自带的类型注解。
+1. props（プロパティ、HTMLタグのattrに似ている）。Vue独自の型注釈ではなく、TypeScriptの型注釈を使用する。
 	```typescript
 	interface Props {
 		foo: string;
 		bar?: number;
 	}
 
-	// 不带默认值
+	// デフォルト値なし
 	const props = defineProps<Props>();
 
-	// 带默认值
+	// デフォルト値あり
 	const props = withDefaults(defineProps<Props>(), {
 		foo: "hello",
 	});
 	```
 
-1. ref（引用）。~~应初始化为 null。~~<wbr>是个 undefined 就行。
+1. ref（参照）。~~nullで初期化すべき。~~<wbr />undefinedであればよい。
 	```html
 	<script setup lang="ts">
 		import MyComponent from "./MyComponent.vue";
 
 		const myDiv = ref<HTMLDivElement>();
-		// 变量名与 ref 名称一致。
+		// 変数名とref名が一致。
 		const myComponent = ref<InstanceType<typeof MyModal>>();
-		// 自定义组件引用写法。
+		// カスタムコンポーネントの参照の書き方。
 	</script>
 	<template>
 		<div ref="myDiv"></div>
@@ -333,43 +333,43 @@ kirakira-douga               # 项目名称
 	</template>
 	```
 
-1. nextTick（下一刻）正确写法。
+1. nextTick（次のティック）の正しい書き方。
 	```typescript
 	import { nextTick } from "vue";
 
-	async function myFunction() { // 先将该函数标记为 async。
+	async function myFunction() { // まず関数をasyncとしてマーク。
 		// 更新前
 		await nextTick();
-		// 更新后
+		// 更新後
 	}
 	```
 
-1. 不要在模板中写复杂语法（一个简单的 lambda 除外），请转换成计算属性。
-1. 在文件末尾增加一个空行！
+1. テンプレートに複雑な構文（単純なラムダ式を除く）を書かず、算出プロパティに変換する。
+1. ファイルの末尾に空行を1行追加する！
 ### TypeScript
-1. **缩进形式：TAB（制表符）**。
+1. **インデント形式：TAB（タブ）**。
 	```typescript
-	// 三元运算符嵌套写法
+	// 三項演算子のネストの書き方
 	const result =
 		arg === 0 ? a :
 		arg === 1 ? b :
 		arg === 2 ? c : d;
 
-	// switch case 写法
+	// switch caseの書き方
 	switch (score) {
 		case 100:
 		case 90:
-			break; // case 缩进一层，里面的内容再缩进一层。
-		case 80: { // 如果需要在 case 顶层定义变量，用花括号将内容括起来。
+			break; // caseは1レベルインデント、中の内容はさらに1レベルインデント。
+		case 80: { // caseのトップレベルで変数を定義する必要がある場合は、内容を中括弧で囲む。
 			const foo = "bar";
-			break; // 尽量不要 switch 穿透，如有必要，有一个 eslint 标记。
+			break; // できるだけswitchのフォールスルーは避ける。必要な場合はeslintのマークがある。
 		}
-		default: // 不要省略 default。
+		default: // defaultを省略しない。
 			break;
 	}
 
-	// 缩进使用 TAB 的好处是编者可以使用任何习惯的缩进值显示，
-	// 永远不要对齐变量、属性、字段或注释等。
+	// インデントにTABを使用する利点は、編集者が好きなインデント幅で表示できること。
+	// 変数、プロパティ、フィールド、コメントなどを決して揃えない。
 
 	// bad
 	let width  =   160,                    // width  value
@@ -380,20 +380,20 @@ kirakira-douga               # 项目名称
 		height = 90, // height value
 		size = 14400; // size value
 
-	// 如果觉得如下形式不好看
+	// 以下の形式が見にくいと感じる場合
 	const a = 0,
 		b = 0,
 		c = 0;
-	// 请修改为
+	// 以下のように修正してください
 	const
 		a = 0,
 		b = 0,
 		c = 0;
 	```
 
-1. 行尾形式：LF（Linux）。\
-~~理由就是正则表达式匹配行尾时得写成 \r\n，很烦。~~
-1. **引号：优先双引号。**<wbr>仅在 HTML attr 的双引号中或字符串仅包含双引号时改为单引号。仅在需要在字符串中包含变量时使用模板字符串（反单引号）。如果需要包含多行字符串，不要使用模板字符串，一是字符串前的缩进需要去除以免包含在结果中且影响美观，二是会对代码压缩工具造成麻烦。
+1. 行末形式：LF（Linux）。\
+~~理由は正規表現で行末をマッチさせる際に\r\nと書くのが面倒だから。~~
+1. **引用符：ダブルクォートを優先。**<wbr />HTML attrのダブルクォート内や、文字列にダブルクォートのみが含まれる場合にのみシングルクォートに変更。文字列に変数を含める必要がある場合にのみテンプレートリテラル（バッククォート）を使用。複数行の文字列を含める必要がある場合は、テンプレートリテラルを使用しない。文字列の前のインデントが結果に含まれてしまい見栄えが悪くなること、コード圧縮ツールに問題を引き起こす可能性があるため。
 	```typescript
 	// bad
 	foo = 'bar';
@@ -409,12 +409,12 @@ kirakira-douga               # 项目名称
 	foo = "hello\n\nworld";
 	```
 
-1. 永远在行尾写分号。~~理由是除了 JS、Python 等外可能还写其它语言，容易混乱。~~<wbr>但是在定义 function、class、enum、interface、namespace 时一律不写分号，但是写匿名函数、箭头函数、类表达式时又要写分号。~~总之就是编译器提示哪少分号哪多分号直接改就行。~~
+1. 常に行末にセミコロンを付ける。~~理由はJS、Python以外の言語も書く可能性があり、混乱しやすいため。~~<wbr />ただし、function、class、enum、interface、namespaceを定義する際にはセミコロンを付けないが、無名関数、アロー関数、クラス式を書く際にはセミコロンを付ける。~~要するに、コンパイラがセミコロンが足りない、または多すぎると指摘した箇所を修正すればよい。~~
 	```typescript
-	// 要写分号
+	// セミコロンを付ける
 	const foo = "bar";
 	const foo = () => "bar";
-	const foo = () => { return "bar"; }; // 内外均要写分号。
+	const foo = () => { return "bar"; }; // 内外両方にセミコロンを付ける。
 	const foo = function () { return "bar"; };
 	const Foo = class { };
 	const foo = {
@@ -425,7 +425,7 @@ kirakira-douga               # 项目名称
 		$(this).text("bar");
 	});
 
-	// 不要写分号（注意看末尾，不是成员变量）
+	// セミコロンを付けない（末尾を見てください、メンバー変数ではありません）
 	function foo() {
 		return "bar";
 	}
@@ -440,7 +440,7 @@ kirakira-douga               # 项目名称
 	}
 	```
 
-1. 写成单行时，在花括号的内侧增加空格。其它括号不用。
+1. 1行で書く場合、中括弧の内側にスペースを追加する。他の括弧は不要。
 	```typescript
 	const foo = { };
 	function foo() { }
@@ -449,7 +449,7 @@ kirakira-douga               # 项目名称
 	const foo = ["bar"];
 	```
 
-1. 单行时一律不尾随逗号，多行时一律尾随逗号。
+1. 1行の場合は末尾にコンマを付けず、複数行の場合は常に末尾にコンマを付ける。
 	```typescript
 	foo = [1, 2, 3];
 	foo = { bar: 1, baz: 2 };
@@ -475,10 +475,10 @@ kirakira-douga               # 项目名称
 	}
 	```
 
-1. 在文件末尾增加一个空行！
-1. 不要在 switch 中包含重复的 case。
-1. 只能使用三等号 “===”，不能使用二等号 “==”。
-1. 不允许数字以小数点开头或结尾。
+1. ファイルの末尾に空行を1行追加する！
+1. switchに重複するcaseを含めない。
+1. 三重等号「===」のみを使用し、二重等号「==」は使用しない。
+1. 数字を小数点で始めたり終えたりしない。
 	```typescript
 	// bad
 	[.25, 25.]
@@ -486,53 +486,53 @@ kirakira-douga               # 项目名称
 	[0.25, 25]
 	```
 
-1. 不允许使用以 0 开头的八进制数字表示。取而代之的是以 0o 开头。
+1. 0で始まる8進数表記を使用しない。代わりに0oで始める。
 	```typescript
 	// bad
 	017
 	// good
 	0o17
 
-	// 另付
-	0b11 // 二进制
-	0xab // 十六进制
+	// その他
+	0b11 // 2進数
+	0xab // 16進数
 	```
 
-1. 使用 parseInt 时，一律指定数字的进制。
+1. parseIntを使用する際は、常に基数を指定する。
 	```typescript
 	let value = "017";
 	// bad
-	parseInt(value); // 这将会错误转换为八进制。
+	parseInt(value); // 8進数に誤って変換される。
 	// good
-	parseInt(value, 10); // 指定这是十进制。毕竟你永远无法想象客户会怎样使用你的产品。
+	parseInt(value, 10); // 10進数であることを指定。顧客が製品をどう使うかは予測できない。
 	```
 
-1. 缩进时不要混合制表符（TAB）和空格。
-1. 块注释内侧各增加一个空格，前后方如果不是行首尾则增加一个空格。行注释后方增加一个空格，前方如果不是行首则增加一个空格。
+1. インデントにタブとスペースを混在させない。
+1. ブロックコメントの内側にそれぞれ1つのスペースを追加し、行頭・行末でない場合は前後に1つのスペースを追加する。行コメントの後ろに1つのスペースを追加し、行頭でない場合は前に1つのスペースを追加する。
 	```typescript
-	/* 块注释 */
-	代码 /* 块注释 */ 代码
+	/* ブロックコメント */
+	コード /* ブロックコメント */ コード
 
-	// 行注释
-	代码 // 行注释
+	// 行コメント
+	コード // 行コメント
 
 	/**
-	* JSDoc 注释，记得多写！
+	* JSDocコメント、たくさん書くこと！
 	*/
 
-	// 下列所述注释一定都不要用，虽然都是合法的。
-	<!-- 看着像块注释，
-	--> 但实际上是行注释。
-	#! 这个只在文件开头能用。
+	// 以下のコメントはすべて合法だが、絶対に使用しないこと。
+	<!-- ブロックコメントに見えるが、
+	--> 実際は行コメント。
+	#! これはファイルの先頭でのみ使用可能。
 	```
 
-1. 不要使用 var，使用 let 和 const 代替之。\
-究竟是用 let 还是 const？**一律用 const**，仅在需要对变量重新赋值时（使用 const 发现会报错时）才用 let。
-1. 不要使用 any 类型，不要写 AnyScript，就像不要做「音 MIDI」。\
-永远使用 TypeScript 正确推断出类型，可以适当断言。
-1. 不要创建空的块作用域（花括号）。
-1. 禁止在判断条件中使用常量值，循环除外。
-1. 下列行为有些迷惑，尽量少做，但也不是不可做。
+1. varを使用せず、letとconstを代わりに使用する。\
+letとconstのどちらを使うか？**常にconstを使用**し、変数の再代入が必要な場合（constを使用してエラーが出た場合）にのみletを使用する。
+1. any型を使用しない。AnyScriptを書かない。就像不要做「音MIDI」。\
+常にTypeScriptで型を正しく推論させる。適切なアサーションは可。
+1. 空のブロックスコープ（中括弧）を作成しない。
+1. 条件判断に定数値を使用しない。ただしループは除く。
+1. 以下の挙動は紛らわしいので、できるだけ避けるが、不可能ではない。
 	```typescript
 	do {
 		if (true)
@@ -554,15 +554,15 @@ kirakira-douga               # 项目名称
 				continue loop;
 	```
 
-1. if、for、while 等如果只包含一条语句，则一律不加花括号；如果包含多条语句，则一律加花括号。
-1. 最好一切都模块化，能拆就拆。
+1. if、for、whileなどが1つの文しか含まない場合は中括弧を付けず、複数の文を含む場合は常に中括弧を付ける。
+1. できるだけすべてをモジュール化し、分割できるものは分割する。
 
-## .eslintrc.js 范例
-## .editorconfig 范例
-## tsconfig.json 范例
-## .gitignore 范例
-以上四个部分直接去左边项目中去找。
+## .eslintrc.js の例
+## .editorconfig の例
+## tsconfig.json の例
+## .gitignore の例
+上記の4つのセクションは、左側のプロジェクトで直接見つけてください。
 
 ## 参考
-* [史上最全 Vue 前端代码风格指南](https://juejin.cn/post/6987349513836953607)
-* [vue 项目开发规范](https://www.cnblogs.com/zxr1002/p/16846234.html)
+* [史上最も完全な Vue フロントエンドコードスタイルガイド](https://juejin.cn/post/6987349513836953607)
+* [vue プロジェクト開発規範](https://www.cnblogs.com/zxr1002/p/16846234.html)
