@@ -1,116 +1,113 @@
 ![Cover](℩ɘvoↄ.svg)
 
 # KIRAKIRA-Rosales
-KIRAKIRA-Rosales, 一个基于 Koa 框架的、RESTful 的后端 API.
+KIRAKIRA-Rosalesは、KoaフレームワークをベースにしたRESTfulなバックエンドAPIです。
 
-API 参考，请参阅 [路由](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/src/route/router.ts)。
-想了解更多？[阅读Wiki](https://deepwiki.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales)！
+APIリファレンスについては、[ルーティング](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/src/route/router.ts)を参照してください。
+もっと詳しく知りたいですか？[Wikiを読む](https://deepwiki.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales)！
 
-## 贡献
-想要参与贡献？请参阅 [开发文档](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)。
+## 貢献
+貢献してみませんか？[開発ドキュメント](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)を参照してください。
 
-遇到问题？你可以在 [此处](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues) 查找可能的解决方案，或创建一个议题。
+問題が発生しましたか？[こちら](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues)で解決策を探すか、Issueを作成してください。
 
-## 开发
-KIRAKIRA-Rosales 提供了可以在本地运行的开发服务器。  
-默认情况下，以下步骤将启动一个开发服务器，并监听 9999 端口。
+## 開発
+KIRAKIRA-Rosalesは、ローカルで実行可能な開発サーバーを提供します。
+デフォルトでは、以下の手順で開発サーバーが起動し、ポート9999をリッスンします。
 
-### 安装
-克隆本存储库，你可以使用如下命令，或其他 Git 兼容工具。
+### インストール
+このリポジトリをクローンするには、次のコマンドまたは他のGit互換ツールを使用します。
 ```
 git clone https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales.git
 ```
 
-完成克隆后，在程序根目录执行以下命令安装依赖包。
+クローンが完了したら、プロジェクトのルートディレクトリで次のコマンドを実行して、依存関係をインストールします。
 
 ```bash
 npm install
 ```
 
-### 设置环境变量
+### 環境変数の設定
 > [!IMPORTANT]
-> 下方的示例代码中并没有包含全部环境变量。
-> 对于不同操作系统，设置环境变量的方式也不同。
-> 全部环境变量及其作用请参阅：[.env.powershell.temp](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/.env.powershell.temp)，该文件中列出的大多数环境变量都是必需的。
+> 以下のサンプルコードには、すべての環境変数が含まれているわけではありません。
+> オペレーティングシステムによって、環境変数の設定方法は異なります。
+> すべての環境変数とその説明については、[.env.powershell.temp](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/blob/develop/.env.powershell.temp)を参照してください。このファイルに記載されているほとんどの環境変数は必須です。
 
-如果你使用的是 ```Windows``` 操作系统
+```Windows``` オペレーティングシステムを使用している場合
 ```powershell
-# 以下为 Windows PowerShell 的示例
+# 以下はWindows PowerShellの例です
 $env:SERVER_PORT="9999"
 $env:SERVER_ENV="dev"
 $env:SERVER_ROOT_URL="kirakira.moe"
 ...
 ```
 
-如果你使用的是 ```Linux``` 操作系统
+```Linux``` オペレーティングシステムを使用している場合
 ```bash
-# 以下为 Linux Shell 的示例
+# 以下はLinux Shellの例です
 export SERVER_PORT="9999"
 export SERVER_ENV="dev"
 export SERVER_ROOT_URL="kirakira.moe"
 ...
 ```
 
-在设置环境变量时有任何问题，请在 [议题](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues) 或 [讨论区](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/discussions) 中查找解答或提问。
+環境変数の設定で問題が発生した場合は、[Issue](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues)または[Discussion](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/discussions)で回答を探すか、質問してください。
 
 
-### 启动后端服务
+### バックエンドサービスの起動
 > [!IMPORTANT]
-> 以开发模式启动服务会将代码打包至项目根目录的 `.kirakira` 目录内。  
-> 如有必要，你可以在 package.json 中修改打包路径。请参阅 [开发文档](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)。
+> 開発モードでサービスを起動すると、コードはプロジェクトのルートディレクトリにある `.kirakira` ディレクトリにバンドルされます。
+> 必要に応じて、package.jsonでバンドルパスを変更できます。[開発ドキュメント](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)を参照してください。
 
-#### 启动本地后端开发服务器
-你可以在程序根目录中执行以下命令来启动
+#### ローカルバックエンド開発サーバーの起動
+プログラムのルートディレクトリで次のコマンドを実行して起動できます
 
 ```bash
 npm run dev
 ```
 
-也可以按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: dev`。
+または、キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: dev` を選択します。
 
-
-
-
-#### 启动本地后端开发热重载服务器
-你可以在程序根目录中执行以下命令来启动
+#### ローカルバックエンド開発ホットリロードサーバーの起動
+プログラムのルートディレクトリで次のコマンドを実行して起動できます
 
 ```bash
 npm run dev-hot
 ```
 
-也可以按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: dev`。
+または、キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: dev` を選択します。
 
-成功执行以上命令后，你应该会获得一个监听 9999 端口的 KIRAKIRA-Rosales 开发服务器。🎉  
-在此基础上，你可以审阅、编写或贡献代码，参与 KIRAKIRA 项目开发。
+上記のコマンドが正常に実行されると、ポート9999でリッスンするKIRAKIRA-Rosales開発サーバーが起動します。🎉
+これをベースに、コードのレビュー、作成、貢献を通じてKIRAKIRAプロジェクトの開発に参加できます。
 
-如何开发？请参阅 [开发文档](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)。
+開発方法は？[開発ドキュメント](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)を参照してください。
 
-遇到问题？你可以在 [此处](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues) 查找可能的解决方案或创建一个议题。
+問題が発生しましたか？[こちら](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/issues)で解決策を探すか、Issueを作成してください。
 
-## 构建 / 自托管
-你可以构建 KIRAKIRA-Rosales, 然后在任何安装了 Node.js 的 AMD64 或 ARM64 实例中运行。
-也可以使用 Docker 或 Docker 兼容工具将其打包为容器镜像。
+## ビルド / セルフホスティング
+KIRAKIRA-Rosalesをビルドして、Node.jsがインストールされている任意のAMD64またはARM64インスタンスで実行できます。
+また、DockerまたはDocker互換ツールを使用してコンテナイメージとしてパッケージ化することもできます。
 
-### 构建
+### ビルド
 
-#### 设置环境变量
-设置方法与上文的开发模式相同，请参阅：[设置环境变量](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop?tab=readme-ov-file#%E5%BC%80%E5%8F%91)。
+#### 環境変数の設定
+設定方法は、上記の開発モードと同じです。[環境変数の設定](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop?tab=readme-ov-file#%E5%BC%80%E5%8F%91)を参照してください。
 
-#### 构建应用程序
+#### アプリケーションのビルド
 > [!IMPORTANT]
-> 执行此操作默认你已经安装所有依赖。
-> 默认会将代码打包至项目根目录的 `dist` 目录内。  
-> 如有必要，你可以在 tsconfig.json 中修改打包路径。相应地，也要修改下方第三步启动服务器命令中的路径。
+> この操作を実行すると、デフォルトですべての依存関係がインストールされていると見なされます。
+> デフォルトでは、コードはプロジェクトのルートディレクトリにある `dist` ディレクトリにバンドルされます。
+> 必要に応じて、tsconfig.jsonでバンドルパスを変更できます。その場合、以下の3番目の手順にあるサーバー起動コマンドのパスも変更する必要があります。
 
-按下键盘按键 <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>，然后选择 `npm: build`。
+キーボードで <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd> を押し、`npm: build` を選択します。
 
 ```bash
 npm run build
 ```
 
-### 打包为容器镜像（最佳实践）
-部署 KIRAKIRA-Rosales 的最佳实践是将其运行在 K8s 集群中。你正在使用的 KIRAKIRA-Rosales 服务便是如此。
-关于如何在容器中部署，请参阅 [开发文档](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)。
+### コンテナイメージとしてのパッケージ化（ベストプラクティス）
+KIRAKIRA-Rosalesをデプロイするためのベストプラクティスは、K8sクラスタで実行することです。現在使用しているKIRAKIRA-Rosalesサービスもそのようにデプロイされています。
+コンテナでのデプロイ方法については、[開発ドキュメント](https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Rosales/tree/develop/docs)を参照してください。
 
 ## License
 BSD-3-Clause license
