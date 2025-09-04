@@ -116,7 +116,7 @@ export default [
 			"object-shorthand": "error",
 			"prefer-template": "off",
 			"@stylistic/template-curly-spacing": "error",
-			"no-undef": "off", // 这波 nuxt 的锅。
+			"no-undef": "off", // nuxtのせいです。
 			"@stylistic/multiline-ternary": "off",
 			"@stylistic/operator-linebreak": "off",
 			"@stylistic/no-trailing-spaces": ["error", { skipBlankLines: true }],
@@ -127,7 +127,7 @@ export default [
 				exceptions: ["+", "-", "*", "/"],
 				markers: ["/", "!", "@", "#", "#region", "#endregion"],
 			}],
-			"radix": "error", // parseInt 必须要指明是十进制。
+			"radix": "error", // parseIntは常に基数を指定する必要があります。
 			"no-self-assign": "off",
 			"no-debugger": "warn",
 			"no-use-before-define": "off",
@@ -139,10 +139,10 @@ export default [
 			"no-redeclare": "off",
 			"@stylistic/no-mixed-operators": "off",
 			"@stylistic/no-extra-parens": ["error", "all", { ignoreJSX: "multi-line" }],
-			"no-void": ["off", { allowAsStatement: true }], // 我就是要使用 void。
+			"no-void": ["off", { allowAsStatement: true }], // voidを使いたいんです。
 			"no-labels": "off",
 			"default-case-last": "off",
-			"no-useless-constructor": "off", // private constructor() { } 你跟我说无用？
+			"no-useless-constructor": "off", // private constructor() { } が無駄だって？
 			"@stylistic/no-multiple-empty-lines": ["error", { max: 1, maxEOF: 0, maxBOF: 0 }],
 			"no-unused-expressions": ["error", {
 				allowShortCircuit: true,
@@ -151,16 +151,16 @@ export default [
 				enforceForJSX: true,
 			}],
 			"@stylistic/max-statements-per-line": "off",
-			"no-useless-assignment": "off", // Vue 模板中的变量不识别。
-			"import/order": "off", // 与 VSCode 内置导入排序特性打架。
-			"import/first": "off", // 与 Vue 特性冲突。
-			"import/named": "off", // 与 TypeScript 特性冲突。
-			"import/no-named-as-default": "off", // 似乎与文件命名方式有点出入。
-			"import/no-named-as-default-member": "off", // 某些库在导出成员时用 TS 命名空间欺诈。
-			"n/no-callback-literal": "off", // 这是啥？
-			"unicorn/escape-case": "off", // 暂时禁用，待修复。
-			"unicorn/number-literal-case": "off", // 同上，你真的觉得大写很好看吗？
-			"@typescript-eslint/no-unused-vars": ["warn", { // 非要使用未使用变量，前面加下划线。
+			"no-useless-assignment": "off", // Vueテンプレート内の変数が認識されません。
+			"import/order": "off", // VSCodeの内蔵インポートソート機能と競合します。
+			"import/first": "off", // Vueの機能と競合します。
+			"import/named": "off", // TypeScriptの機能と競合します。
+			"import/no-named-as-default": "off", // ファイルの命名規則と少し違うようです。
+			"import/no-named-as-default-member": "off", // 一部のライブラリはメンバーをエクスポートする際にTSの名前空間でごまかしています。
+			"n/no-callback-literal": "off", // これは何ですか？
+			"unicorn/escape-case": "off", // 一時的に無効化、修正待ち。
+			"unicorn/number-literal-case": "off", // 同上、大文字の方が見やすいと思いますか？
+			"@typescript-eslint/no-unused-vars": ["warn", { // 未使用の変数を使いたい場合は、前にアンダースコアを追加してください。
 				argsIgnorePattern: "^_",
 				varsIgnorePattern: "^_|^props$|^emits$",
 				caughtErrorsIgnorePattern: "^_",
@@ -198,7 +198,7 @@ export default [
 			"@stylistic/type-named-tuple-spacing": "error",
 			// "@typescript-eslint/no-confusing-void-expression": "error",
 			// "@typescript-eslint/no-floating-promises": "error",
-			// 嗯对这几个不晓得怎么用不了。
+			// うん、これらはなぜか使えない。
 			"vue/html-indent": ["error", "tab"],
 			"vue/script-indent": ["error", "tab", {
 				baseIndent: 1,
@@ -276,7 +276,7 @@ export default [
 				multiline: "always",
 				maxEmptyLines: 0,
 			}],
-			"vue/define-macros-order": ["off", { // 与 typescript 冲突了。
+			"vue/define-macros-order": ["off", { // typescriptと競合しました。
 				order: ["defineProps", "defineEmits"],
 			}],
 			"vue/component-options-name-casing": ["error", "PascalCase"],
@@ -289,9 +289,9 @@ export default [
 			"vue/multiline-html-element-content-newline": "off",
 			"vue/no-template-shadow": "off",
 			"vue/no-mutating-props": ["off", { shallowOnly: false }],
-			"vue/no-deprecated-filter": "off", // 我要按位或，不是要什么过滤器。
+			"vue/no-deprecated-filter": "off", // ビット演算子のORを使いたいのであって、フィルターではありません。
 			"vue/no-dupe-keys": "off",
-			"vue/no-v-for-template-key": "off", // 官方说明：它会和 vue/no-v-for-template-key-on-child 规则打架。
+			"vue/no-v-for-template-key": "off", // 公式説明：vue/no-v-for-template-key-on-childルールと競合します。
 			"vue/v-on-event-hyphenation": ["error", "never", { autofix: true }],
 			"no-restricted-properties": ["error", {
 				object: "arguments",

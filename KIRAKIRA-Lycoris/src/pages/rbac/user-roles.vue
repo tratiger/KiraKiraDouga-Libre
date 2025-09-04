@@ -30,7 +30,7 @@
 	});
 
 	/**
-	 * 通过 UID 获取一个用户的身份
+	 * UIDによってユーザーのロールを取得する
 	 */
 	async function adminFetchUserRole() {
 		if (inputUid.value === undefined || inputUid.value === null) return;
@@ -50,7 +50,7 @@
 	}
 
 	/**
-	 * 获取 RBAC 身份
+	 * RBACロールを取得する
 	 */
 	async function fetchRbacRole() {
 		const getRbacRoleRequest: GetRbacRoleRequestDto = {
@@ -64,11 +64,11 @@
 		if (rbacRoleResult.success)
 			rbacRole.value = rbacRoleResult.result;
 		else
-			console.error("ERROR", "获取 RBAC 身份失败。");
+			console.error("ERROR", "RBACロールの取得に失敗しました。");
 	}
 
 	/**
-	 * 管理员更新用户的身份
+	 * 管理者がユーザーのロールを更新する
 	 */
 	async function adminUpdateUserRoles() {
 		if (!userRolesFormModel.value.uuid || !userRolesFormModel.value.userRoles) return;
@@ -89,9 +89,9 @@
 			isShowSubmitUserRolesModal.value = false;
 		} else
 			dialog.error({
-				title: "管理员更新用户的身份失败",
+				title: "管理者によるユーザーロールの更新に失敗しました",
 				content: adminUpdateUserRolesResult.message,
-				positiveText: "知道了",
+				positiveText: "OK",
 			});
 
 		isUpdatingUserRole.value = false;
@@ -102,33 +102,33 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA RBAC 用户身份管理</PageHeading>
+		<PageHeading>KIRAKIRA RBAC ユーザーロール管理</PageHeading>
 		<NCollapse class="mlb-4">
-			<NCollapseItem title="使用说明">
-				<NP>KIRAKIRA RBAC 权限控制的最小单位是 API 路径。</NP>
+			<NCollapseItem title="使用方法">
+				<NP>KIRAKIRA RBACの権限管理は、APIパスを最小単位として行われます。</NP>
 				<NUl>
-					<NLi>一个用户可以拥有多个身份</NLi>
-					<NLi>一个身份可以对应多位用户</NLi>
-					<NLi>一个身份可以拥有对多个 API 的访问权限</NLi>
-					<NLi>一个 API 可以对应多个身份</NLi>
+					<NLi>一人のユーザーは複数のロールを持つことができます</NLi>
+					<NLi>一つのロールは複数のユーザーに対応できます</NLi>
+					<NLi>一つのロールは複数のAPIへのアクセス権を持つことができます</NLi>
+					<NLi>一つのAPIは複数のロールに対応できます</NLi>
 				</NUl>
 				<NP>
-					你可以查询一个用户的身份，或为其绑定或解除绑定身份。<br />
-					拥有以下特殊名称的身份具有特殊效果，在绑定或解除绑定时请多加注意：
+					ユーザーのロールを照会したり、ロールを割り当てたり、割り当てを解除したりすることができます。<br />
+					以下の特殊な名前を持つロールは特別な効果があるため、割り当てや解除の際には特に注意してください：
 				</NP>
 				<NUl>
-					<NLi><b>root</b> - 拥有 RBAC 的管理权限</NLi>
-					<NLi><b>adminsitrator</b> - 拥有对内容管理权限</NLi>
-					<NLi><b>developer</b> - 拥有某些开发资源的访问权限</NLi>
-					<NLi><b>user</b> - 普通用户</NLi>
-					<NLi><b>blocked</b> - 已封禁的用户</NLi>
+					<NLi><b>root</b> - RBACの管理権限を持ちます</NLi>
+					<NLi><b>adminsitrator</b> - コンテンツの管理権限を持ちます</NLi>
+					<NLi><b>developer</b> - 特定の開発リソースへのアクセス権を持ちます</NLi>
+					<NLi><b>user</b> - 一般ユーザー</NLi>
+					<NLi><b>blocked</b> - ブロックされたユーザー</NLi>
 				</NUl>
-				<NP>注意: blocked 身份与其他身份互斥</NP>
+				<NP>注意：blockedロールは他のロールと互いに排他的です</NP>
 			</NCollapseItem>
 		</NCollapse>
 		<NFlex justify="center">
-			<NInputNumber v-model:value="inputUid" placeholder="要查询的用户的 UID" :showButton="false" />
-			<NButton @click="adminFetchUserRole"><template #icon><Icon name="search" /></template>查询</NButton>
+			<NInputNumber v-model:value="inputUid" placeholder="照会したいユーザーのUID" :showButton="false" />
+			<NButton @click="adminFetchUserRole"><template #icon><Icon name="search" /></template>照会</NButton>
 		</NFlex>
 		<NDivider />
 		<NForm
@@ -138,22 +138,22 @@
 			:labelWidth="160"
 			class="max-is-[640px]"
 		>
-			<NFormItem label="用户 UID" path="uid">
-				<NInputNumber v-model:value="userRolesFormModel.uid" placeholder="查询用户后显示" :showButton="false" :disabled="true" />
+			<NFormItem label="ユーザーUID" path="uid">
+				<NInputNumber v-model:value="userRolesFormModel.uid" placeholder="ユーザーを照会後に表示" :showButton="false" :disabled="true" />
 			</NFormItem>
-			<NFormItem label="用户 UUID" path="uuid">
-				<NInput v-model:value="userRolesFormModel.uuid" placeholder="查询用户后显示" :disabled="true" />
+			<NFormItem label="ユーザーUUID" path="uuid">
+				<NInput v-model:value="userRolesFormModel.uuid" placeholder="ユーザーを照会後に表示" :disabled="true" />
 			</NFormItem>
-			<NFormItem label="用户名" path="username">
-				<NInput v-model:value="userRolesFormModel.username" placeholder="查询用户后显示" :disabled="true" />
+			<NFormItem label="ユーザー名" path="username">
+				<NInput v-model:value="userRolesFormModel.username" placeholder="ユーザーを照会後に表示" :disabled="true" />
 			</NFormItem>
-			<NFormItem label="用户昵称" path="userNickname">
-				<NInput v-model:value="userRolesFormModel.userNickname" placeholder="查询用户后显示" :disabled="true" />
+			<NFormItem label="ニックネーム" path="userNickname">
+				<NInput v-model:value="userRolesFormModel.userNickname" placeholder="ユーザーを照会後に表示" :disabled="true" />
 			</NFormItem>
-			<NFormItem label="启用编辑">
+			<NFormItem label="編集を有効にする">
 				<NSwitch v-model:value="isEnableEditUserRole" />
 			</NFormItem>
-			<NFormItem label="用户身份" path="userRoles">
+			<NFormItem label="ユーザーロール" path="userRoles">
 				<NTransfer
 					:disabled="!isEnableEditUserRole || !userRolesFormModel.uuid"
 					v-model:value="userRolesFormModel.userRoles"
@@ -162,10 +162,10 @@
 					targetFilterable
 				/>
 			</NFormItem>
-			<!-- TODO: 我想要 label 的占位又不想显示 label 文本，难道只能用 label=" " 这种不优雅的方式吗？ -->
+			<!-- TODO: ラベルのプレースホルダーは欲しいけど、ラベルテキストは表示したくない。label=" "のようなエレガントでない方法しかないのか？ -->
 			<NFormItem label=" ">
 				<NButton :disabled="!isEnableEditUserRole || !userRolesFormModel.uuid" @click="isShowSubmitUserRolesModal = true">
-					更新用户身份
+					ユーザーロールを更新
 				</NButton>
 			</NFormItem>
 		</NForm>
@@ -174,26 +174,26 @@
 			v-model:show="isShowSubmitUserRolesModal"
 			:maskClosable="false"
 			preset="dialog"
-			title="确认要更新用户的身份吗？"
-			negativeText="算了"
+			title="ユーザーのロールを更新してもよろしいですか？"
+			negativeText="キャンセル"
 			@positiveClick="adminUpdateUserRoles"
 		>
 			<NForm>
-				<NFormItem label="用户 UID">
+				<NFormItem label="ユーザーUID">
 					<NInputNumber v-model:value="userRolesFormModel.uid" :showButton="false" :disabled="true" class="is-full" />
 				</NFormItem>
-				<NFormItem label="用户 UUID">
+				<NFormItem label="ユーザーUUID">
 					<NInput v-model:value="userRolesFormModel.uuid" :showButton="false" :disabled="true" />
 				</NFormItem>
-				<NFormItem label="用户的身份将会更新为下列身份">
+				<NFormItem label="ユーザーのロールは以下の内容に更新されます">
 					<NFlex>
 						<NTag v-for="role in userRolesFormModel.userRoles" :key="role">{{ role }}</NTag>
 					</NFlex>
 				</NFormItem>
 			</NForm>
 			<template #action>
-				<NButton @click="isShowSubmitUserRolesModal = false">算了</NButton>
-				<NButton :loading="isUpdatingUserRole" type="warning" :secondary="true" @click="adminUpdateUserRoles">确认更新</NButton>
+				<NButton @click="isShowSubmitUserRolesModal = false">キャンセル</NButton>
+				<NButton :loading="isUpdatingUserRole" type="warning" :secondary="true" @click="adminUpdateUserRoles">更新を確認</NButton>
 			</template>
 		</NModal>
 	</div>

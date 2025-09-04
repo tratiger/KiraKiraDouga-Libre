@@ -4,9 +4,9 @@ import { GetSelfUserInfoRequestDto, GetSelfUserInfoResponseDto, CheckUserTokenRe
 const USER_API_URI = `${backendUri}user`;
 
 /**
- * 用户登录
- * @param userLoginRequest 用户登录提交的参数
- * @returns 用户登录的返回参数
+ * ユーザーログイン
+ * @param userLoginRequest ユーザーログイン時に送信するパラメータ
+ * @returns ユーザーログインのレスポンスパラメータ
  */
 export const userLogin = async (userLoginRequest: UserLoginRequestDto): Promise<UserLoginResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -14,10 +14,10 @@ export const userLogin = async (userLoginRequest: UserLoginRequestDto): Promise<
 };
 
 /**
- * 获取当前登录的用户信息，前提是 token 中包含正确的 uid 和 token，同时丰富全局变量中的用户信息
- * @param getSelfUserInfoRequest 获取当前登录的用户信息的请求参数
- * @param usePinia 请求结果是否注入到 Pinia
- * @returns 用户信息
+ * 現在ログインしているユーザーの情報を取得します。前提として、トークンに正しいuidとtokenが含まれている必要があります。同時に、グローバル変数内のユーザー情報を更新します。
+ * @param getSelfUserInfoRequest 現在ログインしているユーザーの情報を取得するリクエストパラメータ
+ * @param usePinia リクエスト結果をPiniaに注入するかどうか
+ * @returns ユーザー情報
  */
 export const getSelfUserInfo = async (getSelfUserInfoRequest?: GetSelfUserInfoRequestDto, usePinia: boolean = true): Promise<GetSelfUserInfoResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -32,8 +32,8 @@ export const getSelfUserInfo = async (getSelfUserInfoRequest?: GetSelfUserInfoRe
 			selfUserInfoStore.roles = selfUserInfoResult.roles ?? ["user"];
 			selfUserInfoStore.userEmail = selfUserInfoResult.email ?? "";
 			selfUserInfoStore.userAvatar = selfUserInfoResult.avatar || "";
-			selfUserInfoStore.username = selfUserInfoResult.username || "Anonymous"; // TODO: 使用多语言，为未设置用户名的用户提供国际化的缺省用户名
-			selfUserInfoStore.userNickname = selfUserInfoResult.userNickname || ""; // TODO: 使用多语言，为未设置用户昵称的用户提供国际化的缺省用户昵称
+			selfUserInfoStore.username = selfUserInfoResult.username || "Anonymous"; // TODO: 多言語を使用して、ユーザー名が設定されていないユーザーに国際化されたデフォルトのユーザー名を提供する
+			selfUserInfoStore.userNickname = selfUserInfoResult.userNickname || ""; // TODO: 多言語を使用して、ニックネームが設定されていないユーザーに国際化されたデフォルトのニックネームを提供する
 			selfUserInfoStore.gender = selfUserInfoResult.gender || "";
 			selfUserInfoStore.signature = selfUserInfoResult.signature || "";
 			selfUserInfoStore.tags = selfUserInfoResult.label?.map(label => label.labelName) || [];
@@ -44,8 +44,8 @@ export const getSelfUserInfo = async (getSelfUserInfoRequest?: GetSelfUserInfoRe
 };
 
 /**
- * 校验用户 token 是否合法，同时可以验证用户是否已经登录
- * @returns 用户信息
+ * ユーザーのトークンが正当であるかを検証し、同時にユーザーがログインしているかを確認できます。
+ * @returns ユーザー情報
  */
 export const checkUserToken = async (): Promise<CheckUserTokenResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -53,9 +53,9 @@ export const checkUserToken = async (): Promise<CheckUserTokenResponseDto> => {
 };
 
 /**
- * 用户登出
- * @param usePinia 是否清空 Pinia
- * @returns 什么也不返回，但是会携带立即清除的 cookie 并覆盖原本的 cookie，同时将全局变量中的用户信息置空
+ * ユーザーログアウト
+ * @param usePinia Piniaをクリアするかどうか
+ * @returns 何も返しませんが、即時クリアのcookieを携帯して元のcookieを上書きし、同時にグローバル変数内のユーザー情報を空にします。
  */
 export async function userLogout(usePinia: boolean = true): Promise<UserLogoutResponseDto> {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -76,43 +76,43 @@ export async function userLogout(usePinia: boolean = true): Promise<UserLogoutRe
 			selfUserInfoStore.tags = [];
 		}
 	} else
-		console.error("ERROR", "用户登出失败"); // TODO: 使用多语言
+		console.error("ERROR", "ユーザーのログアウトに失敗しました"); // TODO: 多言語対応
 	return logoutResult;
 }
 
 /**
- * 管理员获取用户信息
- * @param isOnlyShowUserInfoUpdatedAfterReview 是否只展示在上一次审核通过后修改了用户信息的用户
- * @param sortBy 以此排序
- * @param sortOrder 以此排序的顺序，可选的值：{ascend: 升序, descend: 降序}
- * @param page 当前在第几页
- * @param pageSize 每页显示多少项目
- * @returns 管理员获取用户信息的请求响应
+ * 管理者がユーザー情報を取得する
+ * @param isOnlyShowUserInfoUpdatedAfterReview 前回のレビュー承認後にユーザー情報を変更したユーザーのみ表示するか
+ * @param sortBy ソートキー
+ * @param sortOrder ソート順。選択可能な値：{ascend: 昇順, descend: 降順}
+ * @param page 現在のページ番号
+ * @param pageSize 1ページに表示するアイテム数
+ * @returns 管理者がユーザー情報を取得するリクエストのレスポンス
  */
 export const adminGetUserInfo = async (AdminGetUserInfoRequest: AdminGetUserInfoRequestDto): Promise<AdminGetUserInfoResponseDto> => {
 	return await GET(`${USER_API_URI}/adminGetUserInfo?isOnlyShowUserInfoUpdatedAfterReview=${AdminGetUserInfoRequest.isOnlyShowUserInfoUpdatedAfterReview}&page=${AdminGetUserInfoRequest.pagination.page}&pageSize=${AdminGetUserInfoRequest.pagination.pageSize}&sortBy=${AdminGetUserInfoRequest.sortBy}&sortOrder=${AdminGetUserInfoRequest.sortOrder}&uid=${AdminGetUserInfoRequest.uid}`, { credentials: "include" }) as AdminGetUserInfoResponseDto;
 };
 
 /**
- * 管理员获取封禁用户信息
+ * 管理者がブロックされたユーザー情報を取得する
  */
 export const adminGetBlockedUserInfo = async (GetBlockedUserRequest: GetBlockedUserRequestDto): Promise<GetBlockedUserResponseDto> => {
 	return await GET(`${USER_API_URI}/blocked/info?uid=${GetBlockedUserRequest.uid}&page=${GetBlockedUserRequest.pagination.page}&pageSize=${GetBlockedUserRequest.pagination.pageSize}`, { credentials: "include" }) as GetBlockedUserResponseDto;
 };
 
 /**
- * 管理员删除用户信息
- * @param AdminClearUserInfoRequest 管理员删除用户信息的请求载荷
- * @returns 管理员删除用户信息的请求响应
+ * 管理者がユーザー情報を削除する
+ * @param AdminClearUserInfoRequest 管理者がユーザー情報を削除するリクエストペイロード
+ * @returns 管理者がユーザー情報を削除するリクエストのレスポンス
  */
 export const adminClearUserInfo = async (AdminClearUserInfoRequest: AdminClearUserInfoRequestDto): Promise<AdminClearUserInfoResponseDto> => {
 	return await POST(`${USER_API_URI}/adminClearUserInfo`, AdminClearUserInfoRequest, { credentials: "include" }) as AdminClearUserInfoResponseDto;
 };
 
 /**
- * 管理员编辑用户信息
- * @param AdminEditUserInfoRequest 管理员编辑用户信息的请求载荷
- * @returns 管理员编辑用户信息的请求响应
+ * 管理者がユーザー情報を編集する
+ * @param AdminEditUserInfoRequest 管理者がユーザー情報を編集するリクエストペイロード
+ * @returns 管理者がユーザー情報を編集するリクエストのレスポンス
  */
 export const adminEditUserInfo = async (AdminEditUserInfoRequest: AdminEditUserInfoRequestDto): Promise<AdminEditUserInfoResponseDto> => {
 	return await POST(`${USER_API_URI}/adminEditUserInfo`, AdminEditUserInfoRequest, { credentials: "include" }) as AdminEditUserInfoResponseDto;

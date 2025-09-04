@@ -1,10 +1,10 @@
 /**
- * 生成 URL 后面的查询参数
- * @param obj 查询参数
- * @returns URL 后面的查询参数
+ * URLの後に続くクエリパラメータを生成する
+ * @param obj クエリパラメータ
+ * @returns URLの後に続くクエリパラメータ
  */
 export function getUrlQuery(obj: Record<string, unknown>): string {
-	// 构建查询参数
+	// クエリパラメータを構築する
 	const params = new URLSearchParams();
 
 	Object.entries(obj).forEach(([key, value]) => {

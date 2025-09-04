@@ -2,48 +2,48 @@
 	const message = useMessage();
 	type SecretType = "hidden" | "dotenv" | "windows" | "bash";
 	const secretType = ref<SecretType>("hidden");
-	const getShownText = (shown: boolean) => shown ? "展示" : "隐藏";
+	const getShownText = (shown: boolean) => shown ? "表示" : "非表示";
 
 	type StgEnvBackEndSecret = GetStgEnvBackEndSecretResponse["result"];
-	const stgEnvBackEndSecretData = ref<StgEnvBackEndSecret["envs"]>(); // 环境变量数据（对象格式）
-	const computedDotenvStgEnvBackEndSecretData = computed(() => { // 环境变量数据（.env 字符串格式）
+	const stgEnvBackEndSecretData = ref<StgEnvBackEndSecret["envs"]>(); // 環境変数データ（オブジェクト形式）
+	const computedDotenvStgEnvBackEndSecretData = computed(() => { // 環境変数データ（.env 文字列形式）
 		return Object.entries(stgEnvBackEndSecretData.value ?? {})
 			.map(([key, value]) => `${key}="${value}"`)
 			.join("\n");
 	});
-	const computedWindwowsStgEnvBackEndSecretData = computed(() => { // 环境变量数据（Windows Powershell 字符串格式）
+	const computedWindwowsStgEnvBackEndSecretData = computed(() => { // 環境変数データ（Windows Powershell 文字列形式）
 		return Object.entries(stgEnvBackEndSecretData.value ?? {})
 			.map(([key, value]) => `$env:${key}="${value}"`)
 			.join("\n") + "\n\nclear";
 	});
-	const computedBashStgEnvBackEndSecretData = computed(() => { // 环境变量数据（Bash 字符串格式）
+	const computedBashStgEnvBackEndSecretData = computed(() => { // 環境変数データ（Bash 文字列形式）
 		return Object.entries(stgEnvBackEndSecretData.value ?? {})
 			.map(([key, value]) => `export ${key}="${value}"`)
 			.join("\n") + "\n\nclear";
 	});
 
 	/**
-	 * 拷贝环境变量机密到剪贴板。
+	 * 環境変数のシークレットをクリップボードにコピーします。
 	 */
 	function copySecret() {
 		if (secretType.value === "hidden")
 			return;
 		else if (secretType.value === "dotenv")
 			navigator.clipboard.writeText(computedDotenvStgEnvBackEndSecretData.value).then(() => {
-				message.info("密钥已复制");
+				message.info("シークレットをコピーしました");
 			});
 		else if (secretType.value === "windows")
 			navigator.clipboard.writeText(computedWindwowsStgEnvBackEndSecretData.value).then(() => {
-				message.info("密钥已复制");
+				message.info("シークレットをコピーしました");
 			});
 		else if (secretType.value === "bash")
 			navigator.clipboard.writeText(computedBashStgEnvBackEndSecretData.value).then(() => {
-				message.info("密钥已复制");
+				message.info("シークレットをコピーしました");
 			});
 	}
 
 	/**
-	 * 获取预生产环境后端环境变量机密
+	 * ステージング環境のバックエンド環境変数シークレットを取得します。
 	 */
 	async function getStgEnvBackEndSecret() {
 		const stgEnvBackEndSecretResult = await getStgEnvBackEndSecretController();
@@ -56,20 +56,20 @@
 
 <template>
 	<div class="container">
-		<PageHeading>KIRAKIRA 预生产环境 环境变量</PageHeading>
+		<PageHeading>KIRAKIRA ステージング環境 環境変数</PageHeading>
 		<NFlex size="small">
-			<NTag type="error">密钥严禁公开</NTag>
-			<NTag>请先阅读使用说明</NTag>
+			<NTag type="error">シークレットは厳重に管理してください</NTag>
+			<NTag>まず使用説明書をお読みください</NTag>
 		</NFlex>
 		<NCollapse class="mlb-4">
-			<NCollapseItem title="使用说明">
-				<NP>点击下方按钮后，将会显示 KIRAKIRA 预生产环境的环境变量。</NP>
+			<NCollapseItem title="使用方法">
+				<NP>下のボタンをクリックすると、KIRAKIRAステージング環境の環境変数が表示されます。</NP>
 				<NP>
-					这些环境变量包括了后端程序端口、Cloudflare 密钥、数据库密钥、搜索引擎密钥、邮件服务密钥和获取以下密钥使用的密钥。<br />
-					<b>任何对密钥的公开披露或滥用行为将会导致严重的隐私泄露事故，并涉嫌违法！</b>
+					これらの環境変数には、バックエンドプログラムのポート、Cloudflareのシークレット、データベースのシークレット、検索エンジンのシークレット、メールサービスのシークレット、および以下のシークレットを取得するために使用するシークレットが含まれています。<br />
+					<b>シークレットの公開や不正利用は、重大なプライバシー漏洩事故につながり、法律に違反する可能性があります！</b>
 				</NP>
-				<NP>最佳实践：随用随取，请不要保存这些密钥至本地。仅在程序启动前复制并粘贴一次，然后清空剪贴板。</NP>
-				<NP>请允许我引用某些 linux 发行版中的安全格言：</NP>
+				<NP>ベストプラクティス：必要な時にのみ取得し、これらのシークレットをローカルに保存しないでください。プログラム起動前に一度だけコピー＆ペーストし、その後クリップボードをクリアしてください。</NP>
+				<NP>一部のLinuxディストリビューションのセキュリティ格言を引用させていただきます：</NP>
 				<NBlockquote>
 					<NP>We trust you have received the usual lecture from the local System Administrator. It usually boils down to these three things:</NP>
 					<NOl class="paren-after">
@@ -79,27 +79,27 @@
 					</NOl>
 				</NBlockquote>
 				<NBlockquote>
-					<NP>我们信任您已经从系统管理员那里了解了日常注意事项。总结起来无外乎这三点：</NP>
+					<NP>私たちは、あなたがシステム管理者から日常の注意事項について、いつものように説明を受けたと信じています。それは通常、次の3つのことに要約されます：</NP>
 					<NOl class="paren-after">
-						<NLi>尊重别人的隐私。</NLi>
-						<NLi>输入前要先考虑（后果和风险）。</NLi>
-						<NLi>权力越大，责任越大。</NLi>
+						<NLi>他人のプライバシーを尊重すること。</NLi>
+						<NLi>タイプする前によく考えること（結果とリスク）。</NLi>
+						<NLi>大きな力には大きな責任が伴うこと。</NLi>
 					</NOl>
 				</NBlockquote>
 			</NCollapseItem>
 		</NCollapse>
 		<NFlex class="mbe-4 justify-between">
 			<NFlex>
-				<NButton :secondary="secretType !== 'dotenv'" strong type="warning" @click="secretType = secretType !== 'dotenv' ? 'dotenv' : 'hidden'">{{ getShownText(secretType !== "dotenv") }} .env 格式的环境变量</NButton>
-				<NButton :secondary="secretType !== 'windows'" strong type="warning" @click="secretType = secretType !== 'windows' ? 'windows' : 'hidden'">{{ getShownText(secretType !== "windows") }} Windows PowerShell 格式的环境变量</NButton>
-				<NButton :secondary="secretType !== 'bash'" strong type="warning" @click="secretType = secretType !== 'bash' ? 'bash' : 'hidden'">{{ getShownText(secretType !== "bash") }} Bash (macOS / Linux) 格式的环境变量</NButton>
+				<NButton :secondary="secretType !== 'dotenv'" strong type="warning" @click="secretType = secretType !== 'dotenv' ? 'dotenv' : 'hidden'">{{ getShownText(secretType !== "dotenv") }} .env 形式の環境変数</NButton>
+				<NButton :secondary="secretType !== 'windows'" strong type="warning" @click="secretType = secretType !== 'windows' ? 'windows' : 'hidden'">{{ getShownText(secretType !== "windows") }} Windows PowerShell 形式の環境変数</NButton>
+				<NButton :secondary="secretType !== 'bash'" strong type="warning" @click="secretType = secretType !== 'bash' ? 'bash' : 'hidden'">{{ getShownText(secretType !== "bash") }} Bash (macOS / Linux) 形式の環境変数</NButton>
 			</NFlex>
 			<NFlex>
 				<NButton :disabled="secretType === 'hidden'" strong secondary @click="copySecret">
 					<template #icon>
 						<Icon name="contentCopy" />
 					</template>
-					复制
+					コピー
 				</NButton>
 			</NFlex>
 		</NFlex>
