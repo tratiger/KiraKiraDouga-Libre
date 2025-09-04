@@ -1,6 +1,6 @@
 /**
- * 队列类。
- * 当 data 为空时返回 undefined，使用了泛型约束。
+ * キュークラス。
+ * dataが空の場合にundefinedを返し、ジェネリック制約を使用します。
  */
 export class Queue<T> {
 	data: T[];
@@ -10,24 +10,24 @@ export class Queue<T> {
 	}
 	
 	/**
-	 * 将新元素追加到数组的末尾，并返回数组的新长度。
-	 * @param item - 要添加到数组中的新元素。
+	 * 新しい要素を配列の末尾に追加し、配列の新しい長さを返します。
+	 * @param item - 配列に追加する新しい要素。
 	 */
 	push(item: T) {
 		this.data.push(item);
 	}
 	
 	/**
-	 * 从数组中删除第一个元素并返回它。如果数组为空，则返回 undefined，并且不修改数组。
-	 * @returns 移除的元素。
+	 * 配列から最初の要素を削除して返します。配列が空の場合はundefinedを返し、配列は変更されません。
+	 * @returns 削除された要素。
 	 */
 	pop() {
 		return this.data.shift();
 	}
 	
 	/**
-	 * 在数组的开头插入新元素，并返回数组的新长度。
-	 * @param item - 要在数组开头插入的元素。
+	 * 配列の先頭に新しい要素を挿入し、配列の新しい長さを返します。
+	 * @param item - 配列の先頭に挿入する要素。
 	 */
 	join(item: T) {
 		this.data.unshift(item);

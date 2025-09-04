@@ -8,11 +8,11 @@
 	const headers = { videoTime: t.danmaku.list.thead.time, content: t.danmaku.list.thead.content, sendTime: t.send_date };
 	const colWidths = reactive([70, 130, 180]);
 	const danmakuList = ref<Array<{ item: DanmakuListItem; key: PropertyKey }>>([]);
-	const danmakuListKey = ref(0); // FIXME: 理论上 vue-virtual-scroller 会自动监测弹幕数组更新，但是目前不知道为什么不生效，暂时只能用这种方法解决。
+	const danmakuListKey = ref(0); // FIXME: 理論上、vue-virtual-scrollerは弾幕配列の更新を自動的に検出するはずですが、なぜか現在機能しないため、一時的にこの方法で解決しています。
 	const sortBy = reactive<[column: "videoTime" | "sendTime", order: SortOrder]>(["sendTime", "ascending"]);
 
 	/**
-	 * 更新弹幕列表。
+	 * 弾幕リストを更新します。
 	 */
 	function updateDamakuList() {
 		if (!insertDanmaku.value) return;
@@ -26,8 +26,8 @@
 	watch(insertDanmaku, updateDamakuList, { immediate: true });
 
 	/**
-	 * 单击表头排序。
-	 * @param columnIndex - 单击的列。
+	 * ヘッダーをクリックしてソートします。
+	 * @param columnIndex - クリックされた列。
 	 */
 	function sort(columnIndex: number) {
 		const column = columnIndex === 0 ? "videoTime" : columnIndex === 2 ? "sendTime" : undefined;
@@ -43,8 +43,8 @@
 	}
 
 	/**
-	 * 拖拽抓柄逻辑处理。
-	 * @param e - 指针事件（包括鼠标和触摸）。
+	 * グリップのドラッグロジックを処理します。
+	 * @param e - ポインターイベント（マウスとタッチを含む）。
 	 */
 	function onGripDown(e: PointerEvent) {
 		const grip = e.target as HTMLDivElement;
@@ -68,7 +68,7 @@
 	}
 
 	/**
-	 * 复制弹幕。
+	 * 弾幕をコピーします。
 	 */
 	function copyDanmaku() {
 		if (!currentDanmaku.value) return;
@@ -77,9 +77,9 @@
 	}
 
 	/**
-	 * 处理单元格显示文本。
-	 * @param value - 不同类型的数据。
-	 * @returns 显示为字符串的值。
+	 * セルに表示するテキストを処理します。
+	 * @param value - 異なる型のデータ。
+	 * @returns 文字列として表示される値。
 	 */
 	function handleTableDataCellText(value: ValueOf<UnwrapRef<DanmakuListItem>>) {
 		if (value instanceof Date) return formatDateWithLocale(value, { time: true });

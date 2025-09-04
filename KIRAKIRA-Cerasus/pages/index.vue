@@ -13,7 +13,7 @@
 	});
 
 	/**
-	 * 请求主页视频数据。
+	 * ホームページの動画データをリクエストします。
 	 */
 	async function fetchHomePageVideoData() {
 		try {
@@ -22,20 +22,20 @@
 		} catch (error) {
 			// TODO: anyting can do if data fetch field in the home page? -add a 'refresh' button?
 			console.error("ERROR", "Unable to fetch home page video data", error);
-			useToast("获取视频数据失败，请刷新页面。", "error", 5000);
+			useToast("動画データの取得に失敗しました。ページを再読み込みしてください。", "error", 5000);
 		}
 	}
 
 	/**
-	 * 首页视频的守卫进程。
-	 * 如果首页视频没有数据，则等待三秒后每隔五秒重新请求视频数据，尝试三次。
+	 * ホームページ動画の監視プロセス。
+	 * ホームページの動画データがない場合、3秒待機後、5秒ごとに動画データを再リクエストし、3回試行します。
 	 */
 	function homePageDaemon() {
 		observeEmptyVarbAndRequestData(
-			videos, // 要监听的响应式变量
-			(value: typeof videos) => value.value?.videos.length === 0, // 检测方法
-			fetchHomePageVideoData, // 如果不成功要执行的操作
-			{ delay: 3000, intervalTime: 3000, attempts: 3 }, // 配置
+			videos, // 監視対象のリアクティブ変数
+			(value: typeof videos) => value.value?.videos.length === 0, // 検出メソッド
+			fetchHomePageVideoData, // 失敗した場合に実行する操作
+			{ delay: 3000, intervalTime: 3000, attempts: 3 }, // 設定
 		);
 	}
 
@@ -48,7 +48,7 @@
 	const categories = ref<Map<string | undefined, number | undefined>>();
 	const resultTimestamp = ref(0);
 
-	// 发生用户登录事件时重新获取主页视频数据
+	// ユーザーログインイベント発生時にホームページの動画データを再取得
 	useListen("user:login", async loginStatus => {
 		if (loginStatus)
 			await fetchHomePageVideoData();

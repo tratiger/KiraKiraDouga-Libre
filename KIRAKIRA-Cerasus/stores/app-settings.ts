@@ -3,7 +3,7 @@ export const useAppSettingsStore = defineStore("app-settings", {
 		lastSettingPage: "appearance",
 		exitSettingRoute: "/",
 
-		isOpenVideoInNewTab: false, // 是否在新标签页打开视频
+		isOpenVideoInNewTab: false, // 動画を新しいタブで開くかどうか
 		akkarinGuestAvatar: false,
 		relativeDate: false,
 
@@ -40,7 +40,7 @@ export const useAppSettingsStore = defineStore("app-settings", {
 			},
 		},
 
-		authenticatorType: "none", // 2FA 的类型
+		authenticatorType: "none", // 2FAのタイプ
 	}),
 	getters: {
 		getExitSettingRoute: state => {

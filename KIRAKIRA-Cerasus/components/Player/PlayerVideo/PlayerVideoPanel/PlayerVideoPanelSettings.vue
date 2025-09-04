@@ -1,29 +1,29 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 视频是否正在播放？ */
+		/** 動画は再生中ですか？ */
 		playing?: boolean;
-		/** 视频封面地址。 */
+		/** 動画のカバー画像アドレス。 */
 		thumbnail: string;
-		/** 视频播放器设置。 */
+		/** 動画プレーヤー設定。 */
 		settings: PlayerVideoSettings;
 	}>();
 
 	type Filters = keyof PlayerVideoSettings["filter"] | "rotation90" | "rotation180" | "rotation270";
 
-	/* TODO: 多语言。 */
+	/* TODO: 多言語対応。 */
 	const filters: Record<Exclude<Filters, "rotation">, [string, CSSProperties]> = {
-		horizontalFlip: ["水平翻转", { scale: "-1 1" }],
-		verticalFlip: ["垂直翻转", { scale: "1 -1" }],
-		rotation90: ["旋转90°", { rotate: "90deg" }],
-		rotation180: ["旋转180°", { rotate: "180deg" }],
-		rotation270: ["旋转270°", { rotate: "270deg" }],
-		grayscale: ["黑白", { filter: "grayscale(1)" }],
-		invert: ["反色", { filter: "invert(1)" }],
-		sepia: ["怀旧", { filter: "sepia(1)" }],
-		hue: ["调整色相", { filter: "hue-rotate(180deg)" }],
-		saturate: ["调整饱和度", { filter: "saturate(5)" }],
-		contrast: ["调整对比度", { filter: "contrast(5)" }],
-		brightness: ["调整亮度", { filter: "brightness(2)" }],
+		horizontalFlip: ["水平反転", { scale: "-1 1" }],
+		verticalFlip: ["垂直反転", { scale: "1 -1" }],
+		rotation90: ["90°回転", { rotate: "90deg" }],
+		rotation180: ["180°回転", { rotate: "180deg" }],
+		rotation270: ["270°回転", { rotate: "270deg" }],
+		grayscale: ["白黒", { filter: "grayscale(1)" }],
+		invert: ["色反転", { filter: "invert(1)" }],
+		sepia: ["セピア", { filter: "sepia(1)" }],
+		hue: ["色相調整", { filter: "hue-rotate(180deg)" }],
+		saturate: ["彩度調整", { filter: "saturate(5)" }],
+		contrast: ["コントラスト調整", { filter: "contrast(5)" }],
+		brightness: ["明るさ調整", { filter: "brightness(2)" }],
 	};
 
 	const filterBooleanProxy = new Proxy(props.settings.filter, {
@@ -72,17 +72,17 @@
 			<ScrollContainer overflowX="clip">
 				<Transition :name="transitionName" mode="out-in">
 					<div v-if="selectedSettingsTab === 'player' " class="page-player">
-						<!-- TODO: 需详细阐述是自动播放啥？分 P、合集的下一集、还是相关视频？ -->
+						<!-- TODO: 何を自動再生するかを詳しく説明する必要があります。パート、コレクションの次のエピソード、または関連動画？ -->
 						<ToggleSwitch v-model="settings.autoplay" v-ripple icon="autoplay">{{ t.player.autoplay }}</ToggleSwitch>
 						<p class="subheading">{{ t.danmaku }}</p>
-						<!-- TODO: 多语言。检查字号缩放功能的可用性并显示缩放数值。 -->
+						<!-- TODO: 多言語対応。フォントサイズのスケーリング機能の可用性を確認し、スケーリング値を表示します。 -->
 						<SettingsSlider
 							v-model="settings.danmaku.fontSizeScale"
 							:min="0"
 							:max="2"
 							:defaultValue="1"
 							icon="font_size"
-						>字号缩放</SettingsSlider>
+						>フォントサイズのスケーリング</SettingsSlider>
 						<SettingsSlider
 							v-model="settings.danmaku.opacity"
 							:min="0"
@@ -130,13 +130,13 @@
 					</div>
 
 					<div v-else-if="selectedSettingsTab === 'block-words'">
-						<!-- TODO: 使用多语言 -->
-						<ToggleSwitch v-model="blockWordsToggle" v-ripple icon="visibility_off">开启屏蔽</ToggleSwitch>
+						<!-- TODO: 多言語対応 -->
+						<ToggleSwitch v-model="blockWordsToggle" v-ripple icon="visibility_off">ブロックを有効にする</ToggleSwitch>
 
 						<TabBar v-model="blockWordsSelectedTab">
-							<TabItem id="block-keywords">屏蔽文本</TabItem>
-							<TabItem id="block-regex">屏蔽正则</TabItem>
-							<TabItem id="block-users">屏蔽用户</TabItem>
+							<TabItem id="block-keywords">ブロックテキスト</TabItem>
+							<TabItem id="block-regex">ブロック正規表現</TabItem>
+							<TabItem id="block-users">ブロックユーザー</TabItem>
 						</TabBar>
 					</div>
 				</Transition>

@@ -1,5 +1,5 @@
 /*
- * 参考：Vue 中如何获取插槽的 DOM 对象
+ * 参考：VueでスロットのDOMオブジェクトを取得する方法
  * @see https://free_pan.gitee.io/freepan-blog/articles/05-vue3/vue3-杂项/vue中如何获取插槽的dom对象.html
  */
 
@@ -11,15 +11,15 @@ const vnodePropType = {
 } as const;
 interface RenderCallbackObj {
 	/**
-	 * 自定义 mounted 回调。
+	 * カスタムmountedコールバック。
 	 */
 	mounted?: CallFun;
 	/**
-	 * 自定义 updated 回调。
+	 * カスタムupdatedコールバック。
 	 */
 	updated?: CallFun;
 	/**
-	 * 自定义 unmounted 回调。
+	 * カスタムunmountedコールバック。
 	 */
 	unmounted?: CallFun;
 }
@@ -29,7 +29,7 @@ export const useCustomFactory = ({ mounted, updated, unmounted }: RenderCallback
 			vnode: vnodePropType,
 		},
 		mounted() {
-			// 这个 this.$el 就代表当前 vnode 的 DOM 对象。
+			// この this.$el は現在のvnodeのDOMオブジェクトを表します。
 			mounted?.(this as never);
 		},
 		updated() {
@@ -51,11 +51,11 @@ const findChildren = (vnodes: VNode[] = [], type: unknown) => {
 	return children;
 };
 /**
- * 渲染插槽节点。
- * @remarks 如果直接使用，目前有 bug，其 props 不能构成响应式。
- * @param type - 子组件类型筛选。
- * @param slotName - 插槽名称。留空表示 default 插槽。
- * @returns 插槽组件，和子节点引用。
+ * スロットノードをレンダリングします。
+ * @remarks 直接使用すると、現在バグがあり、propsがリアクティブになりません。
+ * @param type - 子コンポーネントのタイプでフィルタリングします。
+ * @param slotName - スロット名。空の場合はdefaultスロットを意味します。
+ * @returns スロットコンポーネントと子ノードの参照。
  */
 export const useFactory = (type: unknown = undefined, slotName: string | (() => VNode[]) = "default") => {
 	const instance = getCurrentInstance();
@@ -74,7 +74,7 @@ export const useFactory = (type: unknown = undefined, slotName: string | (() => 
 	});
 	const slot = typeof slotName === "string" ? useSlots()[slotName] : slotName;
 	const addSlotScopeId = (s: ReturnType<Exclude<typeof slot, undefined>>) => {
-		if (scopeId) // 无论父组件是否有 `:slotted`，都一律无脑加上？
+		if (scopeId) // 親コンポーネントに `:slotted` があるかどうかに関わらず、一律で追加する？
 			s.forEach(i => {
 				i.props ??= {};
 				i.props[scopeId + "-s"] = "";

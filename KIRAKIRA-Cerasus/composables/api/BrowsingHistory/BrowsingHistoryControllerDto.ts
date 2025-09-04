@@ -1,63 +1,63 @@
 import type { ThumbVideoResponseDto } from "../Video/VideoControllerDto";
 
 /**
- * 浏览的内容的类型
+ * 閲覧したコンテンツの種類
  */
 export type BrowsingHistoryCategory = "video" | "photo" | "comment";
 
 /**
- * 用户浏览历史
+ * ユーザーの閲覧履歴
  */
 type BrowsingHistory = {
-	/** 用户的 UUID - 非空 */
+	/** ユーザーのUUID - 空でないこと */
 	uuid: string;
-	/** 浏览的内容的类型，比如说 video, photo 等 - 非空 */
+	/** 閲覧したコンテンツの種類、例えば video, photo など - 空でないこと */
 	category: BrowsingHistoryCategory;
-	/** 浏览的内容的唯一 ID - 非空 */
+	/** 閲覧したコンテンツの一意のID - 空でないこと */
 	id: string;
-	/** 浏览的定位锚点，如果是视频就是播放时间，如果是相册可能是上次浏览到相册第n张图片，为了兼容性使用 String */
+	/** 閲覧した位置のアンカー、動画の場合は再生時間、アルバムの場合は前回閲覧したn枚目の写真など、互換性のためにStringを使用 */
 	anchor?: string;
 };
 
 /**
- * 创建用户浏览历史的请求载荷
+ * ユーザーの閲覧履歴を作成するリクエストのペイロード
  */
 export type CreateOrUpdateBrowsingHistoryRequestDto = BrowsingHistory & {};
 
 /**
- * 创建用户浏览历史的请求响应
+ * ユーザーの閲覧履歴を作成するリクエストのレスポンス
  */
 export type CreateOrUpdateBrowsingHistoryResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 如果成功，返回创建的这个浏览历史数据 */
+	/** 成功した場合、作成されたこの閲覧履歴データを返します */
 	result?: BrowsingHistory;
 };
 
 /**
- * 获取用户浏览历史的请求载荷
- * 主要是用爱装过滤条件
+ * ユーザーの閲覧履歴を取得するリクエストのペイロード
+ * 主にフィルタリング条件を格納するために使用します
  */
 export type GetUserBrowsingHistoryWithFilterRequestDto = {
-	/** 过滤条件 - 视频标题 */
+	/** フィルタリング条件 - 動画のタイトル */
 	videoTitle?: string;
 };
 
 /**
- * 获取用户浏览历史的请求响应，全部或过滤后的用户浏览历史
+ * ユーザーの閲覧履歴を取得するリクエストのレスポンス、すべてまたはフィルタリングされたユーザーの閲覧履歴
  */
 export type GetUserBrowsingHistoryWithFilterResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 如果成功，返回创建的这个浏览历史数据 */
+	/** 成功した場合、作成されたこの閲覧履歴データを返します */
 	result?: (
 		& BrowsingHistory
 		& {
-			/** 最后更新时间 */
+			/** 最終更新日時 */
 			lastUpdateDateTime: number;
 		}
 		& ThumbVideoResponseDto["videos"][number])[];

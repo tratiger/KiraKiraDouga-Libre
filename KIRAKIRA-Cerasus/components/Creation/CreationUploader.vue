@@ -1,20 +1,20 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 头像网址。 */
+		/** アバターURL。 */
 		avatar?: string;
-		/** 昵称。 */
+		/** ニックネーム。 */
 		nickname: string;
-		/** 用户名。 */
+		/** ユーザー名。 */
 		username: string;
-		/** 角色。 */
+		/** ロール。 */
 		roles?: string[];
-		/** 粉丝数。 */
+		/** フォロワー数。 */
 		followers: number;
-		/** 是否已关注？ */
+		/** フォロー済みですか？ */
 		isFollowing: boolean;
-		/** 是否是自己？ */
+		/** 自分自身ですか？ */
 		isSelf?: boolean;
-		/** 用户 UID。 */
+		/** ユーザーUID。 */
 		uid: number;
 	}>();
 </script>

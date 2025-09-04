@@ -2,11 +2,11 @@ type RequestObject = Record<string, string>;
 type HeadersObject = Record<string, string>;
 
 /**
- * 带有超时停止的 fetch
- * @param resource - 请求的目标
- * @param options - 请求中附带的内容
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请求结果
+ * タイムアウト付きのfetch
+ * @param resource - リクエストのターゲット
+ * @param options - リクエストに付随する内容
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果
  */
 async function fetchWithTimeout(resource: RequestInfo, options: RequestInit = {}, timeout = 30000) {
 	const controller = new AbortController();
@@ -26,12 +26,12 @@ async function fetchWithTimeout(resource: RequestInfo, options: RequestInit = {}
 }
 
 /**
- * 发送 GET 请求
- * @param url - 请求的网址
- * @param requestOptions - 请求携带的请求标头
- * @param headerOptions - 请求携带的 Header 内容
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请取结果
+ * GETリクエストを送信
+ * @param url - リクエストのURL
+ * @param requestOptions - リクエストに付随するリクエストヘッダー
+ * @param headerOptions - リクエストに付随するヘッダー内容
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果
  */
 export async function GET(url: string, requestOptions: RequestObject = {}, headerOptions: HeadersObject = {}, timeout?: number): Promise<unknown> {
 	try {
@@ -48,13 +48,13 @@ export async function GET(url: string, requestOptions: RequestObject = {}, heade
 }
 
 /**
- * 发送 POST 请求
- * @param url - 请求的网址
- * @param body - 请求的 body 内容
- * @param requestOptions - 请求携带的请求标头
- * @param headerOptions - 请求携带的 Header 内容
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请求结果
+ * POSTリクエストを送信
+ * @param url - リクエストのURL
+ * @param body - リクエストのボディ内容
+ * @param requestOptions - リクエストに付随するリクエストヘッダー
+ * @param headerOptions - リクエストに付随するヘッダー内容
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果
  */
 export async function POST(url: string, body: unknown, requestOptions: RequestObject = {}, headerOptions: HeadersObject = {}, timeout?: number): Promise<unknown> {
 	try {
@@ -75,13 +75,13 @@ export async function POST(url: string, body: unknown, requestOptions: RequestOb
 }
 
 /**
- * 发送 DELETE 请求
- * @param url - 请求的网址
- * @param body - 请求的 body 内容
- * @param requestOptions - 请求携带的请求标头
- * @param headerOptions - 请求携带的 Header 内容
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请求结果
+ * DELETEリクエストを送信
+ * @param url - リクエストのURL
+ * @param body - リクエストのボディ内容
+ * @param requestOptions - リクエストに付随するリクエストヘッダー
+ * @param headerOptions - リクエストに付随するヘッダー内容
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果
  */
 export async function DELETE(url: string, body: unknown, requestOptions: RequestObject = {}, headerOptions: HeadersObject = {}, timeout?: number): Promise<unknown> {
 	try {
@@ -102,12 +102,12 @@ export async function DELETE(url: string, body: unknown, requestOptions: Request
 }
 
 /**
- * 发送 PUT 请求向 Cloudflare R2 上传文件
- * @param signedUrl - R2 用于上传文件的预编译 URL
- * @param body - 上传的文件的 Blob
- * @param contentType - 请求负载的数据的媒体类型，例如：'application/json', 'image/png' 等。详细的 Content-Type 请参照本文件最下方的注释
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请求结果，上传成功 true，否则 false
+ * PUTリクエストを送信してCloudflare R2にファイルをアップロード
+ * @param signedUrl - R2がファイルをアップロードするために使用する署名付きURL
+ * @param body - アップロードするファイルのBlob
+ * @param contentType - リクエストペイロードのデータのメディアタイプ、例：'application/json', 'image/png' など。詳細なContent-Typeについては、このファイルの最後のコメントを参照してください
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果、アップロード成功はtrue、それ以外はfalse
  */
 export async function uploadFile2R2(signedUrl: string, body: Blob, contentType: string, timeout: number = 30000): Promise<void> {
 	try {
@@ -126,44 +126,44 @@ export async function uploadFile2R2(signedUrl: string, body: Blob, contentType: 
 	}
 }
 
-// 以下为典型的 Content-Type HTTP 标头
+// 以下は典型的なContent-Type HTTPヘッダーです
 //
-// 文本格式:
-// text/html: 用于 HTML 文档。
-// text/plain: 纯文本文件。
-// text/css: CSS 样式表。
-// text/javascript: JavaScript 代码。
+// テキスト形式:
+// text/html: HTMLドキュメント用。
+// text/plain: プレーンテキストファイル。
+// text/css: CSSスタイルシート。
+// text/javascript: JavaScriptコード。
 //
-// 图像格式:
-// image/jpeg: JPEG 图像。
-// image/png: PNG 图像。
-// image/gif: GIF 图像。
-// image/svg+xml: SVG 矢量图像。
+// 画像形式:
+// image/jpeg: JPEG画像。
+// image/png: PNG画像。
+// image/gif: GIF画像。
+// image/svg+xml: SVGベクター画像。
 //
-// 应用程序和文档格式:
-// application/json: JSON 数据格式。
-// application/xml: XML 数据格式。
-// application/pdf: PDF 文档。
-// application/msword: Microsoft Word 文档。
-// application/vnd.ms-excel: Microsoft Excel 文档。
+// アプリケーションとドキュメント形式:
+// application/json: JSONデータ形式。
+// application/xml: XMLデータ形式。
+// application/pdf: PDFドキュメント。
+// application/msword: Microsoft Wordドキュメント。
+// application/vnd.ms-excel: Microsoft Excelドキュメント。
 //
-// 音频和视频格式:
-// audio/mpeg: MP3 音频。
-// audio/ogg: Ogg 音频。
-// video/mp4: MP4 视频。
-// video/x-msvideo: AVI 视频。
+// 音声と動画形式:
+// audio/mpeg: MP3音声。
+// audio/ogg: Ogg音声。
+// video/mp4: MP4動画。
+// video/x-msvideo: AVI動画。
 //
-// 其他格式:
-// application/octet-stream: 任意的二进制数据。
-// multipart/form-data: 用于表单数据，尤其是包含文件上传时。
+// その他の形式:
+// application/octet-stream: 任意のバイナリデータ。
+// multipart/form-data: フォームデータ用、特にファイルアップロードを含む場合。
 
 /**
- * 发送 POST 请求向 Cloudflare Image 上传文件
- * @param fileName - 上传的文件名
- * @param signedUrl - R2 用于上传文件的预编译 URL
- * @param body - 上传的文件的 Blob
- * @param timeout - 请求超时时间（毫秒），默认：30000ms
- * @returns 请求结果，上传成功 true，否则 false
+ * POSTリクエストを送信してCloudflare Imageにファイルをアップロード
+ * @param fileName - アップロードするファイル名
+ * @param signedUrl - R2がファイルをアップロードするために使用する署名付きURL
+ * @param body - アップロードするファイルのBlob
+ * @param timeout - リクエストのタイムアウト時間（ミリ秒）、デフォルト：30000ms
+ * @returns リクエスト結果、アップロード成功はtrue、それ以外はfalse
  */
 export async function uploadFile2CloudflareImages(fileName: string, signedUrl: string, body: Blob, timeout: number = 30000): Promise<void> {
 	try {
@@ -178,7 +178,7 @@ export async function uploadFile2CloudflareImages(fileName: string, signedUrl: s
 			body: formData,
 		}, timeout);
 	} catch (error) {
-		console.error("ERROR", `something wrong in 'uploadFile2CloudflareImage', URL: ${signedUrl}`, error); // TODO: Remove Console Output?
+		console.error("ERROR", `Cloudflare Imageへのファイルアップロード中にエラーが発生しました, URL: ${signedUrl}`, error); // TODO: Remove Console Output?
 		throw error;
 	}
 }

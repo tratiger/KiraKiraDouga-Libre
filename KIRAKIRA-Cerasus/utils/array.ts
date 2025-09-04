@@ -1,21 +1,21 @@
 /*
- * JS Array 又不自带删除方法，想用 prototype 扩展语法，问题是又不推荐使用。
+ * JSのArrayには削除メソッドが標準で備わっていないし、prototypeを拡張するのも推奨されない。
  */
 
 /**
- * 删除数组指定索引值的项目。
- * @param array - 数组。
- * @param index - 索引值。
+ * 配列から指定されたインデックスの項目を削除します。
+ * @param array - 配列。
+ * @param index - インデックス値。
  */
 export function arrayRemoveAt<T>(array: T[], index: number): void {
 	array.splice(index, 1);
 }
 
 /**
- * 删除数组的指定项目，如有多个重复项目只删除第一个。
- * @param array - 数组。
- * @param items - 项目。
- * @returns 成功删除的个数。
+ * 配列から指定された項目を削除します。重複する項目が複数ある場合は、最初のものだけを削除します。
+ * @param array - 配列。
+ * @param items - 項目。
+ * @returns 正常に削除された数。
  */
 export function arrayRemoveItem<T>(array: T[], ...items: T[]): number {
 	let successes = 0;
@@ -29,10 +29,10 @@ export function arrayRemoveItem<T>(array: T[], ...items: T[]): number {
 }
 
 /**
- * 删除数组的所有指定项目。
- * @param array - 数组。
- * @param items - 项目。
- * @returns 成功删除的个数。
+ * 配列から指定されたすべての項目を削除します。
+ * @param array - 配列。
+ * @param items - 項目。
+ * @returns 正常に削除された数。
  */
 export function arrayRemoveAllItem<T>(array: T[], ...items: T[]) {
 	let successes = 0;
@@ -45,9 +45,9 @@ export function arrayRemoveAllItem<T>(array: T[], ...items: T[]) {
 }
 
 /**
- * 仅在数组不包含该项目时，在数组末尾追加该项目。
- * @param array - 数组。
- * @param items - 项目。
+ * 配列にその項目が含まれていない場合にのみ、配列の末尾に追加します。
+ * @param array - 配列。
+ * @param items - 項目。
  */
 export function arrayPushUniquely<T>(array: T[], ...items: T[]) {
 	for (const item of items)
@@ -56,27 +56,27 @@ export function arrayPushUniquely<T>(array: T[], ...items: T[]) {
 }
 
 /**
- * 清空数组。
- * @param array - 数组。
+ * 配列を空にします。
+ * @param array - 配列。
  */
 export function arrayClearAll<T>(array: T[]): void {
 	array.splice(0, Infinity);
 }
 
 /**
- * 将源数组清空后重新注入新的数据。
- * @param array - 源数组。
- * @param items - 新的数据。
+ * 元の配列を空にしてから、新しいデータを再注入します。
+ * @param array - 元の配列。
+ * @param items - 新しいデータ。
  */
 export function arrayRelist<T>(array: T[], items: Iterable<T>): void {
 	array.splice(0, Infinity, ...items);
 }
 
 /**
- * 切换数组是否包含项目。如果数组包含该项目则移除，反之则添加。
- * @param array - 数组。
- * @param item - 项目。
- * @param force - 包括后，将切换变成仅单向操作。如果设置为 false，则只会删除项目，但不会添加。如果设置为 true，则只会添加项目，但不会删除。
+ * 配列に項目が含まれているかどうかを切り替えます。含まれている場合は削除し、含まれていない場合は追加します。
+ * @param array - 配列。
+ * @param item - 項目。
+ * @param force - trueに設定すると追加のみ、falseに設定すると削除のみの一方向操作になります。
  */
 export function arrayToggle<T>(array: T[], item: T, force?: boolean): void {
 	const index = array.indexOf(item);
@@ -87,10 +87,10 @@ export function arrayToggle<T>(array: T[], item: T, force?: boolean): void {
 }
 
 /**
- * 随机返回数组中的一个项目。
- * @param array - 数组。
- * @param record - 随机记录。如果提供，则在所有项目被随机抽取完毕之前不会抽取相同的项目。
- * @returns 数组其中的随机一个项目。
+ * 配列からランダムに1つの項目を返します。
+ * @param array - 配列。
+ * @param record - ランダム記録。提供された場合、すべての項目が抽出されるまで同じ項目は抽出されません。
+ * @returns 配列からランダムに選ばれた1つの項目。
  */
 export function randomOne<T>(array: T[], record?: MaybeRef<number[]>): T {
 	if (array.length === 0) return null as T;
@@ -112,29 +112,29 @@ export function randomOne<T>(array: T[], record?: MaybeRef<number[]>): T {
 }
 
 /**
- * 通过一个常量数组映射到一个对象。
- * @param array - **常量**字符串数组。
- * @param callbackFn - 生成作为对象的值。
- * @returns 映射的对象。
+ * 定数配列からオブジェクトにマッピングします。
+ * @param array - **定数**の文字列配列。
+ * @param callbackFn - オブジェクトの値を生成するコールバック関数。
+ * @returns マッピングされたオブジェクト。
  */
 export function arrayMapObjectConst<const T extends string, U>(array: readonly T[], callbackFn: (value: T, index: number, array: readonly T[]) => U) {
 	return Object.fromEntries(array.map((value, index, array) => ([value, callbackFn(value, index, array)] as [T, U]))) as Record<T, U>;
 }
 
 /**
- * 通过一个任意数组映射到一个对象。
- * @param array - 任意数组。
- * @param callbackFn - 生成作为对象的键值对元组。
- * @returns 映射的对象。
+ * 任意の配列からオブジェクトにマッピングします。
+ * @param array - 任意の配列。
+ * @param callbackFn - オブジェクトのキーと値のタプルを生成するコールバック関数。
+ * @returns マッピングされたオブジェクト。
  */
 export function arrayMapObject<T, K extends PropertyKey, U>(array: T[], callbackFn: (value: T, index: number, array: T[]) => [K, U]) {
 	return Object.fromEntries(array.map((value, index, array) => callbackFn(value, index, array))) as Record<K, U>;
 }
 
 /**
- * 数组去重。
- * @param array - 数组。
- * @returns 注意是会返回一个新的数组。
+ * 配列の重複を除去します。
+ * @param array - 配列。
+ * @returns 注意：新しい配列が返されます。
  */
 export function arrayToRemoveDuplicates<T>(array: T[]) {
 	return [...new Set(array)];

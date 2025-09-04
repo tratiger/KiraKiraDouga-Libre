@@ -8,7 +8,7 @@
 		state.value = [visibleText.value];
 	};
 
-	useHead({ title: "动态图标测试页" });
+	useHead({ title: "動的アイコンテストページ" });
 </script>
 
 <template>

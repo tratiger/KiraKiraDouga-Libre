@@ -86,7 +86,7 @@ async function moveLocaleFiles(extractedPath: string, projectFolderName: string)
 				break;
 			}
 		}
-		// 只递归进入第一个是目录的文件夹
+		// 最初のディレクトリのみ再帰的に探索します
 		let foundDir = false;
 		for (const file of files) {
 			const nextPath = resolve(path, file);

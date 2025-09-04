@@ -8,7 +8,7 @@
 		.replace(/^Page Not Found:\s*/i, t.page_not_found_info + t.colon)
 		.replace(/^Page Not Found(?=\s|$)/i, t.page_not_found_info));
 	const mouse = useMouse();
-	const gsensor = useDeviceOrientation(); // Safari 不支持加速度传感器（重力感应），散了吧。
+	const gsensor = useDeviceOrientation(); // Safariは加速度センサー（重力センサー）をサポートしていません。あきらめましょう。
 	const inited = ref(false);
 	const timestamp = useTimestamp({ interval: 1_000 });
 	const dayNight = ref<HTMLDivElement>();
@@ -33,12 +33,12 @@
 			1 - clamp(gsensor.beta.value ?? 90, 0, 90) / 90,
 		);
 	});
-	const parallax = useSmoothValue(parallaxRough, 0.1); // 视差平滑移动
+	const parallax = useSmoothValue(parallaxRough, 0.1); // パララックスのスムーズな移動
 
 	onMounted(() => {
-		// 日月轮回
+		// 太陽と月の輪廻
 		if ("requestPermission" in DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function")
-			DeviceMotionEvent.requestPermission(); // Safari 最后的挣扎。
+			DeviceMotionEvent.requestPermission(); // Safariの最後の抵抗。
 		inited.value = true;
 		if (dayNight.value) {
 			const deg = rotationDeg.value;

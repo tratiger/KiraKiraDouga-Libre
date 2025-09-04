@@ -1,8 +1,8 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 指定点击后跳转的链接。 */
+		/** クリック後に遷移するリンクを指定します。 */
 		href?: string;
-		/** 图标。 */
+		/** アイコン。 */
 		icon: DeclaredIcons;
 	}>();
 

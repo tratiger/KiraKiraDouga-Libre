@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 邀请码的用途。 */
+		/** 認証コードの用途。 */
 		verificationCodeFor: "registration" | "change-email" | "change-password" | "delete-email-2fa";
-		/** 邮箱。 */ // WARN 当 verificationCodeFor 为 change-password 时无需传递该参数。
+		/** メールアドレス。 */ // WARN verificationCodeForがchange-passwordの場合、このパラメータは不要です。
 		email?: string;
-		/** 禁用？ */
+		/** 無効？ */
 		disabled?: boolean;
 	}>();
 
@@ -13,13 +13,13 @@
 	}>();
 
 	const value = defineModel<string>({ required: true });
-	// const { timeout, isTimeouted, isResent, startTimeout } = useSendVerificationCodeTimeout(); // 垃圾 Pinia 不支持展开。
+	// const { timeout, isTimeouted, isResent, startTimeout } = useSendVerificationCodeTimeout(); // ゴミPiniaは展開をサポートしていません。
 	const timeout = useSendVerificationCodeTimeout();
 	const pattern = /^\d{6}$/;
-	const isSendingEmail = ref(false); // 是否正在发送邮件
+	const isSendingEmail = ref(false); // メール送信中か
 
 	/**
-	 * 发送注册验证码
+	 * 登録用認証コードを送信
 	 */
 	async function requestSendRegisterVerificationCodeEmail() {
 		if (!props.email) {
@@ -39,7 +39,7 @@
 	}
 
 	/**
-	 * 请求发送修改邮箱的验证码
+	 * メールアドレス変更用の認証コードをリクエスト送信
 	 */
 	async function requestSendChangeEmailVerificationCodeEmail() {
 		if (!props.email) {
@@ -57,7 +57,7 @@
 	}
 
 	/**
-	 * 请求发送修改密码的验证码
+	 * パスワード変更用の認証コードをリクエスト送信
 	 */
 	async function requestSendChangePasswordVerificationCodeEmail() {
 		const locale = getCurrentLocaleLangCode();
@@ -70,7 +70,7 @@
 	}
 
 	/**
-	 * 请求发送删除 Email 身份验证器验证码
+	 * メール認証システム削除用の認証コードをリクエスト送信
 	 */
 	async function requestSendDeleteEmail2FAVerificationCodeEmail() {
 		const locale = getCurrentLocaleLangCode();
@@ -83,7 +83,7 @@
 	}
 
 	/**
-	 * 发送验证码。
+	 * 認証コードを送信します。
 	 */
 	async function sendVerificationCode() {
 		isSendingEmail.value = true;
@@ -114,7 +114,7 @@
 	}
 
 	/**
-	 * 开始倒计时
+	 * カウントダウンを開始します
 	 */
 	function startTimeout() {
 		timeout.startTimeout();

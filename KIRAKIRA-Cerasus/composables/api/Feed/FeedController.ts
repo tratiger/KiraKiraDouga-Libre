@@ -4,12 +4,12 @@ const BACK_END_URI = environment.backendUri;
 const FEED_API_URI = `${BACK_END_URI}feed`;
 
 /**
- * 用户关注一个创作者
- * @param followingUploaderRequest - 用户关注一个创作者的请求载荷
- * @returns 用户关注一个创作者的请求响应
+ * ユーザーがクリエイターをフォローします
+ * @param followingUploaderRequest - ユーザーがクリエイターをフォローするリクエストペイロード
+ * @returns ユーザーがクリエイターをフォローするリクエストのレスポンス
  */
 export const followingUploader = (followingUploaderRequest: FollowingUploaderRequestDto) => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return useFetch<FollowingUploaderResponseDto>(
 		`${FEED_API_URI}/following`,
 		{
@@ -21,12 +21,12 @@ export const followingUploader = (followingUploaderRequest: FollowingUploaderReq
 };
 
 /**
- * 用户取消关注一个创作者
- * @param unfollowingUploaderRequest - 用户取消关注一个创作者的请求载荷
- * @returns 用户取消关注一个创作者的请求响应
+ * ユーザーがクリエイターのフォローを解除します
+ * @param unfollowingUploaderRequest - ユーザーがクリエイターのフォローを解除するリクエストペイロード
+ * @returns ユーザーがクリエイターのフォローを解除するリクエストのレスポンス
  */
 export const unfollowingUploader = (unfollowingUploaderRequest: UnfollowingUploaderRequestDto) => {
-	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
+	// TODO: クロスオリジンドメインからのクッキーの保存/読み取りを許可するために { credentials: "include" } を使用します。本番環境へのデプロイ前には削除すべきかもしれません。
 	return useFetch<UnfollowingUploaderResponseDto>(
 		`${FEED_API_URI}/unfollowing`,
 		{

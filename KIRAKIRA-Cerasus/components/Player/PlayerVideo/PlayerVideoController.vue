@@ -1,28 +1,28 @@
 <docs>
-	# 视频播放器控制条
+	# 動画プレーヤーコントロールバー
 </docs>
 
 <script setup lang="ts">
 	import type shaka from "shaka-player";
 
 	const props = withDefaults(defineProps<{
-		/** 速度保持音高？ */
+		/** 速度変更時にピッチを維持しますか？ */
 		preservesPitch?: boolean;
-		/** 视频时长。 */
+		/** 動画の長さ。 */
 		duration?: number;
-		/** 媒体缓冲加载进度秒数组。 */
+		/** メディアのバッファリングされた読み込み進捗（秒単位の配列）。 */
 		buffered?: Buffered;
-		/** 是否全屏？ */
+		/** フルスクリーンですか？ */
 		fullscreen?: boolean;
-		/** 切换全屏函数。 */
+		/** フルスクリーン切り替え関数。 */
 		toggleFullscreen?: (isFullbrowser?: boolean) => void;
-		/** 视频轨道列表。 */
+		/** 動画トラックリスト。 */
 		tracks?: shaka.extern.Track[];
-		/** 是否正在开屏加载。 */
+		/** スプラッシュスクリーン読み込み中ですか？ */
 		splash?: boolean;
-		/** 视频播放器设置。 */
+		/** 動画プレーヤー設定。 */
 		settings?: PlayerVideoSettings;
-		/** 是否隐藏？ */
+		/** 非表示ですか？ */
 		hidden?: boolean;
 	}>(), {
 		duration: NaN,
@@ -32,9 +32,9 @@
 		tracks: () => [],
 	});
 
-	/** 常用速度列表。 */
+	/** 一般的な再生速度リスト。 */
 	const loopedPlaybackRates = [0.5, 1, 2];
-	/** 有级速度列表。 */
+	/** 段階的な再生速度リスト。 */
 	const steppedPlaybackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 4];
 
 	const playing = defineModel<boolean>("playing", { default: false });
@@ -84,21 +84,21 @@
 	const mobile = () => getResponsiveDevice() === "mobile";
 
 	/**
-	 * 点击速度按钮时，在速度中循环。
+	 * 速度ボタンクリック時に、リスト内の速度をループします。
 	 */
 	function switchSpeed() {
 		let index = loopedPlaybackRates.indexOf(playbackRate.value);
 		if (index === -1) {
 			index = loopedPlaybackRates.indexOf(1);
-			if (index === -1) throw new Error("在 playbackRates 速度列表中必须包含原速 1。");
+			if (index === -1) throw new Error("playbackRates速度リストには、等速の1が含まれている必要があります。");
 		} else index = (index + 1) % loopedPlaybackRates.length;
 		const newRate = loopedPlaybackRates[index];
 		playbackRate.value = newRate;
 	}
 
 	/**
-	 * 使用方向改变速度。
-	 * @param increment - 增量方向，快放为 1，慢放为 -1。
+	 * 方向によって速度を変更します。
+	 * @param increment - 増加方向。1で速く、-1で遅く。
 	 */
 	function switchSpeedByDirection(increment: 1 | -1) {
 		showMenuByKeyboard(rateMenu);
@@ -114,8 +114,8 @@
 	}
 
 	/**
-	 * 键盘控制显示浮窗菜单。
-	 * @param menu - 菜单。
+	 * キーボードでポップアップメニューを表示します。
+	 * @param menu - メニュー。
 	 */
 	function showMenuByKeyboard(menu: Ref<MenuModel | number | undefined>) {
 		if (!isObject(menu.value))
@@ -126,7 +126,7 @@
 	const hideFullbrowserTimeout = ref<Timeout>();
 
 	/**
-	 * 当指针移出全屏或网页全屏按钮时的事件。
+	 * ポインターがフルスクリーンまたはブラウザフルスクリーンボタンから離れたときのイベント。
 	 */
 	function onFullscreenBtnLeave() {
 		hideFullbrowserTimeout.value = setTimeout(() => {
@@ -135,15 +135,15 @@
 	}
 
 	/**
-	 * 获取当前轨道的帧率。
-	 * @returns 当前轨道的帧率。
+	 * 現在のトラックのフレームレートを取得します。
+	 * @returns 現在のトラックのフレームレート。
 	 */
 	function getCurrentFrameRate() {
 		return selectedTrack.value?.frameRate;
 	}
 
 	/**
-	 * 当指针移入全屏或网页全屏按钮时的事件。
+	 * ポインターがフルスクリーンまたはブラウザフルスクリーンボタンに入ったときのイベント。
 	 */
 	function onFullscreenBtnEnter() {
 		clearTimeout(hideFullbrowserTimeout.value);
@@ -152,8 +152,8 @@
 	}
 
 	/**
-	 * 当用户拖拽时间进度滑动条时的事件。
-	 * @param isSeeking - 用户正在拖拽滑动条？
+	 * ユーザーがタイムラインスライダーをドラッグしたときのイベント。
+	 * @param isSeeking - ユーザーがスライダーをドラッグしているか？
 	 */
 	function onSeeking(isSeeking: boolean) {
 		if (isSeeking)
@@ -166,8 +166,8 @@
 	}
 
 	/**
-	 * 当用户拖拽时间进度滑动条时改变为快进或快退的图标。
-	 * @param relativeChangingTime - 相对改变时间，即新时间减去旧时间。
+	 * ユーザーがタイムラインスライダーをドラッグしたときに、早送りまたは巻き戻しアイコンに変更します。
+	 * @param relativeChangingTime - 相対的な時間変化量（新しい時間 - 古い時間）。
 	 */
 	function setSeekingIcon(relativeChangingTime: number) {
 		if (relativeChangingTime === 0) {
@@ -198,14 +198,14 @@
 			case "ArrowRight":
 				if (e.ctrlKey || e.metaKey) // 加速
 					switchSpeedByDirection(1);
-				else // 进度条 →
+				else // プログレスバー →
 					model.value = clamp(model.value + TIME_TICK, 0, props.duration);
 				e.preventDefault();
 				break;
 			case "ArrowLeft":
-				if (e.ctrlKey || e.metaKey) // 减速
+				if (e.ctrlKey || e.metaKey) // 減速
 					switchSpeedByDirection(-1);
-				else // 进度条 ←
+				else // プログレスバー ←
 					model.value = clamp(model.value - TIME_TICK, 0, props.duration);
 				e.preventDefault();
 				break;
@@ -214,17 +214,17 @@
 					props.toggleFullscreen?.();
 				e.preventDefault();
 				break;
-			case "Space": case "F11": /* 解决冲突 */ e.preventDefault(); break;
+			case "Space": case "F11": /* 競合解決 */ e.preventDefault(); break;
 			default: break;
 		}
 	});
 
 	useEventListener("window", "keyup", e => {
 		switch (e.code) {
-			case "KeyD": /* 弹幕 */ showDanmaku.value = !showDanmaku.value; break;
-			case "KeyM": /* 静音 */ muted.value = !muted.value; showMenuByKeyboard(volumeMenu); break;
-			case "KeyF": case "F11": /* 全屏 */ props.toggleFullscreen?.(); break;
-			case "Space": /* 播放/暂停 */ playing.value = !playing.value; break;
+			case "KeyD": /* 弾幕 */ showDanmaku.value = !showDanmaku.value; break;
+			case "KeyM": /* ミュート */ muted.value = !muted.value; showMenuByKeyboard(volumeMenu); break;
+			case "KeyF": case "F11": /* フルスクリーン */ props.toggleFullscreen?.(); break;
+			case "Space": /* 再生/一時停止 */ playing.value = !playing.value; break;
 			default: break;
 		}
 	});
@@ -328,7 +328,7 @@
 				@pointerup.left="e => isMouse(e) && (muted = !muted)"
 				@click="e => mobile() && (volumeMenu = e)"
 			/>
-			<!-- TODO: 音量图标需要修改为三根弧线，并且使用动画切换，参考 Windows 11 / i(Pad)OS 的动画。 -->
+			<!-- TODO: 音量アイコンを3本の弧線に変更し、Windows 11 / i(Pad)OSのアニメーションを参考にアニメーションで切り替える必要があります。 -->
 			<SoftButton
 				:icon="showDanmaku ? 'danmaku' : 'danmaku_off'"
 				@click="showDanmaku = !showDanmaku"
@@ -346,8 +346,8 @@
 <style scoped lang="scss">
 	$thickness: 36px;
 	$twin-thickness: 60px;
-	$ripple-fix-padding: calc(($thickness * (64px / 40px) - $thickness) / 2); // 修复水波纹切割，用于 padding。
-	$ripple-fix-margin: calc(($thickness * (64px / 40px) - $thickness) / -2); // 修复水波纹切割，用于 margin。
+	$ripple-fix-padding: calc(($thickness * (64px / 40px) - $thickness) / 2); // 波紋のクリッピングを修正するためのpadding。
+	$ripple-fix-margin: calc(($thickness * (64px / 40px) - $thickness) / -2); // 波紋のクリッピングを修正するためのmargin。
 
 	:comp {
 		position: relative;

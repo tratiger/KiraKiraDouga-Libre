@@ -4,12 +4,12 @@ const SETTINGS = "/settings";
 // const USER = "/user";
 
 /**
- * 设定页面切换动画。
- * @param pageTransition - 页面切换引用变量。
- * @returns 路由切换响应式变量。
+ * ページ切り替えアニメーションを設定します。
+ * @param pageTransition - ページ切り替え参照変数。
+ * @returns ルート切り替えリアクティブ変数。
  */
 export function usePageTransition() {
-	/** 页面切换引用变量。 */
+	/** ページ切り替え参照変数。 */
 	const pageTransition = ref("page-forward");
 
 	watchRoute((slug, prevSlug, path, prevPath) => {
@@ -29,8 +29,8 @@ export function usePageTransition() {
 }
 
 /**
- * 根据路由动态切换布局。
- * @returns 路由切换响应式变量。
+ * ルートに基づいてレイアウトを動的に切り替えます。
+ * @returns ルート切り替えリアクティブ変数。
  */
 export function useDynamicLayout() {
 	const layout = ref<LayoutKey>("responsive");

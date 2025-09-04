@@ -4,17 +4,17 @@
 
 	const props = withDefaults(defineProps<{
 		statusCode?: 301;
-		/** 错误原因。 */
+		/** エラーの理由。 */
 		message?: string;
 	}>(), {
 		statusCode: 301,
-		// TODO: 后续的视频删除原因可能需要在数据库进行记录（官方删除可能性？）
-		message: "该视频被万恶的创作者给削除了",
+		// TODO: 今後の動画削除理由はデータベースに記録する必要があるかもしれません（公式による削除の可能性は？）
+		message: "この動画は邪悪な作者によって削除されました",
 	});
 
 	const message = computed(() => {
 		const message = props.message.trim();
-		return !message || message === httpResponseStatusCodes[301] ? "该视频被万恶的创作者给削除了" : message;
+		return !message || message === httpResponseStatusCodes[301] ? "この動画は邪悪な作者によって削除されました" : message;
 	});
 
 	const musicEl = ref<HTMLAudioElement>();
@@ -43,14 +43,14 @@
 	</div>
 	<div class="foreground">
 		<div class="top">
-			<h1>啊？不见了‽</h1>
+			<h1>あれ？見当たらない‽</h1>
 		</div>
 		<div class="ellipsis-container" @click="togglePlayMusic">
 			<div class="ellipsis-container-relative">
 				<div class="circle"></div>
 				<div class="triangle triangle-up"></div>
 				<div class="triangle triangle-down"></div>
-				<!-- 原计划使用 JS 生成真随机故障效果，但是那样的话不支持 SSR，即服务端和客户端生成的随机数不可能一致。故改用 Sass 伪随机，即生成的动画实际上是周期变化的。 -->
+				<!-- 当初はJSで真のランダムなグリッチ効果を生成する予定でしたが、それだとSSRをサポートできず、サーバーとクライアントで生成される乱数が一致しなくなってしまいます。そのため、Sassの擬似ランダムを使用することにしました。つまり、生成されるアニメーションは実際には周期的に変化します。 -->
 				<section v-for="i in 3" :key="i" class="ellipsis">
 					<div v-for="j in 3" :key="j" class="ellipsis-dot"></div>
 				</section>
@@ -179,7 +179,7 @@
 		height: 100lvh;
 		overflow: visible;
 
-		rect { // SVG line 元素暂时不支持使用 CSS 控制锚点，故改用 rect 元素代替之。
+		rect { // SVGのline要素は現在CSSでアンカーポイントを制御できないため、代わりにrect要素を使用します。
 			width: 1px;
 			height: var(--height);
 			animation: stroke-scrolling $base-animation-duration linear infinite both;
@@ -206,7 +206,7 @@
 						$stroke-width: calc($base-stroke-width / $depth);
 						--height: #{$height};
 						--stroke-width: #{$stroke-width};
-						transition: $fallback-transitions, x 0s; // 避免水合阶段突然过渡改变 x 方向的位置。
+						transition: $fallback-transitions, x 0s; // ハイドレーション段階でx方向の位置が突然遷移するのを避けます。
 						animation-duration: $base-animation-duration * $depth;
 						animation-delay: math.random() * (-$base-animation-duration);
 						animation-direction: if(not $reversed, normal, reverse);
@@ -232,7 +232,7 @@
 								),
 							);
 						} @else {
-							clip-path: none; // 防止 SSR 时样式被覆盖。
+							clip-path: none; // SSR時にスタイルが上書きされるのを防ぎます。
 						}
 					}
 				}
@@ -265,7 +265,7 @@
 			justify-content: flex-end;
 		}
 
-		// 高度太窄时改成绝对定位。
+		// 高さが狭すぎる場合は、絶対配置に変更します。
 		@media (height < 560px) {
 			.top,
 			.bottom {

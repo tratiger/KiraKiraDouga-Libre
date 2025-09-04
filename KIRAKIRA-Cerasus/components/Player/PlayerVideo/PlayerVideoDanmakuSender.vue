@@ -6,7 +6,7 @@
 	};
 
 	/**
-	 * 基础发射弹幕样式。
+	 * 基本的な弾幕発射スタイル。
 	 */
 	export const basicDanmakuCommentStyle = {
 		fontWeight: "bold",
@@ -14,11 +14,11 @@
 	};
 
 	/**
-	 * 创建一个可发射的弹幕内容。
-	 * @param text - 弹幕内容。
-	 * @param time - 弹幕出现时间。
-	 * @param format - 弹幕格式。
-	 * @returns 可发射的弹幕内容。
+	 * 発射可能な弾幕コンテンツを作成します。
+	 * @param text - 弾幕の内容。
+	 * @param time - 弾幕の出現時間。
+	 * @param format - 弾幕のフォーマット。
+	 * @returns 発射可能な弾幕コンテンツ。
 	 */
 	export function createDanmakuComment(text: string, time: number | undefined, format: DanmakuFormat): DanmakuComment {
 		return {
@@ -34,7 +34,7 @@
 					...basicDanmakuCommentStyle,
 					fontSize: `${fontSizes[format.fontSize]}px`,
 					color: format.color ? format.color.hashHex : undefined,
-					border: "1px solid #337ab7", // 用户刚刚发**射**的弹幕会有一个蓝色框
+					border: "1px solid #337ab7", // ユーザーが**発射**したばかりの弾幕には青い枠が表示されます
 				});
 				return div;
 			},
@@ -44,11 +44,11 @@
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 当前视频时间。 */
+		/** 現在の動画時間。 */
 		currentTime: number;
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 是否可以填写弹幕（用户如果被屏蔽等情况下无法填写弹幕） */
+		/** 弾幕を入力できますか（ユーザーがブロックされている場合などは入力できません） */
 		editable?: boolean;
 	}>(), {
 		editable: true,
@@ -69,8 +69,8 @@
 	}) as DanmakuFormat;
 
 	/**
-	 * 插入颜文字。
-	 * @param kaomoji - 颜文字。
+	 * 顔文字を挿入します。
+	 * @param kaomoji - 顔文字。
 	 */
 	function insertKaomoji(kaomoji?: string) {
 		const { input } = textBox.value!;
@@ -80,7 +80,7 @@
 	}
 
 	/**
-	 * 发送弹幕事件。
+	 * 弾幕送信イベント。
 	 */
 	function onSend() {
 		if (!content.value) return;
@@ -119,8 +119,8 @@
 	<FlyoutDanmakuFormat v-model="flyoutFormat" v-model:format="format" />
 
 	<Comp role="textbox">
-		<!-- // TODO: 使用多语言 -->
-		<TextBox ref="textBox" v-model="content" :placeholder="editable ? t.danmaku.send : '您已被该用户屏蔽，无法发送弹幕。'" :disabled="!editable">
+		<!-- // TODO: 多言語対応 -->
+		<TextBox ref="textBox" v-model="content" :placeholder="editable ? t.danmaku.send : 'あなたはこのユーザーにブロックされているため、弾幕を送信できません。'" :disabled="!editable">
 			<template #actions>
 				<SoftButton
 					v-tooltip:bottom="t.kaomoji"

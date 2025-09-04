@@ -1,82 +1,82 @@
 /**
- * 视频 TAG 名
+ * 動画タグ名
  */
 type VideoTagNameSchema = {
-	/** TAG 名称 - 非空 */
+	/** タグ名 - 空でないこと */
 	name: string;
-	/** 是否为该语言默认名 - 非空 */
+	/** この言語のデフォルト名かどうか - 空でないこと */
 	isDefault: boolean;
-	/** 是否为 TAG 原名 - 非空 */
+	/** タグの元の名前かどうか - 空でないこと */
 	isOriginalTagName: boolean;
 };
 
 /**
- * 不同语言所对应的 TAG 名
+ * 各言語に対応するタグ名
  */
 type MultilingualVideoTagNameSchema = {
-	/** TAG 的语言 - 非空，原则上应该唯一 // WARN: 无法指定指定子文档的唯一索引，只能在业务上避免并做校验 */
+	/** タグの言語 - 空でないこと、原則として一意である必要があります // WARN: サブドキュメントの一意のインデックスを指定できないため、ビジネスロジックで回避および検証する必要があります */
 	lang: string;
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するタグ名 */
 	tagName: VideoTagNameSchema[];
 };
 
 /**
- * 创建视频 TAG 的请求载荷
+ * 動画タグ作成リクエストのペイロード
  */
 export type CreateVideoTagRequestDto = {
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するタグ名 */
 	tagNameList: MultilingualVideoTagNameSchema[];
 };
 
 /**
- * 视频 TAG 的类型
+ * 動画タグのタイプ
  */
 export type VideoTag = {
-	/** TAG ID */
+	/** タグID */
 	tagId: number;
-	/** 不同语言所对应的 TAG 名 */
+	/** 各言語に対応するタグ名 */
 	tagNameList: MultilingualVideoTagNameSchema[];
 };
 
 /**
- * 创建视频 TAG 的请求响应
+ * 動画タグ作成リクエストのレスポンス
  */
 export type CreateVideoTagResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 如果成功，返回创建的这个 TAG 的信息 */
+	/** 成功した場合、作成されたこのタグの情報を返します */
 	result?: VideoTag;
 };
 
 /**
- * 搜索视频 TAG 的请求载荷
+ * 動画タグ検索リクエストのペイロード
  */
 export type SearchVideoTagRequestDto = {
-	/** TAG 名搜索关键词 */
+	/** タグ名検索キーワード */
 	tagNameSearchKey: string;
 };
 
 /**
- * 搜索视频 TAG 的请求响应
+ * 動画タグ検索リクエストのレスポンス
  */
 export type SearchVideoTagResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 如果成功，返回匹配到的 TAG 信息 */
+	/** 成功した場合、一致したタグ情報を返します */
 	result?: VideoTag[];
 };
 
 /**
- * 根据视频 TAG ID 搜索视频的请求载荷
+ * 動画タグIDに基づいて動画を検索するリクエストのペイロード
  */
 export type GetVideoTagByTagIdRequestDto = {
-	/** TAG ID */
+	/** タグID */
 	tagId: number[];
 };
 
-/** 通过视频 TAG ID 获取视频的请求响应 */
+/** 動画タグIDで動画を取得するリクエストのレスポンス */
 export type GetVideoTagByTagIdResponseDto = SearchVideoTagResponseDto & {};

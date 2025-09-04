@@ -1,12 +1,12 @@
 /**
- * 通过 RBAC 检查用户的权限的参数
+ * RBACによるユーザー権限チェックのパラメータ
  */
 export type CheckUserRbacParams =
 	| { uuid: string; apiPath: string }
 	| { uid: number; apiPath: string };
 
 /**
- * 通过 RBAC 检查用户的权限的结果
+ * RBACによるユーザー権限チェックの結果
  */
 export type CheckUserRbacResult = {
 	status: 200 | 403 | 500;
@@ -14,320 +14,320 @@ export type CheckUserRbacResult = {
 };
 
 /**
- * RBAC API 路径
+ * RBAC APIパス
  */
 type RbacApiPath = {
-	/** API 路径的 UUID - 非空 - 唯一 */
+	/** APIパスのUUID - 空でないこと - 一意 */
 	apiPathUuid: string;
-	/** API 路径 - 非空 - 唯一 */
+	/** APIパス - 空でないこと - 一意 */
 	apiPath: string;
-	/** API 路径的类型 */
+	/** APIパスのタイプ */
 	apiPathType?: string;
-	/** API 路径的颜色 - 例子：#66CCFFFF */
+	/** APIパスの色 - 例：#66CCFFFF */
 	apiPathColor?: string;
-	/** API 路径的描述 */
+	/** APIパスの説明 */
 	apiPathDescription?: string;
-	/** API 路径创建者 - 非空 */
+	/** APIパス作成者 - 空でないこと */
 	creatorUuid: string;
-	/** API 路径最后更新者 - 非空 */
+	/** APIパス最終更新者 - 空でないこと */
 	lastEditorUuid: string;
-	/** 系统专用字段-创建时间 - 非空 */
+	/** システム専用フィールド - 作成日時 - 空でないこと */
 	createDateTime: number;
-	/** 系统专用字段-最后编辑时间 - 非空 */
+	/** システム専用フィールド - 最終編集日時 - 空でないこと */
 	editDateTime: number;
 };
 
 /**
- * RBAC API 路径的结果
+ * RBAC APIパスの結果
  */
 type RbacApiPathResult = RbacApiPath & {
-	/** 该路径是否已经被分配了至少一次 */
+	/** このパスは少なくとも一度割り当てられているか */
 	isAssignedOnce: boolean;
 };
 
 /**
- * 创建 RBAC API 路径的请求载荷
+ * RBAC APIパス作成のリクエストペイロード
  */
 export type CreateRbacApiPathRequestDto = {
-	/** API 路径*/
+	/** APIパス*/
 	apiPath: string;
-	/** API 路径的类型 */
+	/** APIパスのタイプ */
 	apiPathType?: string;
-	/** API 路径的颜色 - 例子：#66CCFFFF */
+	/** APIパスの色 - 例：#66CCFFFF */
 	apiPathColor?: string;
-	/** API 路径的描述 */
+	/** APIパスの説明 */
 	apiPathDescription?: string;
 };
 
 /**
- * 创建 RBAC API 路径的请求响应
+ * RBAC APIパス作成のリクエストレスポンス
  */
 export type CreateRbacApiPathResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回创建的数据 */
+	/** 成功した場合、作成されたデータを返す */
 	result?: RbacApiPathResult;
 };
 
 /**
- * 删除 RBAC API 路径的请求载荷
+ * RBAC APIパス削除のリクエストペイロード
  */
 export type DeleteRbacApiPathRequestDto = {
-	/** API 路径*/
+	/** APIパス*/
 	apiPath: string;
 };
 
 /**
- * 删除 RBAC API 路径的请求响应
+ * RBAC APIパス削除のリクエストレスポンス
  */
 export type DeleteRbacApiPathResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 该 API 路径是否已经绑定到角色（如果绑定了角色则无法删除） */
+	/** このAPIパスはロールにバインドされていますか（バインドされている場合は削除不可） */
 	isAssigned: boolean;
 };
 
 /**
- * 获取 API 路径的请求载荷
+ * APIパス取得のリクエストペイロード
  */
 export type GetRbacApiPathRequestDto = {
-	/** 搜索项 */
+	/** 検索項目 */
 	search: {
-		/** API 路径*/
+		/** APIパス*/
 		apiPath?: string;
-		/** API 路径的类型 */
+		/** APIパスのタイプ */
 		apiPathType?: string;
-		/** API 路径的颜色 - 例子：#66CCFFFF */
+		/** APIパスの色 - 例：#66CCFFFF */
 		apiPathColor?: string;
-		/** API 路径的描述 */
+		/** APIパスの説明 */
 		apiPathDescription?: string;
 	};
-	/** 分页查询 */
+	/** ページネーションクエリ */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページに表示する件数 */
 		pageSize: number;
 	};
 };
 
 /**
- * 获取 API 路径的请求响应
+ * APIパス取得のリクエストレスポンス
  */
 export type GetRbacApiPathResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回数据 */
+	/** 成功した場合、データを返す */
 	result?: RbacApiPathResult[];
-	/** 如果成功，返回合计数据 */
+	/** 成功した場合、合計データを返す */
 	count?: number;
 };
 
 /**
- * RBAC 角色
+ * RBACロール
  */
 type RbacRole = {
-	/** 角色的 UUID */
+	/** ロールのUUID */
 	roleUuid: string;
-	/** 角色的名字 */
+	/** ロールの名前 */
 	roleName: string;
-	/** 角色的类型 */
+	/** ロールのタイプ */
 	roleType?: string;
-	/** 角色的颜色 - 例子：#66CCFFFF */
+	/** ロールの色 - 例：#66CCFFFF */
 	roleColor?: string;
-	/** 角色的描述 */
+	/** ロールの説明 */
 	roleDescription?: string;
-	/** 这个角色有哪些 API 路径的访问权 */
+	/** このロールがアクセス権を持つAPIパス */
 	apiPathPermissions: string[];
-	/** API 路径创建者 - 非空 */
+	/** APIパス作成者 - 空でないこと */
 	creatorUuid: string;
-	/** API 路径最后更新者 - 非空 */
+	/** APIパス最終更新者 - 空でないこと */
 	lastEditorUuid: string;
-	/** 系统专用字段-创建时间 - 非空 */
+	/** システム専用フィールド - 作成日時 - 空でないこと */
 	createDateTime: number;
-	/** 系统专用字段-最后编辑时间 - 非空 */
+	/** システム専用フィールド - 最終編集日時 - 空でないこと */
 	editDateTime: number;
 };
 
 /**
- * 创建 RBAC 角色的请求载荷
+ * RBACロール作成のリクエストペイロード
  */
 export type CreateRbacRoleRequestDto = {
-	/** 角色的名字 */
+	/** ロールの名前 */
 	roleName: string;
-	/** 角色的类型 */
+	/** ロールのタイプ */
 	roleType?: string;
-	/** 角色的颜色 - 例子：#66CCFFFF */
+	/** ロールの色 - 例：#66CCFFFF */
 	roleColor?: string;
-	/** 角色的描述 */
+	/** ロールの説明 */
 	roleDescription?: string;
 };
 
 /**
- * 创建 RBAC 角色的请求响应
+ * RBACロール作成のリクエストレスポンス
  */
 export type CreateRbacRoleResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回创建的数据 */
+	/** 成功した場合、作成されたデータを返す */
 	result?: RbacRole;
 };
 
 /**
- * 删除 RBAC 角色的请求载荷
+ * RBACロール削除のリクエストペイロード
  */
 export type DeleteRbacRoleRequestDto = {
-	/** 角色的名字 */
+	/** ロールの名前 */
 	roleName: string;
 };
 
 /**
- * 删除 RBAC 角色的请求响应
+ * RBACロール削除のリクエストレスポンス
  */
 export type DeleteRbacRoleResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };
 
 /**
- * 获取 RBAC 角色的请求载荷
+ * RBACロール取得のリクエストペイロード
  */
 export type GetRbacRoleRequestDto = {
-	/** 搜索项 */
+	/** 検索項目 */
 	search: {
-		/** 角色的名字 */
+		/** ロールの名前 */
 		roleName?: string;
-		/** 角色的类型 */
+		/** ロールのタイプ */
 		roleType?: string;
-		/** 角色的颜色 - 例子：#66CCFFFF */
+		/** ロールの色 - 例：#66CCFFFF */
 		roleColor?: string;
-		/** 角色的描述 */
+		/** ロールの説明 */
 		roleDescription?: string;
 	};
-	/** 分页查询 */
+	/** ページネーションクエリ */
 	pagination: {
-		/** 当前在第几页 */
+		/** 現在のページ番号 */
 		page: number;
-		/** 一页显示多少条 */
+		/** 1ページに表示する件数 */
 		pageSize: number;
 	};
 };
 
 /**
- * 获取 RBAC 角色的请求响应
+ * RBACロール取得のリクエストレスポンス
  */
 export type GetRbacRoleResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回数据 */
+	/** 成功した場合、データを返す */
 	result?: (
 		& RbacRole
 		& { apiPathList: RbacApiPathResult[] }
 	)[];
-	/** 如果成功，返回合计数据 */
+	/** 成功した場合、合計データを返す */
 	count?: number;
 };
 
 /**
- * 为角色更新 API 路径权限的请求载荷
+ * ロールのAPIパス権限更新のリクエストペイロード
  */
 export type UpdateApiPathPermissionsForRoleRequestDto = {
-	/** 角色的名字 */
+	/** ロールの名前 */
 	roleName: string;
-	/** 这个角色有哪些 API 路径的访问权 */
+	/** このロールがアクセス権を持つAPIパス */
 	apiPathPermissions: string[];
 };
 
 /**
- * 为角色更新 API 路径权限的请求响应
+ * ロールのAPIパス権限更新のリクエストレスポンス
  */
 export type UpdateApiPathPermissionsForRoleResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回数据 */
+	/** 成功した場合、データを返す */
 	result?: RbacRole;
 };
 
 /**
- * 通过 UID 获取一个用户的角色的请求载荷
+ * UIDによるユーザーロール取得のリクエストペイロード
  */
 export type AdminGetUserRolesByUidRequestDto = {
-	/** 用户的 UID */
+	/** ユーザーのUID */
 	uid: number;
 };
 
 /**
- * 通过 UID 获取一个用户的角色的请求响应
+ * UIDによるユーザーロール取得のリクエストレスポンス
  */
 export type AdminGetUserRolesByUidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
-	/** 如果成功，返回数据 */
+	/** 成功した場合、データを返す */
 	result?: {
-		/** 用户的 UID */
+		/** ユーザーのUID */
 		uid: number;
-		/** 用户的 UUID */
+		/** ユーザーのUUID */
 		uuid: string;
-		/** 用户名 */
+		/** ユーザー名 */
 		username: string;
-		/** 用户昵称 */
+		/** ユーザーニックネーム */
 		userNickname: string;
-		/** 用户头像 */
+		/** ユーザーアイコン */
 		avatar: string;
-		/** 用户的角色 */
+		/** ユーザーのロール */
 		roles: RbacRole[];
 	};
 };
 
 /**
- * 管理员使用 UUID 更新用户角色
+ * 管理者によるUUIDでのユーザーロール更新
  */
 type AdminUpdateUserRoleByUUID = {
-	/** 要被更新角色的用户的 UUID，不带有 UID */
+	/** 更新対象ユーザーのUUID（UIDなし） */
 	uuid: string;
 	uid: never;
-	/** 新的角色 */
+	/** 新しいロール */
 	newRoles: string[];
 };
 
 /**
- * 管理员使用 UID 更新用户角色
+ * 管理者によるUIDでのユーザーロール更新
  */
 type AdminUpdateUserRoleByUID = {
-	/** 要被更新角色的用户的 UID，不带有 UUID */
+	/** 更新対象ユーザーのUID（UUIDなし） */
 	uid: number;
 	uuid: never;
-	/** 新的角色 */
+	/** 新しいロール */
 	newRoles: string[];
 };
 
 /**
- * 管理员更新用户角色的请求载荷
+ * 管理者によるユーザーロール更新のリクエストペイロード
  */
 export type AdminUpdateUserRoleRequestDto = AdminUpdateUserRoleByUUID | AdminUpdateUserRoleByUID;
 
 /**
- * 管理员更新用户角色的请求响应
+ * 管理者によるユーザーロール更新のリクエストレスポンス
  */
 export type AdminUpdateUserRoleResponseDto = {
-	/** 是否请求成功 */
+	/** リクエスト成功か */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 付加テキストメッセージ */
 	message?: string;
 };

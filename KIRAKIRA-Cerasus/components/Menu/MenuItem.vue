@@ -2,9 +2,9 @@
 	import Menu from "./Menu.vue";
 
 	const props = withDefaults(defineProps<{
-		/** 图标。 */
+		/** アイコン。 */
 		icon?: DeclaredIcons;
-		/** 禁用？ */
+		/** 無効にしますか？ */
 		disabled?: boolean;
 	}>(), {
 		icon: undefined,
@@ -20,8 +20,8 @@
 	const vIndex = ref(0);
 
 	/**
-	 * 单击菜单命令事件。
-	 * @param e - 鼠标点击事件。
+	 * メニューコマンドクリックイベント。
+	 * @param e - マウスのクリックイベント。
 	 */
 	function onClick(e: MouseEvent) {
 		parent.exposed?.hide();

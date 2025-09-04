@@ -136,11 +136,11 @@ export function useBackgroundImages() {
 }
 
 /**
- * 将数组项目移至其他位置。
- * @param array - 源数组。
- * @param from - 原元素索引。
- * @param to - 新元素索引。
- * @returns 带有移至新位置的项目的新数组。
+ * 配列の項目を別の位置に移動します。
+ * @param array - ソース配列。
+ * @param from - 元の要素のインデックス。
+ * @param to - 新しい要素のインデックス。
+ * @returns 新しい位置に移動した項目を持つ新しい配列。
  */
 function arrayMove<T>(array: T[], from: number, to: number): T[] {
 	const newArray = array.slice();

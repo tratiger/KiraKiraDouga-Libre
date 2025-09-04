@@ -1,11 +1,11 @@
 /**
- * 文本光标辅助操作对象。
+ * テキストカーソル補助操作オブジェクト。
  */
 export const Caret = {
 	/**
-	 * 获取文本光标的坐标。
-	 * @param input - 输入框元素（如果有）。
-	 * @returns 文本光标的坐标。
+	 * テキストカーソルの位置を取得します。
+	 * @param input - 入力要素（もしあれば）。
+	 * @returns テキストカーソルの位置。
 	 */
 	get(input?: MaybeRef<HTMLInputElement>) {
 		if (input) {
@@ -18,9 +18,9 @@ export const Caret = {
 	},
 
 	/**
-	 * 设置文本光标的坐标。
-	 * @param element - HTML DOM 元素。
-	 * @param offset - 文本光标的坐标。
+	 * テキストカーソルの位置を設定します。
+	 * @param element - HTML DOM要素。
+	 * @param offset - テキストカーソルの位置。
 	 */
 	set(element: MaybeRef<Element>, offset: number) {
 		element = toValue(element);
@@ -45,9 +45,9 @@ export const Caret = {
 	},
 
 	/**
-	 * 清除文本选择。
+	 * テキストの選択をクリアします。
 	 *
-	 * 注意是不选择文本，而不是将选择文本删除。
+	 * 注意：選択したテキストを削除するのではなく、選択を解除するだけです。
 	 */
 	clear() {
 		if (window.getSelection) {
@@ -61,9 +61,9 @@ export const Caret = {
 };
 
 /**
- * 将文本插入指定文本框中光标的位置，如果选中了文本，则替换之。
- * @param input - 输入框。
- * @param text - 插入的文字。
+ * 指定されたテキストボックスのカーソル位置にテキストを挿入します。テキストが選択されている場合は、それを置き換えます。
+ * @param input - 入力ボックス。
+ * @param text - 挿入するテキスト。
  */
 export function insertTextToTextBox(input: MaybeRef<HTMLInputElement | HTMLTextAreaElement>, text: string = "") {
 	input = toValue(input);

@@ -1,24 +1,24 @@
 <docs>
-	点击 icon 然后播放一段动画的组件。
+	アイコンをクリックするとアニメーションを再生するコンポーネント。
 
-	适合收藏、点赞等小功能。
+	コレクションやお気に入りなどの小さな機能に適しています。
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 循环播放？ */
+		/** ループ再生しますか？ */
 		loop?: boolean;
-		/** 自动播放？ */
+		/** 自動再生しますか？ */
 		autoplay?: boolean;
-		/** 动画数据 JSON 或其文件名。 */
+		/** アニメーションデータJSONまたはそのファイル名。 */
 		name: object | DeclaredLotties;
-		/** 隐藏？ */
+		/** 非表示にしますか？ */
 		hidden?: boolean;
-		/** 播放速度。 */
+		/** 再生速度。 */
 		speed?: number;
-		/** 状态信息。参数依次为：标记、循环、速度。 */
+		/** 状態情報。パラメータは順に、マーカー、ループ、速度です。 */
 		state?: AnimatedIconState;
-		/** 是否保持图标本身的颜色。 */
+		/** アイコン自体の色を保持しますか？ */
 		filled?: boolean;
 	}>(), {
 		speed: 1,
@@ -40,7 +40,7 @@
 	watch(() => props.state, () => onStateChange());
 
 	/**
-	 * 获取以文件名形式的图标。
+	 * ファイル名形式のアイコンを取得します。
 	 */
 	function getIcon() {
 		if (typeof props.name !== "string") {
@@ -62,7 +62,7 @@
 	}
 
 	/**
-	 * 点击图标交互事件。
+	 * アイコンクリックインタラクションイベント。
 	 */
 	function onClick() {
 		if (!anim.value) return;
@@ -70,35 +70,35 @@
 	}
 
 	/**
-	 * 停止动画。
+	 * アニメーションを停止します。
 	 */
 	function stop() {
 		anim.value?.stop();
 	}
 
 	/**
-	 * 播放动画。
+	 * アニメーションを再生します。
 	 */
 	function play() {
 		anim.value?.play();
 	}
 
 	/**
-	 * 暂停动画。
+	 * アニメーションを一時停止します。
 	 */
 	function pause() {
 		anim.value?.pause();
 	}
 
 	/**
-	 * 控制播放速度。
+	 * 再生速度を制御します。
 	 */
 	function onSpeedChange() {
 		anim.value?.setSpeed(props.speed);
 	}
 
 	/**
-	 * 控制状态信息。
+	 * 状態情報を制御します。
 	 */
 	function onStateChange() {
 		const ani = anim.value;
@@ -109,7 +109,7 @@
 		else
 			({ marker, loop, speed } = props.state);
 		if (loop !== undefined) ani.loop = loop;
-		if (speed) { // 在不为 0 时有效。
+		if (speed) { // 0でない場合に有効。
 			ani.playSpeed = Math.abs(speed);
 			ani.playDirection = Math.sign(speed);
 		}
@@ -126,8 +126,8 @@
 	}
 
 	/**
-	 * 当 Lottie 动画完成加载后调用，用于获取 anim 对象。
-	 * @param animated - anim 对象。
+	 * Lottieアニメーションの読み込みが完了したときに呼び出され、animオブジェクトを取得するために使用されます。
+	 * @param animated - animオブジェクト。
 	 */
 	function onAnimationCreated(animated: AnimationItem) {
 		anim.value = animated;

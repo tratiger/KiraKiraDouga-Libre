@@ -1,28 +1,28 @@
-@use "sass:list" as -list; // 修复在 noscript 模块中导入时触发未定义 bug
+@use "sass:list" as -list; // noscriptモジュールでインポートする際に未定義のバグが発生するのを修正
 @use "sass:map" as -map;
 @use "sass:meta" as -meta;
 @use "theme/colors" as *;
 @use "theme/internal" as *;
 @use "theme/functions" as *;
 
-// 将所有预设颜色放在根元素下以便调用，不与下方 class 合并是为了输出时只包含一个 :root。
+// すべてのプリセットカラーをルート要素の下に配置して呼び出しやすくします。下のクラスと結合しないのは、出力時に:rootを1つだけ含めるためです。
 :root {
 	@each $palette, $color in $palette {
 		--#{"" + $palette}: #{$color};
 	}
 }
 
-// 使预设颜色可以直接通过 class 使用。
+// プリセットカラーをクラスで直接使用できるようにします。
 @each $palette, $color in $palette {
 	.#{"" + $palette} {
 		--accent-50: var(--#{$palette});
 	}
 }
 
-// force-color 用于强制指定某个元素的强调色以不跟随全局。
-// 它的存在是为了应对 CSS 变量的特性，不加这些在元素内直接覆盖 --accent 无法修改差分。
-// 此问答可供参考：https://segmentfault.com/q/1010000044508638
-// 在 light 情况下包含 :root 的原因是，防止在 html 标签没有指定任何主题时（如 JavaScript 被禁用时），颜色完全消失的问题。
+// force-colorは、特定の要素のアクセントカラーを強制的に指定し、グローバル設定に従わないようにするために使用します。
+// これはCSS変数の特性に対応するためです。これらを追加しないと、要素内で直接--accentを上書きしても差分を変更できません。
+// このQ&Aが参考になります：https://segmentfault.com/q/1010000044508638
+// lightの場合に:rootを含めるのは、htmlタグにテーマが指定されていない場合（JavaScriptが無効になっている場合など）に色が完全に消えてしまう問題を回避するためです。
 @for $i from 1 through 2 {
 	$is-light: $i == 1;
 	$selector: if(
@@ -35,7 +35,7 @@
 		color-scheme: if($is-light, light, dark);
 		accent-color: var(--accent);
 
-		// 中性色和灰阶类颜色
+		// ニュートラルカラーとグレースケールカラー
 		@each $colors in $neutral-colors, $grayscale-colors {
 			@each $key, $color in $colors {
 				@include hex-or-rgb-color($key, $color, $is-light);
@@ -50,7 +50,7 @@
 			}
 		}
 
-		// 混合色（--accent 的差分）
+		// 混合色（--accentの差分）
 		@each $state, $colors in $mixed-colors {
 			@if -list.length($colors) >= 2 {
 				$mixed-color: -list.nth($colors, $i);
@@ -63,7 +63,7 @@
 			}
 		}
 
-		// @include wave-link($key, $color, $is-light); // TODO: 波浪链接颜色样式暂时搁置，完成后请将 hyperlink.scss 中的注释取消注释。
+		// @include wave-link($key, $color, $is-light); // TODO: 波線リンクのカラースタイルは一時的に保留します。完了後、hyperlink.scssのコメントを解除してください。
 	}
 }
 

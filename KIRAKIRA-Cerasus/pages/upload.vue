@@ -9,13 +9,13 @@
 	const selfUserInfoStore = useSelfUserInfoStore();
 
 	/**
-	 * 成功上传文件。
-	 * @param fileList - 文件列表。
+	 * ファイルのアップロードに成功しました。
+	 * @param fileList - ファイルリスト。
 	 */
 	async function uploaded(fileList: File[]) {
-		// DELETE ME: 该判定仅测试阶段使用
+		// DELETE ME: この判定はテスト段階でのみ使用します
 		if (!selfUserInfoStore.userInfo.roles?.includes("administrator")) {
-			useToast("测试阶段该功能仅限管理员使用。", "warning", 5000);
+			useToast("テスト段階ではこの機能は管理者のみ使用できます。", "warning", 5000);
 			return;
 		}
 
@@ -26,7 +26,7 @@
 	}
 
 	/**
-	 * 上传文件无效。
+	 * 無効なファイルをアップロードしました。
 	 */
 	function invalidUploaded() {
 		successfulUploaded.value = false;
@@ -35,9 +35,9 @@
 	}
 
 	/**
-	 * 获取合法的文件列表。
-	 * @param fileList - 原生文件列表。
-	 * @returns 合法的文件列表。
+	 * 有効なファイルリストを取得します。
+	 * @param fileList - ネイティブのファイルリスト。
+	 * @returns 有効なファイルリスト。
 	 */
 	function getValidFiles(fileList?: FileList | null) {
 		if (!fileList || fileList.length === 0) return [];
@@ -49,8 +49,8 @@
 	}
 
 	/**
-	 * 拖放事件。
-	 * @param e - 拖放事件。
+	 * ドロップイベント。
+	 * @param e - ドロップイベント。
 	 */
 	function onDrop(e: DragEvent) {
 		dragover.value = false;
@@ -64,15 +64,15 @@
 	}
 
 	/**
-	 * 上传文件事件。
-	 * @param e - 普通事件。
+	 * ファイルアップロードイベント。
+	 * @param e - 通常のイベント。
 	 */
 	function onChangeFile(e: Event) {
 		const input = e.target as HTMLInputElement;
 		const files = getValidFiles(input.files);
-		// DELETE ME: 改判定仅测试阶段使用
+		// DELETE ME: この判定はテスト段階でのみ使用します
 		if (!selfUserInfoStore.userInfo.roles?.includes("administrator")) {
-			useToast("测试阶段该功能仅限管理员使用。", "warning", 5000);
+			useToast("テスト段階ではこの機能は管理者のみ使用できます。", "warning", 5000);
 			return;
 		}
 
@@ -83,7 +83,7 @@
 	}
 
 	/**
-	 * 取消本次上传视频。
+	 * 今回の動画アップロードをキャンセルします。
 	 */
 	function cancelUpdate() {
 		if (!showEditor.value) return;
@@ -118,7 +118,7 @@
 			{{ t.under_construction.feature_admin_only }}
 		</InfoBar>
 
-		<!-- TODO: 临时 SoftButton，之后请在 UploadEditor 的 Submit 按钮左边放一个取消。 -->
+		<!-- TODO: 仮のSoftButtonです。後でUploadEditorのSubmitボタンの左にキャンセルボタンを配置してください。 -->
 		<SoftButton icon="close" v-if="showEditor" @click="cancelUpdate" />
 		<input
 			ref="fileInput"

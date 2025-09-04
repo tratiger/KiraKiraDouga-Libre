@@ -1,6 +1,6 @@
 /**
- * 判断是否是手机。
- * @returns 是否是手机。
+ * モバイル端末かどうかを判定します。
+ * @returns モバイル端末かどうか。
  * @see https://www.ruanyifeng.com/blog/2021/09/detecting-mobile-browser.html
  */
 export function isMobile() {
@@ -9,8 +9,8 @@ export function isMobile() {
 }
 
 /**
- * 使用页面宽度判断设备类型。
- * @returns 设备类型。
+ * ページの幅を使用してデバイスの種類を判定します。
+ * @returns デバイスの種類。
  */
 export function getResponsiveDevice() {
 	if (environment.server) return "computer";
@@ -20,17 +20,17 @@ export function getResponsiveDevice() {
 }
 
 /**
- * 判断指针事件是否由鼠标触发而非触摸触发。
- * @param e - 指针点击事件。
- * @returns 指针事件由鼠标触发而非触摸触发？
+ * ポインターイベントがタッチではなくマウスによってトリガーされたかどうかを判断します。
+ * @param e - ポインタークリックイベント。
+ * @returns ポインターイベントがタッチではなくマウスによってトリガーされたか？
  */
 export function isMouse(e?: PointerEvent) {
 	return e?.pointerType !== "touch";
 }
 
 /**
- * 获取当前操作系统。
- * @returns 当前操作系统。
+ * 現在のオペレーティングシステムを取得します。
+ * @returns 現在のオペレーティングシステム。
  */
 export function getPlatform() {
 	if (environment.server) return;

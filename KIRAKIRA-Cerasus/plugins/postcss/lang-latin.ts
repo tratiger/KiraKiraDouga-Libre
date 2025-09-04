@@ -2,9 +2,9 @@ import parser from "postcss-selector-parser";
 
 const latinLangs = ["en", "vi", "id", "fr"] as const;
 
-// 值得注意的是，:lang 选择器并不支持同时选择多种语言，即你不能这么写：
+// 注意点として、:langセレクタは複数の言語を同時に選択することをサポートしていません。つまり、次のように書くことはできません：
 // :lang(zh, en, ja)
-// 你必须只能这么写：
+// 以下のように書く必要があります：
 // :is(:lang(zh), :lang(en), :lang(ja))
 
 const transformPseudo: parser.SyncProcessor = selectors => {

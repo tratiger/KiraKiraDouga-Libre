@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 已打开，单向绑定使用。 */
+		/** 開いているか、一方向バインディングで使用。 */
 		open?: boolean;
-		/** 标题。 */
+		/** タイトル。 */
 		title?: string;
-		/** 聚焦内容。是否**不要**单击空白处关闭。 */
+		/** コンテンツにフォーカス。空白部分をクリックして閉じないようにしますか？ */
 		static?: boolean;
 	}>();
 
@@ -33,9 +33,9 @@
 					<div class="body">
 						<Icon name="info" />
 						<div class="content-part">
-							<h2>{{ title ?? "KIRAKIRA 提示您" }}</h2>
+							<h2>{{ title ?? "KIRAKIRAからのお知らせ" }}</h2>
 							<div class="content">
-								<slot><em>没有内容。</em></slot>
+								<slot><em>内容がありません。</em></slot>
 							</div>
 						</div>
 					</div>
@@ -46,7 +46,7 @@
 					</div>
 					<div class="right">
 						<slot name="footer-right">
-							<Button @click="open = false">了然</Button>
+							<Button @click="open = false">OK</Button>
 						</slot>
 					</div>
 				</div>

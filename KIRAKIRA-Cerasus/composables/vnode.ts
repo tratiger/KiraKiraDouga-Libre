@@ -1,6 +1,6 @@
 /**
- * 在组合式 API 定义 render 函数，比如返回特定的 JSX。
- * @param render - 指定渲染函数，比如 JSX。
+ * コンポジションAPIでレンダリング関数を定義します。例えば、特定のJSXを返します。
+ * @param render - レンダリング関数を指定します。例えば、JSX。
  */
 export function useRender(render: () => VNode): void {
 	const vm = getCurrentInstance() as ComponentInternalInstance & { render: () => VNode } | null;
@@ -9,10 +9,10 @@ export function useRender(render: () => VNode): void {
 }
 
 /**
- * 获取父组件。
- * @remarks 如果使用该函数，在修改该组件触发热重载时，会出现组件突然消失的情况。目前只能支持通过刷新网页解决。
- * @param type - 父组件的类型筛选。
- * @returns 父组件或 null（如果没有）。
+ * 親コンポーネントを取得します。
+ * @remarks この関数を使用すると、このコンポーネントを変更してホットリロードをトリガーしたときに、コンポーネントが突然消えることがあります。現在のところ、ウェブページをリフレッシュすることでのみ解決できます。
+ * @param type - 親コンポーネントの型フィルタ。
+ * @returns 親コンポーネント、またはnull（存在しない場合）。
  */
 export function useParent<T extends ComponentInternalInstance>(type?: ConcreteComponent | unknown) {
 	let parent = getCurrentInstance()?.parent;
@@ -22,26 +22,26 @@ export function useParent<T extends ComponentInternalInstance>(type?: ConcreteCo
 }
 
 /**
- * 获取父组件的作用域样式 ID。
- * @returns 父组件的作用域样式 ID。
+ * 親コンポーネントのスコープ付きスタイルIDを取得します。
+ * @returns 親コンポーネントのスコープ付きスタイルID。
  */
 export function useParentScopeId() {
 	return getCurrentInstance()?.vnode.scopeId;
 }
 
 /**
- * 获取当前组件的作用域样式 ID。
- * @remarks 疑似在发行版中在某些极端情况下可能无法正常使用。
- * @returns 当前组件的作用域样式 ID。
- * 如果当前组件没有作用域样式 ID，返回 undefined；如果该函数不在 setup 时期调用，返回 null。
+ * 現在のコンポーネントのスコープ付きスタイルIDを取得します。
+ * @remarks リリース版では、特定の極端な状況下で正常に動作しない可能性があります。
+ * @returns 現在のコンポーネントのスコープ付きスタイルID。
+ * 現在のコンポーネントにスコープ付きスタイルIDがない場合はundefinedを返し、この関数がsetup期間中に呼び出されない場合はnullを返します。
  */
 export function useScopeId() {
 	return getScopeIdFromInstance(getCurrentInstance());
 }
 
 /**
- * 通过 Scope ID 来获取父组件。
- * @returns 父组件或 null（如果没有）。
+ * Scope IDを介して親コンポーネントを取得します。
+ * @returns 親コンポーネント、またはnull（存在しない場合）。
  */
 export function useParentByScopeId() {
 	const instance = getCurrentInstance();
@@ -57,10 +57,10 @@ export function useParentByScopeId() {
 }
 
 /**
- * 从实例获取组件的 Scope ID。
- * @remarks 疑似在发行版中在某些极端情况下可能无法正常使用。
- * @param instance - 组件内部实例。
- * @returns 组件的 Scope ID。
+ * インスタンスからコンポーネントのScope IDを取得します。
+ * @remarks リリース版では、特定の極端な状況下で正常に動作しない可能性があります。
+ * @param instance - コンポーネントの内部インスタンス。
+ * @returns コンポーネントのScope ID。
  */
 export function getScopeIdFromInstance(instance: ComponentInternalInstance | null) {
 	if (!instance) return null;
@@ -71,25 +71,24 @@ export function getScopeIdFromInstance(instance: ComponentInternalInstance | nul
 }
 
 /**
- * 在 defineModel 同时兼容绑定一个单向绑定的布尔属性。
- * @param model - 双向绑定布尔模型。
- * @param oneWayProp - 调用单向兼容绑定布尔属性的函数，不建议直接传递变量否则会失去绑定除非是常量。
- * @returns 一个计算属性，修改时与直接用模型一致，读取时如果模型获取到 undefined，则会调用单向绑定属性的值。如果还是
- * undefined 则会自动转换为 false。
+ * defineModelで単方向バインディングのブール値プロパティを同時に互換性を持たせてバインドします。
+ * @param model - 双方向バインディングのブール値モデル。
+ * @param oneWayProp - 単方向互換バインディングのブール値プロパティを呼び出す関数。定数でない限り、変数を直接渡すことは推奨されません。さもなければバインディングが失われます。
+ * @returns 変更時はモデルと直接一致し、読み取り時にモデルがundefinedを取得した場合は、単方向バインディングプロパティの値を呼び出す計算済みプロパティ。それでもundefinedの場合は自動的にfalseに変換されます。
  */
 export function withOneWayProp(model: Ref<boolean | undefined>, oneWayProp: TypeOrReturnToType<boolean | undefined>): WritableComputedRef<boolean>;
 /**
- * 在 defineModel 同时兼容绑定一个单向绑定的属性。
- * @param model - 双向绑定模型。
- * @param oneWayProp - 调用单向兼容绑定属性的函数，不建议直接传递变量否则会失去绑定。
- * @returns 一个计算属性，修改时与直接用模型一致，读取时如果模型获取到 undefined，则会调用单向绑定属性的值。
+ * defineModelで単方向バインディングのプロパティを同時に互換性を持たせてバインドします。
+ * @param model - 双方向バインディングモデル。
+ * @param oneWayProp - 単方向互換バインディングプロパティを呼び出す関数。変数を直接渡すことは推奨されません。さもなければバインディングが失われます。
+ * @returns 変更時はモデルと直接一致し、読み取り時にモデルがundefinedを取得した場合は、単方向バインディングプロパティの値を呼び出す計算済みプロパティ。
  */
 export function withOneWayProp<T>(model: Ref<T | undefined>, oneWayProp: TypeOrReturnToType<T>): WritableComputedRef<T>;
 /**
- * 在 defineModel 同时兼容绑定一个单向绑定的属性。
- * @param model - 双向绑定模型。
- * @param oneWayProp - 调用单向兼容绑定属性的函数，不建议直接传递变量否则会失去绑定。
- * @returns 一个计算属性，修改时与直接用模型一致，读取时如果模型获取到 undefined，则会调用单向绑定属性的值。
+ * defineModelで単方向バインディングのプロパティを同時に互換性を持たせてバインドします。
+ * @param model - 双方向バインディングモデル。
+ * @param oneWayProp - 単方向互換バインディングプロパティを呼び出す関数。変数を直接渡すことは推奨されません。さもなければバインディングが失われます。
+ * @returns 変更時はモデルと直接一致し、読み取り時にモデルがundefinedを取得した場合は、単方向バインディングプロパティの値を呼び出す計算済みプロパティ。
  */
 export function withOneWayProp<T>(model: Ref<T | undefined>, oneWayProp: TypeOrReturnToType<T>) {
 	const result = computed({
@@ -102,9 +101,9 @@ export function withOneWayProp<T>(model: Ref<T | undefined>, oneWayProp: TypeOrR
 }
 
 /**
- * 从可能是 Vue 组件中获取真实 DOM。
- * @param el - 组件或元素的引用。
- * @returns 真实 DOM。
+ * Vueコンポーネントの可能性があるものから実際のDOMを取得します。
+ * @param el - コンポーネントまたは要素の参照。
+ * @returns 実際のDOM。
  */
 export function getElFromComponentInstance(el: MaybeRef<HTMLElement | ComponentPublicInstance | undefined>) {
 	el = toValue(el);
@@ -112,19 +111,19 @@ export function getElFromComponentInstance(el: MaybeRef<HTMLElement | ComponentP
 }
 
 /**
- * 获取插槽中的子节点内容。
- * @param item - 插槽中的某一个项目。
- * @returns 插槽中的子节点内容。
+ * スロット内の子ノードの内容を取得します。
+ * @param item - スロット内の特定のアイテム。
+ * @returns スロット内の子ノードの内容。
  */
 export function getSlotVNodeNormalizedChildren(item: VNode) {
 	return (item.children as Slots).default?.()?.[0]?.children;
 }
 
 /**
- * 获取有关虚拟插槽内容的对象数组。
- * @see https://stackoverflow.com/questions/55754822 本函数受限于 TypeScript 功能的妥协，在短期内暂时无法更改为更优雅的写法。
- * @param vdoms - 插槽内容。
- * @returns 注意必须调用两次函数的括号，才能获取有关插槽内容的对象数组。
+ * 仮想スロットの内容に関するオブジェクトの配列を取得します。
+ * @see https://stackoverflow.com/questions/55754822 この関数はTypeScriptの機能の妥協に制約されており、短期的にはよりエレガントな書き方に変更することはできません。
+ * @param vdoms - スロットの内容。
+ * @returns 関数の括弧を2回呼び出す必要があることに注意してください。そうしないと、スロットの内容に関するオブジェクトの配列を取得できません。
  */
 export function getSlotItems<
 	C,
@@ -132,8 +131,8 @@ export function getSlotItems<
 	vdoms: VNode<RendererNode, RendererElement, AnyObject>[] | undefined,
 ) {
 	/**
-	 * @param def - 指定 Props 默认值。
-	 * @returns 有关插槽内容的对象数组。
+	 * @param def - Propsのデフォルト値を指定します。
+	 * @returns スロットの内容に関するオブジェクトの配列。
 	 */
 	return <
 		D extends Partial<Record<keyof ComponentProps<C>, unknown>> = {},
@@ -164,8 +163,8 @@ export function getSlotItems<
 }
 
 /**
- * 判断默认插槽中是否有内容。
- * @returns 默认插槽中是否有内容？
+ * デフォルトスロットに内容があるかどうかを判断します。
+ * @returns デフォルトスロットに内容がありますか？
  */
 export function hasContentInDefaultSlot() {
 	return !!useSlots().default?.()?.length;

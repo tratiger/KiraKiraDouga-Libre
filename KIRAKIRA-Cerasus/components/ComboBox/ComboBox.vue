@@ -1,9 +1,9 @@
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 内容占位符，当选中的一项不是任何一项有效的标识符时显示。 */
+		/** プレースホルダー。選択された項目が有効な識別子でない場合に表示されます。 */
 		placeholder?: string;
 	}>(), {
-		placeholder: () => t.unselected.combobox, // 注意看，如果在 prop 的默认值中使用 i18n 则必须这样写。
+		placeholder: () => t.unselected.combobox, // 注意：propのデフォルト値でi18nを使用する場合は、このように記述する必要があります。
 	});
 
 	const selected = defineModel<string>({ required: true });
@@ -45,10 +45,10 @@
 	const clipPathUnset = { clipPath: "inset(0 round 4px)" } as const;
 
 	/**
-	 * 在元素被插入到 DOM 之后的下一帧被调用。
-	 * 用这个来开始进入动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 要素がDOMに挿入された後の次のフレームで呼び出されます。
+	 * これを使用して、進入アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - コールバック関数doneを呼び出すと、遷移が終了したことを示します。
 	 */
 	async function onMenuEnter(el: Element, done: () => void) {
 		const { top, finalHeight, clipPath } = getMenuCssVars(el);
@@ -64,10 +64,10 @@
 	}
 
 	/**
-	 * 在离开过渡开始时调用。
-	 * 用这个来开始离开动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 離脱遷移が開始されるときに呼び出されます。
+	 * これを使用して、離脱アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - コールバック関数doneを呼び出すと、遷移が終了したことを示します。
 	 */
 	async function onMenuLeave(el: Element, done: () => void) {
 		const { top, finalHeight, clipPath } = getMenuCssVars(el);
@@ -92,7 +92,7 @@
 <template>
 	<Comp role="combobox" :aria-expanded="showMenu">
 		<div>
-			<!-- TODO: 缺少字段图标与标签以与输入框样式匹配。注意是整个字段的图标，不是每个项目的图标。 -->
+			<!-- TODO: フィールドアイコンとラベルが不足しているため、入力ボックスのスタイルと一致させる必要があります。注意：フィールド全体のアイコンであり、各項目のアイコンではありません。 -->
 			<div v-ripple class="wrapper" :tabindex="0" @click="show">
 				<span v-if="isSelectionValid">{{ selectedContent }}</span>
 				<span v-else class="placeholder">{{ placeholder }}</span>
@@ -126,7 +126,7 @@
 
 	@layer props {
 		:comp {
-			/// 组合框尺寸，可选的值为：small | normal | large。
+			/// コンボボックスのサイズ。選択可能な値：small | normal | large。
 			--size: normal;
 		}
 	}

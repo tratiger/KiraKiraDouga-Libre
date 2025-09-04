@@ -31,7 +31,7 @@
 	 * Fetch the user profile data.
 	 */
 	async function fetchUserData() {
-		// TODO: 现在获取用户信息的接口还没法获得这些信息
+		// TODO: 現在のユーザー情報取得APIではまだこれらの情報を取得できません
 
 		const getUserInfoByUidRequest: GetUserInfoByUidRequestDto = {
 			uid: urlUid.value,

@@ -4,31 +4,31 @@ const { min, max, round } = Math;
 const { isArray } = Array;
 
 /**
- * 颜色类。
+ * カラークラス。
  */
 export class Color {
 	private hsva: FourD;
 
 	/**
-	 * 从色饱明创建颜色类实例。
+	 * 色相、彩度、明度からカラークラスのインスタンスを作成します。
 	 * @access private
-	 * @param h - 色相分量 ∈ [0 ~ 360)。
-	 * @param s - 饱和度分量 ∈ [0 ~ 100]。
-	 * @param v - 明度分量 ∈ [0 ~ 100]。
-	 * @param a - 不透明度 ∈ [0 ~ 1]。
-	 * @returns 颜色类实例。
+	 * @param h - 色相成分 ∈ [0, 360)。
+	 * @param s - 彩度成分 ∈ [0, 100]。
+	 * @param v - 明度成分 ∈ [0, 100]。
+	 * @param a - 不透明度 ∈ [0, 1]。
+	 * @returns カラークラスのインスタンス。
 	 */
 	private constructor(h: number, s: number, v: number, a: number) {
 		this.hsva = [h, s, v, a];
 	}
 
 	/**
-	 * 从红绿蓝创建颜色类实例。
-	 * @param r - 红色分量 ∈ [0 ~ 255]。
-	 * @param g - 绿色分量 ∈ [0 ~ 255]。
-	 * @param b - 蓝色分量 ∈ [0 ~ 255]。
-	 * @param a - 不透明度 ∈ [0 ~ 1]。
-	 * @returns 颜色类实例。
+	 * 赤、緑、青からカラークラスのインスタンスを作成します。
+	 * @param r - 赤成分 ∈ [0, 255]。
+	 * @param g - 緑成分 ∈ [0, 255]。
+	 * @param b - 青成分 ∈ [0, 255]。
+	 * @param a - 不透明度 ∈ [0, 1]。
+	 * @returns カラークラスのインスタンス。
 	 */
 	static fromRgb(r: number, g: number, b: number, a: number = 1) {
 		const [h, s, v] = rgbToHsv(r, g, b);
@@ -36,12 +36,12 @@ export class Color {
 	}
 
 	/**
-	 * 从色饱亮创建颜色类实例。
-	 * @param h - 色相分量 ∈ [0 ~ 360)。
-	 * @param s - 饱和度分量 ∈ [0 ~ 100]。
-	 * @param l - 亮度分量 ∈ [0 ~ 100]。
-	 * @param a - 不透明度 ∈ [0 ~ 1]。
-	 * @returns 颜色类实例。
+	 * 色相、彩度、輝度からカラークラスのインスタンスを作成します。
+	 * @param h - 色相成分 ∈ [0, 360)。
+	 * @param s - 彩度成分 ∈ [0, 100]。
+	 * @param l - 輝度成分 ∈ [0, 100]。
+	 * @param a - 不透明度 ∈ [0, 1]。
+	 * @returns カラークラスのインスタンス。
 	 */
 	static fromHsl(h: number, s: number, l: number, a: number = 1) {
 		const [_h, _s, _v] = hslToHsv(h, s, l);
@@ -49,33 +49,33 @@ export class Color {
 	}
 
 	/**
-	 * 从色饱明创建颜色类实例。
-	 * @param h - 色相分量 ∈ [0 ~ 360)。
-	 * @param s - 饱和度分量 ∈ [0 ~ 100]。
-	 * @param v - 明度分量 ∈ [0 ~ 100]。
-	 * @param a - 不透明度 ∈ [0 ~ 1]。
-	 * @returns 颜色类实例。
+	 * 色相、彩度、明度からカラークラスのインスタンスを作成します。
+	 * @param h - 色相成分 ∈ [0, 360)。
+	 * @param s - 彩度成分 ∈ [0, 100]。
+	 * @param v - 明度成分 ∈ [0, 100]。
+	 * @param a - 不透明度 ∈ [0, 1]。
+	 * @returns カラークラスのインスタンス。
 	 */
 	static fromHsv(h: number, s: number, v: number, a: number = 1) {
 		return new Color(h, s, v, a);
 	}
 
 	/**
-	 * 从色饱明创建颜色类实例。
-	 * @param h - 色相分量 ∈ [0 ~ 360)。
-	 * @param s - 饱和度分量 ∈ [0 ~ 100]。
-	 * @param v - 明度分量 ∈ [0 ~ 100]。
-	 * @param a - 不透明度 ∈ [0 ~ 1]。
-	 * @returns 颜色类实例。
+	 * 色相、彩度、明度からカラークラスのインスタンスを作成します。
+	 * @param h - 色相成分 ∈ [0, 360)。
+	 * @param s - 彩度成分 ∈ [0, 100]。
+	 * @param v - 明度成分 ∈ [0, 100]。
+	 * @param a - 不透明度 ∈ [0, 1]。
+	 * @returns カラークラスのインスタンス。
 	 */
 	static fromHsb(h: number, s: number, v: number, a: number = 1) {
 		return this.fromHsv(h, s, v, a);
 	}
 
 	/**
-	 * 从 16 进制颜色值创建颜色类实例。
-	 * @param hex - 16 进制颜色值。
-	 * @returns 颜色类实例。
+	 * 16進数のカラー値からカラークラスのインスタンスを作成します。
+	 * @param hex - 16進数のカラー値。
+	 * @returns カラークラスのインスタンス。
 	 */
 	static fromHex(hex: string) {
 		const rgba = hexToRgb(hex);
@@ -84,24 +84,24 @@ export class Color {
 		return Color.fromRgb(r, g, b, a);
 	}
 
-	/** 色相分量。 */
+	/** 色相成分。 */
 	get h() { return this.hsva[0]; }
 	set h(v) { this.hsva[0] = floorMod(v, 360); }
 
-	/** 饱和度分量。 */
+	/** 彩度成分。 */
 	get s() { return this.hsva[1]; }
 	set s(v) { this.hsva[1] = clamp(v, 0, 100); }
 
-	/** 明度分量。 */
+	/** 明度成分。 */
 	get v() { return this.hsva[2]; }
 	set v(v) { this.hsva[2] = clamp(v, 0, 100); }
 
-	/** 不透明度分量。 */
+	/** 不透明度成分。 */
 	get a() { return this.hsva[3]; }
 	set a(v) { this.hsva[3] = clamp(v, 0, 1); }
 
 	/**
-	 * 获取并设置不带井号开头的 16 进制颜色值。
+	 * シャープなしの16進数のカラー値を取得および設定します。
 	 */
 	get hex() {
 		const padStart = (value: number) => padTo2Digit(Math.round(value), 16);
@@ -118,7 +118,7 @@ export class Color {
 	}
 
 	/**
-	 * 获取并设置带井号开头的 16 进制颜色值。
+	 * シャープ付きの16進数のカラー値を取得および設定します。
 	 */
 	get hashHex() {
 		return "#" + this.hex;
@@ -221,7 +221,7 @@ export class Color {
 		this.hsv = { h, s, v: b, a };
 	}
 
-	/** 获取更自然亮度值。 */
+	/** より自然な輝度値を取得します。 */
 	get naturalLightness() {
 		const { r, g, b } = this.rgb;
 		return 0.299 * r / 255 + 0.587 * g / 255 + 0.114 * b / 255;

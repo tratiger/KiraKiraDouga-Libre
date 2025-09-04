@@ -1,17 +1,17 @@
 import safeRegex from "safe-regex";
 
 /**
- * 判断一个字符串是否看起来像正则表达式。
- * @param str - 待测试字符串。
- * @returns 字符串是否看起来像正则表达式？
+ * 文字列が正規表現のように見えるかどうかを判断します。
+ * @param str - テスト対象の文字列。
+ * @returns 文字列が正規表現のように見えるか？
  */
 export function isLooksLikeRegexString(str: string) {
-	// 1. 基本格式：以斜杠开头、斜杠结尾，可跟 0~6 位正则标志
+	// 1. 基本フォーマット：スラッシュで始まり、スラッシュで終わり、0〜6文字の正規表現フラグが続く
 	const regexSyntax = /^\/(.+)\/([gimsuy]*)$/;
 	const match = str.match(regexSyntax);
 	if (!match) return false;
 
-	// 2. 校验 pattern 和 flags 是否能真正构造出一个 RegExp
+	// 2. patternとflagsが実際にRegExpを構築できるか検証する
 	try {
 		new RegExp(match[1], match[2]);
 		return true;
@@ -21,9 +21,9 @@ export function isLooksLikeRegexString(str: string) {
 }
 
 /**
- * 检测一个正则表达式是否非法。
- * @param str - 待检测的正则表达式字符串。
- * @returns 正则表达式是否非法？
+ * 正規表現が不正かどうかを検出します。
+ * @param str - 検出対象の正規表現文字列。
+ * @returns 正規表現が不正か？
  */
 export function isIllegalRegexString(str: string) {
 	try {

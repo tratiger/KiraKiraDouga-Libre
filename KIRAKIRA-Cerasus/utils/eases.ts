@@ -1,5 +1,5 @@
 /*
- * 在 TypeScript 中也可以使用缓动值的参数。
+ * TypeScriptでもイージング値のパラメータを使用できます。
  */
 import eases from "styles/theme/eases.module.scss";
 export default eases;

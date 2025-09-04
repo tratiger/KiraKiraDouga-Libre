@@ -44,7 +44,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 		return navigateTo(`/${MEDIA_INFO_MODULE_WASM}`);
 	if (routeSlug[0] === "error") {
 		const routeNumber = +routeSlug[1];
-		if (routeSlug[1] === "") // 论空字符串被转换成 0 ……
+		if (routeSlug[1] === "") // 空文字列が0に変換されることについて……
 			return;
 		if (routeNumber === 404)
 			return;
@@ -53,10 +53,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 		if (routeNumber === 233)
 			return abortNavigation({
 				statusCode: 233,
-				message: "乐",
+				message: "楽しかった",
 			});
-		if (Number.isFinite(routeNumber)) // 测试，如果输入的路由是数字就可以触发对应数字的错误代码。
-			// 谨记千万不要使用 isFinite 而是使用 Number.isFinite，众所周知 "" == 0 ……
+		if (Number.isFinite(routeNumber)) // テスト、入力されたルートが数字であれば、対応する数字のエラーコードをトリガーできます。
+			// isFiniteではなくNumber.isFiniteを使用することを忘れないでください。ご存知のように、"" == 0です……
 			return abortNavigation({
 				statusCode: routeNumber,
 				message: httpResponseStatusCodes[routeNumber],
@@ -65,9 +65,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 });
 
 /**
- * 检查 KVID 是否存在？
- * @param kvidString - URL 中的 KVID 字符。
- * @returns 存在返回 true，否则返回一个 Error。
+ * KVIDが存在するかどうかを確認しますか？
+ * @param kvidString - URL内のKVID文字列。
+ * @returns 存在する場合はtrue、それ以外の場合はErrorを返します。
  */
 async function checkKvid(kvidString: string): Promise<true | Error> {
 	try {
@@ -75,7 +75,7 @@ async function checkKvid(kvidString: string): Promise<true | Error> {
 		if (match) {
 			const kvidBigInt = BigInt(match[0]);
 			const kvidNumber = Number(kvidBigInt);
-			if (kvidNumber.toString().includes("e")) return new Error(`你输入的 KVID: ${kvidNumber} 超出琪露诺能理解的数值范围`);
+			if (kvidNumber.toString().includes("e")) return new Error(`入力したKVID: ${kvidNumber} はチルノが理解できる数値範囲を超えています`);
 			const getVideoByKvidRequest: CheckVideoExistRequestDto = {
 				videoId: kvidNumber,
 			};
@@ -83,33 +83,33 @@ async function checkKvid(kvidString: string): Promise<true | Error> {
 			if (videoInfoResult.success && videoInfoResult.exist)
 				return true;
 			else
-				return new Error("你输入的 KVID 不存在");
+				return new Error("入力したKVIDは存在しません");
 		} else
-			return new Error("请输入 KVID");
+			return new Error("KVIDを入力してください");
 	} catch (e) {
-		return new Error("你输入的 KVID 不合法");
+		return new Error("入力したKVIDは不正です");
 	}
 }
 
 /**
- * 如果用户已登录，则根据 cookie 中的 uid 和 token 来获取用户信息（同时具有验证用户 token 的功能）。
- * 如果未登录或验证不成功，则清空全局变量中的用户信息并清空残留 cookie。
- * @param uid - 显式指定其他用户的 UID。
+ * ユーザーがログインしている場合は、cookieのuidとtokenに基づいてユーザー情報を取得します（ユーザートークンの検証機能も兼ねています）。
+ * ログインしていないか、検証に失敗した場合は、グローバル変数のユーザー情報をクリアし、残りのcookieをクリアします。
+ * @param uid - 他のユーザーのUIDを明示的に指定します。
  */
 async function getUserInfo(uid?: string) {
-	// 指定了 UID，打开该 UID 用户主页。
+	// UIDが指定されている場合、そのUIDのユーザーページを開きます。
 	if (uid) {
 		let uidBigInt: bigint;
 		try {
 			uidBigInt = BigInt(uid);
-		} catch { return new Error(`你输入的 UID: ${uid} 不合法`); }
+		} catch { return new Error(`入力したUID: ${uid} は不正です`); }
 		const uidNumber = Number(uidBigInt);
-		if (uidNumber.toString().includes("e")) return new Error(`你输入的 UID: ${uidBigInt} 超出琪露诺能理解的数值范围`);
-		const userInfoResult = await api.user.userExistsCheckByUID({ uid: uidNumber }); // TODO: UID 最好使用 string 或 bigint 存储，不要用 number 存储。
+		if (uidNumber.toString().includes("e")) return new Error(`入力したUID: ${uidBigInt} はチルノが理解できる数値範囲を超えています`);
+		const userInfoResult = await api.user.userExistsCheckByUID({ uid: uidNumber }); // TODO: UIDはnumberではなく、stringまたはbigintで保存するのが望ましいです。
 		if (userInfoResult.success && userInfoResult.exists) return uidBigInt;
-		else return new Error(`你输入的 UID: ${uidBigInt} 用户不存在`);
+		else return new Error(`入力したUID: ${uidBigInt} のユーザーは存在しません`);
 	}
-	// 未指定 UID，打开自己的用户主页。
+	// UIDが指定されていない場合、自分のユーザーページを開きます。
 	const checkUserResult = await api.user.checkUserToken();
 	if (checkUserResult.success && checkUserResult.userTokenOk)
 		try {
@@ -117,6 +117,6 @@ async function getUserInfo(uid?: string) {
 			await api.user.getSelfUserInfo({ getSelfUserInfoRequest: undefined, appSettingsStore: useAppSettingsStore(), selfUserInfoStore, headerCookie: undefined });
 			if (!selfUserInfoStore.isLogined || selfUserInfoStore.userInfo.uid === undefined) throw new Error("Unlogined");
 			return BigInt(selfUserInfoStore.userInfo.uid);
-		} catch (error) { return new Error("你的登录信息已失效，请重新登录"); }
-	else return new Error("你尚未登录，请登录后再试");
+		} catch (error) { return new Error("ログイン情報が無効です。再度ログインしてください"); }
+	else return new Error("まだログインしていません。ログインしてから再度お試しください");
 }

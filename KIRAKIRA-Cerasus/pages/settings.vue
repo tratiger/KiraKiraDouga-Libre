@@ -8,24 +8,24 @@
 		},
 	});
 
-	// 已请求的设置页面。
+	// リクエストされた設定ページ。
 	const currentSettingsRequested = ref("");
-	// 已渲染的设置页面。
+	// レンダリングされた設定ページ。
 	const currentSettingsRendered = ref("");
 
-	// 当前地址栏路由地址。
+	// 現在のアドレスバーのルートアドレス。
 	const currentSettingsRoute = computed(() => currentSettingsPage());
 
-	// 先判断当前是否在设置页面，然后赋值给 currentSettingsRequested，防止退出页面时数值异常。
+	// まず現在のページが設定ページかどうかを判断し、その後currentSettingsRequestedに値を割り当てて、ページを離れる際の異常値を防ぎます。
 	watch(currentSettingsRoute, currentSettingsRoute => {
 		if (currentSettingsRoute !== "")
 			currentSettingsRequested.value = currentSettingsRoute;
 	}, { immediate: true });
 
-	// SSR 首屏加载时确保内容不是空的。
+	// SSRの初回読み込み時にコンテンツが空でないことを確認します。
 	currentSettingsRendered.value = currentSettingsRequested.value;
 
-	// CSR 切换页面。
+	// CSRページ切り替え。
 	const nuxtApp = useNuxtApp();
 	nuxtApp.hook("page:finish", () => {
 		currentSettingsRendered.value = currentSettingsRequested.value;
@@ -47,7 +47,7 @@
 	const backgroundImages = useBackgroundImages();
 	const backgroundShown = ref(false);
 
-	// 彩色侧边栏
+	// カラーサイドバー
 	const cookieColoredSidebar = useCookie<boolean>(COOKIE_KEY.coloredSidebarCookieKey);
 
 	useEventListener("window", "resize", () => {
@@ -55,9 +55,9 @@
 	});
 
 	/**
-	 * 手势滑动事件。左右滑动即可收起/展开导航菜单。
-	 * 已暂时禁用，因为会导致所有元素按下去后拖到外部会仍然执行而不会取消。
-	 * 原本使用方法是在当前文件的根 div 上放置 v-drag="onSwipe"
+	 * ジェスチャースワイプイベント。左右にスワイプしてナビゲーションメニューを折りたたんだり展開したりします。
+	 * 一時的に無効化されています。なぜなら、すべての要素が押された後に外部にドラッグされると、キャンセルされずに実行され続けるためです。
+	 * 元の使い方は、現在のファイルのルートdivにv-drag="onSwipe"を配置することでした。
 	 */
 	function onSwipe({ dragging, direction, distance, axis }: GestureDragEvent) {
 		const MIN_DISTANCE = 100;
@@ -94,7 +94,7 @@
 	};
 
 	/**
-	 * 登出。
+	 * ログアウト。
 	 */
 	async function logout() {
 		const logoutResult = await api.user.userLogout({ appSettingsStore, selfUserInfoStore });
@@ -157,8 +157,8 @@
 								:to="`/settings/${setting.id}`"
 								@click="showDrawer = false"
 							>{{ ti(setting.id) }}</TabItem>
-							<!-- DELETE: Cerasus内置管理设置即将被单独的控制台Lycoris项目取代。 -->
-							<Subheader v-if="isAdmin" icon="build_circle">管理设置</Subheader>
+							<!-- DELETE: Cerasusに組み込まれている管理設定は、まもなく独立したコンソールプロジェクトLycorisに置き換えられます。 -->
+							<Subheader v-if="isAdmin" icon="build_circle">管理設定</Subheader>
 							<template v-if="isAdmin">
 								<TabItem
 									v-for="setting in settings.admin"
@@ -226,7 +226,7 @@
 	$submit-margin-y: 2rem;
 
 	.settings {
-		--side-width: calc(max((100% - #{$max-width + $nav-width}) / 2, 0px)); // 注意这里的 0px 一旦省略 px 就会报错，因此不能去掉单位。
+		--side-width: calc(max((100% - #{$max-width + $nav-width}) / 2, 0px)); // ここでの0pxはpxを省略するとエラーになるため、単位を省略できません。
 		position: relative;
 		min-height: 100dvh;
 		background-color: c(gray-5);

@@ -7,7 +7,7 @@ import vi from "./locales/Vietnamese";
 import id from "./locales/Indonesian";
 import fr from "./locales/French";
 import yue from "./locales/Cantonese";
-import ii from "./locales/Sichuan Yi"; // 语境翻译工具伪语言
+import ii from "./locales/Sichuan Yi"; // 文脈翻訳ツールのための疑似言語
 
 export default defineI18nConfig(() => ({
 	legacy: false,

@@ -1,7 +1,7 @@
 /**
- * 移除指定 DOM 元素正在进行的所有动画。
+ * 指定されたDOM要素で進行中のすべてのアニメーションを削除します。
  * @param elements - HTML DOM 元素。
- * @returns 是否有移除动画。
+ * @returns アニメーションが削除されたかどうか。
  */
 export function removeExistAnimations(...elements: Element[]) {
 	let hasExistAnimations = false;
@@ -16,8 +16,8 @@ export function removeExistAnimations(...elements: Element[]) {
 }
 
 /**
- * 等待下一时刻 CSS 动画更新刷新。
- * @returns 空承诺。
+ * 次のCSSアニメーション更新フレームを待ちます。
+ * @returns 空のPromise。
  */
 export function nextAnimationTick() {
 	return new Promise<void>(resolve => {
@@ -30,9 +30,9 @@ export function nextAnimationTick() {
 }
 
 /**
- * 在设置元素样式时**暂时**禁用过渡动画。
- * @param element - HTML DOM 元素及其 CSS 样式声明。
- * @param style - CSS 样式。
+ * 要素のスタイルを設定する際に、一時的にトランジションを無効にします。
+ * @param element - HTML DOM要素またはそのCSSスタイル宣言。
+ * @param style - CSSスタイル。
  */
 export async function setStyleWithoutTransition(element: HTMLElement | CSSStyleDeclaration, style: CSSProperties = {}) {
 	const styles = element instanceof CSSStyleDeclaration ? element : element.style;
@@ -43,9 +43,9 @@ export async function setStyleWithoutTransition(element: HTMLElement | CSSStyleD
 }
 
 /**
- * 重播 CSS 动画。
- * @param element - HTML DOM 元素。
- * @param className - 具有动画的 CSS 类名。
+ * CSSアニメーションを再再生します。
+ * @param element - HTML DOM要素。
+ * @param className - アニメーションを持つCSSクラス名。
  */
 export async function replayAnimation(element: Element, ...className: string[]) {
 	element.classList.remove(...className);
@@ -54,8 +54,8 @@ export async function replayAnimation(element: Element, ...className: string[]) 
 }
 
 /**
- * 是否用户请求削弱动态效果？
- * @returns 用户请求削弱动态效果。
+ * ユーザーは動きの削減を要求していますか？
+ * @returns ユーザーが動きの削減を要求したかどうか。
  */
 export const isPrefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -66,52 +66,52 @@ type DimensionAxis = "height" | "width" | "both";
 type MaybePromise<T> = T | Promise<T>;
 
 type AnimateSizeOptions = Partial<{
-	/** 显式指定初始高度（可选）。 */
+	/** 開始高さを明示的に指定します（オプション）。 */
 	startHeight: number;
-	/** 显式指定结束高度（可选）。 */
+	/** 終了高さを明示的に指定します（オプション）。 */
 	endHeight: number;
-	/** 显式指定初始宽度（可选）。 */
+	/** 開始幅を明示的に指定します（オプション）。 */
 	startWidth: number;
-	/** 显式指定结束宽度（可选）。 */
+	/** 終了幅を明示的に指定します（オプション）。 */
 	endWidth: number;
-	/** 动画时间。 */
+	/** アニメーション時間。 */
 	duration: number;
-	/** 动画运动曲线。默认为：平滑缓出。 */
+	/** アニメーションのイージング。デフォルト：スムーズなイーズアウト。 */
 	easing: string;
-	/** 显式指定需要动画的是哪个方向。 */
+	/** アニメーションさせる方向を明示的に指定します。 */
 	specified: DimensionAxis;
-	/** 指定**不**需要动画调整哪个方向的内/外边距值。 */
+	/** アニメーションで調整**しない**パディング/マージンの方向を指定します。 */
 	withoutAdjustPadding: DimensionAxis;
-	/** 在改变回调函数后自动增加等待下一帧。 */
+	/** コールバック関数を変更した後、自動的に次のフレームを待ちます。 */
 	nextTick: boolean;
-	/** 获取最终的元素尺寸。 */
+	/** 最終的な要素のサイズを取得します。 */
 	getSize: TwoD | Ref<TwoD | undefined>;
-	/** 获取最终的元素矩形。 */
+	/** 最終的な要素の矩形を取得します。 */
 	getRect: Ref<DOMRect | undefined>;
-	/** 显式指定初始样式（可选）。 */
+	/** 開始スタイルを明示的に指定します（オプション）。 */
 	startStyle: Keyframe;
-	/** 显式指定结束样式（可选）。 */
+	/** 終了スタイルを明示的に指定します（オプション）。 */
 	endStyle: Keyframe;
-	/** 初始从反向滑入界面。 */
+	/** 最初は逆方向からスライドインします。 */
 	startReverseSlideIn: boolean;
-	/** 结束从反向滑入界面。 */
+	/** 最後は逆方向へスライドアウトします。 */
 	endReverseSlideIn: boolean;
-	/** 元素的**唯一**子元素初始位移。 */
+	/** 要素の**唯一**の子要素の開始時の変位。 */
 	startChildTranslate: Numberish;
-	/** 元素的**唯一**子元素结束位移。 */
+	/** 要素の**唯一**の子要素の終了時の変位。 */
 	endChildTranslate: Numberish;
-	/** 是否抽掉动画的第一帧以解决可能存在的动画故障？仅在有子元素时生效。 */
+	/** アニメーションの不具合を解消するために最初の一コマを抜きますか？子要素がある場合にのみ有効です。 */
 	removeGlitchFrame: boolean;
-	/** 动画播放的同时附加其它动画，并使用与之相同的时长与缓动值。 */
+	/** アニメーション再生中に他のアニメーションを追加し、同じ時間とイージングを使用します。 */
 	attachAnimations: [Element, Keyframes][] | false;
-	/** 不要 `overflow: clip;`？ */
+	/** `overflow: clip;` を使用しませんか？ */
 	noClipping: boolean;
 }>;
 
 /**
- * 当宽/高度值设为 auto 时的动画宽/高度的高级钩子生成器函数。
- * @param element - HTML DOM 元素。
- * @returns 最终返回动画异步承诺的生成器函数。
+ * 幅/高さがautoの場合にアニメーションさせるための高度なフックジェネレータ関数。
+ * @param element - HTML DOM要素。
+ * @returns 最終的にアニメーションの非同期Promiseを返すジェネレータ関数。
  */
 export async function* animateSizeGenerator(
 	element: MaybeRef<Element | undefined>,
@@ -154,7 +154,7 @@ export async function* animateSizeGenerator(
 		getRect.value = element.getBoundingClientRect();
 	let isHeightChanged = specified === "height" || specified === "both",
 		isWidthChanged = specified === "width" || specified === "both";
-	if (startHeight === endHeight) isHeightChanged = false; // 不用动了。
+	if (startHeight === endHeight) isHeightChanged = false; // 動かす必要はありません。
 	if (startWidth === endWidth) isWidthChanged = false;
 	if (!isHeightChanged && !isWidthChanged) return;
 	const keyframes = [{}, {}] as Keyframes;
@@ -184,7 +184,7 @@ export async function* animateSizeGenerator(
 	const result = element.animate(keyframes, animationOptions);
 	if (!noClipping) result.addEventListener("finish", () => htmlElement.style.removeProperty("overflow"));
 	if (startChildTranslate || endChildTranslate || attachAnimations) {
-		const onlyChild = element.children[0]; // 只取唯一一个子元素。
+		const onlyChild = element.children[0]; // 唯一の子要素のみを取得します。
 		if (onlyChild && element instanceof HTMLElement && removeGlitchFrame) {
 			element.hidden = true;
 			await nextAnimationTick();
@@ -200,11 +200,11 @@ export async function* animateSizeGenerator(
 }
 
 /**
- * 当宽/高度值设为 auto 时的动画宽/高度。
- * @param element - HTML DOM 元素。
- * @param changeFunc - 使宽/高度将会改变的回调函数。
- * @param options - 配置选项。
- * @returns 动画异步承诺。
+ * 幅/高さがautoの場合にアニメーションさせます。
+ * @param element - HTML DOM要素。
+ * @param changeFunc - 幅/高さを変更するコールバック関数。
+ * @param options - 設定オプション。
+ * @returns アニメーションの非同期Promise。
  */
 export async function animateSize(
 	element: MaybeRef<Element | undefined>,
@@ -222,11 +222,11 @@ type SameOrDifferent<T> = T | undefined | [T | undefined, T | undefined];
 type TransitionHook = (el: Element, done: () => void) => Promise<void>;
 
 /**
- * `animateSize` 函数的简化版，适用于更为简单的动画。
- * @param specified - 显式指定需要动画的是哪个方向。默认为高度动画。
- * @param duration - 指定动画时间。
- * @param easing - 指定动画缓动曲线。
- * @returns 返回 `onEnter` 和 `onLeave` 两个函数。
+ * `animateSize`関数の簡易版で、よりシンプルなアニメーションに適しています。
+ * @param specified - アニメーションさせる方向を明示的に指定します。デフォルトは高さのアニメーションです。
+ * @param duration - アニメーション時間を指定します。
+ * @param easing - アニメーションのイージングを指定します。
+ * @returns `onEnter` と `onLeave` の2つの関数を返します。
  */
 export function simpleAnimateSize(specified: "width" | "height" = "height", duration?: SameOrDifferent<number>, easing?: SameOrDifferent<string>) {
 	type Options = Parameters<typeof animateSize>[2];
@@ -260,10 +260,10 @@ export function simpleAnimateSize(specified: "width" | "height" = "height", dura
 export const STOP_TRANSITION_ID = "stop-transition";
 
 /**
- * 使用新 `CSSStyleSheet` 实例并返回清理功能以将其删除。
+ * 新しい `CSSStyleSheet` インスタンスを使用し、それを削除するためのクリーンアップ関数を返します。
  *
- * @param css - 要添加到文档中的 CSS 字符串。
- * @returns 一个函数，当调用时，从 `document.adoptedStyleSheets` 中删除添加的样式表。
+ * @param css - ドキュメントに追加するCSS文字列。
+ * @returns 呼び出されると、追加されたスタイルシートを `document.adoptedStyleSheets` から削除する関数。
  *
  * @example
  * ```typescript
@@ -280,23 +280,23 @@ function addStyle(css: string) {
 }
 
 /**
- * 通过注入一个 `<style>` 元素，为所有元素（包括伪元素）设置 `transition: none !important;`，暂时禁用页面上的所有 CSS 过渡。
+ * `<style>` 要素を注入し、すべての要素（疑似要素を含む）に `transition: none !important;` を設定することで、ページ上のすべてのCSSトランジションを一時的に無効にします。
  *
- * @returns 一个清场函数，当被调用时，它会删除注入的 `<style>` 元素并恢复过渡。
+ * @returns 呼び出されると、注入された `<style>` 要素を削除してトランジションを復元するクリーンアップ関数。
  *
  * @remarks
- * 此函数可用于在 DOM 更新或 UI 更改期间防止不必要的转换。
- * 确保调用返回的清理函数，以避免使页面处于转换禁用状态。
+ * この関数は、DOMの更新やUIの変更中に不要なトランジションを防ぐために使用できます。
+ * ページがトランジション無効状態で放置されるのを避けるため、必ず返されたクリーンアップ関数を呼び出してください。
  *
  * @example
  * ```typescript
- * const restoreTransitions = stopTransition(); // 禁用过渡！
- * // 执行 DOM 更新……
- * restoreTransitions(); // 重启过渡！
+ * const restoreTransitions = stopTransition(); // トランジションを無効化！
+ * // DOMの更新を実行...
+ * restoreTransitions(); // トランジションを再開！
  * ```
  */
 export function stopTransition({ includesViewTransitions = false }: {
-	/** 也包含 `view-transition-old` 和 `view-transition-new`？ */
+	/** `view-transition-old` と `view-transition-new` も含めますか？ */
 	includesViewTransitions?: boolean;
 } = {}) {
 	return addStyle(`
@@ -311,7 +311,7 @@ export function stopTransition({ includesViewTransitions = false }: {
 			transition: none !important;
 		}
 
-		/* Chromium 不爱将 webkit 和 moz 写在一起（写一起的话就 Chromium 异常，Firefox 不会）。 */
+		/* Chromiumはwebkitとmozを一緒に書くのを嫌います（一緒に書くとChromiumで異常が発生しますが、Firefoxでは発生しません）。 */
 		::-moz-progress-bar {
 			-moz-transition: none !important;
 			transition: none !important;
@@ -342,18 +342,18 @@ type ColorViewTransitionAnimationOption = Override<KeyframeAnimationOptions, {
 }>;
 
 interface ColorViewTransitionAnimationFallbackDefaultOption extends ColorViewTransitionAnimationOption {
-	/** 设置过渡时的光标指针。 */
+	/** トランジション中のカーソルポインターを設定します。 */
 	cursor?: Cursor;
-	/** 在整个过渡期间，附加其它静态 CSS 样式。 */
+	/** トランジション全体を通して、他の静的CSSスタイルを追加します。 */
 	staticStyle?: string;
 }
 
 /**
- * 为整个页面添加视图过渡动画。
- * @param changeFunc - 使页面变化的回调函数。
- * @param animations - 包含动画关键帧和各动画选项的元组的数组。
- * @param defaultOptions - 缺省设定各动画选项。你还可以设置过渡时的光标指针。
- * @returns 在动画播放完成之后可执行析构函数。
+ * ページ全体にビュー・トランジション・アニメーションを追加します。
+ * @param changeFunc - ページを変更するコールバック関数。
+ * @param animations - アニメーションのキーフレームと各アニメーションオプションを含むタプルの配列。
+ * @param defaultOptions - 各アニメーションオプションのデフォルト設定。トランジション中のカーソルポインターも設定できます。
+ * @returns アニメーションの再生完了後に実行可能なデストラクタ関数。
  */
 export async function startColorViewTransition(changeFunc: () => MaybePromise<void | unknown>, animations: [keyframes: Keyframe[] | PropertyIndexedKeyframes, options?: ColorViewTransitionAnimationOption][], defaultOptions: ColorViewTransitionAnimationFallbackDefaultOption = {}) {
 	if (!document.startViewTransition) {
@@ -385,8 +385,8 @@ export async function startColorViewTransition(changeFunc: () => MaybePromise<vo
 }
 
 /**
- * 如果浏览器支持 `document.startViewTransition` 则调用它，否则直接执行回调函数。
- * @param callback - 触发页面过渡的回调函数。
+ * ブラウザが `document.startViewTransition` をサポートしている場合はそれを呼び出し、そうでなければコールバック関数を直接実行します。
+ * @param callback - ページのトランジションをトリガーするコールバック関数。
  */
 export async function startViewTransition(callback: () => MaybePromise<void>) {
 	if (document.startViewTransition) await document.startViewTransition(callback).finished;
@@ -436,27 +436,27 @@ export function startCircleViewTransition(isSpread: boolean, changeFunc: () => M
 }
 
 /**
- * 获取一个会根据周期动态改变的随机数。
- * @param interval - 改变周期。单位：毫秒。
- * @returns 会根据周期动态改变的随机数。
+ * 周期的に変化する乱数を取得します。
+ * @param interval - 変化の周期。単位：ミリ秒。
+ * @returns 周期的に変化する乱数。
  */
 export function useDynamicRandom(interval: number): Readonly<Ref<number>>;
 /**
- * 获取一个会根据周期动态改变的随机数。
- * @param interval - 改变周期。单位：毫秒。
- * @param min - 指定最小值。
- * @param max - 指定最大值。
- * @returns 会根据周期动态改变的随机数。
+ * 周期的に変化する乱数を取得します。
+ * @param interval - 変化の周期。単位：ミリ秒。
+ * @param min - 最小値を指定します。
+ * @param max - 最大値を指定します。
+ * @returns 周期的に変化する乱数。
  */
 export function useDynamicRandom(interval: number, min: number, max: number): Readonly<Ref<number>>;
 /**
- * 获取一个会根据周期动态改变的随机数。
- * @param interval - 改变周期。单位：毫秒。
- * @param min - 指定最小值，可选。
- * @param max - 指定最大值，可选。
- * @returns 会根据周期动态改变的随机数。
+ * 周期的に変化する乱数を取得します。
+ * @param interval - 変化の周期。単位：ミリ秒。
+ * @param min - 最小値を指定します（オプション）。
+ * @param max - 最大値を指定します（オプション）。
+ * @returns 周期的に変化する乱数。
  */
-export function useDynamicRandom(interval: number, min?: number, max?: number) { // WARN: 该函数不支持 SSR，谨慎使用。
+export function useDynamicRandom(interval: number, min?: number, max?: number) { // WARN: この関数はSSRをサポートしていないため、注意して使用してください。
 	const initial = min != null && max != null ? (max - min) / 2 + min : 0.5;
 	const random = ref(initial);
 	const intervalId = ref<Timeout>();

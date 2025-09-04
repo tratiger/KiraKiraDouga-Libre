@@ -4,20 +4,20 @@
 	export default defineComponent({
 		inheritAttrs: false,
 		props: {
-			/** 超链接目标地址。 */
+			/** ハイパーリンクのターゲットアドレス。 */
 			to: { type: String, required: true },
-			/** 是否是链接内链接？ */
+			/** リンク内リンクですか？ */
 			linkInLink: { type: Boolean, default: false },
-			/** 是否在当前路由下显示为活跃状态？ */
+			/** 現在のルートでアクティブ状態として表示しますか？ */
 			activable: { type: Boolean, default: false },
-			/** 是否在新窗口打开链接？ */
+			/** 新しいウィンドウでリンクを開きますか？ */
 			blank: { type: Boolean, default: false },
-			/** URL Search Params (?). */
+			/** URL検索パラメータ（？）。 */
 			query: {
 				type: [String, Object] as PropType<UrlQueryType>,
 				default: "",
 			},
-			/** URL Hash (#). */
+			/** URLハッシュ（＃）。 */
 			hash: { type: String, default: undefined },
 		},
 		setup(props) {
@@ -25,7 +25,7 @@
 			const parentScopeId = useParentScopeId();
 
 			const attrs = computed(() => {
-				const attrs = { ...useAttrs() }; // 注意：useAttrs 函数会引用自 attrs 的只读对象，因此必须创建一份对象拷贝。
+				const attrs = { ...useAttrs() }; // 注意：useAttrs関数はattrsからの読み取り専用オブジェクトを参照するため、オブジェクトのコピーを作成する必要があります。
 				if (!props.activable && !props.blank)
 					Object.assign(attrs, { activeClass: " ", exactActiveClass: " " }); // disableActiveClass
 				else

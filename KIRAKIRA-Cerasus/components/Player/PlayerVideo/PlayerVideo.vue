@@ -1,6 +1,6 @@
 <docs>
 	# YOZORA PLAYER
-	视频播放器。
+	動画プレーヤー。
 </docs>
 
 <script setup lang="ts">
@@ -9,13 +9,13 @@
 	import { basicDanmakuCommentStyle, createDanmakuComment } from "./PlayerVideoDanmakuSender.vue";
 
 	const props = defineProps<{
-		/** 视频源。 */
+		/** 動画ソース。 */
 		src: string;
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 视频标题。 */
+		/** 動画タイトル。 */
 		title: string;
-		/** 视频封面地址。 */
+		/** 動画カバー画像のURL。 */
 		thumbnail: string;
 	}>();
 
@@ -91,7 +91,7 @@
 	const video = ref<HTMLVideoElement>();
 	const playerVideoMain = ref<HTMLDivElement>();
 	const { exit: exitFullscreen, enter: enterFullscreen } = useFullscreen();
-	const fullscreen = ref(false); // 是否独占整个浏览器画面？
+	const fullscreen = ref(false); // ブラウザ画面全体を占有しますか？
 	const resample = computed({ get: () => !preservesPitch.value, set: value => preservesPitch.value = !value });
 	const menu = ref<MenuModel>();
 	const showDanmaku = ref(true);
@@ -135,7 +135,7 @@
 	});
 
 	watch(volume, volume => {
-		const logarithmicVolume = volume ** 2; // 使用对数音量。
+		const logarithmicVolume = volume ** 2; // 対数ボリュームを使用。
 		if (video.value) {
 			video.value.volume = logarithmicVolume;
 			playerConfig.audio.volume = volume;
@@ -177,15 +177,15 @@
 		playerConfig.controller.autoResumePlayAfterSeeking = autoResumePlayAfterSeeking;
 	});
 
-	watch(fullscreen, fullscreen => { // 全屏时请求横屏。在设备不支持或安全问题时有可能会报错。
+	watch(fullscreen, fullscreen => { // フルスクリーン時に横画面をリクエスト。デバイスが非対応またはセキュリティ上の問題でエラーになる可能性があります。
 		if (fullscreen) {
 			screenOrientationBeforeFullscreen.value = screen.orientation.type;
 			screen.orientation.lock("landscape").catch(useNoop);
-			autoHideController(); // 进入全屏后自动开始隐藏控制栏计时。
+			autoHideController(); // フルスクリーンに入った後、コントロールバーを自動的に隠すタイマーを開始します。
 		} else {
 			screen.orientation.lock(screenOrientationBeforeFullscreen.value).catch(useNoop);
 			screen.orientation.unlock();
-			hideController.value = false; // 退出全屏时确保显示播放器控制栏。
+			hideController.value = false; // フルスクリーンを終了する際に、コントロールバーが表示されるようにします。
 		}
 	});
 
@@ -204,7 +204,7 @@
 			const danmakuListResult = await api.danmaku.getDanmakuByKvid(getDanmakuByKvidRequest);
 
 			if (danmakuListResult.success && danmakuListResult.danmaku && danmakuListResult.danmaku.length > 0) {
-				// 初始化视频上的弹幕列表
+				// 動画上の弾幕リストを初期化
 				initialDanmaku.value = danmakuListResult.danmaku.map(danmaku => ({
 					text: danmaku.text,
 					mode: danmaku.mode,
@@ -215,7 +215,7 @@
 						color: `#${danmaku.color}`,
 					},
 				}));
-				// 初始化视频旁边的弹幕列表
+				// 動画の横の弾幕リストを初期化
 				willInsertDanmaku.value = danmakuListResult.danmaku.map(danmaku => ({
 					videoTime: new Duration(danmaku.time),
 					content: danmaku.text,

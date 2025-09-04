@@ -15,8 +15,8 @@
 	const placement = ref<Placement>();
 
 	/**
-	 * 插入颜文字回调函数。
-	 * @param kaomoji - 输入的颜文字。
+	 * 顔文字を挿入するコールバック関数。
+	 * @param kaomoji - 入力された顔文字。
 	 */
 	function input(kaomoji: string) {
 		emits("insert", kaomoji);

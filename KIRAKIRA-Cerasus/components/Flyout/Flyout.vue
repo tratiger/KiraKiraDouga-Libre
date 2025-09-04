@@ -1,8 +1,8 @@
 <script lang="ts">
 	/**
-	 * 获取位置和矩形。
-	 * @param target - 目标元素。
-	 * @returns 位置和矩形。
+	 * 位置と矩形を取得します。
+	 * @param target - ターゲット要素。
+	 * @returns 位置と矩形。
 	 */
 	export function getLocation(target: FlyoutModelNS.Target): [location: TwoD | null, targetRect: DOMRect | undefined] {
 		if (target instanceof Array) return [target, undefined];
@@ -22,13 +22,13 @@
 	import type { FlyoutModelNS } from "types/arguments";
 
 	const props = withDefaults(defineProps<{
-		/** 是否**不**向加内边距？ */
+		/** **内側**にパディングを追加しませんか？ */
 		noPadding?: boolean;
-		/** 是否在按下 `Esc` 按键时**不要**关闭浮窗？ */
+		/** `Esc`キーを押したときにフローティングウィンドウを**閉じない**ようにしますか？ */
 		doNotCloseOnEsc?: boolean;
-		/** 是否**不** `overflow: clip;`？ */
+		/** `overflow: clip;`を**しない**ようにしますか？ */
 		noClipping?: boolean;
-		/** 在点击元素外围时，如其包含以下类名的元素，则不会触发自动关闭。 */
+		/** 要素の外側をクリックしたときに、次のクラス名を持つ要素が含まれている場合、自動クローズはトリガーされません。 */
 		ignoreOutsideElementClasses?: string[];
 	}>(), {
 		ignoreOutsideElementClasses: () => [],
@@ -53,10 +53,10 @@
 	const scopeId = useParentScopeId() ?? "";
 	const isWidthAnimation = computed(() => ["left", "right", "x"].includes(placementForAnimation.value));
 	const isReverseSlide = computed(() => ["left", "top"].includes(placementForAnimation.value));
-	/** 定义在关闭浮窗后的至少多少毫秒内不得再次打开浮窗，以免用户连续点击时浮窗有快速闪烁的动画。 */
+	/** ユーザーが連続してクリックしたときにフローティングウィンドウがすばやく点滅するのを防ぐために、フローティングウィンドウを閉じた後、少なくとも何ミリ秒以内に再度開いてはならないかを定義します。 */
 	const QUICK_CLICK_DURATION = 200;
 	const suppressShowing = ref(false);
-	const clipping = ref(!props.noClipping); // 修正在要求 noClipping 的同时开/关浮窗动画时显示错误的问题。
+	const clipping = ref(!props.noClipping); // noClippingを要求しながらフローティングウィンドウのアニメーションをオン/オフにすると表示エラーが発生する問題を修正します。
 	const moving = ref(false);
 
 	useEventListener("window", "keydown", e => {
@@ -65,7 +65,7 @@
 	});
 
 	/**
-	 * 隐藏浮窗。
+	 * フローティングウィンドウを非表示にします。
 	 */
 	async function hide() {
 		shown.value = false;
@@ -77,10 +77,10 @@
 	}
 
 	/**
-	 * 显示浮窗。
-	 * @param target - 指定浮窗位置。
-	 * @param placement - 浮窗出现方向。
-	 * @param offset - 与目标元素距离偏移。
+	 * フローティングウィンドウを表示します。
+	 * @param target - フローティングウィンドウの位置を指定します。
+	 * @param placement - フローティングウィンドウの表示方向。
+	 * @param offset - ターゲット要素からの距離オフセット。
 	 */
 	async function show(target: FlyoutModelNS.Target, placement?: Placement, offset?: number) {
 		if (suppressShowing.value) return;
@@ -107,11 +107,11 @@
 	}
 
 	/**
-	 * 移动浮窗到页面内部。
-	 * @param target - 指定浮窗位置。
-	 * @param placement - 浮窗出现方向。
-	 * @param offset - 与目标元素距离偏移。
-	 * @param getNewPosition - 获取改变后的新位置和偏移量。
+	 * フローティングウィンドウをページ内に移動します。
+	 * @param target - フローティングウィンドウの位置を指定します。
+	 * @param placement - フローティングウィンドウの表示方向。
+	 * @param offset - ターゲット要素からの距離オフセット。
+	 * @param getNewPosition - 変更後の新しい位置とオフセットを取得します。
 	 */
 	async function _moveIntoPage(target: FlyoutModelNS.Target, placement?: Placement, offset?: number, getNewPosition?: (placement: Placement, offset: number) => void) {
 		target = toValue(target);
@@ -149,10 +149,10 @@
 	});
 
 	/**
-	 * 在元素被插入到 DOM 之后的下一帧被调用。
-	 * 用这个来开始进入动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 要素がDOMに挿入された後の次のフレームで呼び出されます。
+	 * これを使用して、進入アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - コールバック関数doneを呼び出すと、遷移が終了したことを示します。
 	 */
 	async function onFlyoutEnter(el: Element, done: () => void) {
 		clipping.value = true;
@@ -168,10 +168,10 @@
 	}
 
 	/**
-	 * 在离开过渡开始时调用。
-	 * 用这个来开始离开动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 離脱遷移が開始されるときに呼び出されます。
+	 * これを使用して、離脱アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - コールバック関数doneを呼び出すと、遷移が終了したことを示します。
 	 */
 	async function onFlyoutLeave(el: Element, done: () => void) {
 		clipping.value = true;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 	const flyout = defineModel<FlyoutModel>();
-	const tags = defineModel<Map<VideoTag["tagId"], VideoTag>>("tags"); // TAG 数据
+	const tags = defineModel<Map<VideoTag["tagId"], VideoTag>>("tags"); // TAGデータ
 	const emit = defineEmits<{
 		(e: "add-new-tag", tag: VideoTag): void;
 	}>();
@@ -9,9 +9,9 @@
 	const search = ref("");
 	const isSearched = computed(() => !!search.value.trim());
 	const matchedTags = ref<VideoTag[]>([]);
-	const showCreateNew = ref(false); // 是否显示 “创建 TAG” 按钮
-	const showTagEditor = ref(false); // 是否显示 TAG（创建）编辑器
-	const isCreatingTag = ref(false); // 是否正在创建 TAG
+	const showCreateNew = ref(false); // 「TAGを作成」ボタンを表示するかどうか
+	const showTagEditor = ref(false); // TAG（作成）エディタを表示するかどうか
+	const isCreatingTag = ref(false); // TAGを作成中かどうか
 	const languages = [
 		{ langId: "zhs", langName: getLocaleName("zh-Hans") },
 		{ langId: "en", langName: getLocaleName("en") },
@@ -22,15 +22,15 @@
 		{ langId: "id", langName: getLocaleName("id") },
 		{ langId: "ar", langName: getLocaleName("ar") },
 		{ langId: "other", langName: t.other },
-	] as const; // 可选语言列表
+	] as const; // 選択可能な言語リスト
 	type LanguageList = typeof languages[number];
 	type EditorType = { language: LanguageList | { langId: ""; langName: "" }; values: string[]; default: [number, string] | null; original: [number, string] | null }[];
-	const editor = reactive<EditorType>([]); // TAG 编辑器实例
-	const availableLanguages = ref<LanguageList[][]>([]); // 除去用户已经选择的语言之外的其他语言
-	const currentLanguage = computed(getCurrentLocale); // 当前用户的语言
+	const editor = reactive<EditorType>([]); // TAGエディタインスタンス
+	const availableLanguages = ref<LanguageList[][]>([]); // ユーザーがすでに選択した言語以外の言語
+	const currentLanguage = computed(getCurrentLocale); // 現在のユーザーの言語
 
 	/**
-	 * 搜索视频 TAG
+	 * 動画TAGを検索
 	 */
 	async function searchVideoTag() {
 		showCreateNew.value = true;
@@ -52,19 +52,19 @@
 	const debounceVideoTagSearcher = useDebounce(searchVideoTag, 500);
 
 	/**
-	 * 用户在搜索框内输入文本时的事件。
+	 * ユーザーが検索ボックスにテキストを入力したときのイベント。
 	 */
 	async function onInput() {
 		await debounceVideoTagSearcher();
 	}
 
 	/**
-	 * TAG 编辑器生成的数据转换为适用于后端存储的格式
-	 * @param editor TAG 编辑器数据
-	 * @returns 适于存储的 TAG 数据
+	 * TAGエディタで生成されたデータをバックエンドストレージに適した形式に変換します
+	 * @param editor TAGエディタデータ
+	 * @returns 保存に適したTAGデータ
 	 *
 	 * @example
-	 * 假设有如下数据：
+	 * 次のようなデータがあるとします。
 	 * const foo = [
 	 *		{
 	 *			default: "StarCitizen",
@@ -83,7 +83,7 @@
 	 *		},
 	 *	]
 	 *
-	 * 执行 editorData2Dto(foo), 结果为：
+	 * editorData2Dto(foo)を実行すると、結果は次のようになります。
 	 *	{
 	 *		tagNameList: [
 	 *			{
@@ -119,7 +119,7 @@
 				tagName: filteredTag.values.map(tagName => {
 					return {
 						name: tagName,
-						isDefault: tagName === filteredTag.default?.[1], // TODO: 如果没有指定默认 TAG 怎么办？
+						isDefault: tagName === filteredTag.default?.[1], // TODO: デフォルトのTAGが指定されていない場合はどうなりますか？
 						isOriginalTagName: tagName === filteredTag.default?.[1] && tagName === filteredTag.original?.[1],
 					};
 				}),
@@ -129,9 +129,9 @@
 	}
 
 	/**
-	 * 检查 TAG 数据是否合法
-	 * @param createVideoTagRequest TAG 数据
-	 * @returns boolean 合法返回 true, 不合法返回 false
+	 * TAGデータが有効かどうかを確認します
+	 * @param createVideoTagRequest TAGデータ
+	 * @returns boolean 有効な場合はtrue、無効な場合はfalseを返します
 	 */
 	function checkTagData(createVideoTagRequest: CreateVideoTagRequestDto): boolean {
 		const isAllTagItemNotNull = createVideoTagRequest?.tagNameList?.every(tag => tag && tag.lang && tag.tagName?.length > 0 && tag.tagName.every(tagName => !!tagName.name));
@@ -143,8 +143,8 @@
 	}
 
 	/**
-	 * 切换标签编辑器。
-	 * @param shown - 是否显示？
+	 * タグエディタを切り替えます。
+	 * @param shown - 表示しますか？
 	 */
 	async function switchTagEditor(shown: true | "ok" | "cancel") {
 		if (shown === "ok") {
@@ -171,8 +171,8 @@
 	}
 
 	/**
-	 * 用户点击一个搜索到的 TAG，将其添加到视频 TAG 列表中。
-	 * @param tag 用户点击的 TAG 数据。
+	 * ユーザーが検索したTAGをクリックして、動画のTAGリストに追加します。
+	 * @param tag ユーザーがクリックしたTAGデータ。
 	 */
 	function addTag(tag: VideoTag) {
 		if (tag.tagId !== undefined && tag.tagId !== null && tag.tagId >= 0) {
@@ -200,7 +200,7 @@
 	}, { deep: true });
 
 	/**
-	 * 关闭浮窗后事件。
+	 * フローティングウィンドウを閉じた後のイベント。
 	 */
 	function onFlyoutHide() {
 		showTagEditor.value = false;
@@ -415,7 +415,7 @@
 		.list-wrapper {
 			position: relative;
 			height: 100%;
-			overflow: hidden auto; // FIXME: 开启页面滚动，但是会导致打开下拉菜单时，元素溢出到外面。
+			overflow: hidden auto; // FIXME: ページのスクロールを有効にすると、ドロップダウンメニューを開いたときに要素がはみ出してしまいます。
 		}
 
 		.list {

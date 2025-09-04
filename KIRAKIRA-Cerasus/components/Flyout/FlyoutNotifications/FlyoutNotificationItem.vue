@@ -1,22 +1,22 @@
 <docs>
-	# 通知浮窗的每条通知内容
+	# 通知フローティングウィンドウの各通知内容
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 发起对象的昵称。 */
+		/** 送信者のニックネーム。 */
 		nickname?: string;
-		/** 用户名。 */
+		/** ユーザー名。 */
 		username?: string;
-		/** 用户 UID。 */
+		/** ユーザーUID。 */
 		uid?: number;
-		/** 通知日期。 */
+		/** 通知日。 */
 		date: Date;
 		/** 引用内容。 */
 		quote?: string;
-		/** 评论唯一 ID。 */
+		/** コメントの一意のID。 */
 		commentId?: string;
-		/** 评论所在的视频的 ID。 */
+		/** コメントが属する動画のID。 */
 		videoId?: number;
 	}>();
 
@@ -36,7 +36,7 @@
 			<template #footerRight>
 				<SoftButton v-tooltip:bottom="t.reply" icon="reply" />
 				<SoftButton v-tooltip:bottom="t.more" icon="more_vert" @click="e => menu = [e, 'bottom']" />
-				<!-- TODO: 制作富文本后展开需要**带格式**。 -->
+				<!-- TODO: リッチテキストを作成した後、展開するには**書式付き**が必要です。 -->
 				<SoftButton icon="chevron_down" />
 				<Menu v-model="menu">
 					<MenuItem icon="delete">{{ t.delete }}</MenuItem>
@@ -77,7 +77,7 @@
 			text-overflow: "⋯⋯";
 		}
 
-		@supports (display: -webkit-box) { // 只有 -webkit-box 才能支持多行省略号
+		@supports (display: -webkit-box) { // -webkit-box のみ複数行の省略記号をサポートします
 			$title-line-height: 22px;
 			// stylelint-disable-next-line value-no-vendor-prefix
 			display: -webkit-box;

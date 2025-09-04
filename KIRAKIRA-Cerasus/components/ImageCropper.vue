@@ -1,54 +1,54 @@
-<!-- 基于 vue-cropper 的图片切割组件 -->
+<!-- vue-cropperに基づく画像切り抜きコンポーネント -->
 <script setup lang="ts">
 	import cropTestImage from "assets/images/av820864307.jpg";
 	import { VueCropper } from "vue-cropper";
 
 	const props = withDefaults(defineProps<{
-		/** 裁剪图片的地址 */
+		/** 切り抜き画像のアドレス */
 		image?: string;
-		/** 裁剪生成图片的质量, 0.1 ~ 1 */
+		/** 切り抜き画像の品質、0.1～1 */
 		outputSize?: number;
-		/** 裁剪生成图片的格式 */
+		/** 切り抜き画像のフォーマット */
 		outputType?: "jpeg" | "png" | "webp";
-		/** 是否显示裁剪框的尺寸信息 */
+		/** 切り抜き枠のサイズ情報を表示するかどうか */
 		info?: boolean;
-		/** 图片是否允许滚轮缩放 */
+		/** 画像のホイールズームを許可するかどうか */
 		canScale?: boolean;
-		/** 是否默认生成截图框 */
+		/** デフォルトでスクリーンショット枠を生成するかどうか */
 		autoCrop?: boolean;
-		/** 默认生成截图框宽度 */
+		/** デフォルトで生成されるスクリーンショット枠の幅 */
 		autoCropWidth?: number;
-		/** 默认生成截图框高度 */
+		/** デフォルトで生成されるスクリーンショット枠の高さ */
 		autoCropHeight?: number;
-		/** 是否开启截图框宽高固定比例 */
+		/** スクリーンショット枠の幅と高さの比率を固定するかどうか */
 		fixed?: boolean;
-		/** 截图框的宽高比例, 开启 fixed 才能生效 */
+		/** スクリーンショット枠の幅と高さの比率、fixedを有効にする必要があります */
 		fixedNumber?: [number, number];
-		/** 是否输出原图比例的截图 */
+		/** 元画像の比率でスクリーンショットを出力するかどうか */
 		full?: boolean;
-		/** 固定截图框大小，true 时截图框无法改变尺寸，false 时可以改变尺寸 */
+		/** スクリーンショット枠のサイズを固定します。trueの場合、スクリーンショット枠のサイズは変更できません。falseの場合、変更できます */
 		fixedBox?: boolean;
-		/** 上传图片是否可以移动 */
+		/** アップロードした画像を移動できるかどうか */
 		canMove?: boolean;
-		/** 截图框能否拖动 */
+		/** スクリーンショット枠をドラッグできるかどうか */
 		canMoveBox?: boolean;
-		/** 上传图片按照原始比例渲染 */
+		/** アップロードした画像を元の比率でレンダリングします */
 		original?: boolean;
-		/** 截图框是否被限制在图片里面 */
+		/** スクリーンショット枠が画像内に制限されているかどうか */
 		centerBox?: boolean;
-		/** 是否按照设备的 dpr 输出等比例图片 */
+		/** デバイスのdprに従って等比率の画像を出力するかどうか */
 		high?: boolean;
-		/** true 为展示真实输出图片宽高 false 展示看到的截图框宽高 */
+		/** trueは実際の出力画像の幅と高さを表示し、falseは表示されているスクリーンショット枠の幅と高さを表示します */
 		infoTrue?: boolean;
-		/** 限制图片最大宽度和高度, 0 ~ max */
+		/** 画像の最大幅と高さを制限します、0～max */
 		maxImgSize?: number;
-		/** 图片根据截图框输出比例倍数, 0 ~ max (建议不要太大不然会卡死的呢) */
+		/** スクリーンショット枠に応じた画像の出力倍率、0～max（大きすぎるとフリーズする可能性があるため、推奨されません） */
 		enlarge?: number;
-		/** 图片默认渲染方式 */
+		/** 画像のデフォルトのレンダリング方法 */
 		mode?: "contain" | "cover" | string;
-		/** 裁剪框限制最小区域 */
+		/** 切り抜き枠の最小領域を制限します */
 		limitMinSize?: number | [] | string;
-		/** 导出时背景颜色填充 */
+		/** エクスポート時の背景色の塗りつぶし */
 		fillColor?: string | void;
 	}>(), {
 		image: cropTestImage,
@@ -78,8 +78,8 @@
 
 	const cropper = ref();
 	/**
-	 * 获取被裁减的图片结果
-	 * @returns Blob 格式存储的被裁剪后的图片
+	 * 切り抜かれた画像の結果を取得します
+	 * @returns Blob形式で保存された切り抜き後の画像
 	 */
 	const getCropBlobData = (): Promise<Blob> => {
 		return new Promise((resolve, reject) => {
@@ -140,13 +140,13 @@
 
 <style scoped lang="scss">
 	.vue-cropper:deep(*) {
-		// 防止拖动出现延迟
+		// ドラッグによる遅延を防ぐ
 		transition: none;
 
 		.cropper-view-box {
 			outline-color: c(accent);
 
-			// 网格线
+			// グリッド線
 			&::before,
 			&::after {
 				content: "";
@@ -156,7 +156,7 @@
 				pointer-events: none;
 			}
 
-			// 网格线 - 横向
+			// グリッド線 - 水平
 			&::before {
 				top: 50%;
 				left: 0;
@@ -166,7 +166,7 @@
 				translate: 0 -50%;
 			}
 
-			// 网格线 - 纵向
+			// グリッド線 - 垂直
 			&::after {
 				top: 0;
 				left: 50%;
@@ -182,7 +182,7 @@
 			background-color: transparent;
 			opacity: 1;
 
-			// 准星
+			// 十字線
 			&::before,
 			&::after {
 				@include oval;
@@ -193,20 +193,20 @@
 				pointer-events: none;
 			}
 
-			// 准星 - 横向
+			// 十字線 - 水平
 			&::before {
 				width: 12px;
 				height: 1px;
 			}
 
-			// 准星 - 纵向
+			// 十字線 - 垂直
 			&::after {
 				width: 1px;
 				height: 12px;
 			}
 		}
 
-		// 控制球
+		// コントロールボール
 		.crop-point {
 			$size: 16px;
 			// stylelint-disable-next-line order/order
@@ -273,7 +273,7 @@
 			}
 		}
 
-		// 分辨率信息
+		// 解像度情報
 		.crop-info {
 			@include round-small;
 			@include dropdown-flyouts;

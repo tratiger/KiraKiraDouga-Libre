@@ -1,12 +1,12 @@
-<!-- @deprecated 已弃用 -->
+<!-- @deprecated 廃止されました -->
 
 <docs>
-	UP 主为你比🖤🖤！
+	投稿者があなたに「いいね」しています🖤🖤！
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 是否不显示？ */
+		/** 非表示にしますか？ */
 		hidden?: boolean;
 	}>();
 
@@ -17,10 +17,10 @@
 <template>
 	<Transition>
 		<Comp v-if="!hidden" role="text" @mouseenter="hover = true" @mouseleave="hover = false">
-			<!-- 谨记：这里有个坑。要用 mouseenter 和 mouseleave，千万不要用 mouseover 和 mouseout。 -->
+			<!-- 注意：ここには落とし穴があります。mouseenterとmouseleaveを使い、mouseoverとmouseoutは絶対に使わないでください。 -->
 			<Icon name="heart" />
 			<Transition :css="false" @enter="onContentEnter" @leave="onContentLeave">
-				<span v-show="hover" class="text">UP主爱啦</span>
+				<span v-show="hover" class="text">投稿者が「いいね」しました</span>
 			</Transition>
 		</Comp>
 	</Transition>

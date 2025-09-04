@@ -5,9 +5,9 @@ const BACK_END_URI = environment.backendUri;
 const DANMAKU_API_URI = `${BACK_END_URI}video/danmaku`;
 
 /**
- * 用户发送弹幕
- * @param emitDanmakuRequest - 用户发送的弹幕数据
- * @returns 用户发送弹幕的结果
+ * ユーザーが弾幕を送信します
+ * @param emitDanmakuRequest - ユーザーが送信した弾幕データ
+ * @returns ユーザーが弾幕を送信した結果
  */
 export const emitDanmaku = async (emitDanmakuRequest: EmitDanmakuRequestDto): Promise<EmitDanmakuResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -15,9 +15,9 @@ export const emitDanmaku = async (emitDanmakuRequest: EmitDanmakuRequestDto): Pr
 };
 
 /**
- * 根据 kvid 获取视频弹幕列表
- * @param getDanmakuByKvidRequest - 请求弹幕列表的查询参数
- * @returns 视频的弹幕列表
+ * kvidに基づいて動画の弾幕リストを取得します
+ * @param getDanmakuByKvidRequest - 弾幕リストを要求するクエリパラメータ
+ * @returns 動画の弾幕リスト
  */
 export const getDanmakuByKvid = async (getDanmakuByKvidRequest: GetDanmakuByKvidRequestDto): Promise<GetDanmakuByKvidResponseDto> => {
 	return await GET(`${DANMAKU_API_URI}?videoId=${getDanmakuByKvidRequest.videoId}`) as GetDanmakuByKvidResponseDto;

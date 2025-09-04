@@ -1,5 +1,5 @@
 /**
- * 点类。
+ * ポイントクラス。
  */
 export class Point {
 	x: number;
@@ -11,35 +11,35 @@ export class Point {
 	}
 
 	/**
-	 * 求两点间距离。
-	 * @param point - 另一个点。
-	 * @returns 距离。
+	 * 2点間の距離を求めます。
+	 * @param point - もう一方の点。
+	 * @returns 距離。
 	 */
 	distance(point: Point): number {
 		return Math.hypot(point.x - this.x, point.y - this.y);
 	}
 
 	/**
-	 * 求两点间 X 轴距离。
-	 * @param point - 另一个点。
-	 * @returns X 轴距离。
+	 * 2点間のX軸距離を求めます。
+	 * @param point - もう一方の点。
+	 * @returns X軸距離。
 	 */
 	distanceX(point: Point): number {
 		return point.x - this.x;
 	}
 
 	/**
-	 * 求两点间 Y 轴距离。
-	 * @param point - 另一个点。
-	 * @returns Y 轴距离。
+	 * 2点間のY軸距離を求めます。
+	 * @param point - もう一方の点。
+	 * @returns Y軸距離。
 	 */
 	distanceY(point: Point): number {
 		return point.y - this.y;
 	}
 
 	/**
-	 * 返回对象的字符串表示形式。
-	 * @returns 对象的字符串表示形式。
+	 * オブジェクトの文字列表現を返します。
+	 * @returns オブジェクトの文字列表現。
 	 */
 	toString() {
 		return `(${this.x}, ${this.y})`;

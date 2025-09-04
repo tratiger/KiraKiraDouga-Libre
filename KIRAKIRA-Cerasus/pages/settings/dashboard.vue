@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const selfUserInfoStore = useSelfUserInfoStore();
-	// const userBirthdayDisplay = computed(() => selfUserInfoStore.userInfo.userBirthday ? formatDateWithLocale(new Date(selfUserInfoStore.userInfo.userBirthday)) : "Unknown"); // TODO: 生日功能适配temporal
+	// const userBirthdayDisplay = computed(() => selfUserInfoStore.userInfo.userBirthday ? formatDateWithLocale(new Date(selfUserInfoStore.userInfo.userBirthday)) : "Unknown"); // TODO: 誕生日機能をtemporalに適合させる
 
 	/**
-	 * 复制内容到剪贴板。
-	 * @param content - 要复制的内容。
+	 * 内容をクリップボードにコピーします。
+	 * @param content - コピーする内容。
 	 */
 	async function copy(content: Readable) {
 		if (!content) return;
@@ -36,7 +36,7 @@
 			</UserContent>
 		</div>
 
-		<!-- TODO: 请在至少一个计数做完之后启用 -->
+		<!-- TODO: 少なくとも1つのカウントが完了した後に有効にしてください -->
 		<!-- <div class="user-counts chip">
 			<div>
 				<span class="value">233</span>
@@ -57,7 +57,7 @@
 		</div> -->
 
 		<div class="user-info chip">
-			<!-- TODO: 生日功能适配temporal -->
+			<!-- TODO: 誕生日機能をtemporalに適合させる -->
 			<!-- <SettingsChipItem icon="birthday" :details="userBirthdayDisplay">{{ t.user.birthday }}</SettingsChipItem> -->
 			<SettingsChipItem
 				v-if="selfUserInfoStore.userInfo.userCreateDateTime"
@@ -82,7 +82,7 @@
 				trailingIcon="copy"
 				:onTrailingIconClick="() => copy(selfUserInfoStore.userInfo.invitationCode!)"
 			>
-				使用邀请码
+				招待コードを使用
 			</SettingsChipItem>
 		</div>
 	</div>

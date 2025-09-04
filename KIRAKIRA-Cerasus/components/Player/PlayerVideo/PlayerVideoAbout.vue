@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 视频是否正在播放？ */
+		/** 動画は再生中ですか？ */
 		playing?: boolean;
 	}>();
 
-	/** 是否显示？ */
+	/** 表示しますか？ */
 	const shown = defineModel<boolean>();
 </script>
 

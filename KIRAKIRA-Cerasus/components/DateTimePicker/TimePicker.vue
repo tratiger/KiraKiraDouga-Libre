@@ -1,10 +1,10 @@
 <docs>
-	# 时间选择器
+	# 時刻ピッカー
 </docs>
 
 <script lang="ts">
 	function getLocaleTimeFormat(locale: string | Intl.Locale) {
-		const go = new Date("2006-01-02T15:04:05"); // 幽默 Golang 的日期时间格式化字符串。
+		const go = new Date("2006-01-02T15:04:05"); // Golangのユーモラスな日時フォーマット文字列。
 		const options: Intl.DateTimeFormatOptions = { hour: "2-digit", minute: "2-digit", numberingSystem: "latn" };
 		const formatted = new Intl.DateTimeFormat(locale, options).format(go);
 		const hour12 = formatted.includes("03");

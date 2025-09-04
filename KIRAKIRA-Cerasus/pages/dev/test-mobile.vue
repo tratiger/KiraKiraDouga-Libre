@@ -1,4 +1,4 @@
-<!-- DELETE: 即将删除！ -->
+<!-- DELETE: 間もなく削除！ -->
 
 <script setup lang="ts">
 	const combobox = ref("default");
@@ -37,7 +37,7 @@
 		<template #leading>
 			<Icon name="dehaze" class="decorative-icon" />
 			<UserAvatar />
-			分区
+			カテゴリ
 		</template>
 		<template #trailing>
 			<SoftButton v-tooltip:bottom="t.messages" icon="email" />
@@ -52,7 +52,7 @@
 		</template>
 	</TopBar>
 	
-	<!-- 测试下拉框的 bug -->
+	<!-- ドロップダウンのバグをテスト -->
 	<ComboBox v-model="combobox" :style="{ width: '400px', margin: '2rem' }">
 		<ComboBoxItem id="default">default</ComboBoxItem>
 		<ComboBoxItem id="time">{{ now }}</ComboBoxItem>

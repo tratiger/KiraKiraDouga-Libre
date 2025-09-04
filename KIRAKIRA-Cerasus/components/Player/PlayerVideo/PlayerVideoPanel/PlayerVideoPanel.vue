@@ -2,21 +2,21 @@
 	import NumberFlow from "@number-flow/vue";
 
 	const props = defineProps<{
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 当前视频时间。 */
+		/** 現在の動画時間。 */
 		currentTime: number;
-		/** 视频是否正在播放？ */
+		/** 動画は再生中ですか？ */
 		playing: boolean;
-		/** 视频封面地址。 */
+		/** 動画のカバー画像アドレス。 */
 		thumbnail: string;
-		/** 视频播放器设置。 */
+		/** 動画プレーヤー設定。 */
 		settings: PlayerVideoSettings;
 	}>();
 
 	const insertDanmaku = defineModel<DanmakuListItem[]>("insertDanmaku");
 
-	/** @deprecated - 测试数据。 */
+	/** @deprecated - テストデータ。 */
 	const counts = reactive({
 		danmaku: 10000n,
 		watching: 1n,
@@ -62,13 +62,13 @@
 					<Transition :name="showSettings ? 'page-jump-out' : 'page-jump-in'" mode="out-in">
 						<TabBar v-if="showTabBar && !showSettings" v-model="selectedTab" @movingForTransition="name => transitionName = name">
 							<TabItem id="danmaku-list">{{ t(0).danmaku }}</TabItem>
-							<TabItem id="chapters">分段章节</TabItem>
-							<TabItem id="playlist">播放列表</TabItem>
+							<TabItem id="chapters">チャプター</TabItem>
+							<TabItem id="playlist">再生リスト</TabItem>
 						</TabBar>
 						<TabBar v-else-if="showSettings" v-model="selectedSettingsTab" @movingForTransition="name => transitionName = name">
 							<TabItem id="player">{{ t.player }}</TabItem>
 							<TabItem id="filters">{{ t.player.filter }}</TabItem>
-							<TabItem id="block-words">屏蔽词</TabItem>
+							<TabItem id="block-words">ブロックワード</TabItem>
 						</TabBar>
 					</Transition>
 				</div>

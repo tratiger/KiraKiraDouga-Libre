@@ -3,7 +3,7 @@ import type { TooltipEvent, VTooltipBindingValue } from "plugins/vue/tooltip";
 import type { ToastEvent } from "./toast";
 
 type ApplicationEvents = {
-	// 在此处定义需要全局使用的事件。
+	// ここでグローバルに使用する必要があるイベントを定義します。
 	"app:requestLogin": void;
 	"app:toast": ToastEvent;
 	"app:clearAllToast": void;

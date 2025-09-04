@@ -1,10 +1,10 @@
 <docs>
-	# 关注
+	# フォロー中
 
-	显示比如关注的用户发了新东西、关注的收藏夹有了更新等。
-	当前只支持显示视频。
+	フォロー中のユーザーが新しい投稿をした場合や、フォロー中のコレクションが更新された場合などを表示します。
+	現在、動画の表示のみをサポートしています。
 
-	TODO: 滚动加载更多，希望可以像Twitter一样尽可能无感（在还没到最底部的时候就开始往下加载）。
+	TODO: スクロールしてさらに読み込む。Twitterのように、できるだけ違和感なく（一番下に着く前に読み込みを開始する）ようにしたいです。
 </docs>
 
 <script setup lang="ts">
@@ -16,14 +16,14 @@
 <template>
 	<div class="container">
 		<PullToRefresh v-model:refreshing="refreshing" />
-		<!-- TODO: 切换视图 -->
+		<!-- TODO: ビューを切り替える -->
 		<div class="feed">
 			<UserContent
 				v-for="i in 10"
 				:key="i"
 				:uid="1"
-				nickname="占位符"
-				username="占位符"
+				nickname="プレースホルダー"
+				username="プレースホルダー"
 				avatarInside
 			>
 				<template #description>
@@ -33,7 +33,7 @@
 					<ThumbVideo
 						:videoId="1"
 					>
-						占位符
+						プレースホルダー
 					</ThumbVideo>
 				</ThumbGrid>
 			</UserContent>

@@ -3,7 +3,7 @@ type KirakiraErrorCode = 233 | 301 | 403 | 404 | 500 | 502 | 503 | 601;
 
 /**
  * Navigate To Error Page
- * // DELETE: 直接跳转至错误页可能并非最佳实践，寻找使用 Nuxt 的错误处理机制来替代的方案。
+ * // DELETE: エラーページに直接ジャンプするのはベストプラクティスではない可能性があるため、Nuxtのエラー処理メカニズムを使用して代替案を探します。
  * @param errorCode
  */
 export async function navigateToErrorPage(errorCode: KirakiraErrorCode) {

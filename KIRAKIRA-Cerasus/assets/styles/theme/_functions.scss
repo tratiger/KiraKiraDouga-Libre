@@ -3,39 +3,39 @@
 @use "sass:string";
 @use "sass:math";
 
-/// 将指定颜色反转亮度。
-/// @param {Color} $color - 颜色值。
-/// @return {Color} 反转亮度后的颜色值。
+/// 指定された色の輝度を反転させます。
+/// @param {Color} $color - カラー値。
+/// @return {Color} 輝度を反転させた後のカラー値。
 @function invert-lightness($color) {
 	$lightness: 100% - color.lightness($color);
 	@return hsla(color.hue($color), color.saturation($color), $lightness, color.alpha($color));
 }
 
-/// 将 Sass 映射的键名转换为 CSS 属性的属性名。
-/// @param {String} $key - Sass 映射的键名。
-/// @return {String} CSS 属性的属性名。
+/// Sassマップのキー名をCSSプロパティ名に変換します。
+/// @param {String} $key - Sassマップのキー名。
+/// @return {String} CSSプロパティ名。
 @function key-to-css-var($key) {
 	@return string.unquote($string: "--" + $key);
 }
 
-/// 将颜色值中的“#”号转义，放在 background url data svg 中。
-/// @param {Color} $color - 颜色值。
-/// @return {String} 转义 SVG 中的颜色值。
+/// カラー値の「#」をエスケープし、background url data svgに配置します。
+/// @param {Color} $color - カラー値。
+/// @return {String} SVG内のエスケープされたカラー値。
 @function color-to-svg-color($color) {
-	@return string.unquote("%23" + string.slice(#{$color}, -6)); // $color 变量是颜色类型，需要转换成字符串类型才可继续使用。
+	@return string.unquote("%23" + string.slice(#{$color}, -6)); // $color 変数はカラー型なので、文字列型に変換してから使用する必要があります。
 }
 
-/// 将颜色（如 `#f00`）转换为 RGB 列表（如 `255, 0, 0`），方便用于调用 rgba 函数。
-/// @param {Color} $color - 颜色值。
-/// @return {List} RGB 三色的列表。
+/// カラー（例：`#f00`）をRGBリスト（例：`255, 0, 0`）に変換し、rgba関数の呼び出しを容易にします。
+/// @param {Color} $color - カラー値。
+/// @return {List} RGB3色のリスト。
 @function color-to-rgb-list($color) {
 	@return color.red($color), color.green($color), color.blue($color);
 }
 
-/// 调用主题色。
-/// @param {String} $css-var-name - 颜色的 CSS 属性名称，不必加前面的“--”。也可以是 white 或 black。
-/// @param {Number | null} $alpha [null] - Alpha 值，可以是百分比值或零到一之间的小数，推荐用百分比值，如果留空表示不透明色。
-/// @return {Color} 返回由 var 调用的自定义属性纯色，或 rgba 封装的透明色。
+/// テーマカラーを呼び出します。
+/// @param {String} $css-var-name - カラーのCSSプロパティ名。「--」を前に付ける必要はありません。whiteまたはblackも可能です。
+/// @param {Number | null} $alpha [null] - アルファ値。パーセンテージまたは0から1の間の小数で指定できます。パーセンテージを推奨します。空の場合は不透明色を意味します。
+/// @return {Color} varで呼び出されるカスタムプロパティの純色、またはrgbaでカプセル化された透明色を返します。
 @function c($css-var-name, $alpha: null) {
 	$color: if($css-var-name == white or $css-var-name == black, $css-var-name, var(--#{$css-var-name}));
 
@@ -46,16 +46,16 @@
 	}
 }
 
-/// #### 不准温度计
-/// 即将一个数值从一个标度单位转移到另一个标度单位，新旧单位成线性关系，且不一定成正比关系，比如说摄氏度和华氏度的关系，返回对应的新值。
-/// 比如说，将一个取值范围为 0 ~ 255 的颜色值转到 0 ~ 100 的值。
-/// @param {Number} $x - 待转换的原标度数值。
-/// @param {Number} $min - 原标度值（小）。
-/// @param {Number} $max - 原标度值（大）。
-/// @param {Number} $a - 新标度值（小）。
-/// @param {Number} $b - 新标度值（大）。
-/// @param {Number} $css-calc [false] - 如是，则返回为基于 CSS 运行时的计算表达式。
-/// @return {Number} 转换后的新标度数值。
+/// #### 不正確な温度計
+/// ある数値を一つのスケール単位から別のスケール単位に変換します。新旧の単位は線形関係にありますが、必ずしも正比例するわけではありません。例えば、摂氏と華氏の関係のように、対応する新しい値を返します。
+/// 例えば、0〜255の範囲のカラー値を0〜100の値に変換します。
+/// @param {Number} $x - 変換前の元のスケール数値。
+/// @param {Number} $min - 元のスケール値（小）。
+/// @param {Number} $max - 元のスケール値（大）。
+/// @param {Number} $a - 新しいスケール値（小）。
+/// @param {Number} $b - 新しいスケール値（大）。
+/// @param {Number} $css-calc [false] - trueの場合、CSSランタイムベースの計算式を返します。
+/// @return {Number} 変換後の新しいスケール数値。
 @function map($x, $min, $max, $a, $b, $css-calc: false) {
 	@if not $css-calc {
 		@return calc(($b - $a) * ($x - $min) / ($max - $min)) + $a;
@@ -64,13 +64,13 @@
 	}
 }
 
-/// 将列表中的每一项取相反数。
+/// リストの各項目の符号を反転させます。
 /// @example scss
 /// 	margin: list-negative(1rem 2rem);
 /// 	// result
 /// 	margin: -1rem -2rem;
-/// @param {List} $list - 列表。
-/// @return {List} 取负数后的列表。
+/// @param {List} $list - リスト。
+/// @return {List} 符号を反転させた後のリスト。
 @function list-negative($list) {
 	@for $i from 1 through list.length($list) {
 		$list: list.set-nth($list, $i, -(list.nth($list, $i)));
@@ -78,10 +78,10 @@
 	@return $list;
 }
 
-/// 重复指定次数字符串。
-/// @param {String} $str - 字符串。
-/// @param {Number} $count - 重复次数。
-/// @return {String} 重复指定次数后的字符串。
+/// 文字列を指定された回数繰り返します。
+/// @param {String} $str - 文字列。
+/// @param {Number} $count - 繰り返す回数。
+/// @return {String} 指定された回数繰り返した後の文字列。
 @function string-repeat($str, $count) {
 	$result: "";
 
@@ -92,11 +92,11 @@
 	@return $result;
 }
 
-/// 将 `$string` 中的 `$search` 替换为 `$replace`。
-/// @param {String} $string - 初始字符串。
-/// @param {String} $search - 要更换的子字符串。
-/// @param {String} $replace [""] - 新值。
-/// @return {String} 更新后的字符串。
+/// `$string` 内の `$search` を `$replace` に置き換えます。
+/// @param {String} $string - 元の文字列。
+/// @param {String} $search - 置き換える部分文字列。
+/// @param {String} $replace [""] - 新しい値。
+/// @return {String} 更新後の文字列。
 @function string-replace($string, $search, $replace: "") {
 	$index: string.index($string, $search);
 
@@ -107,11 +107,11 @@
 	@return $string;
 }
 
-/// 生成给定两个数之间随机数。
-/// @param {Number} $min - 最小值。
-/// @param {Number} $max - 最大值。
-/// @param {Bool} $is-int [true] - 是否必须返回一个整数而不是小数？默认是整数。
-/// @return {Number} 范围内的随机数。
+/// 指定された2つの数の間の乱数を生成します。
+/// @param {Number} $min - 最小値。
+/// @param {Number} $max - 最大値。
+/// @param {Bool} $is-int [true] - 少数ではなく整数を返す必要がありますか？デフォルトは整数です。
+/// @return {Number} 範囲内の乱数。
 @function rand-between($min, $max, $is-int: true) {
 	@if $is-int {
 		@return math.random($max + 1 - $min) + $min;

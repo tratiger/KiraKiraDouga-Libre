@@ -1,5 +1,5 @@
 <docs>
-	用于测试 Slider 精准度问题。
+	Sliderの精度問題をテストするために使用します。
 </docs>
 
 <script setup lang="ts">
@@ -10,9 +10,9 @@
 <template>
 	<div class="slider-test">
 		<Segmented v-model="pending">
-			<SegmentedItem :id="(false as never)">不显示</SegmentedItem>
-			<SegmentedItem id="current">滑块值</SegmentedItem>
-			<SegmentedItem id="cursor">光标值</SegmentedItem>
+			<SegmentedItem :id="(false as never)">非表示</SegmentedItem>
+			<SegmentedItem id="current">スライダー値</SegmentedItem>
+			<SegmentedItem id="cursor">カーソル値</SegmentedItem>
 		</Segmented>
 		<p>{{ value }}</p>
 		<div class="slider-wrapper">

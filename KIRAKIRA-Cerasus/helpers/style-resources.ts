@@ -6,9 +6,9 @@ type AtRule = "import" | "use" | "require" | "forward" | "useAsGlobal";
 type Entries = Record<Preprocessor, Partial<Record<AtRule, string[]>>> & { hoistUseStatements: boolean };
 
 /**
- * 指定哪些样式需要在所有的样式文件中导入。
- * @param userOptions - 用户配置的前置导入项目。
- * @returns 全局引入的样式资源。
+ * すべてのスタイルファイルでインポートする必要があるスタイルを指定します。
+ * @param userOptions - ユーザーが設定した先行インポート項目。
+ * @returns グローバルにインポートされるスタイルリソース。
  */
 export default function styleResources(userOptions: Partial<Entries>) {
 	type PreprocessorOptions = { [p in Preprocessor]?: { additionalData: string } };

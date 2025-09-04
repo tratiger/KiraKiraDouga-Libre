@@ -1,10 +1,10 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 日期时间对象。 */
+		/** 日時オブジェクト。 */
 		dateTime: Date | null;
-		/** 是否同时显示时间？ */
+		/** 時刻も表示しますか？ */
 		showTime?: boolean;
-		/** 是否显示相对时间？ */
+		/** 相対時間を表示しますか？ */
 		relativeTime?: boolean | Intl.RelativeTimeFormatStyle;
 	}>();
 

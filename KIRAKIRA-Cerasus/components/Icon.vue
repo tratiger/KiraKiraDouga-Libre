@@ -1,14 +1,14 @@
 <docs>
-	# 图标组件
-	封装的总图标组件。如果下次想更换图标模块可直接在此处统一更换。
-	目前的图标模块：@nuxt/icon
+	# アイコンコンポーネント
+	カプセル化された総合アイコンコンポーネント。次回アイコンモジュールを変更したい場合は、ここで一括して変更できます。
+	現在のアイコンモジュール：@nuxt/icon
 </docs>
 
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 图标文件名称。 */
+		/** アイコンファイル名。 */
 		name: DeclaredIcons;
-		/** 是否保持图标本身的颜色。 */
+		/** アイコン自体の色を保持しますか？ */
 		filled?: boolean;
 	}>(), {
 		filled: false,

@@ -1,5 +1,5 @@
 <docs>
-	页面顶部的 Banner（横幅）。
+	ページ上部のバナー。
 </docs>
 
 <script setup lang="ts">
@@ -13,7 +13,7 @@
 	] as const;
 
 	/**
-	 * 检测当前页面并更新 page 的值。
+	 * 現在のページを検出し、pageの値を更新します。
 	 */
 	function updateCurrentPage() {
 		const localedRoute = getRoutePath();
@@ -27,10 +27,10 @@
 		else currentPage.value = "other";
 	}
 
-	// SSR 首屏加载。
+	// SSR初回読み込み。
 	updateCurrentPage();
 
-	// CSR 切换页面。
+	// CSRページ切り替え。
 	const nuxtApp = useNuxtApp();
 	nuxtApp.hook("page:finish", () => {
 		updateCurrentPage();

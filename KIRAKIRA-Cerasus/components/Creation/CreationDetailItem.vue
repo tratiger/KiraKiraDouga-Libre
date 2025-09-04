@@ -1,8 +1,8 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 图标，可选。 */
+		/** アイコン、任意。 */
 		icon?: DeclaredIcons;
-		/** 是否可点击？ */
+		/** クリック可能ですか？ */
 		clickable?: boolean;
 	}>();
 </script>

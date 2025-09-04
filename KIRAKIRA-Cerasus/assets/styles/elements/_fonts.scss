@@ -1,4 +1,4 @@
-/// 英文标题字体 Montserrat
+/// 英語タイトルフォント Montserrat
 @for $_weight from 1 through 9 {
 	$weight: $_weight * 100;
 
@@ -13,7 +13,7 @@
 	}
 }
 
-/// 修正字形字体 Monu
+/// グリフ修正フォント Monu
 /// https://github.com/MY1L/QuQi
 // @for $weight from 1 through 2 {
 // 	@font-face {
@@ -25,7 +25,7 @@
 // 	}
 // }
 
-/// 修正字形字体 Yozora Sans
+/// グリフ修正フォント Yozora Sans
 @font-face {
 	font-family: "Yozora Sans";
 	font-weight: 250 900;

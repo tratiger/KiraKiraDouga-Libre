@@ -3,7 +3,7 @@
 	"short_name": "KIRAKIRA",
 	"start_url": "/?source=pwa",
 	"id": "/?source=pwa",
-	"description": "一个可爱的视频网站，献给可爱的你！",
+	"description": "かわいい動画サイトを、かわいいあなたに！",
 	"display_override": [
 		"window-controls-overlay"
 	],

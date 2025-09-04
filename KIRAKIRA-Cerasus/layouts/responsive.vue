@@ -1,5 +1,5 @@
 <docs>
-	# 响应式布局
+	# レスポンシブレイアウト
 </docs>
 
 <script setup lang="ts">

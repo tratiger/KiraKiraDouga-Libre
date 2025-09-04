@@ -1,23 +1,23 @@
 <docs>
-	# 关注/取消关注按钮。
+	# フォロー/フォロー解除ボタン。
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 用户 UID。 */
+		/** ユーザーUID。 */
 		uid: number;
-		/** 是否已关注？（初始化时的） */
+		/** フォロー済みか？（初期化時） */
 		isFollowing: boolean;
 	}>();
 
-	const isFollowing = ref(props.isFollowing); // 是否正在关注
-	const isTogglingFollow = ref(false); // 是否正在发送关注或取消关注用户的请求
-	const followButton = ref<InstanceType<typeof Button>>(); // 关注按钮实例
-	const unfollowMenu = ref<FlyoutModel>(); // 点击「已关注」按钮时会出现的取消关注菜单
+	const isFollowing = ref(props.isFollowing); // フォロー中か
+	const isTogglingFollow = ref(false); // ユーザーのフォローまたはフォロー解除リクエストを送信中か
+	const followButton = ref<InstanceType<typeof Button>>(); // フォローボタンのインスタンス
+	const unfollowMenu = ref<FlyoutModel>(); // 「フォロー中」ボタンをクリックしたときに表示されるフォロー解除メニュー
 
 	/**
-	 * 关注按钮点击事件。
-	 * @param e - 鼠标事件。
+	 * フォローボタンクリックイベント。
+	 * @param e - マウスイベント。
 	 */
 	async function onFollowButtonClick(e: MouseEvent) {
 		const button = e.target as HTMLButtonElement;
@@ -30,7 +30,7 @@
 	}
 
 	/**
-	 * 取消关注按钮点击事件。
+	 * フォロー解除ボタンクリックイベント。
 	 */
 	async function onUnfollowButtonClick() {
 		if (!followButton.value) return;
@@ -41,7 +41,7 @@
 	}
 
 	/**
-	 * 关注当前 URL 所对应的用户。
+	 * 現在のURLに対応するユーザーをフォローします。
 	 */
 	async function followingUser() {
 		isTogglingFollow.value = true;
@@ -56,13 +56,13 @@
 				useToast(t.toast.something_went_wrong, "error", 5000);
 		} catch (error) {
 			useToast(t.toast.something_went_wrong, "error", 5000);
-			console.error("ERROR", "关注用户时出错：", error);
+			console.error("ERROR", "ユーザーフォロー時にエラーが発生しました：", error);
 		}
 		isTogglingFollow.value = false;
 	}
 
 	/**
-	 * 取关当前 URL 所对应的用户。
+	 * 現在のURLに対応するユーザーのフォローを解除します。
 	 */
 	async function unfollowingUser() {
 		isTogglingFollow.value = true;
@@ -80,7 +80,7 @@
 		} catch (error) {
 			isFollowing.value = true;
 			useToast(t.toast.something_went_wrong, "error", 5000);
-			console.error("ERROR", "取消关注用户时出错：", error);
+			console.error("ERROR", "ユーザーのフォロー解除時にエラーが発生しました：", error);
 		}
 		isTogglingFollow.value = false;
 	}

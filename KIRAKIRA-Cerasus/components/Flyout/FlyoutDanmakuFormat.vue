@@ -21,7 +21,7 @@
 	const placement = ref<Placement>();
 
 	/**
-	 * 切换页面时，移动浮窗到页面内部。
+	 * ページを切り替えるときに、フローティングウィンドウをページ内に移動します。
 	 */
 	function onSwitchPageEnter() {
 		placement.value = undefined;
@@ -31,9 +31,9 @@
 	}
 
 	/**
-	 * 是否使用深色的勾图标？
-	 * @param color - 颜色 HEX 值。
-	 * @returns 是否是深色？
+	 * 暗い色のチェックマークアイコンを使用しますか？
+	 * @param color - カラーHEX値。
+	 * @returns 暗い色ですか？
 	 */
 	function isDarkCheckMark(color: string) {
 		return Color.fromHex(color).naturalLightness >= 0.5;

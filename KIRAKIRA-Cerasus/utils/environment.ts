@@ -1,16 +1,16 @@
 /**
- * 环境宏定义变量。
+ * 環境マクロ定義変数。
  */
 export const environment = {
-	/** 是否是服务端渲染？ */
+	/** サーバーサイドレンダリングですか？ */
 	get server() { return import.meta.server; },
-	/** 是否是客户端渲染？ */
+	/** クライアントサイドレンダリングですか？ */
 	get client() { return import.meta.client; },
-	/** 是否是生产环境下？ */
+	/** 本番環境ですか？ */
 	get production() { return process.env.NODE_ENV === "production"; },
-	/** 是否是开发环境下？ */
+	/** 開発環境ですか？ */
 	get development() { return process.env.NODE_ENV === "development"; },
-	/** 后端接口 URI 地址 */
+	/** バックエンドAPIのURIアドレス */
 	get backendUri() {
 		const DEFAULT_BACKEND_URI = "https://localhost:9999/";
 		try {
@@ -31,7 +31,7 @@ export const environment = {
 			return DEFAULT_BACKEND_URI;
 		}
 	},
-	/** cloudflare 的图片提供者的名字，生产环境时使用 cloudflare-prod，否则使用 cloudflare-stg */
+	/** cloudflareの画像プロバイダー名。本番環境ではcloudflare-prod、それ以外ではcloudflare-stgを使用します */
 	get cloudflareImageProvider() {
 		const provider = import.meta.env.VITE_CLOUDFLARE_IMAGES_PROVIDER as string;
 		if (!provider)
@@ -41,7 +41,7 @@ export const environment = {
 		else
 			return "cloudflare-stg";
 	},
-	/** Cloudflare MPD 视频清单 URL 模板，其中 "{videoId}" 部分将会被替换为真实的视频 ID，生产和测试时使用不同的 URL */
+	/** Cloudflare MPD 動画マニフェストURLテンプレート。"{videoId}"部分は実際の動画IDに置き換えられます。本番とテストで異なるURLを使用します */
 	get cloudflareStreamVideoMpdUrlTemplate() {
 		const DEFAULT_CLOUDFLARE_STREAM_SUBDOMAIN = "https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/";
 		try {

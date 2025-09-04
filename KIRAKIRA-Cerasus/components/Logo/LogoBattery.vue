@@ -1,12 +1,12 @@
 <docs>
-	# 电池图标
+	# バッテリーアイコン
 </docs>
 
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 当前电量，从 0 到 1。 */
+		/** 現在の電力、0から1まで。 */
 		value: number;
-		/** 是否正在充电？ */
+		/** 充電中ですか？ */
 		charging: boolean;
 	}>();
 </script>

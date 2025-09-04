@@ -1,80 +1,80 @@
 export { };
 
 /**
- * 现在声明进入全局命名空间的类型，或者增加全局命名空间中的现有声明。
+ * グローバルな名前空間に入る型を宣言するか、グローバルな名前空間の既存の宣言に追加します。
  */
 declare global {
 	// type HtmlContext = Record<"body" | "bodyAppend" | "bodyAttrs" | "bodyPrepend" | "head" | "htmlAttrs", string[]>;
 
 	/**
-	 * 布尔型及其字符串形式。
+	 * ブール値とその文字列形式。
 	 */
 	type Booleanish = boolean | BooleanString;
 	/**
-	 * 布尔型的字符串形式。
+	 * ブール値の文字列形式。
 	 */
 	type BooleanString = "true" | "false";
 	/**
-	 * 数字及其字符串形式。
+	 * 数字とその文字列形式。
 	 */
 	type Numberish = number | string;
 	/**
-	 * 任何人类可直接读的类型，包括字符串、数字、大数。
+	 * 人間が直接読める任意の型で、文字列、数値、bigintを含みます。
 	 */
 	type Readable = string | number | bigint;
 	/**
-	 * 听说你想绕过警告使用 any？
+	 * 警告を回避してanyを使いたいと聞きましたが？
 	 */
 	type Any = Parameters<typeof alert>[0];
 	/**
-	 * 管它是啥反正是对象就是了。
+	 * 何であれ、とにかくオブジェクトです。
 	 */
 	type AnyObject = Record<PropertyKey, Any>;
 	/**
-	 * 为什么 Record 还需要手动指定键的类型？多此一举。
-	 * @template T - 值的类型。
+	 * なぜRecordはキーの型を手動で指定する必要があるのか？余計な手間です。
+	 * @template T - 値の型。
 	 */
 	type RecordValue<T> = Record<PropertyKey, T>;
 	/**
-	 * 表示二维点的元组。
+	 * 2次元の点を表すタプル。
 	 */
 	type TwoD = [number, number];
 	/**
-	 * 表示三维点的元组。
+	 * 3次元の点を表すタプル。
 	 */
 	type ThreeD = [number, number, number];
 	/**
-	 * 表示四维点的元组。
+	 * 4次元の点を表すタプル。
 	 */
 	type FourD = [number, number, number, number];
 	/**
-	 * 指定类型或一个无参数函数返回为指定类型。
-	 * @template T - 指定类型及无参数函数返回的这个类型。
+	 * 型を指定するか、その型を返す引数なしの関数を指定します。
+	 * @template T - 指定された型、および引数なしの関数が返すその型。
 	 */
 	type TypeOrReturnToType<T> = T | (() => T);
 	/**
-	 * 此对象在内部创建，并从 `setTimeout()` 和 `setInterval()` 返回。它可以传递给 `clearTimeout()` 或 `clearInterval()`，以便取消计划的操作。
+	 * このオブジェクトは内部で作成され、`setTimeout()` および `setInterval()` から返されます。これを `clearTimeout()` または `clearInterval()` に渡して、スケジュールされた操作をキャンセルできます。
 	 *
-	 * 默认情况下，当使用 `setTimeout()` 或 `setInterval()` 调度计时器时，只要计时器处于活动状态，Node.js 事件循环就会继续运行。这些函数返回的每个 `Timeout` 对象都导出 `timeout.ref()` 和 `timeout.unref()` 函数，它们可用于控制此默认行为。
+	 * デフォルトでは、`setTimeout()` または `setInterval()` を使用してタイマーをスケジュールすると、タイマーがアクティブである限りNode.jsのイベントループは実行し続けます。これらの関数から返される各 `Timeout` オブジェクトは、このデフォルトの動作を制御するために使用できる `timeout.ref()` および `timeout.unref()` 関数をエクスポートします。
 	 */
 	interface Timeout extends NodeJS.Timeout { }
 	/**
-	 * SCSS 中定义的变量的值。其中的 numbers 属性表示已转换为数字类型的值。
+	 * SCSSで定義された変数の値。numbersプロパティは数値型に変換された値を表します。
 	 */
 	interface IScssVariables extends DeepReadonly<Record<string, string> & { numbers: Record<string, number> }> { }
 	/**
-	 * 使用 SCSS 中定义的变量的值。其中的 numbers 属性表示已转换为数字类型的值。
+	 * SCSSで定義された変数の値を使用します。numbersプロパティは数値型に変換された値を表します。
 	 */
 	declare function useScssVariables(): IScssVariables;
 	interface Window {
 		/**
-		 * 仅在 Internet Explorer 中可用的 ActiveX 对象，高版本浏览器则会返回 undefined。
+		 * Internet Explorerでのみ利用可能なActiveXオブジェクトで、新しいブラウザではundefinedを返します。
 		 */
 		ActiveXObject: undefined;
 	}
 	interface Document {
 		/**
-		 * 在 Internet Explorer 中可用的文本选中对象。
+		 * Internet Explorerで利用可能なテキスト選択オブジェクト。
 		 *
 		 * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/getSelection)
 		 */
@@ -82,9 +82,9 @@ declare global {
 	}
 	interface ScreenOrientation {
 		/**
-		 * `ScreenOrientation` 接口的 `lock()` 属性将包含文档的方向锁定为指定的方向。
+		 * `ScreenOrientation` インターフェースの `lock()` プロパティは、ドキュメントの向きを指定された方向にロックします。
 		 *
-		 * 堂堂 VSCode 把这个定义给删了。
+		 * なんとVSCodeがこの定義を削除してしまいました。
 		 *
 		 * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ScreenOrientation/lock)
 		 */

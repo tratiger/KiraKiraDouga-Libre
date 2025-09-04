@@ -1,18 +1,18 @@
 <script setup lang="ts">
 	const props = defineProps<{
-		/** 图标，可选。 */
+		/** アイコン、任意。 */
 		icon?: DeclaredIcons;
 		/**
-		 * 点击按钮是否切换导航？
+		 * ボタンをクリックしてナビゲーションを切り替えますか？
 		 * #### NOTE
-		 * 点击按钮将会立刻切换导航，使单击事件失去作用。
+		 * ボタンをクリックするとすぐにナビゲーションが切り替わり、クリックイベントが無効になります。
 		 *
-		 * **不推荐使用该功能**，比如鼠标中键新窗口打开，触屏长按链接操作都将不再起作用。应该使用链接组件。
+		 * **この機能の使用は推奨されません**。例えば、マウスの中ボタンで新しいウィンドウを開いたり、タッチスクリーンでリンクを長押ししたりする操作は機能しなくなります。リンクコンポーネントを使用してください。
 		 */
 		href?: string;
-		/** 按钮是否在加载中？ */
+		/** ボタンは読み込み中ですか？ */
 		loading?: boolean;
-		/** 按钮事件级别。 */
+		/** ボタンイベントのレベル。 */
 		severity?: "warning" | "danger";
 	}>();
 
@@ -21,8 +21,8 @@
 	}>();
 
 	/**
-	 * 单击鼠标事件。
-	 * @param e - 鼠标事件。
+	 * マウスクリックイベント。
+	 * @param e - マウスイベント。
 	 */
 	function onClick(e: MouseEvent) {
 		props.href && navigate(props.href);
@@ -55,14 +55,14 @@
 <style scoped lang="scss">
 	@layer props {
 		button {
-			/// 外观偏好，可选的值为：primary | secondary | tertiary。
-			/// primary: 强调色按钮。
-			/// secondary: 次要/无背景按钮。
-			/// tertiary: 非强调色状态按钮。
+			/// 外観の好み、選択可能な値：primary | secondary | tertiary。
+			/// primary: 強調色ボタン。
+			/// secondary: セカンダリ/背景なしボタン。
+			/// tertiary: 非強調色状態ボタン。
 			--appearance: primary;
-			/// 是否隐藏标签文本？
+			/// ラベルテキストを非表示にしますか？
 			--hide-caption: false;
-			/// 图标是否放在文本后面。
+			/// アイコンをテキストの後に配置しますか？
 			--icon-behind: false;
 		}
 	}
@@ -147,7 +147,7 @@
 		}
 
 		button:any-hover > & {
-			// 在触摸屏上不要支持 hover 样式。
+			// タッチスクリーンではhoverスタイルをサポートしません。
 			@include button-shadow-hover;
 			background-color: c(accent-hover);
 		}

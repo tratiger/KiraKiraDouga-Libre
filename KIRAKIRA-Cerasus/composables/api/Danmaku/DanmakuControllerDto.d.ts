@@ -1,64 +1,64 @@
 /**
- * 基础弹幕数据
+ * 基本的な弾幕データ
  */
 type BasicDanmakuDto = {
-	/** 非空 - KVID 视频 ID */
+	/** 空でない - KVID 動画ID */
 	videoId: number;
-	/** 非空 - 弹幕发送的时机，单位：秒（支持小数） */
+	/** 空でない - 弾幕の送信タイミング、単位：秒（小数をサポート） */
 	time: number;
-	/** 非空 - 弾幕文本 */
+	/** 空でない - 弾幕テキスト */
 	text: string;
-	/** 非空 - 弾幕颜色 */
+	/** 空でない - 弾幕の色 */
 	color: string;
-	/** 非空 - 弹幕字体大小，后端只存储三种数据，在前端再映射为 css 可用的像素值 */
+	/** 空でない - 弾幕のフォントサイズ、バックエンドでは3つのデータのみを保存し、フロントエンドでCSSで利用可能なピクセル値にマッピングします */
 	fontSize: "small" | "medium" | "large";
-	/** 非空 - 弹幕发射模式，默认 'rtl' —— 从右舷向西发射 */
+	/** 空でない - 弾幕の発射モード、デフォルトは 'rtl' —— 右から左へ発射 */
 	mode: "ltr" | "rtl" | "top" | "bottom";
-	/** 非空 - 是否启用彩虹弹幕，默认不启用 */
+	/** 空でない - 虹色弾幕を有効にするかどうか、デフォルトでは無効 */
 	enableRainbow: boolean;
 };
 
 /**
- * 发送弹幕的请求的数据
+ * 弾幕送信リクエストのデータ
  */
 export type EmitDanmakuRequestDto = BasicDanmakuDto & {};
 
 /**
- * 发送弹幕的响应的数据
+ * 弾幕送信レスポンスのデータ
  */
 export type EmitDanmakuResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 发送成功的话，返回发送时的弹幕的数据 */
+	/** 送信に成功した場合、送信時の弾幕データを返します */
 	danmaku?: EmitDanmakuRequestDto;
 };
 
 /**
- * 获取视频的弹幕列表的请求的载荷
+ * 動画の弾幕リストを取得するリクエストのペイロード
  */
 export type GetDanmakuByKvidRequestDto = {
-	/** 非空 - KVID 视频 ID */
+	/** 空でない - KVID 動画ID */
 	videoId: number;
 };
 
 /**
- * 获取视频的弹幕列表的响应中的弹幕
+ * 動画の弾幕リストを取得するレスポンスの弾幕
  */
 export type GetDanmakuByKvidDto = BasicDanmakuDto & {
-	/** 弹幕最后编辑时间 */
+	/** 弾幕の最終編集日時 */
 	editDateTime: number;
 };
 
 /**
- * 获取视频的弹幕列表的响应
+ * 動画の弾幕リストを取得するレスポンス
  */
 export type GetDanmakuByKvidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したかどうか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加のテキストメッセージ */
 	message?: string;
-	/** 发送成功的话，返回弹幕的数据列表（不包含用户 ID，包含最后编辑时间） */
+	/** 送信に成功した場合、弾幕のデータリストを返します（ユーザーIDは含まず、最終編集日時を含む） */
 	danmaku?: (GetDanmakuByKvidDto & { isBlockedByOther?: boolean })[];
 };

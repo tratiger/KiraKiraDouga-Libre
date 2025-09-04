@@ -1,5 +1,5 @@
 /*
- * 删除 URL 的尾部斜杠。
+ * URLの末尾のスラッシュを削除します。
  */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
