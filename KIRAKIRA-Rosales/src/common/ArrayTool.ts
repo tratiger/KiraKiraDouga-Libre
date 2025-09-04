@@ -1,4 +1,3 @@
-
 /**
  *
  * JavaScriptで複雑なオブジェクト配列の重複を除去します
@@ -64,11 +63,11 @@ export const removeDuplicateObjectsInDeepArrayStrong = <T>(inputArray: NestedArr
 			const flattenedArray = flattenArray<T>(inputArray)
 			return removeDuplicates<T>(flattenedArray)
 		} else {
-			console.error('something error in function removeDuplicateObjectsStrongInDeepArray, required data "inputArray" is empty')
+			console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました。必須データ"inputArray"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function removeDuplicateObjectsStrongInDeepArray')
+		console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました')
 		return []
 	}
 }
@@ -90,7 +89,7 @@ const objectsAreEqual = <T>(a: T, b: T): boolean => {
 			
 		return true
 	} else {
-		console.error('something error in function objectsAreEqual, required data "a" or "b" is empty')
+		console.error('objectsAreEqual関数でエラーが発生しました。必須データ"a"または"b"が空です')
 		return false
 	}
 }
@@ -129,11 +128,11 @@ export const removeDuplicateObjectsInDeepArrayAndDeepObjectStrong = <T>(inputArr
 			const flattenedArray = flattenArray<T>(inputArray)
 			return removeDuplicates<T>(flattenedArray)
 		} else {
-			console.error('something error in function removeDuplicateObjectsStrongInDeepArray, required data "inputArray" is empty')
+			console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました。必須データ"inputArray"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function removeDuplicateObjectsStrongInDeepArray')
+		console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました')
 		return []
 	}
 }
@@ -168,11 +167,11 @@ export const mergeAndDeduplicateObjectArrays = <T>(arr1: T[], arr2: T[]): T[] =>
 
 			return uniqueArray
 		} else {
-			console.error('something error in function mergeAndDeduplicateObjectArrays, required data "inputArray(arr1 and arr2)" is empty')
+			console.error('mergeAndDeduplicateObjectArrays関数でエラーが発生しました。必須データ"inputArray(arr1 and arr2)"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function mergeAndDeduplicateObjectArrays')
+		console.error('mergeAndDeduplicateObjectArrays関数でエラーが発生しました')
 		return []
 	}
 }

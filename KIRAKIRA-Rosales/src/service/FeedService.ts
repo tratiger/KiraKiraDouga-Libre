@@ -97,7 +97,7 @@ export const followingUploaderService = async (followingUploaderRequest: Followi
 
 /**
  * ユーザーがクリエイターのフォローを解除する
- * @param followingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
+ * @param unfollowingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
  * @param uuid ユーザーのUUID
  * @param token ユーザーのトークン
  * @returns ユーザーがクリエイターのフォローを解除するリクエストレスポンス
@@ -909,7 +909,7 @@ const checkFollowingUploaderRequest = (followingUploaderRequest: FollowingUpload
 
 /**
  * ユーザーがクリエイターのフォローを解除するリクエストペイロードを検証する
- * @param followingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
+ * @param unfollowingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkUnfollowingUploaderRequest = (unfollowingUploaderRequest: UnfollowingUploaderRequestDto): boolean => {

@@ -19,39 +19,37 @@ import { FollowingSchema } from '../dbPool/schema/FeedSchema.js'
 import { buildBlockListMongooseFilter, checkBlockUserService, checkIsBlockedByOtherUserService } from './BlockService.js'
 
 /**
- * 上传视频
- * @param uploadVideoRequest 上传视频请求携带的请求载荷
- * @param esClient Elasticsearch 客户端连接
- * @returns 上传视频的结果
+ * 動画を更新
+ * @param uploadVideoRequest 動画アップロードリクエストのペイロード
+ * @param uid ユーザーID
+ * @param token ユーザートークン
+ * @param esClient Elasticsearchクライアント接続
+ * @returns 動画アップロードの結果
  */
 export const updateVideoService = async (uploadVideoRequest: UploadVideoRequestDto, uid: number, token: string, esClient?: Client): Promise<UploadVideoResponseDto> => {
 	try {
 		if (checkUploadVideoRequest(uploadVideoRequest) && esClient && !isEmptyObject(esClient)) {
 			if (!(await checkUserTokenService(uid, token)).success) {
-				console.error('ERROR', '上传视频失败，用户校验未通过')
-				return { success: false, message: '上传视频失败，用户校验未通过' }
+				console.error('ERROR', '動画のアップロードに失敗しました、ユーザー検証に失敗しました')
+				return { success: false, message: '動画のアップロードに失敗しました、ユーザー検証に失敗しました' }
 			}
-
 			if (uploadVideoRequest.uploaderId !== uid) {
-				console.error('ERROR', '上传视频失败, UID 与 cookie 不相符')
-				return { success: false, message: '上传视频失败, 账户未对齐' }
+				console.error('ERROR', '動画のアップロードに失敗しました、UIDがcookieと一致しません')
+				return { success: false, message: '動画のアップロードに失敗しました、アカウントが一致しません' }
 			}
 
-			const UUID = await getUserUuid(uid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+			const UUID = await getUserUuid(uid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 			if (!UUID) {
-				console.error('ERROR', '上传视频失败，UUID 不存在', { uid })
-				return { success: false, message: '上传视频失败，UUID 不存在' }
+				console.error('ERROR', '動画のアップロードに失敗しました、UUIDが存在しません', { uid })
+				return { success: false, message: '動画のアップロードに失敗しました、UUIDが存在しません' }
 			}
 
-			// 启动事务
 			const session = await mongoose.startSession()
 			session.startTransaction()
-
-			const __VIDEO_SEQUENCE_EJECT__ = [9, 42, 233, 404, 2233, 10388, 10492, 114514] // 生成 KVID 时要跳过的数字
+			const __VIDEO_SEQUENCE_EJECT__ = [9, 42, 233, 404, 2233, 10388, 10492, 114514] // KVID生成時にスキップする数字
 			const videoIdNextSequenceValueResult = await getNextSequenceValueEjectService('video', __VIDEO_SEQUENCE_EJECT__, 1, 1, session)
 			const videoId = videoIdNextSequenceValueResult.sequenceValue
 			if (videoIdNextSequenceValueResult?.success && videoId !== null && videoId !== undefined) {
-				// 准备视频数据
 				const nowDate = new Date().getTime()
 				const title = uploadVideoRequest.title
 				const description = uploadVideoRequest.description
@@ -59,10 +57,9 @@ export const updateVideoService = async (uploadVideoRequest: UploadVideoRequestD
 				const videoPart = uploadVideoRequest.videoPart.map(video => ({ ...video, editDateTime: nowDate }))
 				const videoTagList = uploadVideoRequest.videoTagList.map(tag => ({ ...tag, editDateTime: nowDate }))
 
-				// 准备上传到 MongoDB 的数据
+				// MongoDBにアップロードするデータを準備
 				const { collectionName, schemaInstance } = VideoSchema
 				type Video = InferSchemaType<typeof schemaInstance>
-
 				const video: Video = {
 					videoId,
 					videoPart: videoPart as Video['videoPart'], // TODO: Mongoose issue: #12420
@@ -85,7 +82,7 @@ export const updateVideoService = async (uploadVideoRequest: UploadVideoRequestD
 					editDateTime: nowDate,
 				}
 
-				// 准备上传到 Elasticsearch 的数据
+				// Elasticsearchにアップロードするデータを準備
 				const { indexName: esIndexName, schema: videoEsSchema } = VideoDocument
 				const videoEsData: EsSchema2TsType<typeof videoEsSchema> = {
 					title,
@@ -100,48 +97,47 @@ export const updateVideoService = async (uploadVideoRequest: UploadVideoRequestD
 					const refreshFlag = true
 					const insert2ElasticsearchPromise = insertData2ElasticsearchCluster(esClient, esIndexName, videoEsSchema, videoEsData, refreshFlag)
 					const [insert2MongoDBResult, insert2ElasticsearchResult] = await Promise.all([insert2MongoDBPromise, insert2ElasticsearchPromise])
-
 					if (insert2MongoDBResult.success && insert2ElasticsearchResult.success) {
 						await session.commitTransaction()
 						session.endSession()
-						return { success: true, videoId, message: '视频上传成功' }
+						return { success: true, videoId, message: '動画のアップロードに成功しました' }
 					} else {
 						if (session.inTransaction()) {
 							await session.abortTransaction()
 						}
 						session.endSession()
-						console.error('ERROR', '视频上传失败，数据无法导入数据库或搜索引擎')
-						return { success: false, message: '视频上传失败，数据无法导入数据库或搜索引擎' }
+						console.error('ERROR', '動画のアップロードに失敗しました、データをデータベースまたは検索エンジンにインポートできません')
+						return { success: false, message: '動画のアップロードに失敗しました、データをデータベースまたは検索エンジンにインポートできません' }
 					}
 				} catch (error) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('ERROR', '视频上传失败，数据无法导入数据库，错误：', error)
-					return { success: false, message: '视频上传失败，无法记录视频信息' }
+					console.error('ERROR', '動画のアップロードに失敗しました、データをデータベースにインポートできません、エラー：', error)
+					return { success: false, message: '動画のアップロードに失敗しました、動画情報を記録できません' }
 				}
 			} else {
 				if (session.inTransaction()) {
 					await session.abortTransaction()
 				}
 				session.endSession()
-				console.error('ERROR', '获取视频自增 ID 失败', uploadVideoRequest)
-				return { success: false, message: '视频上传失败，获取视频 ID 失败' }
+				console.error('ERROR', '動画の自動インクリメントIDの取得に失敗しました', uploadVideoRequest)
+				return { success: false, message: '動画のアップロードに失敗しました、動画IDの取得に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', `上传视频时的字段校验未通过或 Es 客户端未连接，用户ID：${uploadVideoRequest.uploaderId}`)
-			return { success: false, message: '上传时携带的参数不正确或搜索引擎客户端未连接' }
+			console.error('ERROR', `動画アップロード時のフィールド検証に失敗したか、Esクライアントが接続されていません、ユーザーID：${uploadVideoRequest.uploaderId}`)
+			return { success: false, message: 'アップロード時に指定されたパラメータが正しくないか、検索エンジンクライアントが接続されていません' }
 		}
 	} catch (error) {
-		console.error('ERROR', '视频上传失败：', error)
-		return { success: false, message: '视频上传失败' }
+		console.error('ERROR', '動画のアップロードに失敗しました：', error)
+		return { success: false, message: '動画のアップロードに失敗しました' }
 	}
 }
 
 /**
- * 获取主页视频 // TODO 应该使用推荐算法，而不是获取最后上传的 100 个视频
- * @returns 获取主页视频的请求响应
+ * ホームページの動画を取得 // TODO 推薦アルゴリズムを使用すべきであり、最後にアップロードされた100件の動画を取得すべきではない
+ * @returns ホームページの動画取得リクエストのレスポンス
  */
 export const getThumbVideoService = async (uuid?: string, token?: string): Promise<ThumbVideoResponseDto> => {
 	try {
@@ -166,7 +162,7 @@ export const getThumbVideoService = async (uuid?: string, token?: string): Promi
 				{
 					attr: 'title',
 					category: 'regex',
-				},
+				}
 			],
 			uuid,
 			token
@@ -182,14 +178,14 @@ export const getThumbVideoService = async (uuid?: string, token?: string): Promi
 				},
 			},
 			...blockListFilter.filter,
-			{ $skip: 0 }, // 跳过指定数量的文档 // TODO: 目前的值是占位符
-			{ $limit: 100 }, // 限制返回的文档数量 // TODO: 目前的值是占位符
+			{ $skip: 0 }, // 指定された数のドキュメントをスキップ // TODO: 現在の値はプレースホルダー
+			{ $limit: 100 }, // 返されるドキュメントの数を制限 // TODO: 現在の値はプレースホルダー
 			{
 				$unwind: '$uploader_info',
 			},
 			{
 				$sort: {
-					uploadDate: -1, // 按 uploadDate 降序排序
+					uploadDate: -1, // uploadDateで降順にソート
 				},
 			},
 			{
@@ -199,45 +195,44 @@ export const getThumbVideoService = async (uuid?: string, token?: string): Promi
 					image: 1,
 					uploadDate: 1,
 					watchedCount: 1,
-					uploaderId: 1, // 上传者 UID
+					uploaderId: 1, // アップローダーのUID
 					duration: 1,
 					description: 1,
 					editDateTime: 1,
-					uploader: '$uploader_info.username', // 上传者的名字
-					uploaderNickname: '$uploader_info.userNickname', // 上传者的昵称
-					...blockListFilter.additionalFields, // 黑名单过滤器的额外字段
-				}
-			}
+					uploader: '$uploader_info.username', // アップローダーの名前
+					uploaderNickname: '$uploader_info.userNickname', // アップローダーのニックネーム
+					...blockListFilter.additionalFields, // ブラックリストフィルターの追加フィールド
+				},
+			},
 		]
 
 		try {
 			const { collectionName: videoCollectionName, schemaInstance: videoSchemaInstance } = VideoSchema
 			type ThumbVideo = InferSchemaType<typeof videoSchemaInstance>
-
 			const result = await selectDataByAggregateFromMongoDB<ThumbVideo>(videoSchemaInstance, videoCollectionName, getThumbVideoPipeline)
 			const videoResult = result.result
 
 			if (!result.success || !videoResult) {
-				console.error('ERROR', '获取到的视频数组长度小于等于 0')
-				return { success: false, message: '获取首页视频时出现异常，视频数量为 0', videosCount: 0, videos: [] }
+				console.error('ERROR', '取得した動画配列の長さが0以下です')
+				return { success: false, message: 'ホームページの動画取得時に例外が発生しました、動画数が0です', videosCount: 0, videos: [] }
 			}
-
 			const videosCount = videoResult.length
-			return { success: true, message: '获取首页视频成功', videosCount, videos: videoResult }
+			return { success: true, message: 'ホームページの動画取得に成功しました', videosCount, videos: videoResult }
 		} catch (error) {
-			console.error('ERROR', '获取首页视频时出现异常，查询失败：', error)
-			return { success: false, message: '获取首页视频时出现异常', videosCount: 0, videos: [] }
+			console.error('ERROR', 'ホームページの動画取得時に例外が発生しました、クエリに失敗しました：', error)
+			return { success: false, message: 'ホームページの動画取得時に例外が発生しました', videosCount: 0, videos: [] }
 		}
+
 	} catch (error) {
-		console.error('ERROR', '获取首页视频失败：', error)
-		return { success: false, message: '获取首页视频失败', videosCount: 0, videos: [] }
+		console.error('ERROR', 'ホームページの動画取得に失敗しました：', error)
+		return { success: false, message: 'ホームページの動画取得に失敗しました', videosCount: 0, videos: [] }
 	}
 }
 
 /**
- * 根据视频 ID (KVID) 检查视频是否存在
- * @param getVideoByKvidRequest 根据视频 ID (KVID) 检查视频是否存在的请求载荷
- * @returns 视频是否存在
+ * 動画ID（KVID）に基づいて動画が存在するかどうかを確認
+ * @param getVideoByKvidRequest 動画ID（KVID）に基づいて動画が存在するかどうかを確認するリクエストペイロード
+ * @returns 動画が存在するかどうか
  */
 export const checkVideoExistByKvidService = async (checkVideoExistRequestDto: CheckVideoExistRequestDto): Promise<CheckVideoExistResponseDto> => {
 	try {
@@ -256,41 +251,40 @@ export const checkVideoExistByKvidService = async (checkVideoExistRequestDto: Ch
 				if (result.success && videoResult) {
 					const videosCount = videoResult?.length
 					if (videosCount === 1) {
-						return { success: true, message: "视频存在", exist: true }
+						return { success: true, message: "動画が存在します", exist: true }
 					} else {
-						console.error('ERROR', '获取到的视频数组长度不等于 1')
-						return { success: false, message: "获取视频信息错误，视频不存在", exist: false }
+						console.error('ERROR', '取得した動画配列の長さが1ではありません')
+						return { success: false, message: "動画情報の取得に失敗しました、動画が存在しません", exist: false }
 					}
 				} else {
-					console.error('ERROR', '获取到的视频结果或视频数组为空')
-					return { success: false, message: "获取视频信息错误，视频不存在", exist: false }
+					console.error('ERROR', '取得した動画結果または動画配列が空です')
+					return { success: false, message: "動画情報の取得に失敗しました、動画が存在しません", exist: false }
 				}
 			} catch (error) {
-				console.error('ERROR', '获取视频失败：', error)
-				return { success: false, message: "获取视频信息错误，视频不存在", exist: false }
+				console.error('ERROR', '動画の取得に失敗しました：', error)
+				return { success: false, message: "動画情報の取得に失敗しました、動画が存在しません", exist: false }
 			}
 		} else {
-			console.error('ERROR', 'KVID 为空')
-			return { success: false, message: "获取视频信息错误，KVID 为空", exist: false }
+			console.error('ERROR', 'KVIDが空です')
+			return { success: false, message: "動画情報の取得に失敗しました、KVIDが空です", exist: false }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取视频失败：', error)
-		return { success: false, message: "获取视频信息错误，未知错误", exist: false }
+		console.error('ERROR', '動画の取得に失敗しました：', error)
+		return { success: false, message: "動画情報の取得に失敗しました、不明なエラー", exist: false }
 	}
 }
 
 /**
- * 根据 kvid 判断用户是否被屏蔽
- * @param videoId 视频的 KVID
- * @param selectorUuid 用户的 UUID
- * @param selectorToken 用户的 Token
+ * 動画がブロックされているかを確認
+ * @param videoId 動画のKVID
+ * @param selectorUuid ユーザーのUUID
+ * @param selectorToken ユーザーのトークン
  */
 export const checkVideoBlockedByKvidService = async (videoId: number, selectorUuid: string, selectorToken: string): Promise<CheckVideoBlockedByKvidResponseDto> => {
 	try {
 		let isBlocked = false
 		let isBlockedByOther = false
 		let isHidden = false
-
 		const { collectionName, schemaInstance } = VideoSchema
 		type Video = InferSchemaType<typeof schemaInstance>
 		const where: QueryType<Video> = {
@@ -301,85 +295,81 @@ export const checkVideoBlockedByKvidService = async (videoId: number, selectorUu
 		}
 		const videoResult = await selectDataFromMongoDB<Video>(where, select, schemaInstance, collectionName)
 		if (!videoResult.success || !videoResult.result || videoResult.result.length === 0) {
-			console.error('ERROR', '检查视频是否被屏蔽失败，未找到对应的视频')
-			return { success: false, message: '检查视频是否被屏蔽失败，未找到对应的视频'}
+			console.error('ERROR', '動画がブロックされているかの確認に失敗しました、対応する動画が見つかりません')
+			return { success: false, message: '動画がブロックされているかの確認に失敗しました、対応する動画が見つかりません'}
 		}
 		const video = videoResult.result?.[0]
 		const uploaderUUID = video.uploaderUUID
 		if (!uploaderUUID) {
-			console.error('ERROR', '检查视频是否被屏蔽失败，视频上传者 UID 为空')
-			return { success: false, message: '检查视频是否被屏蔽失败，视频上传者 UID 为空' }
+			console.error('ERROR', '動画がブロックされているかの確認に失敗しました、動画のアップローダーUIDが空です')
+			return { success: false, message: '動画がブロックされているかの確認に失敗しました、動画のアップローダーUIDが空です' }
 		}
 		const targetUid = await getUserUid(uploaderUUID)
 		if (!targetUid) {
-			console.error('ERROR', '检查视频是否被屏蔽失败，视频上传者 UID 不存在')
-			return { success: false, message: '检查视频是否被屏蔽失败，视频上传者 UID 不存在' }
+			console.error('ERROR', '動画がブロックされているかの確認に失敗しました、動画のアップローダーUIDが存在しません')
+			return { success: false, message: '動画がブロックされているかの確認に失敗しました、動画のアップローダーUIDが存在しません' }
 		}
 
 		const checkBlockUserResult = await checkBlockUserService({ uid: targetUid }, selectorUuid, selectorToken)
 		const checkIsBlockedByOtherUserResult = await checkIsBlockedByOtherUserService({ targetUid }, selectorUuid, selectorToken)
+
 		if (!checkBlockUserResult.success && !checkIsBlockedByOtherUserResult.success) {
-			console.error('ERROR', '检查视频是否被屏蔽失败，无法检查用户是否被屏蔽')
-			return { success: false, message: '检查视频是否被屏蔽失败，无法检查用户是否被屏蔽' }
+			console.error('ERROR', '動画がブロックされているかの確認に失敗しました、ユーザーがブロックされているか確認できません')
+			return { success: false, message: '動画がブロックされているかの確認に失敗しました、ユーザーがブロックされているか確認できません' }
 		}
 
-		// 1. 检查上传者是否已经被当前用户隐藏
+		// 1. アップローダーが現在のユーザーによって非表示にされているかを確認
 		if (checkBlockUserResult.isHidden) {
 			isHidden = true
 		}
-
-		// 2. 检查当前用户是否已经被上传者屏蔽
+		// 2. 現在のユーザーがアップローダーによってブロックされているかを確認
 		if (checkIsBlockedByOtherUserResult.isBlocked) {
 			isBlockedByOther = true
 		}
-
-		// 3. 检查当前用户是否与上传者双向屏蔽
+		// 3. 現在のユーザーとアップローダーが相互にブロックしているかを確認
 		if (checkBlockUserResult.isBlocked && checkIsBlockedByOtherUserResult.isBlocked) {
-			return { success: true, message: '你与该用户已双向屏蔽', isBlockedByOther, isBlocked: true, isHidden }
+			return { success: true, message: 'あなたとこのユーザーは相互にブロックしています', isBlockedByOther, isBlocked: true, isHidden }
+		}
+		// 4. アップローダーが現在のユーザーによってブロックされているかを確認
+		if (checkBlockUserResult.isBlocked) {
+			return { success: true, message: 'あなたはこのユーザーをブロックしています', isBlockedByOther, isBlocked: true, isHidden }
 		}
 
-		// 4. 检查上传者是否已经被当前用户屏蔽
-		if (checkBlockUserResult.isBlocked) {
-			return { success: true, message: '你已屏蔽该用户', isBlockedByOther, isBlocked: true, isHidden }
-		}
-		return { success: true, message: '未屏蔽', isBlocked, isBlockedByOther, isHidden }
+		return { success: true, message: 'ブロックされていません', isBlocked, isBlockedByOther, isHidden }
 	} catch (error) {
-		console.error('ERROR', '检查视频是否被屏蔽失败：', error)
-		return { success: false, message: '检查视频是否被屏蔽失败，未知错误'}
+		console.error('ERROR', '動画がブロックされているかの確認に失敗しました：', error)
+		return { success: false, message: '動画がブロックされているかの確認に失敗しました、不明なエラー'}
 	}
 }
 
 /**
- * 根据 kvid 获取视频详细信息（用户打开某个视频页面）
- * @param uploadVideoRequest 根据 kvid 获取视频的请求携带的请求载荷
- * @returns 视频数据
+ * KVIDに基づいて動画を取得
+ * @param uploadVideoRequest kvidに基づいて動画を取得するリクエストのペイロード
+ * @returns 動画データ
  */
 export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvidRequestDto, selectorUuid?: string, selectorToken?: string): Promise<GetVideoByKvidResponseDto> => {
 	try {
 		const { videoId } = getVideoByKvidRequest
 		const { collectionName: videoCollectionName, schemaInstance: videoSchemaInstance } = VideoSchema
-
 		let isHidden = false
 		let isBlockedByOther = false
 
-		// 判断请求参数是否合法
 		if (!checkGetVideoByKvidRequest(getVideoByKvidRequest)) {
-			console.error('ERROR', '视频页 - KVID 为空')
-			return { success: false, message: '视频页 - 必要的请求参数为空', isBlocked: false, isBlockedByOther, isHidden }
+			console.error('ERROR', '動画ページ - KVIDが空です')
+			return { success: false, message: '動画ページ - 必須リクエストパラメータが空です', isBlocked: false, isBlockedByOther, isHidden }
 		}
 
-		// 构建视频查询 Pipeline
 		const getThumbVideoPipeline: PipelineStage[] = [
 			{
 				$match: {
-					videoId, // 通过 videoId 过滤视频
+					videoId, // videoIdで動画をフィルタリング
 				},
 			},
 			{
-				$limit: 1, // 如果意外获取多条视频，只获取第一条
+				$limit: 1, // 誤って複数の動画を取得した場合、最初の1件のみを取得
 			},
 			{
-				$lookup: { // 关联用户信息表，获取上传者信息
+				$lookup: { // ユーザー情報テーブルを関連付け、アップローダー情報を取得
 					from: 'user-infos',
 					localField: 'uploaderUUID',
 					foreignField: 'UUID',
@@ -387,7 +377,7 @@ export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvi
 				},
 			},
 			{
-				$unwind: '$uploader_info', // 平铺上传者信息
+				$unwind: '$uploader_info', // アップローダー情報を展開
 			},
 			{
 				$project: {
@@ -414,49 +404,45 @@ export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvi
 						avatar: '$uploader_info.avatar',
 						userBannerImage: '$uploader_info.userBannerImage',
 						signature: '$uploader_info.signature',
-					}
-				}
-			}
+					},
+				},
+			},
 		]
 
 		try {
-			// 使用 Pipeline 查询视频及上传者数据
+			// Pipelineを使用して動画とアップローダーのデータをクエリ
 			const result = await selectDataByAggregateFromMongoDB(videoSchemaInstance, videoCollectionName, getThumbVideoPipeline)
 			const video = result.result?.[0] as GetVideoByKvidResponseDto['video']
+
 			if (!result.success || !video) {
-				console.error('ERROR', '视频页 - 获取到的视频结果或视频数组为空')
-				return { success: false, message: '视频页 - 未获取到视频', isBlocked: false, isBlockedByOther, isHidden }
+				console.error('ERROR', '動画ページ - 取得した動画結果または動画配列が空です')
+				return { success: false, message: '動画ページ - 動画を取得できませんでした', isBlocked: false, isBlockedByOther, isHidden }
 			}
 
-			video.uploaderInfo.isFollowing = false // 默认没有关注上传者
-			video.uploaderInfo.isSelf = false // 默认上传者不是自己
+			video.uploaderInfo.isFollowing = false // デフォルトではアップローダーをフォローしていない
+			video.uploaderInfo.isSelf = false // デフォルトではアップローダーは自分自身ではない
 
-			if ((await checkUserTokenByUuidService(selectorUuid, selectorToken)).success) { // 如果用户已登录
+			if ((await checkUserTokenByUuidService(selectorUuid, selectorToken)).success) { // ユーザーがログインしている場合
 				const checkBlockUserResult = await checkBlockUserService({ uid: video.uploaderInfo.uid }, selectorUuid, selectorToken)
 				const checkIsBlockedByOtherUserResult = await checkIsBlockedByOtherUserService({ targetUid: video.uploaderInfo.uid }, selectorUuid, selectorToken)
-
-				// 1. 检查上传者是否已经被当前用户隐藏
+				// 1. アップローダーが現在のユーザーによって非表示にされているかを確認
 				if (checkBlockUserResult.isHidden) {
 					isHidden = true
 				}
-
-				// 2. 检查当前用户是否已经被上传者屏蔽
+				// 2. 現在のユーザーがアップローダーによってブロックされているかを確認
 				if (checkIsBlockedByOtherUserResult.isBlocked) {
 					isBlockedByOther = true
 				}
-
-				// 3. 检查当前用户是否与上传者双向屏蔽
+				// 3. 現在のユーザーとアップローダーが相互にブロックしているかを確認
 				if (checkBlockUserResult.isBlocked && checkIsBlockedByOtherUserResult.isBlocked) {
-					return { success: true, message: '视频页 - 未获取到视频，你与该用户已双向屏蔽', isBlockedByOther, isBlocked: true, isHidden }
+					return { success: true, message: '動画ページ - 動画を取得できませんでした、あなたとこのユーザーは相互にブロックしています', isBlockedByOther, isBlocked: true, isHidden }
 				}
-
-				// 4. 检查上传者是否已经被当前用户屏蔽
+				// 4. アップローダーが現在のユーザーによってブロックされているかを確認
 				if (checkBlockUserResult.isBlocked) {
-					return { success: true, message: '视频页 - 未获取到视频，你已屏蔽该用户', isBlockedByOther, isBlocked: true, isHidden }
+					return { success: true, message: '動画ページ - 動画を取得できませんでした、あなたはこのユーザーをブロックしています', isBlockedByOther, isBlocked: true, isHidden }
 				}
 
-
-				// 5. 存储浏览历史记录
+				// 5. 閲覧履歴を保存
 				const createOrUpdateBrowsingHistoryRequest: CreateOrUpdateBrowsingHistoryRequestDto = {
 					uuid: selectorUuid,
 					category: 'video',
@@ -464,7 +450,7 @@ export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvi
 				}
 				await createOrUpdateBrowsingHistoryService(createOrUpdateBrowsingHistoryRequest, selectorUuid, selectorToken)
 
-				// 6. 查询上传者是否被当前登录用户关注
+				// 6. アップローダーが現在のログインユーザーにフォローされているかクエリ
 				const { collectionName: followingSchemaCollectionName, schemaInstance: followingSchemaInstance } = FollowingSchema
 				type Following = InferSchemaType<typeof followingSchemaInstance>
 				const followingWhere: QueryType<Following> = {
@@ -478,11 +464,11 @@ export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvi
 				}
 				const selectFollowingDataResult = await selectDataFromMongoDB<Following>(followingWhere, followingSelect, followingSchemaInstance, followingSchemaCollectionName)
 				const followingResult = selectFollowingDataResult?.result
-				if (selectFollowingDataResult.success && followingResult.length === 1) { // 如果能查询到结果，则代表正在关注
+				if (selectFollowingDataResult.success && followingResult.length === 1) { // クエリ結果があればフォローしていることを示す
 					video.uploaderInfo.isFollowing = true
 				}
 
-				// 7. 如果上传者 uuid 和当前登录用户 uuid 相同，则是自己查看自己的视频
+				// 7. アップローダーのuuidと現在のログインユーザーのuuidが同じ場合、自分で自分の動画を見ていることになる
 				if (video.uploaderUUID === selectorUuid) {
 					video.uploaderInfo.isSelf = true
 				}
@@ -490,112 +476,104 @@ export const getVideoByKvidService = async (getVideoByKvidRequest: GetVideoByKvi
 
 			return {
 				success: true,
-				message: '视频页 - 获取视频成功',
+				message: '動画ページ - 動画の取得に成功しました',
 				video,
 				isBlocked: false,
 				isBlockedByOther,
 				isHidden,
 			}
 		} catch (error) {
-			console.error('ERROR', '视频页 - 视频查询失败：', error)
-			return { success: false, message: '视频页 - 视频查询失败', isBlocked: false, isBlockedByOther, isHidden }
+			console.error('ERROR', '動画ページ - 動画のクエリに失敗しました：', error)
+			return { success: false, message: '動画ページ - 動画のクエリに失敗しました', isBlocked: false, isBlockedByOther, isHidden }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取视频失败：', error)
-		return { success: false, message: '获取视频失败：', isBlocked: false, isBlockedByOther: false, isHidden: false }
+		console.error('ERROR', '動画の取得に失敗しました：', error)
+		return { success: false, message: '動画の取得に失敗しました：', isBlocked: false, isBlockedByOther: false, isHidden: false }
 	}
 }
 
 /**
- * 根据 UID 获取该用户上传的视频
- * @param getVideoByUidRequest 根据 UID 获取该用户上传的视频的请求 UID
- * @returns 请求到的视频信息
+ * UIDに基づいてそのユーザーがアップロードした動画を取得
+ * @param getVideoByUidRequest UIDに基づいてそのユーザーがアップロードした動画を取得するリクエストUID
+ * @returns リクエストされた動画情報
  */
 export const getVideoByUidRequestService = async (getVideoByUidRequest: GetVideoByUidRequestDto, selectorUuid?: string, selectorToken?: string): Promise<GetVideoByUidResponseDto> => {
 	try {
 		let isHidden = false
 		let isBlockedByOther = false
-
 		if (!checkGetVideoByUidRequest(getVideoByUidRequest)) {
-			console.error('ERROR', '根据 UID 获取视频失败，请求的 UID 为空：')
-			return { success: false, message: '根据 UID 获取视频失败，请求的 UID 为空', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
+			console.error('ERROR', 'UIDによる動画取得に失敗しました、リクエストされたUIDが空です：')
+			return { success: false, message: 'UIDによる動画取得に失敗しました、リクエストされたUIDが空です', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
 		}
-
 		const { uid } = getVideoByUidRequest
 
 		if (selectorUuid && selectorToken && (await checkUserTokenByUuidService(selectorUuid, selectorToken)).success) {
 			const checkBlockUserResult = await checkBlockUserService({ uid }, selectorUuid, selectorToken)
 			const checkIsBlockedByOtherUserResult = await checkIsBlockedByOtherUserService({ targetUid: uid }, selectorUuid, selectorToken)
 
-			// 1. 检查上传者是否已经被当前用户隐藏
+			// 1. アップローダーが現在のユーザーによって非表示にされているかを確認
 			if (checkBlockUserResult.isHidden) {
 				isHidden = true
 			}
-
-			// 2. 检查当前用户是否已经被上传者屏蔽
+			// 2. 現在のユーザーがアップローダーによってブロックされているかを確認
 			if (checkIsBlockedByOtherUserResult.isBlocked) {
 				isBlockedByOther = true
 			}
-
-			// 3. 检查当前用户是否与上传者双向屏蔽
+			// 3. 現在のユーザーとアップローダーが相互にブロックしているかを確認
 			if (checkBlockUserResult.isBlocked && checkIsBlockedByOtherUserResult.isBlocked) {
-				return { success: true, message: '根据 UID 获取视频失败，你与该用户已双向屏蔽', videosCount: 0, videos: [], isBlockedByOther, isBlocked: true, isHidden }
+				return { success: true, message: 'UIDによる動画取得に失敗しました、あなたとこのユーザーは相互にブロックしています', videosCount: 0, videos: [], isBlockedByOther, isBlocked: true, isHidden }
 			}
-
-			// 4. 检查上传者是否已经被当前用户屏蔽
+			// 4. アップローダーが現在のユーザーによってブロックされているかを確認
 			if (checkBlockUserResult.isBlocked) {
-				return { success: true, message: '根据 UID 获取视频失败，你已屏蔽该用户', videosCount: 0, videos: [], isBlockedByOther, isBlocked: true, isHidden }
+				return { success: true, message: 'UIDによる動画取得に失敗しました、あなたはこのユーザーをブロックしています', videosCount: 0, videos: [], isBlockedByOther, isBlocked: true, isHidden }
 			}
-		}
-
-		const { collectionName, schemaInstance } = VideoSchema
-		type Video = InferSchemaType<typeof schemaInstance>
-		const where: QueryType<Video> = {
-			uploaderId: uid,
-		}
-		const select: SelectType<Video> = {
-			videoId: 1,
-			videoPart: 1,
-			title: 1,
-			image: 1,
-			uploadDate: 1,
-			watchedCount: 1,
-			uploaderId: 1,
-			duration: 1,
-			description: 1,
-			editDateTime: 1,
 		}
 
 		try {
+			const { collectionName, schemaInstance } = VideoSchema
+			type Video = InferSchemaType<typeof schemaInstance>
+			const where: QueryType<Video> = {
+				uploaderId: uid,
+			}
+			const select: SelectType<Video> = {
+				videoId: 1,
+				videoPart: 1,
+				title: 1,
+				image: 1,
+				uploadDate: 1,
+				watchedCount: 1,
+				uploaderId: 1,
+				duration: 1,
+				description: 1,
+				editDateTime: 1,
+			}
 			const result = await selectDataFromMongoDB<Video>(where, select, schemaInstance, collectionName)
 			const videoResult = result.result
+
 			if (!result.success || !videoResult) {
-				console.error('ERROR', '根据 UID 获取视频失败，获取的结果失败或为空')
-				return { success: false, message: '根据 UID 获取视频失败，获取的结果失败或为空', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
+				console.error('ERROR', 'UIDによる動画取得に失敗しました、取得結果が失敗または空です')
+				return { success: false, message: 'UIDによる動画取得に失敗しました、取得結果が失敗または空です', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
 			}
-
 			const videoResultLength = videoResult?.length
-
 			if (videoResultLength <= 0) {
-				return { success: true, message: '该用户似乎未上传过视频', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
+				return { success: true, message: 'このユーザーは動画をアップロードしていないようです', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
 			}
-
-			return { success: true, message: '根据 UID 获取视频成功', videosCount: videoResultLength, videos: videoResult, isBlockedByOther, isBlocked: false, isHidden }
+			return { success: true, message: 'UIDによる動画取得に成功しました', videosCount: videoResultLength, videos: videoResult, isBlockedByOther, isBlocked: false, isHidden }
 		} catch (error) {
-			console.error('ERROR', '根据 UID 获取视频失败，检索视频出错：', error)
-			return { success: false, message: '根据 UID 获取视频失败，检索视频出错', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
+			console.error('ERROR', 'UIDによる動画取得に失敗しました、動画検索中にエラーが発生しました：', error)
+			return { success: false, message: 'UIDによる動画取得に失敗しました、動画検索中にエラーが発生しました', videosCount: 0, videos: [], isBlockedByOther, isBlocked: false, isHidden }
 		}
 	} catch (error) {
-		console.error('ERROR', '根据 UID 获取视频失败，未知原因：', error)
-		return { success: false, message: '根据 UID 获取视频失败，未知原因', videosCount: 0, videos: [], isBlockedByOther: false, isBlocked: false, isHidden: false }
+		console.error('ERROR', 'UIDによる動画取得に失敗しました、原因不明：', error)
+		return { success: false, message: 'UIDによる動画取得に失敗しました、原因不明', videosCount: 0, videos: [], isBlockedByOther: false, isBlocked: false, isHidden: false }
 	}
 }
 
 /**
- * 根据关键字在 Elasticsearch 中搜索视频
- * @param searchVideoByKeywordRequest 请求参数，搜索的关键字
- * @param client Elasticsearch 连接客户端
- * @returns 搜索视频的请求结果
+ * キーワードに基づいてElasticsearchで動画を検索
+ * @param searchVideoByKeywordRequest リクエストパラメータ、検索キーワード
+ * @param client Elasticsearch接続クライアント
+ * @returns 動画検索リクエストの結果
  */
 export const searchVideoByKeywordService = async (searchVideoByKeywordRequest: SearchVideoByKeywordRequestDto, client: Client | undefined): Promise<SearchVideoByKeywordResponseDto> => {
 	try {
@@ -606,7 +584,6 @@ export const searchVideoByKeywordService = async (searchVideoByKeywordRequest: S
 					query: searchVideoByKeywordRequest.keyword,
 				},
 			}
-
 			try {
 				const esSearchResult = await searchDataFromElasticsearchCluster(client, esIndexName, videoEsSchema, esQuery)
 				if (esSearchResult.success) {
@@ -642,57 +619,55 @@ export const searchVideoByKeywordService = async (searchVideoByKeywordRequest: S
 							}))
 							const videosCount = videos?.length
 							if (videos && videosCount !== undefined && videosCount !== null && videosCount > 0) {
-								return { success: true, message: '使用关键字搜索视频成功', videosCount, videos }
+								return { success: true, message: 'キーワードによる動画検索に成功しました', videosCount, videos }
 							} else {
-								console.error('ERROR', '使用关键字搜索视频失败，在 Es 中搜索成功，但在 MongoDB 中没有找到匹配的视频')
-								return { success: false, message: '使用关键字搜索视频失败，搜索到视频了，但是视频信息没有存储在在数据库中', videosCount: 0, videos: [] }
+								console.error('ERROR', 'キーワードによる動画検索に失敗しました、Esでの検索は成功しましたが、MongoDBで一致する動画が見つかりませんでした')
+								return { success: false, message: 'キーワードによる動画検索に失敗しました、動画は見つかりましたが、動画情報がデータベースに保存されていません', videosCount: 0, videos: [] }
 							}
 						} catch (error) {
-							console.error('ERROR', '使用关键字搜索视频失败，在 Es 中搜索成功，但在 MongoDB 中搜索出现异常')
-							return { success: false, message: '使用关键字搜索视频失败，搜索到视频了，但是视频数据获取异常', videosCount: 0, videos: [] }
+							console.error('ERROR', 'キーワードによる動画検索に失敗しました、Esでの検索は成功しましたが、MongoDBでの検索で例外が発生しました')
+							return { success: false, message: 'キーワードによる動画検索に失敗しました、動画は見つかりましたが、動画データの取得で例外が発生しました', videosCount: 0, videos: [] }
 						}
 					} else {
-						return { success: true, message: '使用关键字搜索视频成功，但搜索结果为空', videosCount: 0, videos: [] }
+						return { success: true, message: 'キーワードによる動画検索に成功しましたが、検索結果は空でした', videosCount: 0, videos: [] }
 					}
 				} else {
-					console.error('ERROR', '使用关键字搜索视频失败，在 Es 中搜索失败')
-					return { success: false, message: '使用关键字搜索视频失败，搜索失败', videosCount: 0, videos: [] }
+					console.error('ERROR', 'キーワードによる動画検索に失敗しました、Esでの検索に失敗しました')
+					return { success: false, message: 'キーワードによる動画検索に失敗しました、検索に失敗しました', videosCount: 0, videos: [] }
 				}
 			} catch (error) {
-				console.error('ERROR', '使用关键字搜索视频失败，在 Es 中搜索数据出现异常', error)
-				return { success: false, message: '使用关键字搜索视频失败，搜索数据时出现异常', videosCount: 0, videos: [] }
+				console.error('ERROR', 'キーワードによる動画検索に失敗しました、Esでのデータ検索中に例外が発生しました', error)
+				return { success: false, message: 'キーワードによる動画検索に失敗しました、データ検索時に例外が発生しました', videosCount: 0, videos: [] }
 			}
 		} else {
-			console.error('ERROR', '使用关键字搜索视频失败，检索关键字或 Es 连接客户端为空')
-			return { success: false, message: '使用关键字搜索视频失败，必要参数为空', videosCount: 0, videos: [] }
+			console.error('ERROR', 'キーワードによる動画検索に失敗しました、検索キーワードまたはEs接続クライアントが空です')
+			return { success: false, message: 'キーワードによる動画検索に失敗しました、必須パラメータが空です', videosCount: 0, videos: [] }
 		}
 	} catch (error) {
-		console.error('ERROR', '使用关键字搜索视频失败，未知原因：', error)
-		return { success: false, message: '使用关键字搜索视频失败，未知原因', videosCount: 0, videos: [] }
+		console.error('ERROR', 'キーワードによる動画検索に失敗しました、原因不明：', error)
+		return { success: false, message: 'キーワードによる動画検索に失敗しました、原因不明', videosCount: 0, videos: [] }
 	}
 }
 
 /**
- * 获取视频文件 TUS 上传端点
- * @param uid 用户 UID
- * @param token 用户 token
- * @param getVideoFileTusEndpointRequest 获取视频文件 TUS 上传端点的请求载荷
- * @returns 获取视频文件 TUS 上传端点地址
+ * 動画ファイルのTUSアップロードエンドポイントを取得
+ * @param uid ユーザーUID
+ * @param token ユーザートークン
+ * @param getVideoFileTusEndpointRequest 動画ファイルのTUSアップロードエンドポイントを取得するリクエストペイロード
+ * @returns 動画ファイルのTUSアップロードエンドポイントアドレス
  */
 export const getVideoFileTusEndpointService = async (uid: number, token: string, getVideoFileTusEndpointRequest: GetVideoFileTusEndpointRequestDto): Promise<string | undefined> => {
 	try {
 		if ((await checkUserTokenService(uid, token)).success) {
 			const streamTusEndpointUrl = process.env.CF_STREAM_TUS_ENDPOINT_URL
 			const streamToken = process.env.CF_STREAM_TOKEN
-
 			const uploadLength = getVideoFileTusEndpointRequest.uploadLength
 			const uploadMetadata = getVideoFileTusEndpointRequest.uploadMetadata
 
 			if (!streamTusEndpointUrl && !streamToken) {
-				console.error('ERROR', '无法创建 Cloudflare Stream TUS Endpoint, streamTusEndpointUrl 和 streamToken 可能为空。请检查环境变量设置（CF_STREAM_TUS_ENDPOINT_URL, CF_STREAM_TOKEN）')
+				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、streamTusEndpointUrlとstreamTokenが空の可能性があります。環境変数の設定を確認してください（CF_STREAM_TUS_ENDPOINT_URL, CF_STREAM_TOKEN）')
 				return undefined
 			}
-
 			try {
 				const videoTusEndpointResponse = await fetch(streamTusEndpointUrl, {
 					method: 'POST',
@@ -703,39 +678,36 @@ export const getVideoFileTusEndpointService = async (uid: number, token: string,
 						'Upload-Metadata': uploadMetadata,
 					},
 				})
-
 				if (!videoTusEndpointResponse.ok) {
-					console.error('ERROR', `无法创建 Cloudflare Stream TUS Endpoint, HTTP error! status: ${videoTusEndpointResponse.status}`)
+					console.error('ERROR', `Cloudflare Stream TUSエンドポイントを作成できません、HTTPエラー！ステータス：${videoTusEndpointResponse.status}`)
 					return undefined
 				}
-
 				const videoTusEndpoint = videoTusEndpointResponse.headers.get('location')
-
 				if (videoTusEndpoint) {
 					return videoTusEndpoint
 				} else {
-					console.error('ERROR', '无法创建 Cloudflare Stream TUS Endpoint, 请求结果为空')
+					console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエスト結果が空です')
 					return undefined
 				}
 			} catch (error) {
-				console.error('ERROR', '无法创建 Cloudflare Stream TUS Endpoint, 发送请求失败', error?.response?.data)
+				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエストの送信に失敗しました', error?.response?.data)
 				return undefined
 			}
 		} else {
-			console.error('ERROR', '无法创建 Cloudflare Stream TUS Endpoint, 用户校验未通过', { uid })
+			console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、ユーザー検証に失敗しました', { uid })
 			return undefined
 		}
 	} catch (error) {
-		console.error('ERROR', '无法创建 Cloudflare Stream TUS Endpoint, 未知错误：', error)
+		console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、不明なエラー：', error)
 		return undefined
 	}
 }
 
 /**
- * 获取用于上传视频封面图的预签名 URL
- * @param uid 用户 UID
- * @param token 用户 token
- * @returns GetVideoCoverUploadSignedUrlResponseDto 获取用于上传视频封面图的预签名 URL 响应结果
+ * 動画カバー画像のアップロード用署名付きURLを取得
+ * @param uid ユーザーUID
+ * @param token ユーザートークン
+ * @returns GetVideoCoverUploadSignedUrlResponseDto 動画カバー画像のアップロード用署名付きURL取得リクエストのレスポンス結果
  */
 export const getVideoCoverUploadSignedUrlService = async (uid: number, token: string): Promise<GetVideoCoverUploadSignedUrlResponseDto> => {
 	try {
@@ -745,26 +717,26 @@ export const getVideoCoverUploadSignedUrlService = async (uid: number, token: st
 			try {
 				const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
 				if (signedUrl) {
-					return { success: true, message: '获取视频封面图上传预签名 URL 成功', result: { fileName, signedUrl } }
+					return { success: true, message: '動画カバー画像のアップロード用署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
 				}
 			} catch (error) {
-				console.error('ERROR', '获取视频封面图上传预签名 URL 失败，请求失败', error)
-				return { success: false, message: '获取视频封面图上传预签名 URL 失败，请求失败' }
+				console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
+				return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '获取视频封面图上传预签名 URL 失败，用户校验未通过')
-			return { success: false, message: '获取视频封面图上传预签名 URL 失败，用户校验未通过' }
+			console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました')
+			return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取视频封面图上传预签名 URL 失败：', error)
-		return { success: false, message: '获取视频封面图上传预签名 URL 失败，未知原因' }
+		console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました：', error)
+		return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、原因不明' }
 	}
 }
 
 /**
- * 根据视频 TAG ID 搜索视频数据
- * @param searchVideoByVideoTagIdRequest 根据视频 TAG ID 搜索视频的请求载荷
- * @returns 通过视频 TAG ID 获取视频的请求响应
+ * 動画TAG IDに基づいて動画データを検索
+ * @param searchVideoByVideoTagIdRequest 動画TAG IDに基づいて動画を検索するリクエストペイロード
+ * @returns 動画TAG IDで動画を取得するリクエストレスポンス
  */
 export const searchVideoByVideoTagIdService = async (searchVideoByVideoTagIdRequest: SearchVideoByVideoTagIdRequestDto): Promise<SearchVideoByVideoTagIdResponseDto> => {
 	try {
@@ -773,6 +745,7 @@ export const searchVideoByVideoTagIdService = async (searchVideoByVideoTagIdRequ
 			const { collectionName: userInfoCollectionName, schemaInstance: userInfoSchemaInstance } = UserInfoSchema
 			type Video = InferSchemaType<typeof videoSchemaInstance>
 			type UserInfo = InferSchemaType<typeof userInfoSchemaInstance>
+
 			const where: QueryType<Video> = {
 				videoTagList: {
 					$all: searchVideoByVideoTagIdRequest.tagId.map(tagId => ({ $elemMatch: { tagId } })),
@@ -796,12 +769,12 @@ export const searchVideoByVideoTagIdService = async (searchVideoByVideoTagIdRequ
 			const uploaderInfoKey = 'uploaderInfo'
 			const option: DbPoolOptions<Video, UserInfo> = {
 				virtual: {
-					name: uploaderInfoKey, // 虚拟属性名
+					name: uploaderInfoKey, // 仮想属性名
 					options: {
-						ref: userInfoCollectionName, // 关联的子模型，注意结尾要加s
-						localField: 'uploaderId', // 父模型中用于关联的字段
-						foreignField: 'uid', // 子模型中用于关联的字段
-						justOne: true, // 如果为 true 则只一条数据关联一个文档（即使有很多符合条件的）
+						ref: userInfoCollectionName, // 関連付けられた子モデル、末尾にsを付けることを忘れないでください
+						localField: 'uploaderId', // 親モデルの関連付けフィールド
+						foreignField: 'uid', // 子モデルの関連付けフィールド
+						justOne: true, // trueの場合、1つのデータに1つのドキュメントのみを関連付ける（条件に一致するものが多数あっても）
 					},
 				},
 				populate: uploaderInfoKey,
@@ -812,7 +785,7 @@ export const searchVideoByVideoTagIdService = async (searchVideoByVideoTagIdRequ
 				if (result.success && videoResult) {
 					const videoList = videoResult.map(video => {
 						const uploaderInfo = uploaderInfoKey in video && video?.[uploaderInfoKey] as UserInfo
-						if (uploaderInfo) { // 如果获取到的话，就将视频上传者信息附加到请求响应中
+						if (uploaderInfo) { // 取得できた場合、動画アップローダー情報をリクエストレスポンスに追加する
 							const uid = uploaderInfo.uid
 							const username = uploaderInfo.username
 							const userNickname = uploaderInfo.userNickname
@@ -826,59 +799,56 @@ export const searchVideoByVideoTagIdService = async (searchVideoByVideoTagIdRequ
 
 					if (videoList) {
 						if (videoList.length > 0) {
-							return { success: true, message: '通过 TAG ID 搜索视频成功', videosCount: videoList.length, videos: videoList }
+							return { success: true, message: 'TAG IDによる動画検索に成功しました', videosCount: videoList.length, videos: videoList }
 						} else {
-							return { success: true, message: '通过 TAG ID 搜索未找到视频', videosCount: 0, videos: [] }
+							return { success: true, message: 'TAG IDによる検索では動画が見つかりませんでした', videosCount: 0, videos: [] }
 						}
 					} else {
-						console.error('ERROR', '通过 TAG ID 搜索时出错，搜索结果为空')
-						return { success: true, message: '通过 TAG ID 搜索时出错，整理后的搜索结果为空', videosCount: 0, videos: [] }
+						console.error('ERROR', 'TAG IDによる検索中にエラーが発生しました、検索結果が空です')
+						return { success: true, message: 'TAG IDによる検索中にエラーが発生しました、整理後の検索結果が空です', videosCount: 0, videos: [] }
 					}
 				} else {
-					console.error('ERROR', '通过 TAG ID 搜索时出错，搜索结果为空')
-					return { success: false, message: '通过 TAG ID 搜索时出错，搜索结果为空', videosCount: 0, videos: [] }
+					console.error('ERROR', 'TAG IDによる検索中にエラーが発生しました、検索結果が空です')
+					return { success: false, message: 'TAG IDによる検索中にエラーが発生しました、検索結果が空です', videosCount: 0, videos: [] }
 				}
 			} catch (error) {
-				console.error('ERROR', '通过 TAG ID 搜索时出错，搜索视频出错：', error)
-				return { success: false, message: '通过 TAG ID 搜索时出错，搜索视频出错', videosCount: 0, videos: [] }
+				console.error('ERROR', 'TAG IDによる検索中にエラーが発生しました、動画検索中にエラーが発生しました：', error)
+				return { success: false, message: 'TAG IDによる検索中にエラーが発生しました、動画検索中にエラーが発生しました', videosCount: 0, videos: [] }
 			}
 		} else {
-			console.error('ERROR', '无法通过 TAG ID 获取视频，请求参数不合法')
-			return { success: false, message: '无法通过 TAG ID 获取视频，请求参数不合法', videosCount: 0, videos: [] }
+			console.error('ERROR', 'TAG IDで動画を取得できません、リクエストパラメータが不正です')
+			return { success: false, message: 'TAG IDで動画を取得できません、リクエストパラメータが不正です', videosCount: 0, videos: [] }
 		}
 	} catch (error) {
-		console.error('ERROR', '无法通过 TAG ID 获取视频，未知异常：', error)
-		return { success: false, message: '无法通过 TAG ID 获取视频，未知异常', videosCount: 0, videos: [] }
+		console.error('ERROR', 'TAG IDで動画を取得できません、不明な例外：', error)
+		return { success: false, message: 'TAG IDで動画を取得できません、不明な例外', videosCount: 0, videos: [] }
 	}
 }
 
 /**
- * 删除一个视频
- * @param deleteVideoRequest 删除一个视频的请求载荷
- * @param adminUid 管理员 UID
- * @param adminToken 管理员 token
- * @param esClient Elasticsearch 客户端连接
- * @returns 删除一个视频的请求响应
+ * 動画を1つ削除
+ * @param deleteVideoRequest 動画を1つ削除するリクエストペイロード
+ * @param adminUid 管理者UID
+ * @param adminToken 管理者トークン
+ * @param esClient Elasticsearchクライアント接続
+ * @returns 動画を1つ削除するリクエストレスポンス
  */
 export const deleteVideoByKvidService = async (deleteVideoRequest: DeleteVideoRequestDto, adminUid: number, adminToken: string, esClient: Client): Promise<DeleteVideoResponseDto> => {
 	try {
 		if (checkDeleteVideoRequest(deleteVideoRequest) && esClient && !isEmptyObject(esClient)) {
 			if ((await checkUserTokenService(adminUid, adminToken)).success) {
-				const adminUUID = await getUserUuid(adminUid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+				const adminUUID = await getUserUuid(adminUid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 				if (!adminUUID) {
-					console.error('ERROR', '删除一个视频失败，adminUUID 不存在', { adminUid })
-					return { success: false, message: '删除一个视频失败，adminUUID 不存在' }
+					console.error('ERROR', '動画の削除に失敗しました、adminUUIDが存在しません', { adminUid })
+					return { success: false, message: '動画の削除に失敗しました、adminUUIDが存在しません' }
 				}
-
 				const videoId = deleteVideoRequest.videoId
 				const nowDate = new Date().getTime()
-
 				const { collectionName: videoCollectionName, schemaInstance: videoSchemaInstance } = VideoSchema
 				type Video = InferSchemaType<typeof videoSchemaInstance>
 				const deleteWhere: QueryType<Video> = {
 					videoId,
 				}
-
 				const { indexName: esIndexName } = VideoDocument
 				const conditions = {
 					kvid: videoId,
@@ -887,11 +857,11 @@ export const deleteVideoByKvidService = async (deleteVideoRequest: DeleteVideoRe
 				const { collectionName: removedVideoCollectionName, schemaInstance: removedVideoSchemaInstance } = RemovedVideoSchema
 				type RemovedVideo = InferSchemaType<typeof removedVideoSchemaInstance>
 
-				// 启动事务
+				// トランザクション開始
 				const session = await mongoose.startSession()
 				session.startTransaction()
-
 				const option = { session }
+
 				try {
 					const getVideoByKvidRequest: GetVideoByKvidRequestDto = {
 						videoId,
@@ -901,7 +871,7 @@ export const deleteVideoByKvidService = async (deleteVideoRequest: DeleteVideoRe
 					if (videoResult.success && videoData) {
 						const removedVideoData: RemovedVideo = {
 							...videoData as Video, // TODO: Mongoose issue: #12420
-							pendingReview: false, // 已删除的视频就不需要审核了...
+							pendingReview: false, // 削除済みの動画は審査不要...
 							_operatorUUID_: adminUUID,
 							_operatorUid_: adminUid,
 							editDateTime: nowDate,
@@ -913,71 +883,71 @@ export const deleteVideoByKvidService = async (deleteVideoRequest: DeleteVideoRe
 							if (deleteResult.success && deleteFromElasticsearchResult) {
 								await session.commitTransaction()
 								session.endSession()
-								return { success: true, message: '删除视频成功' }
+								return { success: true, message: '動画の削除に成功しました' }
 							} else {
 								if (session.inTransaction()) {
 									await session.abortTransaction()
 								}
 								session.endSession()
-								console.error('ERROR', '删除一个视频失败，删除视频失败')
-								return { success: false, message: '删除一个视频失败，删除视频失败' }
+								console.error('ERROR', '動画の削除に失敗しました、動画の削除に失敗しました')
+								return { success: false, message: '動画の削除に失敗しました、動画の削除に失敗しました' }
 							}
 						} else {
 							if (session.inTransaction()) {
 								await session.abortTransaction()
 							}
 							session.endSession()
-							console.error('ERROR', '删除一个视频失败，保存副本失败')
-							return { success: false, message: '删除一个视频失败，保存副本失败' }
+							console.error('ERROR', '動画の削除に失敗しました、コピーの保存に失敗しました')
+							return { success: false, message: '動画の削除に失敗しました、コピーの保存に失敗しました' }
 						}
 					} else {
 						if (session.inTransaction()) {
 							await session.abortTransaction()
 						}
 						session.endSession()
-						console.error('ERROR', '删除一个视频失败，查询视频数据失败')
-						return { success: false, message: '删除一个视频失败，查询视频数据失败' }
+						console.error('ERROR', '動画の削除に失敗しました、動画データのクエリに失敗しました')
+						return { success: false, message: '動画の削除に失敗しました、動画データのクエリに失敗しました' }
 					}
 				} catch (error) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('ERROR', '删除一个视频时出错，获取视频失败！')
-					return { success: false, message: '删除一个视频时出错，获取视频失败' }
+					console.error('ERROR', '動画の削除中にエラーが発生しました、動画の取得に失敗しました！')
+					return { success: false, message: '動画の削除中にエラーが発生しました、動画の取得に失敗しました' }
 				}
 			} else {
-				console.error('ERROR', '删除一个视频失败，非法用户！')
-				return { success: false, message: '删除一个视频失败，非法用户！' }
+				console.error('ERROR', '動画の削除に失敗しました、不正なユーザーです！')
+				return { success: false, message: '動画の削除に失敗しました、不正なユーザーです！' }
 			}
 		} else {
-			console.error('ERROR', '删除一个视频失败，参数不合法')
-			return { success: false, message: '删除一个视频失败，参数不合法' }
+			console.error('ERROR', '動画の削除に失敗しました、パラメータが不正です')
+			return { success: false, message: '動画の削除に失敗しました、パラメータが不正です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '删除一个视频时出错，未知错误：', error)
-		return { success: false, message: '删除一个视频时出错，未知错误' }
+		console.error('ERROR', '動画の削除中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: '動画の削除中にエラーが発生しました、不明なエラー' }
 	}
 }
 
-
 /**
- * 获取待审核视频列表
- * @param adminUid 管理员 UID
- * @param adminToken 管理员 token
- * @returns 获取待审核视频列表的请求响应
+ * 審査待ち動画リストを取得
+ * @param adminUid 管理者UID
+ * @param adminToken 管理者トークン
+ * @returns 審査待ち動画リスト取得リクエストのレスポンス
  */
 export const getPendingReviewVideoService = async (adminUid: number, adminToken: string): Promise<PendingReviewVideoResponseDto> => {
 	try {
 		if (!(await checkUserTokenService(adminUid, adminToken)).success) {
-			console.error('ERROR', '获取待审核视频列表失败，用户校验失败！')
-			return { success: false, message: '获取待审核视频列表失败，用户校验失败！', videosCount: 0, videos: [] }
+			console.error('ERROR', '審査待ち動画リストの取得に失敗しました、ユーザー検証に失敗しました！')
+			return { success: false, message: '審査待ち動画リストの取得に失敗しました、ユーザー検証に失敗しました！', videosCount: 0, videos: [] }
 		}
 
 		const { collectionName: videoCollectionName, schemaInstance: videoSchemaInstance } = VideoSchema
 		const { collectionName: userInfoCollectionName, schemaInstance: userInfoSchemaInstance } = UserInfoSchema
 		type Video = InferSchemaType<typeof videoSchemaInstance>
 		type UserInfo = InferSchemaType<typeof userInfoSchemaInstance>
+
 		const where: QueryType<Video> = {}
 		const select: SelectType<Video> = {
 			videoId: 1,
@@ -996,16 +966,17 @@ export const getPendingReviewVideoService = async (adminUid: number, adminToken:
 		const uploaderInfoKey = 'uploaderInfo'
 		const option: DbPoolOptions<Video, UserInfo> = {
 			virtual: {
-				name: uploaderInfoKey, // 虚拟属性名
+				name: uploaderInfoKey, // 仮想属性名
 				options: {
-					ref: userInfoCollectionName, // 关联的子模型
-					localField: 'uploaderId', // 父模型中用于关联的字段
-					foreignField: 'uid', // 子模型中用于关联的字段
-					justOne: true, // 如果为 true 则只一条数据关联一个文档（即使有很多符合条件的）
+					ref: userInfoCollectionName, // 関連付けられた子モデル
+					localField: 'uploaderId', // 親モデルの関連付けフィールド
+					foreignField: 'uid', // 子モデルの関連付けフィールド
+					justOne: true, // trueの場合、1つのデータに1つのドキュメントのみを関連付ける（条件に一致するものが多数あっても）
 				},
 			},
 			populate: uploaderInfoKey,
 		}
+
 		try {
 			const result = await selectDataFromMongoDB<Video, UserInfo>(where, select, videoSchemaInstance, videoCollectionName, option, orderBy)
 			const videoResult = result.result
@@ -1014,7 +985,7 @@ export const getPendingReviewVideoService = async (adminUid: number, adminToken:
 				if (videosCount && videosCount > 0) {
 					return {
 						success: true,
-						message: '获取待审核视频成功',
+						message: '審査待ち動画の取得に成功しました',
 						videosCount,
 						videos: videoResult.map(video => {
 							if (video) {
@@ -1025,45 +996,43 @@ export const getPendingReviewVideoService = async (adminUid: number, adminToken:
 								}
 							}
 							return { ...video, uploader: undefined }
-						}),
+						})
 					}
 				} else {
-					console.error('ERROR', '获取待审核视频列表失败，获取到的视频数组长度小于等于 0')
-					return { success: false, message: '获取待审核视频列表失败，视频数量为 0', videosCount: 0, videos: [] }
+					console.error('ERROR', '審査待ち動画リストの取得に失敗しました、取得した動画配列の長さが0以下です')
+					return { success: false, message: '審査待ち動画リストの取得に失敗しました、動画数が0です', videosCount: 0, videos: [] }
 				}
 			} else {
-				console.error('ERROR', '获取待审核视频列表失败，获取到的视频结果或视频数组为空')
-				return { success: false, message: '获取待审核视频列表失败，未获取到视频', videosCount: 0, videos: [] }
+				console.error('ERROR', '審査待ち動画リストの取得に失敗しました、取得した動画結果または動画配列が空です')
+				return { success: false, message: '審査待ち動画リストの取得に失敗しました、動画を取得できませんでした', videosCount: 0, videos: [] }
 			}
 		} catch (error) {
-			console.error('ERROR', '获取待审核视频列表时出错，获取视频时出现异常，查询失败：', error)
-			return { success: false, message: '获取待审核视频列表时出错，查询失败', videosCount: 0, videos: [] }
+			console.error('ERROR', '審査待ち動画リスト取得時にエラーが発生しました、動画取得時に例外が発生しました、クエリに失敗しました：', error)
+			return { success: false, message: '審査待ち動画リスト取得時にエラーが発生しました、クエリに失敗しました', videosCount: 0, videos: [] }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取待审核视频列表时出错，获取视频出错：', error)
-		return { success: false, message: '获取待审核视频列表时出错，获取视频出错', videosCount: 0, videos: [] }
+		console.error('ERROR', '審査待ち動画リスト取得時にエラーが発生しました、動画取得中にエラーが発生しました：', error)
+		return { success: false, message: '審査待ち動画リスト取得時にエラーが発生しました、動画取得中にエラーが発生しました', videosCount: 0, videos: [] }
 	}
 }
 
 /**
- * 通过一个待审核视频
- * @param approvePendingReviewVideoRequest 通过一个待审核视频的请求载荷
- * @param adminUid 管理员 UID
- * @param adminToken 管理员 token
- * @returns 通过一个待审核视频的请求响应
+ * 審査待ちの動画を承認
+ * @param approvePendingReviewVideoRequest 審査待ちの動画を1つ承認するリクエストペイロード
+ * @param adminUid 管理者UID
+ * @param adminToken 管理者トークン
+ * @returns 審査待ちの動画を1つ承認するリクエストレスポンス
  */
 export const approvePendingReviewVideoService = async (approvePendingReviewVideoRequest: ApprovePendingReviewVideoRequestDto, adminUid: number, adminToken: string): Promise<ApprovePendingReviewVideoResponseDto> => {
 	try {
 		if (!checkApprovePendingReviewVideoRequest(approvePendingReviewVideoRequest)) {
-			console.error('ERROR', '通过一个待审核视频失败，参数校验失败')
-			return { success: false, message: '通过一个待审核视频失败，参数校验失败' }
+			console.error('ERROR', '審査待ち動画の承認に失敗しました、パラメータ検証に失敗しました')
+			return { success: false, message: '審査待ち動画の承認に失敗しました、パラメータ検証に失敗しました' }
 		}
-
 		if (!(await checkUserTokenService(adminUid, adminToken)).success) {
-			console.error('ERROR', '通过一个待审核视频失败，用户校验失败！')
-			return { success: false, message: '通过一个待审核视频失败，用户校验失败！' }
+			console.error('ERROR', '審査待ち動画の承認に失敗しました、ユーザー検証に失敗しました！')
+			return { success: false, message: '審査待ち動画の承認に失敗しました、ユーザー検証に失敗しました！' }
 		}
-
 		try {
 			const { videoId } = approvePendingReviewVideoRequest
 			const { collectionName: videoCollectionName, schemaInstance: videoSchemaInstance } = VideoSchema
@@ -1071,37 +1040,32 @@ export const approvePendingReviewVideoService = async (approvePendingReviewVideo
 			const updatePendingReviewVideoWhere: QueryType<Video> = {
 				videoId,
 			}
-
 			const updatePendingReviewVideoData: UpdateType<Video> = {
 				pendingReview: false,
 			}
 			const updatePendingReviewVideoResult = await findOneAndUpdateData4MongoDB<Video>(updatePendingReviewVideoWhere, updatePendingReviewVideoData, videoSchemaInstance, videoCollectionName)
-
 			if (!updatePendingReviewVideoResult.success) {
-				console.error('ERROR', '通过一个待审核视频失败，更新失败')
-				return { success: false, message: '通过一个待审核视频失败，更新失败' }
+				console.error('ERROR', '審査待ち動画の承認に失敗しました、更新に失敗しました')
+				return { success: false, message: '審査待ち動画の承認に失敗しました、更新に失敗しました' }
 			}
-
-
-			return { success: true, message: '通过待审核视频成功' }
+			return { success: true, message: '審査待ち動画の承認に成功しました' }
 		} catch (error) {
-			console.error('ERROR', '通过一个待审核视频时出错，请求更新时出错：', error)
-			return { success: false, message: '通过一个待审核视频时出错，请求更新时出错' }
+			console.error('ERROR', '審査待ち動画の承認中にエラーが発生しました、更新リクエスト中にエラーが発生しました：', error)
+			return { success: false, message: '審査待ち動画の承認中にエラーが発生しました、更新リクエスト中にエラーが発生しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '通过一个待审核视频时出错，未知错误：', error)
-		return { success: false, message: '通过一个待审核视频时出错，未知错误' }
+		console.error('ERROR', '審査待ち動画の承認中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: '審査待ち動画の承認中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 检查上传的视频中的参数是否正确且无疏漏
- * @param uploadVideoRequest 上传视频请求携带的请求载荷
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * 動画アップロードリクエストのペイロードを検証
+ * @param uploadVideoRequest 動画アップロードリクエストのペイロード
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkUploadVideoRequest = (uploadVideoRequest: UploadVideoRequestDto) => {
-	// TODO // WARN 这里可能需要更安全的校验机制
-
+	// TODO // WARN ここでは、より安全な検証メカニズムが必要になる可能性があります
 	const VIDEO_CATEGORY = ['anime', 'music', 'otomad', 'tech', 'design', 'game', 'misc']
 	return (
 		uploadVideoRequest.videoPart && uploadVideoRequest.videoPart?.length > 0 && uploadVideoRequest.videoPart.every(checkVideoPartData)
@@ -1117,9 +1081,9 @@ const checkUploadVideoRequest = (uploadVideoRequest: UploadVideoRequestDto) => {
 }
 
 /**
- * 检查上传的视频中的 videoPartDate 参数是否正确且无疏漏
- * @param videoPartDate 每一 P 视频的数据
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * アップロードされた動画のvideoPartDateパラメータが正しく、漏れがないかを確認する
+ * @param videoPartDate 各P動画のデータ
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkVideoPartData = (videoPartDate: VideoPartDto) => {
 	return (
@@ -1130,56 +1094,55 @@ const checkVideoPartData = (videoPartDate: VideoPartDto) => {
 }
 
 /**
- * 检查根据 kvid 获取视频时的 kvid 是否存在
- * @param getVideoByKvidRequest 根据 kvid 获取视频数据时携带的请求参数
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * kvidに基づいて動画データを取得する際に渡されるリクエストパラメータを検証
+ * @param getVideoByKvidRequest kvidに基づいて動画データを取得する際に渡されるリクエストパラメータ
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkGetVideoByKvidRequest = (getVideoByKvidRequest: GetVideoByKvidRequestDto) => {
 	return (getVideoByKvidRequest.videoId !== null && getVideoByKvidRequest.videoId !== undefined)
 }
 
 /**
- * 检查根据 uid 获取视频列表时的 uid 是否存在
- * @param getVideoByUidRequest 根据 uid 获取视频列表数据时携带的请求参数
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * uidに基づいて動画リストを取得する際にuidが存在するかどうかを確認する
+ * @param getVideoByUidRequest uidに基づいて動画リストデータを取得する際に渡されるリクエストパラメータ
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkGetVideoByUidRequest = (getVideoByUidRequest: GetVideoByUidRequestDto) => {
 	return (getVideoByUidRequest.uid !== null && getVideoByUidRequest.uid !== undefined)
 }
 
 /**
- * 检查根据关键字搜索视频的请求参数
- * @param searchVideoByKeywordRequest 根据关键字搜索视频的请求参数
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * キーワードによる動画検索のリクエストパラメータを検証
+ * @param searchVideoByKeywordRequest キーワードによる動画検索のリクエストパラメータ
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkSearchVideoByKeywordRequest = (searchVideoByKeywordRequest: SearchVideoByKeywordRequestDto) => {
 	return (!!searchVideoByKeywordRequest.keyword)
 }
 
 /**
- * 检查根据视频 TAG ID 搜索视频的请求载荷
- * @param searchVideoByVideoTagIdRequest 根据视频 TAG ID 搜索视频的请求载荷
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * 動画TAG IDに基づいて動画を検索するリクエストペイロードを検証する
+ * @param searchVideoByVideoTagIdRequest 動画TAG IDに基づいて動画を検索するリクエストペイロード
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkSearchVideoByVideoTagIdRequest = (searchVideoByVideoTagIdRequest: SearchVideoByVideoTagIdRequestDto): boolean => {
 	return (searchVideoByVideoTagIdRequest && searchVideoByVideoTagIdRequest.tagId && searchVideoByVideoTagIdRequest.tagId.length > 0)
 }
 
 /**
- * 检查删除一个视频的请求载荷
- * @param deleteVideoRequest 删除一个视频的请求载荷
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * 動画を1つ削除するリクエストペイロードを検証する
+ * @param deleteVideoRequest 動画を1つ削除するリクエストペイロード
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkDeleteVideoRequest = (deleteVideoRequest: DeleteVideoRequestDto): boolean => {
 	return (!!deleteVideoRequest.videoId && typeof deleteVideoRequest.videoId === 'number' && deleteVideoRequest.videoId >= 0)
 }
 
 /**
- * 检查通过一个待审核视频的请求载荷
- * @param approvePendingReviewVideoRequest 通过一个待审核视频的请求载荷
- * @returns 检查结果，合法返回 true，不合法返回 false
+ * 審査待ちの動画を1つ承認するリクエストペイロードを検証する
+ * @param approvePendingReviewVideoRequest 審査待ちの動画を1つ承認するリクエストペイロード
+ * @returns 検証結果、正当な場合はtrue、不正な場合はfalseを返す
  */
 const checkApprovePendingReviewVideoRequest = (approvePendingReviewVideoRequest: ApprovePendingReviewVideoRequestDto) => {
 	return (!!approvePendingReviewVideoRequest.videoId && typeof approvePendingReviewVideoRequest.videoId === 'number' && approvePendingReviewVideoRequest.videoId >= 0)
 }
-

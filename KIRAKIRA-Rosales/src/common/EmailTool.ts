@@ -25,32 +25,32 @@ export const sendMail = async (to: string, title: string, body: EmailBodyType) =
 
 	if (!smtpHost) {
 		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpHostが空です')
-		throw new Error('Unable send email because the smtpHost is null')
+		throw new Error('メールの送信に失敗しました。smtpHostがnullです')
 	}
 
 	if (smtpPort === undefined || smtpPort === null) {
 		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpPortが空か、不正なポートです')
-		throw new Error('Unable send email because the smtpPort is null')
+		throw new Error('メールの送信に失敗しました。smtpPortがnullです')
 	}
 
 	if (!smtpUsername) {
 		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpUsernameが空です')
-		throw new Error('Unable send email because the smtpUsername is null')
+		throw new Error('メールの送信に失敗しました。smtpUsernameがnullです')
 	}
 
 	if (!smtpPassword) {
 		console.error('ERROR', 'メールの送信に失敗しました。環境変数のsmtpPasswordが空です')
-		throw new Error('Unable send email because the smtpPassword is null')
+		throw new Error('メールの送信に失敗しました。smtpPasswordがnullです')
 	}
 
 	if (!to) {
 		console.error('ERROR', 'メールの送信に失敗しました。受信者が空です')
-		throw new Error('Unable to send the mail, Recipient(TO) is empty')
+		throw new Error('メールを送信できません、受信者(TO)が空です')
 	}
 
 	if (!title) {
 		console.error('ERROR', 'メールの送信に失敗しました。メールの件名（subject）が空です')
-		throw new Error('Unable to send the mail, email title (subject) is empty')
+		throw new Error('メールを送信できません、メールの件名（subject）が空です')
 	}
 
 	if (title.length > 200) {
@@ -59,12 +59,12 @@ export const sendMail = async (to: string, title: string, body: EmailBodyType) =
 
 	if (title.length > 1000) {
 		console.error('ERROR', 'メールの送信に失敗しました。メールの件名（subject）が長すぎます')
-		throw new Error('Unable to send the mail, title (subject) is too long')
+		throw new Error('メールを送信できません、件名（subject）が長すぎます')
 	}
 
 	if (!body.text && !body.html) {
 		console.error('ERROR', 'メールの送信に失敗しました。メール本文のtextとhtmlが両方とも空です。少なくとも一方のデータを提供してください')
-		throw new Error('Unable to send the mail, text and html in body in null')
+		throw new Error('メールを送信できません、本文のtextとhtmlがnullです')
 	}
 
 	// SMTPクライアントを設定し、ポートを指定します

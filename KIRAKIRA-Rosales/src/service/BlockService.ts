@@ -11,7 +11,7 @@ const MAX_KEYWORD_LENGTH = 30; // キーワードの長さ制限
 const MAX_REGEX_LENGTH = 30; // 正規表現の長さ制限
 
 /**
- * ユーザーをブロック
+ * UIDでユーザーをブロックする
  * @param blockUserByUidRequest ユーザーブロックのリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -23,6 +23,7 @@ export const blockUserByUidService = async (blockUserByUidRequest: BlockUserByUi
 		}
 
 		const { blockUid } = blockUserByUidRequest
+
 		if (!checkUserExistsByUIDService({ uid: blockUid })) {
 			console.error('ERROR', 'ユーザーブロックに失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザーブロックに失敗しました、ユーザーが存在しません' }
@@ -30,17 +31,14 @@ export const blockUserByUidService = async (blockUserByUidRequest: BlockUserByUi
 
 		const userUuid = await getUserUuid(blockUid)
 		const operatorUid = await getUserUid(uuid)
-
 		if (!userUuid || !operatorUid) {
 			console.error('ERROR', 'ユーザーブロックに失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザーブロックに失敗しました、ユーザーが存在しません' }
 		}
-
 		if (userUuid === uuid) {
 			console.error('ERROR', 'ユーザーブロックに失敗しました、自分自身をブロックすることはできません')
 			return { success: false, message: 'ユーザーブロックに失敗しました、自分自身をブロックすることはできません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ユーザーブロックに失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'ユーザーブロックに失敗しました、ユーザートークンが不正です' }
@@ -53,6 +51,7 @@ export const blockUserByUidService = async (blockUserByUidRequest: BlockUserByUi
 		const now = new Date().getTime()
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'block',
 			value: userUuid,
@@ -75,10 +74,12 @@ export const blockUserByUidService = async (blockUserByUidRequest: BlockUserByUi
 		}
 
 		const insertResult = await insertData2MongoDB<BlockListSchemaType>(blockListData, blockListSchemaInstance, blockListCollectionName)
+
 		if (!insertResult.success) {
 			console.error('ERROR', 'ユーザーブロックに失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'ユーザーブロックに失敗しました、データクエリに失敗しました' }
 		}
+
 		return { success: true, message: 'ユーザーブロックに成功しました' }
 	}
 	catch (error) {
@@ -88,7 +89,7 @@ export const blockUserByUidService = async (blockUserByUidRequest: BlockUserByUi
 }
 
 /**
- * ユーザーを非表示
+ * UIDでユーザーを非表示にする
  * @param blockTagRequest キーワードブロックのリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -101,6 +102,7 @@ export const hideUserByUidService = async (hideUserByUidRequest: HideUserByUidRe
 		}
 
 		const { hideUid } = hideUserByUidRequest
+
 		if (!checkUserExistsByUIDService({ uid: hideUid })) {
 			console.error('ERROR', 'ユーザー非表示に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザー非表示に失敗しました、ユーザーが存在しません' }
@@ -108,7 +110,6 @@ export const hideUserByUidService = async (hideUserByUidRequest: HideUserByUidRe
 
 		const userUuid = await getUserUuid(hideUid)
 		const operatorUid = await getUserUid(uuid)
-
 		if (!userUuid || !operatorUid) {
 			console.error('ERROR', 'ユーザー非表示に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザー非表示に失敗しました、ユーザーが存在しません' }
@@ -129,6 +130,7 @@ export const hideUserByUidService = async (hideUserByUidRequest: HideUserByUidRe
 		const now = new Date().getTime()
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'hide',
 			value: userUuid,
@@ -151,10 +153,12 @@ export const hideUserByUidService = async (hideUserByUidRequest: HideUserByUidRe
 		}
 
 		const insertResult = await insertData2MongoDB<BlockListSchemaType>(blockListData, blockListSchemaInstance, blockListCollectionName)
+
 		if (!insertResult.success) {
 			console.error('ERROR', 'ユーザー非表示に失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'ユーザー非表示に失敗しました、データクエリに失敗しました' }
 		}
+
 		return { success: true, message: 'ユーザー非表示に成功しました' }
 	}
 	catch (error) {
@@ -164,7 +168,7 @@ export const hideUserByUidService = async (hideUserByUidRequest: HideUserByUidRe
 }
 
 /**
- * キーワードをブロック
+ * キーワードをブロックする
  * @param blockTagRequest キーワードブロックのリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -184,12 +188,10 @@ export const blockKeywordService = async (blockKeywordRequest: BlockKeywordReque
 		}
 
 		const operatorUid = await getUserUid(uuid)
-
 		if (!operatorUid) {
 			console.error('ERROR', 'キーワードブロックに失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'キーワードブロックに失敗しました、ユーザーが存在しません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'キーワードブロックに失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'キーワードブロックに失敗しました、ユーザートークンが不正です' }
@@ -202,6 +204,7 @@ export const blockKeywordService = async (blockKeywordRequest: BlockKeywordReque
 		const now = new Date().getTime()
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'keyword',
 			value: blockKeyword,
@@ -210,7 +213,6 @@ export const blockKeywordService = async (blockKeywordRequest: BlockKeywordReque
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			operatorUid: 1,
 		}
-
 		const blockListResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName)
 		if (blockListResult.success && blockListResult.result && blockListResult.result.length > 0) {
 			console.error('ERROR', 'キーワードブロックに失敗しました、このキーワードは既にブロックされています')
@@ -226,9 +228,11 @@ export const blockKeywordService = async (blockKeywordRequest: BlockKeywordReque
 		}
 
 		const insertResult = await insertData2MongoDB<BlockListSchemaType>(blockListData, blockListSchemaInstance, blockListCollectionName)
+
 		if (!insertResult.success) {
 			return { success: false, message: 'キーワードブロックに失敗しました' }
 		}
+
 		return { success: true, message: 'キーワードブロックに成功しました' }
 	}
 	catch (error) {
@@ -238,7 +242,7 @@ export const blockKeywordService = async (blockKeywordRequest: BlockKeywordReque
 }
 
 /**
- * タグをブロック
+ * タグをブロックする
  * @param blockTagRequest タグブロックのリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -251,13 +255,12 @@ export const blockTagService = async (blockTagRequest: BlockTagRequestDto, uuid:
 		}
 
 		const tagId = blockTagRequest.tagId.toString()
-		const operatorUid = await getUserUid(uuid)
 
+		const operatorUid = await getUserUid(uuid)
 		if (!operatorUid) {
 			console.error('ERROR', 'タグブロックに失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'タグブロックに失敗しました、ユーザーが存在しません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'タグブロックに失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'タグブロックに失敗しました、ユーザートークンが不正です' }
@@ -268,9 +271,11 @@ export const blockTagService = async (blockTagRequest: BlockTagRequestDto, uuid:
 		}
 
 		// TODO: TAGが存在するかどうかを確認
+
 		const now = new Date().getTime()
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'tag',
 			value: tagId,
@@ -279,7 +284,6 @@ export const blockTagService = async (blockTagRequest: BlockTagRequestDto, uuid:
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			operatorUid: 1,
 		}
-
 		const blockListResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName)
 		if (blockListResult.success && blockListResult.result && blockListResult.result.length > 0) {
 			console.error('ERROR', 'タグブロックに失敗しました、このタグは既にブロックされています')
@@ -295,10 +299,12 @@ export const blockTagService = async (blockTagRequest: BlockTagRequestDto, uuid:
 		}
 
 		const insertResult = await insertData2MongoDB<BlockListSchemaType>(blockListData, blockListSchemaInstance, blockListCollectionName)
+
 		if (!insertResult.success) {
 			console.error('ERROR', 'タグブロックに失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'タグブロックに失敗しました、データクエリに失敗しました' }
 		}
+
 		return { success: true, message: 'タグブロックに成功しました' }
 	}
 	catch (error) {
@@ -308,7 +314,7 @@ export const blockTagService = async (blockTagRequest: BlockTagRequestDto, uuid:
 }
 
 /**
- * 正規表現を追加
+ * 正規表現を追加する
  * @param addRegexRequest 正規表現追加のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -328,12 +334,10 @@ export const addRegexService = async (addRegexRequest: AddRegexRequestDto, uuid:
 		}
 
 		const operatorUid = await getUserUid(uuid)
-
 		if (!operatorUid) {
 			console.error('ERROR', '正規表現追加に失敗しました、ユーザーが存在しません')
 			return { success: false, message: '正規表現追加に失敗しました、ユーザーが存在しません', unsafeRegex: false }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', '正規表現追加に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: '正規表現追加に失敗しました、ユーザートークンが不正です', unsafeRegex: false }
@@ -346,6 +350,7 @@ export const addRegexService = async (addRegexRequest: AddRegexRequestDto, uuid:
 		const now = new Date().getTime()
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'regex',
 			value: blockRegex,
@@ -354,7 +359,6 @@ export const addRegexService = async (addRegexRequest: AddRegexRequestDto, uuid:
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			operatorUid: 1,
 		}
-
 		const blockListResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName)
 		if (blockListResult.success && blockListResult.result && blockListResult.result.length > 0) {
 			return { success: false, message: '正規表現追加に失敗しました、正規表現は既に存在します', unsafeRegex: false }
@@ -369,6 +373,7 @@ export const addRegexService = async (addRegexRequest: AddRegexRequestDto, uuid:
 		}
 
 		const insertResult = await insertData2MongoDB<BlockListSchemaType>(blockListData, blockListSchemaInstance, blockListCollectionName)
+
 		if (!insertResult.success) {
 			return { success: false, message: '正規表現追加に失敗しました', unsafeRegex: false }
 		}
@@ -382,7 +387,7 @@ export const addRegexService = async (addRegexRequest: AddRegexRequestDto, uuid:
 }
 
 /**
- * ユーザーブロックを解除
+ * ユーザーのブロックを解除する
  * @param unblockUserByUidRequest ユーザーブロック解除のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -395,13 +400,14 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 		}
 
 		const { blockUid } = unblockUserByUidRequest
+
 		if (!checkUserExistsByUIDService({ uid: blockUid })) {
 			console.error('ERROR', 'ユーザーブロック解除に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザーブロック解除に失敗しました、ユーザーが存在しません' }
 		}
+
 		const userUuid = await getUserUuid(blockUid)
 		const operatorUid = await getUserUid(uuid)
-
 		if (!userUuid || !operatorUid) {
 			console.error('ERROR', 'ユーザーブロック解除に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザーブロック解除に失敗しました、ユーザーが存在しません' }
@@ -410,7 +416,6 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 			console.error('ERROR', 'ユーザーブロック解除に失敗しました、自分自身のブロックは解除できません')
 			return { success: false, message: 'ユーザーブロック解除に失敗しました、自分自身のブロックは解除できません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ユーザーブロック解除に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'ユーザーブロック解除に失敗しました、ユーザートークンが不正です' }
@@ -418,12 +423,12 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'block',
 			value: userUuid,
 			operatorUUID: uuid,
 		}
-
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
@@ -431,7 +436,6 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 			operatorUUID: 1,
 		}
 
-		// トランザクション開始
 		const session = await createAndStartSession()
 
 		const selectResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName, {session})
@@ -467,6 +471,7 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 			console.error('ERROR', 'ユーザーブロック解除に失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'ユーザーブロック解除に失敗しました、データクエリに失敗しました' }
 		}
+
 		await commitAndEndSession(session)
 		return { success: true, message: 'ユーザーブロック解除に成功しました' }
 	}
@@ -477,7 +482,7 @@ export const unBlockUserService = async (unblockUserByUidRequest: UnblockUserByU
 }
 
 /**
- * ユーザーを表示
+ * ユーザーを表示する
  * @param ShowUserByUidRequestDto ユーザー表示のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -490,13 +495,14 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 		}
 
 		const { hideUid } = showUserByUidRequest
+
 		if (!checkUserExistsByUIDService({ uid: hideUid })) {
 			console.error('ERROR', 'ユーザー表示に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザー表示に失敗しました、ユーザーが存在しません' }
 		}
+
 		const userUuid = await getUserUuid(hideUid)
 		const operatorUid = await getUserUid(uuid)
-
 		if (!userUuid || !operatorUid) {
 			console.error('ERROR', 'ユーザー表示に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'ユーザー表示に失敗しました、ユーザーが存在しません' }
@@ -505,7 +511,6 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 			console.error('ERROR', 'ユーザー表示に失敗しました、自分自身を表示することはできません')
 			return { success: false, message: 'ユーザー表示に失敗しました、自分自身を表示することはできません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ユーザー表示に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'ユーザー表示に失敗しました、ユーザートークンが不正です' }
@@ -513,12 +518,12 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'hide',
 			value: userUuid,
 			operatorUUID: uuid,
 		}
-
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
@@ -526,7 +531,6 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 			operatorUUID: 1,
 		}
 
-		// トランザクション開始
 		const session = await createAndStartSession()
 
 		const selectResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName, {session})
@@ -562,6 +566,7 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 			console.error('ERROR', 'ユーザー表示に失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'ユーザー表示に失敗しました、データクエリに失敗しました' }
 		}
+
 		await commitAndEndSession(session)
 		return { success: true, message: 'ユーザー表示に成功しました' }
 	}
@@ -572,7 +577,7 @@ export const showUserService = async (showUserByUidRequest: ShowUserByUidRequest
 }
 
 /**
- * タグブロックを解除
+ * タグのブロックを解除する
  * @param unblockTagRequest タグブロック解除のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -585,13 +590,12 @@ export const unBlockTagService = async (unblockTagRequest: UnblockTagRequestDto,
 		}
 
 		const tagId = unblockTagRequest.tagId.toString()
-		const operatorUid = await getUserUid(uuid)
 
+		const operatorUid = await getUserUid(uuid)
 		if (!operatorUid) {
 			console.error('ERROR', 'タグブロック解除に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'タグブロック解除に失敗しました、ユーザーが存在しません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'タグブロック解除に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'タグブロック解除に失敗しました、ユーザートークンが不正です' }
@@ -599,12 +603,12 @@ export const unBlockTagService = async (unblockTagRequest: UnblockTagRequestDto,
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'tag',
 			value: tagId,
 			operatorUUID: uuid,
 		}
-
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
@@ -612,7 +616,6 @@ export const unBlockTagService = async (unblockTagRequest: UnblockTagRequestDto,
 			operatorUUID: 1,
 		}
 
-		// トランザクション開始
 		const session = await createAndStartSession()
 
 		const selectResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName, {session})
@@ -648,6 +651,7 @@ export const unBlockTagService = async (unblockTagRequest: UnblockTagRequestDto,
 			console.error('ERROR', 'タグブロック解除に失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'タグブロック解除に失敗しました、データクエリに失敗しました' }
 		}
+
 		await commitAndEndSession(session)
 		return { success: true, message: 'タグブロック解除に成功しました' }
 	}
@@ -658,7 +662,7 @@ export const unBlockTagService = async (unblockTagRequest: UnblockTagRequestDto,
 }
 
 /**
- * キーワードブロックを解除
+ * キーワードのブロックを解除する
  * @param unblockKeywordRequest キーワードブロック解除のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -671,13 +675,12 @@ export const unBlockKeywordService = async (unblockKeywordRequest: UnblockKeywor
 		}
 
 		const { blockKeyword: keyword } = unblockKeywordRequest
-		const operatorUid = await getUserUid(uuid)
 
+		const operatorUid = await getUserUid(uuid)
 		if (!operatorUid) {
 			console.error('ERROR', 'キーワードブロック解除に失敗しました、ユーザーが存在しません')
 			return { success: false, message: 'キーワードブロック解除に失敗しました、ユーザーが存在しません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'キーワードブロック解除に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'キーワードブロック解除に失敗しました、ユーザートークンが不正です' }
@@ -685,12 +688,12 @@ export const unBlockKeywordService = async (unblockKeywordRequest: UnblockKeywor
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'keyword',
 			value: keyword,
 			operatorUUID: uuid,
 		}
-
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
@@ -698,7 +701,6 @@ export const unBlockKeywordService = async (unblockKeywordRequest: UnblockKeywor
 			operatorUUID: 1,
 		}
 
-		// トランザクション開始
 		const session = await createAndStartSession()
 
 		const selectResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName, {session})
@@ -734,6 +736,7 @@ export const unBlockKeywordService = async (unblockKeywordRequest: UnblockKeywor
 			console.error('ERROR', 'キーワードブロック解除に失敗しました、データクエリに失敗しました')
 			return { success: false, message: 'キーワードブロック解除に失敗しました、データクエリに失敗しました' }
 		}
+
 		await commitAndEndSession(session)
 		return { success: true, message: 'キーワードブロック解除に成功しました' }
 	}
@@ -744,7 +747,7 @@ export const unBlockKeywordService = async (unblockKeywordRequest: UnblockKeywor
 }
 
 /**
- * 正規表現を削除
+ * 正規表現を削除する
  * @param removeRegexRequest 正規表現削除のリクエストペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -757,13 +760,12 @@ export const removeRegexService = async (removeRegexRequest: RemoveRegexRequestD
 		}
 
 		const { blockRegex: regex } = removeRegexRequest
-		const operatorUid = await getUserUid(uuid)
 
+		const operatorUid = await getUserUid(uuid)
 		if (!operatorUid) {
 			console.error('ERROR', '正規表現削除に失敗しました、ユーザーが存在しません')
 			return { success: false, message: '正規表現削除に失敗しました、ユーザーが存在しません' }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', '正規表現削除に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: '正規表現削除に失敗しました、ユーザートークンが不正です' }
@@ -771,12 +773,12 @@ export const removeRegexService = async (removeRegexRequest: RemoveRegexRequestD
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockListWhere: QueryType<BlockListSchemaType> = {
 			type: 'regex',
 			value: regex,
 			operatorUUID: uuid,
 		}
-
 		const blockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
@@ -784,7 +786,6 @@ export const removeRegexService = async (removeRegexRequest: RemoveRegexRequestD
 			operatorUUID: 1,
 		}
 
-		// トランザクション開始
 		const session = await createAndStartSession()
 
 		const selectResult = await selectDataFromMongoDB<BlockListSchemaType>(blockListWhere, blockListSelect, blockListSchemaInstance, blockListCollectionName, {session})
@@ -820,6 +821,7 @@ export const removeRegexService = async (removeRegexRequest: RemoveRegexRequestD
 			console.error('ERROR', '正規表現削除に失敗しました、データクエリに失敗しました')
 			return { success: false, message: '正規表現削除に失敗しました、データクエリに失敗しました' }
 		}
+
 		await commitAndEndSession(session)
 		return { success: true, message: '正規表現削除に成功しました' }
 	}
@@ -830,7 +832,7 @@ export const removeRegexService = async (removeRegexRequest: RemoveRegexRequestD
 }
 
 /**
- * ユーザーのブロックリストを取得
+ * ユーザーのブロックリストを取得する
  * @param getBlockListRequest ユーザーのブロックリスト取得リクエストのペイロード
  * @param uuid ユーザーUUID
  * @param token ユーザートークン
@@ -841,18 +843,17 @@ export const getBlockListService = async (getBlockListRequest: GetBlockListReque
 		if (!checkGetBlockListRequest(getBlockListRequest)) {
 			return { success: false, message: 'ブロックリスト取得に失敗しました、ブロックリスト取得リクエストのペイロードが不正です', blocklistCount: -1 }
 		}
-
 		if (!uuid || !token) {
 			console.warn('WARN', 'WARNING', 'ブロックリスト取得に失敗しました、ユーザーがログインしていません')
 			return { success: false, message: 'ブロックリスト取得に失敗しました、ユーザーがログインしていません', blocklistCount: -1 }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ブロックリスト取得に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'ブロックリスト取得に失敗しました、ユーザートークンが不正です', blocklistCount: -1 }
 		}
 
 		const { type } = getBlockListRequest
+
 		if (!['hide', 'block', 'keyword', 'tag', 'regex'].includes(type)) {
 			console.error('ERROR', 'ブロックリスト取得に失敗しました、ブロックリストのタイプが不正です')
 			return { success: false, message: 'ブロックリスト取得に失敗しました、ブロックリストのタイプが不正です' }
@@ -877,7 +878,7 @@ export const getBlockListService = async (getBlockListRequest: GetBlockListReque
 
 		const shouldJoinUserInfo = ['hide', 'block'].includes(type) // ユーザー情報を関連付ける必要があるかどうかを判断
 		const shouldJoinTagInfo = type === 'tag' // TAG情報を関連付ける必要があるかどうかを判断
-		
+
 		if (shouldJoinUserInfo) {
 			getBlocklistPipelineProject = [
 				{
@@ -945,7 +946,7 @@ export const getBlockListService = async (getBlockListRequest: GetBlockListReque
 				$match: {
 					operatorUUID: uuid,
 					type,
-				},
+				}
 			},
 			{
 				$count: 'totalCount',
@@ -957,13 +958,14 @@ export const getBlockListService = async (getBlockListRequest: GetBlockListReque
 				$match: {
 					operatorUUID: uuid,
 					type,
-				},
+				}
 			},
 			{ $sort: { 'createDateTime': -1 } },
 			{ $skip: skip },
 			...(pageSize ? [{ $limit: pageSize }] : []),
 			...getBlocklistPipelineProject
 		]
+
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		const blocklistCountResult = await selectDataByAggregateFromMongoDB(blockListSchemaInstance, blockListCollectionName, countBlocklistPipeline)
 		const blocklistResult = await selectDataByAggregateFromMongoDB(blockListSchemaInstance, blockListCollectionName, getBlocklistPipelineMix)
@@ -979,26 +981,23 @@ export const getBlockListService = async (getBlockListRequest: GetBlockListReque
 			blocklistCount: blocklistCountResult.result?.[0]?.totalCount,
 			result: blocklistResult.result,
 		}
-
 	} catch (error) {
 		console.error('ERROR', 'ブロックリスト取得に失敗しました、不明なエラー', error)
 		return { success: false, message: 'ブロックリスト取得に失敗しました、不明なエラー' }
 	}
 }
 
-// /** ブロックリストのタイプ */
 // type BlockListFilterCategory = 'block-uuid' | 'block-uid' | 'hide-uuid' | 'hide-uid' | 'keyword' | 'tag-id' | 'regex'
-/** ブロックリストのタイプ */
 type BlockListFilterCategory = 'block-uuid' | 'hide-uuid' | 'keyword' | 'tag-id' | 'regex'
 /** どのプロパティにどのタイプのブロックリストフィルタを使用するかを設定します。attrパラメータは**開発者がハードコードした安全なフィールドでなければならず**、**ユーザーからの入力は禁止**です */
 type BlockListAttrs = { attr: string, category: BlockListFilterCategory }[]
 /** ブロックリスト機能の追加フィールド Project */
 type AdditionalFieldsProject = {
-	/** 他のユーザーによってブロックされているかどうか */
 	isBlockedByOther?: 1;
 }
 /** 戻り値、構築済みのMonogoose Pipelineクエリ */
 type BlockListFilterResult = { success: boolean, filter: PipelineStage.Match[], additionalFields: AdditionalFieldsProject } 
+
 /**
  * Mongoose Pipeline ブロックリストフィルタを構築
  * @param attrs フィルタリングするプロパティと使用するフィルタリング方法
@@ -1012,7 +1011,6 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 		if (!uuid || !token) {
 			return { success: false, filter: [], additionalFields: { } }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ブロックリストフィルタの構築に失敗しました、ユーザートークンが不正です')
 			return { success: false, filter: [], additionalFields: { } }
@@ -1020,19 +1018,15 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
-
 		const getBlockListWhere: QueryType<BlockListSchemaType> = {
 			operatorUUID: uuid,
 		}
-		
 		const getBlockListSelect: SelectType<BlockListSchemaType> = {
 			type: 1,
 			value: 1,
 			operatorUUID: 1,
 		}
-		
 		const { result: blockListResult, success: blockListSuccess } = await selectDataFromMongoDB<BlockListSchemaType>(getBlockListWhere, getBlockListSelect, blockListSchemaInstance, blockListCollectionName)
-
 		const isBlockListOk = blockListSuccess && blockListResult.length > 0
 
 		const blockUuidList = []
@@ -1085,28 +1079,28 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 													$and: [
 														{ $eq: ['$operatorUUID', '$$uuid'] },
 														{ $eq: ['$type', 'block'] },
-													],
-												},
-											},
+													]
+												}
+											}
 										},
 										{
 											$project: {
 												_id: 0,
 												blockedUserUUID: '$value', // valueフィールドにはブロックされたユーザーのUUIDが保存される
-											},
-										},
+											}
+										}
 									],
 									as: 'block_by_others_data',
-								},
+								}
 							},
 							// 2. フィルタリング：アップローダーが現在のユーザーをブロックしている動画を除外
 							{
 								$addFields: {
 									isBlockedByOther: {
 										$in: [ uuid, '$block_by_others_data.blockedUserUUID' ]
-									},
-								},
-							},
+									}
+								}
+							}
 						)
 						additionalFields['isBlockedByOther'] = 1
 						break;
@@ -1132,28 +1126,28 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 													$and: [
 														{ $eq: ['$operatorUUID', '$$uuid'] },
 														{ $eq: ['$type', 'block'] },
-													],
-												},
-											},
+													]
+												}
+											}
 										},
 										{
 											$project: {
 												_id: 0,
 												blockedUserUUID: '$value', // valueフィールドにはブロックされたユーザーのUUIDが保存される
-											},
-										},
+											}
+										}
 									],
 									as: 'block_by_others_data',
-								},
+								}
 							},
 							// 2. フィルタリング：アップローダーが現在のユーザーをブロックしている動画を除外
 							{
 								$addFields: {
 									isBlockedByOther: {
 										$in: [ uuid, '$block_by_others_data.blockedUserUUID' ]
-									},
-								},
-							},
+									}
+								}
+							}
 						)
 						additionalFields['isBlockedByOther'] = 1
 						break;
@@ -1190,7 +1184,7 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 }
 
 // /**
-//  * コンテンツがブロックされているかどうかを確認
+//  * コンテンツがブロックされているかどうかを確認する
 //  * @param uuid ユーザーuuid
 //  * @param token ユーザートークン
 //  * @param content コンテンツ
@@ -1203,15 +1197,14 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 			return { success: true, message: 'コンテンツがブロックされているかどうかの確認に失敗しました、リクエストペイロードが不正です', isBlocked: false }
 // 		}
 // 		const { content } = CheckIsBlockedRequest
-
 // 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 // 			console.error('ERROR', 'コンテンツがブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です')
 // 			return { success: false, message: 'コンテンツがブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です', isBlocked: false }
 // 		}
 
-
 // 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 // 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 // 		const keywordWhere: QueryType<BlockListSchemaType> = {
 // 			type: 'keyword',
 // 			operatorUUID: uuid,
@@ -1219,7 +1212,6 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 		const keywordSelect: SelectType<BlockListSchemaType> = {
 // 			value: 1,
 // 		}
-
 // 		const regexWhere: QueryType<BlockListSchemaType> = {
 // 			type: 'regex',
 // 			operatorUUID: uuid,
@@ -1227,21 +1219,19 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 		const regexSelect: SelectType<BlockListSchemaType> = {
 // 			value: 1,
 // 		}
-
 // 		const keywordResult = await selectDataFromMongoDB(keywordWhere, keywordSelect, blockListSchemaInstance, blockListCollectionName)
 // 		if (!keywordResult.success) {
 // 			console.error('ERROR', 'コンテンツがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました')
 // 			return { success: false, message: 'コンテンツがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました', isBlocked: false }
 // 		}
-
 // 		const regexResult = await selectDataFromMongoDB(regexWhere, regexSelect, blockListSchemaInstance, blockListCollectionName)
 // 		if (!regexResult.success) {
 // 			console.error('ERROR', 'コンテンツがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました')
 // 			return { success: false, message: 'コンテンツがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました', isBlocked: false }
 // 		}
+
 // 		const keywordData = keywordResult.result.map((item) => item.value)
 // 		const regexData = regexResult.result.map((item) => item.value)
-
 // 		if (keywordData.length > 0 || regexData.length > 0) {
 // 			const regexList = regexData.map((regex) => new RegExp(regex, 'i'))
 // 			const isBlocked = keywordData.some((keyword) => content.includes(keyword)) || regexList.some((regex) => regex.test(content))
@@ -1249,7 +1239,6 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 		} else {
 // 			return { success: true, message: 'コンテンツがブロックされているかどうかの確認に成功しました、ブロックされていません', isBlocked: false }
 // 		}
-
 // 	} catch (error) {
 // 		console.error('ERROR', 'コンテンツがブロックされているかどうかの確認に失敗しました、不明なエラー', error)
 // 		return { success: false, message: 'コンテンツがブロックされているかどうかの確認に失敗しました、不明なエラー', isBlocked: false }
@@ -1257,7 +1246,7 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // }
 
 // /**
-//  * タグがブロックされているかどうかを確認
+//  * タグがブロックされているかどうかを確認する
 //  * @param uuid ユーザーuuid
 //  * @param token ユーザートークン
 //  * @param tagId タグID
@@ -1270,13 +1259,14 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 			return { success: true, message: 'タグがブロックされているかどうかの確認に失敗しました、リクエストペイロードが不正です', isBlocked: false }
 // 		}
 // 		const { tagId } = CheckIsBlockedRequest
-
 // 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 // 			console.error('ERROR', 'タグがブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です')
 // 			return { success: false, message: 'タグがブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です', isBlocked: false }
 // 		}
+
 // 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 // 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 // 		const tagWhere: QueryType<BlockListSchemaType> = {
 // 			type: 'tag',
 // 			operatorUUID: uuid,
@@ -1289,7 +1279,6 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 			console.error('ERROR', 'タグがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました')
 // 			return { success: false, message: 'タグがブロックされているかどうかの確認に失敗しました、データクエリに失敗しました', isBlocked: false }
 // 		}
-
 // 		if (tagResult.result.length > 0) {
 // 			const tagData = tagResult.result.map((item) => item.value)
 // 			const isBlocked = tagData.some((tag) => tag === tagId)
@@ -1297,7 +1286,6 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // 		} else {
 // 			return { success: true, message: 'タグがブロックされているかどうかの確認に成功しました、ブロックされていません', isBlocked: false }
 // 		}
-
 // 	} catch (error) {
 // 		console.error('ERROR', 'タグがブロックされているかどうかの確認に失敗しました、不明なエラー', error)
 // 		return { success: false, message: 'タグがブロックされているかどうかの確認に失敗しました、不明なエラー', isBlocked: false }
@@ -1305,7 +1293,7 @@ export const buildBlockListMongooseFilter = async (attrs: BlockListAttrs, uuid?:
 // }
 
 /**
- * ユーザーがブロックまたは非表示にされているかを確認
+ * ユーザーがブロックまたは非表示にされているかを確認する
  * @param UUID ユーザーuuid
  * @param token ユーザートークン
  * @param targetUid ターゲットユーザーUID
@@ -1315,7 +1303,6 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 	try {
 		let isBlocked = false
 		let isHidden = false
-
 		if (!checkCheckUserIsBlockedRequest(checkIsBlockedRequest)) {
 			console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、リクエストペイロードが不正です')
 			return { success: false, message: 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、リクエストペイロードが不正です', isBlocked, isHidden }
@@ -1333,7 +1320,6 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 			console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ユーザーUUIDが存在しません')
 			return { success: false, message: 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ユーザーUUIDが存在しません', isBlocked, isHidden }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ユーザートークンが不正です', isBlocked, isHidden }
@@ -1341,6 +1327,7 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockWhere: QueryType<BlockListSchemaType> = {
 			type: 'block',
 			value: targetUuid,
@@ -1360,7 +1347,6 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 			console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ブロックデータのクエリに失敗しました')
 			return { success: false, message: 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、ブロックデータのクエリに失敗しました', isBlocked, isHidden }
 		}
-
 		const hideResult = await selectDataFromMongoDB<BlockListSchemaType>(hideWhere, userSelect, blockListSchemaInstance, blockListCollectionName)
 		if (!hideResult.success) {
 			console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、非表示データのクエリに失敗しました')
@@ -1370,13 +1356,11 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 		if (blockResult.result && Array.isArray(blockResult.result) && blockResult.result?.length > 0) {
 			isBlocked = true
 		}
-
 		if (hideResult.result && Array.isArray(hideResult.result) && hideResult.result?.length > 0) {
 			isHidden = true
 		}
 
 		return { success: true, message: 'ユーザーがブロックまたは非表示にされているかの確認が完了しました', isBlocked, isHidden }
-
 	} catch (error) {
 		console.error('ERROR', 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、不明なエラー', error)
 		return { success: false, message: 'ユーザーがブロックまたは非表示にされているかどうかの確認に失敗しました、不明なエラー', isBlocked: false, isHidden: false }
@@ -1384,7 +1368,7 @@ export const checkBlockUserService = async (checkIsBlockedRequest: CheckUserIsBl
 }
 
 /**
- * 他のユーザーによってブロックされているかを確認
+ * 他のユーザーによってブロックされているかどうかを確認する
  * @param UUID ユーザーuuid
  * @param token ユーザートークン
  * @param targetUid ターゲットユーザーUID
@@ -1396,18 +1380,20 @@ export const checkIsBlockedByOtherUserService = async (checkIsBlockedByOtherRequ
 			console.error('ERROR', '他のユーザーによってブロックされているかどうかの確認に失敗しました、リクエストペイロードが不正です')
 			return { success: false, message: '他のユーザーによってブロックされているかどうかの確認に失敗しました、リクエストペイロードが不正です', isBlocked: false }
 		}
+
 		const { targetUid } = checkIsBlockedByOtherRequest
 
 		if (!checkUserExistsByUIDService({uid: targetUid})) {
 			return { success: false, message: '他のユーザーによってブロックされているかどうかの確認に失敗しました、ユーザーが存在しません', isBlocked: false }
 		}
-
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
 			console.error('ERROR', '他のユーザーによってブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です')
 			return { success: false, message: '他のユーザーによってブロックされているかどうかの確認に失敗しました、ユーザートークンが不正です', isBlocked: false }
 		}
+
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
 		type BlockListSchemaType = InferSchemaType<typeof blockListSchemaInstance>
+
 		const blockWhere: QueryType<BlockListSchemaType> = {
 			type: 'block',
 			operatorUid: targetUid,
@@ -1416,6 +1402,7 @@ export const checkIsBlockedByOtherUserService = async (checkIsBlockedByOtherRequ
 		const blockSelect: SelectType<BlockListSchemaType> = {
 			value: 1,
 		}
+
 		const blockResult = await selectDataFromMongoDB<BlockListSchemaType>(blockWhere, blockSelect, blockListSchemaInstance, blockListCollectionName)
 		if (!blockResult.success) {
 			console.error('ERROR', '他のユーザーによってブロックされているかどうかの確認に失敗しました、データクエリに失敗しました')
@@ -1427,7 +1414,6 @@ export const checkIsBlockedByOtherUserService = async (checkIsBlockedByOtherRequ
 		} else {
 			return { success: true, message: '他のユーザーによってブロックされているかの確認に成功しました、他のユーザーによってブロックされていません', isBlocked: false }
 		}
-
 	} catch (error) {
 		console.error('ERROR', '他のユーザーによってブロックされているかどうかの確認に失敗しました、不明なエラー', error)
 		return { success: false, message: '他のユーザーによってブロックされているかどうかの確認に失敗しました、不明なエラー', isBlocked: false }
@@ -1435,7 +1421,7 @@ export const checkIsBlockedByOtherUserService = async (checkIsBlockedByOtherRequ
 }
 
 /**
- * 対応するタイプのブロックリストの数量を取得
+ * 特定のタイプのブロックリストの数量を取得する
  * @param blocklistType ブロックリストのタイプ
  * @param uuid ブロックリストの作成者UUID
  * @returns 対応するタイプのブロックリストの数量
@@ -1443,22 +1429,26 @@ export const checkIsBlockedByOtherUserService = async (checkIsBlockedByOtherRequ
 const getBlocklistCount = async (blocklistType: string, uuid: string): Promise<number> => {
 	try {
 		const { collectionName: blockListCollectionName, schemaInstance: blockListSchemaInstance } = BlockListSchema
+
 		const countBlocklistPipeline: PipelineStage[] = [
 			{
 				$match: {
 					operatorUUID: uuid,
 					type: blocklistType,
-				},
+				}
 			},
 			{
 				$count: 'totalCount',
 			},
 		]
+
 		const BlocklistCountResult = await selectDataByAggregateFromMongoDB(blockListSchemaInstance, blockListCollectionName, countBlocklistPipeline)
+
 		if (!BlocklistCountResult.success) {
 			console.error('ERROR', 'ブロックリストの数量取得に失敗しました、データクエリに失敗しました')
 			return 0
 		}
+
 		return BlocklistCountResult.result?.[0]?.totalCount
 	} catch (error) {
 		console.error('ERROR', 'ブロックリストの数量取得に失敗しました、不明なエラー', error)
@@ -1466,9 +1456,8 @@ const getBlocklistCount = async (blocklistType: string, uuid: string): Promise<n
 	}
 }
 
-
 /**
- * ユーザーブロックリクエストのペイロードを検証
+ * ユーザーブロックのリクエストペイロードを検証する
  * @param blockUserByUidRequest ユーザーブロックのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1481,7 +1470,7 @@ const checkBlockUserByUidRequest = (blockUserByUidRequest: BlockUserByUidRequest
 }
 
 /**
- * ユーザー非表示リクエストのペイロードを検証
+ * ユーザー非表示のリクエストペイロードを検証する
  * @param HideUserByUidRequest ユーザー非表示のリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1494,7 +1483,7 @@ const checkHideUserByUidRequest = (hideUserByUidRequest: HideUserByUidRequestDto
 }
 
 /**
- * キーワードブロックリクエストのペイロードを検証
+ * キーワードブロックのリクエストペイロードを検証する
  * @param blockKeywordRequest キーワードブロックのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1513,12 +1502,11 @@ const checkBlockKeywordRequest = (blockKeywordRequest: BlockKeywordRequestDto): 
 			console.error('ERROR', 'キーワードブロックリクエストのペイロードが不正です')
 			return false
 	}
-
 	return true
 }
 
 /**
- * タグブロックリクエストのペイロードを検証
+ * タグブロックのリクエストペイロードを検証する
  * @param blockTagRequest タグブロックのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1531,7 +1519,7 @@ const checkBlockTagRequest = (blockTagRequest: BlockTagRequestDto): boolean => {
 }
 
 /**
- * 正規表現追加リクエストのペイロードを検証
+ * 正規表現追加のリクエストペイロードを検証する
  * @param addRegexRequest 正規表現追加のリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1556,7 +1544,7 @@ const checkAddRegexRequest = (addRegexRequest: AddRegexRequestDto): boolean => {
 }
 
 /**
- * ブロックリスト取得リクエストのペイロードを検証
+ * ブロックリスト取得のリクエストペイロードを検証する
  * @param request ブロックリスト取得のリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1567,7 +1555,7 @@ const checkGetBlockListRequest = (GetBlockListRequest: GetBlockListRequestDto) =
 }
 
 /**
- * コンテンツがブロックされているかどうかのリクエストペイロードを検証
+ * コンテンツがブロックされているかどうかのリクエストペイロードを検証する
  * @param CheckIsBlockedRequestDto コンテンツがブロックされているかどうかのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1587,7 +1575,7 @@ const checkCheckContentIsBlockedRequest = (checkIsBlockedRequest: CheckContentIs
 }
 
 /**
- * タグがブロックされているかどうかのリクエストペイロードを検証
+ * タグがブロックされているかどうかのリクエストペイロードを検証する
  * @param CheckIsBlockedRequest コンテンツがブロックされているかどうかのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1598,7 +1586,7 @@ const checkCheckTagIsBlockedRequest = (checkIsBlockedRequest: CheckTagIsBlockedR
 }
 
 /**
- * ユーザーがブロックされているかどうかのリクエストペイロードを検証
+ * ユーザーがブロックされているかどうかのリクエストペイロードを検証する
  * @param CheckIsBlockedRequest コンテンツがブロックされているかどうかのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -1609,7 +1597,7 @@ const checkCheckUserIsBlockedRequest = (checkIsBlockedRequest: CheckUserIsBlocke
 }
 
 /**
- * 他のユーザーによってブロックされているかどうかのリクエストペイロードを検証
+ * 他のユーザーによってブロックされているかどうかのリクエストペイロードを検証する
  * @param CheckIsBlockedByOtherUserRequestDto 他のユーザーによってブロックされているかどうかのリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */

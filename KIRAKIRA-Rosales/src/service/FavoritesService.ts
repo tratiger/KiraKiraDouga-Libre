@@ -20,29 +20,24 @@ export const createFavoritesService = async (createFavoritesRequest: CreateFavor
 				const { favoritesTitle, favoritesBio, favoritesCover, favoritesVisibility } = createFavoritesRequest
 				const { collectionName, schemaInstance } = FavoritesSchema
 				const now = new Date().getTime()
-
 				type FavoritesType = InferSchemaType<typeof schemaInstance>
-
-				// トランザクション開始
 				const session = await mongoose.startSession()
 				session.startTransaction()
-
-				const favoritesId = (await getNextSequenceValueService('favorites', 1, 1, session))?.sequenceValue
-
-				const createFavoritesData: FavoritesType = {
-					favoritesId,
-					creator: uid,
-					editor: [],
-					favoritesTitle,
-					favoritesBio,
-					favoritesCover,
-					favoritesVisibility,
-					favoritesCreateDateTime: now,
-					createDateTime: now,
-					editDateTime: now,
-				}
-
 				try {
+					const favoritesId = (await getNextSequenceValueService('favorites', 1, 1, session))?.sequenceValue
+					const createFavoritesData: FavoritesType = {
+						favoritesId,
+						creator: uid,
+						editor: [],
+						favoritesTitle,
+						favoritesBio,
+						favoritesCover,
+						favoritesVisibility,
+						favoritesCreateDateTime: now,
+						createDateTime: now,
+						editDateTime: now,
+					}
+
 					const createFavoritesResult = await insertData2MongoDB<FavoritesType>(createFavoritesData, schemaInstance, collectionName)
 					if (createFavoritesResult.success && createFavoritesResult.result?.length === 1 && createFavoritesResult.result?.[0]) {
 						await session.commitTransaction()
@@ -88,13 +83,10 @@ export const getFavoritesService = async (uid: number, token: string): Promise<G
 	try {
 		if ((await checkUserTokenService(uid, token)).success) {
 			const { collectionName, schemaInstance } = FavoritesSchema
-
 			type FavoritesType = InferSchemaType<typeof schemaInstance>
-
 			const getFavoritesQuery: QueryType<FavoritesType> = {
 				creator: uid,
 			}
-
 			const getFavoritesSelect: SelectType<FavoritesType> = {
 				favoritesId: 1,
 				creator: 1,
@@ -105,7 +97,6 @@ export const getFavoritesService = async (uid: number, token: string): Promise<G
 				favoritesVisibility: 1,
 				favoritesCreateDateTime: 1,
 			}
-
 			try {
 				const getFavoritesResult = await selectDataFromMongoDB<FavoritesType>(getFavoritesQuery, getFavoritesSelect, schemaInstance, collectionName)
 				const favorites = getFavoritesResult?.result
@@ -134,7 +125,7 @@ export const getFavoritesService = async (uid: number, token: string): Promise<G
 }
 
 /**
- * お気に入りフォルダ作成リクエストのペイロードをチェック
+ * お気に入りフォルダ作成リクエストのペイロードを検証
  * @param createFavoritesRequest  お気に入りフォルダ作成のリクエストペイロード
  * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
@@ -156,14 +147,13 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 				if ((await checkUserTokenService(uid, token)).success) {
 // 					const { collectionName, schemaInstance } = BrowsingHistorySchema
 // 					type BrowsingHistoryType = InferSchemaType<typeof schemaInstance>
-
 // 					const uid = createOrUpdateBrowsingHistoryRequest.uid
 // 					const category = createOrUpdateBrowsingHistoryRequest.category
 // 					const id = createOrUpdateBrowsingHistoryRequest.id
 // 					const anchor = createOrUpdateBrowsingHistoryRequest.anchor
 // 					const nowDate = new Date().getTime()
 
-// 					// 搜索数据
+// 					// 准备查询数据
 // 					const BrowsingHistoryWhere: QueryType<BrowsingHistoryType> = {
 // 						uid,
 // 						category,
@@ -179,7 +169,6 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 						lastUpdateDateTime: nowDate,
 // 						editDateTime: nowDate,
 // 					}
-
 // 					try {
 // 						const insert2MongoDResult = await findOneAndUpdateData4MongoDB(BrowsingHistoryWhere, BrowsingHistoryData, schemaInstance, collectionName)
 // 						const result = insert2MongoDResult.result
@@ -209,7 +198,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 获取全部或过滤后的用户浏览历史，按对某一内容的最后访问时间降序排序
+//  * 获取全部或筛选后的用户浏览历史，并按最新访问特定内容的时间倒序排序
 //  * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
 //  * @param uid 用户 ID
 //  * @param token 用户安全令牌
@@ -309,7 +298,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 			}
 // 		} else {
 // 			console.error('ERROR', '获取用户浏览历史时出错，请求参数不合法')
-// 			return { success: false, message: '获取用户浏览历史时出错，请求参数不合法' }
+// 			return { success: false, message: '获取用户浏览歴史時出錯，請求參數不合法' }
 // 		}
 // 	} catch (error) {
 // 		console.error('ERROR', '获取用户浏览历史时出错，未知原因：', error)
@@ -318,7 +307,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 校验创建用户浏览历史的请求参数
+//  * 验证创建用户浏览历史的请求参数
 //  * @param createBrowsingHistoryRequest 创建用户浏览历史的请求参数
 //  * @returns 合法返回 true, 不合法返回 false
 //  */
@@ -331,7 +320,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 校验获取用户浏览历史的请求载荷
+//  * 验证获取用户浏览历史的请求载荷
 //  * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
 //  * @returns 合法返回 true, 不合法返回 false
 //  */

@@ -28,14 +28,14 @@ if (!!SERVER_ENV && ['dev', 'prod'].includes(SERVER_ENV)) {
 		})
 	
 		console.info()
-		console.info('Created an AWS Sercret Manager Client base on the environment variables you provided!')
+		console.info('環境変数に基づいてAWS Secret Managerクライアントを作成しました！')
 	} catch(error) {
 		console.error('ERROR', 'AWS Secrets Manager クライアントの作成に失敗しました：', error)
 		process.exit()
 	}
 } else {
 	console.info()
-	console.info('Now starting the server without created an AWS Sercret Manager Client.')
+	console.info('AWS Secret Managerクライアントを作成せずにサーバーを起動します。')
 }
 
 /**

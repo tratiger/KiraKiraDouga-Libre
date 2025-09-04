@@ -10,100 +10,92 @@ import { buildBlockListMongooseFilter } from './BlockService.js'
 import { checkVideoBlockedByKvidService } from './VideoService.js'
 
 /**
- * 用户发送视频评论
- * @param emitVideoCommentRequest 用户发送的弹幕数据
- * @param uid cookie 中的用户 ID
- * @param token cookie 中的用户 token
- * @returns 用户发送弹幕的结果
+ * @param emitVideoCommentRequest ユーザーが送信したコメントデータ
+ * @param uid cookie内のユーザーID
+ * @param token cookie内のユーザートークン
+ * @returns ユーザーがコメントを送信した結果
  */
 export const emitVideoCommentService = async (emitVideoCommentRequest: EmitVideoCommentRequestDto, uuid: string, token: string): Promise<EmitVideoCommentResponseDto> => {
 	try {
 		if (!checkEmitVideoCommentRequest(emitVideoCommentRequest)) {
-			console.error('ERROR', '视频评论发送失败，弹幕数据校验未通过：', { videoId: emitVideoCommentRequest.videoId, uuid })
-			return { success: false, message: '视频评论发送失败，视频评论数据错误' }
+			console.error('ERROR', 'ビデオコメントの送信に失敗しました、コメントデータの検証に失敗しました：', { videoId: emitVideoCommentRequest.videoId, uuid })
+			return { success: false, message: 'ビデオコメントの送信に失敗しました、ビデオコメントデータが不正です' }
 		}
-		
+
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '视频评论发送失败，用户校验未通过', { videoId: emitVideoCommentRequest.videoId, uuid })
-			return { success: false, message: '视频评论发送失败，用户校验未通过' }
+			console.error('ERROR', 'ビデオコメントの送信に失敗しました、ユーザー検証に失敗しました', { videoId: emitVideoCommentRequest.videoId, uuid })
+			return { success: false, message: 'ビデオコメントの送信に失敗しました、ユーザー検証に失敗しました' }
 		}
 
 		if (!uuid) {
-			console.error('ERROR', '评论发送失败，UUID 不存在', { uuid })
-			return { success: false, message: '评论发送失败，UUID 不存在' }
+			console.error('ERROR', 'コメントの送信に失敗しました、UUIDが存在しません', { uuid })
+			return { success: false, message: 'コメントの送信に失敗しました、UUIDが存在しません' }
 		}
-
 		const uid = await getUserUid(uuid)
 		if (uid === undefined || uid === null || uid < 1) {
-			console.error('ERROR', '评论发送失败，获取发送者 UID 失败。', { uuid })
-			return { success: false, message: '评论发送失败，获取发送者 UID 失败。' }
+			console.error('ERROR', 'コメントの送信に失敗しました、送信者のUIDの取得に失敗しました。', { uuid })
+			return { success: false, message: 'コメントの送信に失敗しました、送信者のUIDの取得に失敗しました。' }
 		}
 
-		// 检查视频是否被屏蔽
 		const { videoId } = emitVideoCommentRequest
 		const selectorUuid = uuid
 		const selectorToken = token
-
 		const checkVideoBlockedResult = await checkVideoBlockedByKvidService(videoId, selectorUuid, selectorToken)
 		if (!checkVideoBlockedResult.success) {
-			console.error('ERROR', '评论发送失败，检查视频是否被屏蔽失败', { uuid })
-			return { success: false, message: '评论发送失败，检查视频是否被屏蔽失败' }
+			console.error('ERROR', 'コメントの送信に失敗しました、動画がブロックされているかの確認に失敗しました', { uuid })
+			return { success: false, message: 'コメントの送信に失敗しました、動画がブロックされているかの確認に失敗しました' }
 		}
-
 		if (checkVideoBlockedResult.isBlockedByOther) {
-			console.error('ERROR', '评论发送失败，用户被其他用户屏蔽', { uuid })
-			return { success: false, message: '评论发送失败，用户被其他用户屏蔽' }
+			console.error('ERROR', 'コメントの送信に失敗しました、他のユーザーによってブロックされています', { uuid })
+			return { success: false, message: 'コメントの送信に失敗しました、他のユーザーによってブロックされています' }
 		}
 		if (checkVideoBlockedResult.isBlocked) {
-			console.error('ERROR', '评论发送失败，用户已屏蔽上传者', { uuid })
-			return { success: false, message: '评论发送失败，用户已屏蔽上传者' }
+			console.error('ERROR', 'コメントの送信に失敗しました、アップローダーをブロックしています', { uuid })
+			return { success: false, message: 'コメントの送信に失敗しました、アップローダーをブロックしています' }
 		}
 
-		// 启动事务
 		const session = await mongoose.startSession()
 		session.startTransaction()
-
-		const getCommentIndexResult = await getNextSequenceValueService(`KVID-${emitVideoCommentRequest.videoId}`, 1, 1, session) // 以视频 ID 为键，获取下一个值，即评论楼层
-		const commentIndex = getCommentIndexResult.sequenceValue
-		if (!getCommentIndexResult.success || commentIndex === undefined || commentIndex === null) {
-			if (session.inTransaction()) {
-				await session.abortTransaction()
-			}
-			session.endSession()
-			console.error('ERROR', '视频评论发送失败，获取楼层数据失败，无法根据视频 ID 获取序列下一个值', { videoId: emitVideoCommentRequest.videoId, uid })
-			return { success: false, message: '视频评论发送失败，获取楼层数据失败' }
-		}
-
-		const { collectionName, schemaInstance } = VideoCommentSchema
-		type VideoComment = InferSchemaType<typeof schemaInstance>
-		const nowDate = new Date().getTime()
-		const videoComment: VideoComment = {
-			...emitVideoCommentRequest,
-			UUID: uuid,
-			uid,
-			commentRoute: `${emitVideoCommentRequest.videoId}.${commentIndex}`,
-			commentIndex,
-			emitTime: nowDate,
-			upvoteCount: 0,
-			downvoteCount: 0,
-			subComments: [] as VideoComment['subComments'], // TODO: Mongoose issue: #12420
-			subCommentsCount: 0,
-			editDateTime: nowDate,
-		}
 		try {
+			const getCommentIndexResult = await getNextSequenceValueService(`KVID-${emitVideoCommentRequest.videoId}`, 1, 1, session) // ビデオIDをキーとして次の値を取得、つまりコメントフロア
+			const commentIndex = getCommentIndexResult.sequenceValue
+			if (!getCommentIndexResult.success || commentIndex === undefined || commentIndex === null) {
+				if (session.inTransaction()) {
+					await session.abortTransaction()
+				}
+				session.endSession()
+				console.error('ERROR', 'ビデオコメントの送信に失敗しました、フロアデータの取得に失敗しました、ビデオIDに基づいて次のシーケンス値を取得できません', { videoId: emitVideoCommentRequest.videoId, uid })
+				return { success: false, message: 'ビデオコメントの送信に失敗しました、フロアデータの取得に失敗しました' }
+			}
+
+			const { collectionName, schemaInstance } = VideoCommentSchema
+			type VideoComment = InferSchemaType<typeof schemaInstance>
+			const nowDate = new Date().getTime()
+			const videoComment: VideoComment = {
+				...emitVideoCommentRequest,
+				UUID: uuid,
+				uid,
+				commentRoute: `${emitVideoCommentRequest.videoId}.${commentIndex}`,
+				commentIndex,
+				emitTime: nowDate,
+				upvoteCount: 0,
+				downvoteCount: 0,
+				subComments: [] as VideoComment['subComments'], // TODO: Mongoose issue: #12420
+				subCommentsCount: 0,
+				editDateTime: nowDate,
+			}
 			const insertData2MongoDBResult = await insertData2MongoDB(videoComment, schemaInstance, collectionName, { session })
-			
 			if (!insertData2MongoDBResult || !insertData2MongoDBResult.success) {
 				if (session.inTransaction()) {
 					await session.abortTransaction()
 				}
 				session.endSession()
-				console.error('ERROR', '视频评论发送失败，未返回结果', { videoId: emitVideoCommentRequest.videoId, uid })
-				return { success: false, message: '视频评论发送失败，存储视频评论数据失败' }
+				console.error('ERROR', 'ビデオコメントの送信に失敗しました、結果が返されませんでした', { videoId: emitVideoCommentRequest.videoId, uid })
+				return { success: false, message: 'ビデオコメントの送信に失敗しました、ビデオコメントデータの保存に失敗しました' }
 			}
 
-			const getUserInfoByUidRequest: GetUserInfoByUidRequestDto = { uid: videoComment.uid }
 			try {
+				const getUserInfoByUidRequest: GetUserInfoByUidRequestDto = { uid: videoComment.uid }
 				const videoCommentSenderUserInfo = await getUserInfoByUidService(getUserInfoByUidRequest)
 				const videoCommentSenderUserInfoResult = videoCommentSenderUserInfo.result
 				if (!videoCommentSenderUserInfo.success || !videoCommentSenderUserInfoResult) {
@@ -111,8 +103,8 @@ export const emitVideoCommentService = async (emitVideoCommentRequest: EmitVideo
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.warn('WARN', 'WARNING', '视频评论发送成功，但是获取回显数据为空', { videoId: emitVideoCommentRequest.videoId, uid })
-					return { success: false, message: '视频评论发送成功，请尝试刷新页面' }
+					console.warn('WARN', 'WARNING', 'ビデオコメントの送信に成功しましたが、エコーデータが空です', { videoId: emitVideoCommentRequest.videoId, uid })
+					return { success: false, message: 'ビデオコメントの送信に成功しました、ページを更新してみてください' }
 				}
 
 				const videoCommentResult: VideoCommentResult = {
@@ -129,48 +121,48 @@ export const emitVideoCommentService = async (emitVideoCommentRequest: EmitVideo
 					isUpvote: false,
 					isDownvote: false,
 				}
+
 				await session.commitTransaction()
 				session.endSession()
-				return { success: true, message: '视频评论发送成功！', videoComment: videoCommentResult }
+				return { success: true, message: 'ビデオコメントの送信に成功しました！', videoComment: videoCommentResult }
 			} catch (error) {
 				if (session.inTransaction()) {
 					await session.abortTransaction()
 				}
 				session.endSession()
-				console.warn('WARN', 'WARNING', '视频评论发送成功，但是获取回显数据失败', error, { videoId: emitVideoCommentRequest.videoId, uid })
-				return { success: false, message: '视频评论发送成功，请刷新页面' }
+				console.warn('WARN', 'WARNING', 'ビデオコメントの送信に成功しましたが、エコーデータの取得に失敗しました', error, { videoId: emitVideoCommentRequest.videoId, uid })
+				return { success: false, message: 'ビデオコメントの送信に成功しました、ページを更新してください' }
 			}
 		} catch (error) {
 			if (session.inTransaction()) {
 				await session.abortTransaction()
 			}
 			session.endSession()
-			console.error('ERROR', '视频评论发送失败，无法存储到 MongoDB', error, { videoId: emitVideoCommentRequest.videoId, uid })
-			return { success: false, message: '视频评论发送失败，存储视频评论数据失败' }
+			console.error('ERROR', 'ビデオコメントの送信に失敗しました、MongoDBに保存できませんでした', error, { videoId: emitVideoCommentRequest.videoId, uid })
+			return { success: false, message: 'ビデオコメントの送信に失敗しました、ビデオコメントデータの保存に失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '视频评论发送失败，错误信息：', error, { videoId: emitVideoCommentRequest.videoId, uuid })
-		return { success: false, message: '视频评论发送失败，未知错误' }
+		console.error('ERROR', 'ビデオコメントの送信に失敗しました、エラー情報：', error, { videoId: emitVideoCommentRequest.videoId, uuid })
+		return { success: false, message: 'ビデオコメントの送信に失敗しました、不明なエラー' }
 	}
 }
 
 /**
- * 根据 KVID 获取视频评论列表，并检查当前用户是否对获取到的评论有点赞/点踩，如果有，相应的值会变为 true
- * @param getVideoCommentByKvidRequest 请求视频评论列表的查询参数
- * @returns 视频的视频评论列表
+ * KVIDに基づいてビデオコメントリストを取得し、現在のユーザーが取得したコメントに「いいね」/「よくないね」を付けたかどうかを確認します。もし付けた場合、対応する値はtrueになります
+ * @param getVideoCommentByKvidRequest ビデオコメントリストをリクエストするクエリパラメータ
+ * @returns ビデオのビデオコメントリスト
  */
 export const getVideoCommentListByKvidService = async (getVideoCommentByKvidRequest: GetVideoCommentByKvidRequestDto, uuid: string, token: string): Promise<GetVideoCommentByKvidResponseDto> => {
-	// WARN // TODO 应当添加更多安全验证，防刷！
+	// WARN // TODO さらに多くのセキュリティ検証を追加して、スクレイピングを防止する必要があります！
 	try {
 		if (!checkGetVideoCommentByKvidRequest(getVideoCommentByKvidRequest)) {
-			console.error('ERROR', '获取视频评论列表失败，数据校验失败', { getVideoCommentByKvidRequest })
-			return { success: false, message: '获取视频评论列表失败，数据校验失败', videoCommentCount: 0, videoCommentList: [] }
+			console.error('ERROR', 'ビデオコメントリストの取得に失敗しました、データ検証に失敗しました', { getVideoCommentByKvidRequest })
+			return { success: false, message: 'ビデオコメントリストの取得に失敗しました、データ検証に失敗しました', videoCommentCount: 0, videoCommentList: [] }
 		}
-
-		if (uuid !== undefined && uuid !== null && token) { // 校验用户，如果校验通过，则获取当前用户对某一视频的点赞/点踩的评论的评论 ID 列表
+		if (uuid !== undefined && uuid !== null && token) { // ユーザーを検証し、検証が成功した場合、現在のユーザーが特定のビデオに対して「いいね」/「よくないね」を付けたコメントのコメントIDリストを取得します
 			if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-				console.error('ERROR', '获取视频评论列表失败，用户校验未通过', { getVideoCommentByKvidRequest })
-				return { success: false, message: '获取视频评论列表失败，用户校验未通过', videoCommentCount: 0, videoCommentList: [] }
+				console.error('ERROR', 'ビデオコメントリストの取得に失敗しました、ユーザー検証に失敗しました', { getVideoCommentByKvidRequest })
+				return { success: false, message: 'ビデオコメントリストの取得に失敗しました、ユーザー検証に失敗しました', videoCommentCount: 0, videoCommentList: [] }
 			}
 		}
 
@@ -199,81 +191,81 @@ export const getVideoCommentListByKvidService = async (getVideoCommentByKvidRequ
 				{
 					attr: 'text',
 					category: 'regex',
-				},
+				}
 			],
 			uuid,
 			token
 		)
 
-		// 获取视频的评论总数的 pipeline
+		// ビデオのコメント総数を取得するパイプライン
 		const countVideoCommentPipeline: PipelineStage[] = [
-			// 1. 查询评论信息
+			// 1. コメント情報をクエリ
 			{
 				$match: {
-					videoId // 通过 videoId 筛选评论
-				},
+					videoId // videoIdでコメントを絞り込む
+				}
 			},
 			...blockListFilter.filter,
-			// 2. 统计总数量
+			// 2. 総数を集計
 			{
-				$count: 'totalCount', // 统计总文档数
+				$count: 'totalCount', // 総ドキュメント数を集計
 			}
 		]
 
-		// 获取视频评论的 pipeline
+		// ビデオコメントを取得するパイプライン
 		const getVideoCommentsPipeline: PipelineStage[] = [
-			// 1. 查询评论信息
+			// 1. コメント情報をクエリ
 			{
 				$match: {
-					videoId // 通过 videoId 筛选评论
-				},
+					videoId // videoIdでコメントを絞り込む
+				}
 			},
 			...blockListFilter.filter,
-			// 2. 关联用户表获取评论发送者信息
+			// 2. ユーザーテーブルを関連付けてコメント送信者の情報を取得
 			{
 				$lookup: {
-					from: 'user-infos', // WARN: 别忘了变复数
+					from: 'user-infos', // WARN: 複数形を忘れないでください
 					localField: 'UUID',
 					foreignField: 'UUID',
 					as: 'user_info_data',
-				},
+				}
 			},
 			{
 				$unwind: {
 					path: '$user_info_data',
-					preserveNullAndEmptyArrays: true, // 保留空数组和null值
-				},
+					preserveNullAndEmptyArrays: true, // 空の配列とnull値を保持
+				}
 			},
-			// 3. 按楼层升序排序
+			// 3. フロアで昇順にソート
 			{ $sort: { 'commentIndex': 1 } },
-			// 4. 分页查询
-			{ $skip: skip }, // 跳过指定数量的文档
-			...(pageSize ? [{ $limit: pageSize }] : []), // 限制返回的文档数量
-			// 5. 关联目标用户的点赞数据
+			// 4. ページネーションクエリ
+			{ $skip: skip }, // 指定された数のドキュメントをスキップ
+			...(pageSize ? [{ $limit: pageSize }] : []), // 返されるドキュメントの数を制限
+			// 5. ターゲットユーザーのいいねデータを関連付け
 			{
 				$lookup: {
-					from: 'video-comment-upvotes', // 用户视频评论点赞表名 // WARN: 别忘了变复数
-					let: { commentId: { $toString: '$_id' } }, // 当前评论的 _id
+					from: 'video-comment-upvotes', // ユーザービデオコメントいいねテーブル名 // WARN: 複数形を忘れないでください
+					let: { commentId: { $toString: '$_id' } }, // 現在のコメントの_id
 					pipeline: [
 						{
 							$match: {
 								$expr: {
 									$and: [
-										{ $eq: ['$commentId', '$$commentId'] }, // 匹配评论 ID
-										{ $eq: ['$UUID', uuid] }, // 匹配用户 UUID
-										{ $eq: ['$invalidFlag', false] }, // 只统计有效点赞
-									],
-								},
-							},
-						},
+										{ $eq: ['$commentId', '$$commentId'] }, // コメントIDを照合
+										{ $eq: ['$UUID', uuid] }, // ユーザーUUIDを照合
+										{ $eq: ['$invalidFlag', false] }, // 有効ないいねのみをカウント
+									]
+								}
+							}
+						}
 					],
 					as: 'userUpvote',
-				},
+				}
 			},
-			// 6. 只关联该用户的点踩数据
+			// 6. このユーザーのよくないねデータのみを関連付け
 			{
 				$lookup: {
-					from: 'video-comment-downvotes', // 用户视频评论点踩表名 // WARN: 别忘了变复数
+					from: 'video-comment-downvotes', // ユーザービデオコメントよくないねテーブル名 // WARN: 複数形を忘れないでください
 					let: { commentId: { $toString: '$_id' } },
 					pipeline: [
 						{
@@ -281,51 +273,51 @@ export const getVideoCommentListByKvidService = async (getVideoCommentByKvidRequ
 								$expr: {
 									$and: [
 										{ $eq: ['$commentId', '$$commentId'] },
-										{ $eq: ['$UUID', uuid] }, // 匹配用户 UUID
-										{ $eq: ['$invalidFlag', false] }, // 只统计有效点踩
-									],
-								},
-							},
-						},
+										{ $eq: ['$UUID', uuid] }, // ユーザーUUIDを照合
+										{ $eq: ['$invalidFlag', false] }, // 有効なよくないねのみをカウント
+									]
+								}
+							}
+						}
 					],
 					as: 'userDownvote',
-				},
+				}
 			},
-			// 7. 判断用户是否点赞或点踩
+			// 7. ユーザーがいいねまたはよくないねを付けたかどうかを判断
 			{
 				$addFields: {
-					isUpvote: { $gt: [{ $size: '$userUpvote' }, 0] }, // 是否点赞
-					isDownvote: { $gt: [{ $size: '$userDownvote' }, 0] }, // 是否点踩
-				},
+					isUpvote: { $gt: [{ $size: '$userUpvote' }, 0] }, // いいねしたかどうか
+					isDownvote: { $gt: [{ $size: '$userDownvote' }, 0] }, // よくないねしたかどうか
+				}
 			},
-			// 8. 清理不必要字段，返回所需数据
+			// 8. 不要なフィールドをクリーンアップし、必要なデータを返す
 			{
 				$project: {
-					_id: 1, // 评论的 ID
-					content: 1, // 评论内容
-					commentRoute: 1, // 评论的路由
+					_id: 1, // コメントのID
+					content: 1, // コメント内容
+					commentRoute: 1, // コメントのルート
 					videoId: 1,
-					UUID: 1, // 评论发送者的 UUID
-					uid: 1, // 评论发送者的 UID
-					emitTime: 1, // 发送评论的时间
-					text: 1, // 评论正文
-					upvoteCount: 1, // 评论点赞数
-					downvoteCount: 1, // 评论点踩数
-					commentIndex: 1, // 评论楼层数
-					subCommentsCount: 1, // 该评论的下一级子评论数量
-					editDateTime: 1, // 最后编辑时间
-					isUpvote: 1, // 是否已点赞
-					isDownvote: 1, // 是否已点踩
+					UUID: 1, // コメント送信者のUUID
+					uid: 1, // コメント送信者のUID
+					emitTime: 1, // コメント送信時間
+					text: 1, // コメント本文
+					upvoteCount: 1, // コメントいいね数
+					downvoteCount: 1, // コメントよくないね数
+					commentIndex: 1, // コメントフロア数
+					subCommentsCount: 1, // このコメントの次のレベルの子コメント数
+					editDateTime: 1, // 最終編集時間
+					isUpvote: 1, // いいねしたかどうか
+					isDownvote: 1, // よくないねしたかどうか
 					userInfo: {
-						username: '$user_info_data.username', // 用户名
-						userNickname: '$user_info_data.userNickname', // 用户昵称
-						avatar: '$user_info_data.avatar', // 用户头像的链接
-						signature: '$user_info_data.signature', // 用户的个性签名
-						gender: '$user_info_data.gender' // 用户的性别
+						username: '$user_info_data.username', // ユーザー名
+						userNickname: '$user_info_data.userNickname', // ユーザーニックネーム
+						avatar: '$user_info_data.avatar', // ユーザーアバターのリンク
+						signature: '$user_info_data.signature', // ユーザーの自己紹介
+						gender: '$user_info_data.gender' // ユーザーの性別
 					},
-					...blockListFilter.additionalFields, // 黑名单过滤器的额外字段
-				},
-			},
+					...blockListFilter.additionalFields, // ブラックリストフィルターの追加フィールド
+				}
+			}
 		]
 
 		const { collectionName, schemaInstance } = VideoCommentSchema
@@ -333,141 +325,132 @@ export const getVideoCommentListByKvidService = async (getVideoCommentByKvidRequ
 		const videoCommentsResult = await selectDataByAggregateFromMongoDB(schemaInstance, collectionName, getVideoCommentsPipeline)
 
 		if (!videoCommentsResult.success || !videoCommentsCountResult.success) {
-			console.error('ERROR', '获取视频评论列表失败，查询数据失败', { getVideoCommentByKvidRequest })
-			return { success: false, message: '获取视频评论列表失败，查询数据失败', videoCommentCount: 0, videoCommentList: [] }
+			console.error('ERROR', 'ビデオコメントリストの取得に失敗しました、データのクエリに失敗しました', { getVideoCommentByKvidRequest })
+			return { success: false, message: 'ビデオコメントリストの取得に失敗しました、データのクエリに失敗しました', videoCommentCount: 0, videoCommentList: [] }
 		}
 
 		return {
 			success: true,
-			message: videoCommentsCountResult.result?.[0]?.totalCount > 0 ? '获取视频评论列表成功' : '获取视频评论列表成功，长度为零',
+			message: videoCommentsCountResult.result?.[0]?.totalCount > 0 ? 'ビデオコメントリストの取得に成功しました' : 'ビデオコメントリストの取得に成功しました、長さはゼロです',
 			videoCommentCount: videoCommentsCountResult.result?.[0]?.totalCount,
 			videoCommentList: videoCommentsResult.result,
 		}
 	} catch (error) {
-		console.error('ERROR', '获取视频评论列表失败，错误信息：', error, { getVideoCommentByKvidRequest })
-		return { success: false, message: '获取视频评论列表失败，未知原因', videoCommentCount: 0, videoCommentList: [] }
+		console.error('ERROR', 'ビデオコメントリストの取得に失敗しました、エラー情報：', error, { getVideoCommentByKvidRequest })
+		return { success: false, message: 'ビデオコメントリストの取得に失敗しました、原因不明', videoCommentCount: 0, videoCommentList: [] }
 	}
 }
 
-
 /**
- * 获取某个用户对某个视频的评论的点赞情况
- * @param getVideoCommentUpvoteProps 获取某个用户对某个视频的评论的点赞情况的参数
- * @returns 某个用户对某个视频的评论的点赞情况
+ * @param getVideoCommentUpvoteProps 特定のユーザーが特定のビデオのコメントに対して「いいね」を付けた状況を取得するためのパラメータ
+ * @returns 特定のユーザーが特定のビデオのコメントに対して「いいね」を付けた状況
  */
 const getVideoCommentUpvoteByUid = async (getVideoCommentUpvoteProps: GetVideoCommentUpvotePropsDto): Promise<GetVideoCommentUpvoteResultDto> => {
 	try {
 		if (checkGetVideoCommentUpvoteProps(getVideoCommentUpvoteProps)) {
-			const { collectionName, schemaInstance } = VideoCommentUpvoteSchema
-			type VideoCommentUpvote = InferSchemaType<typeof schemaInstance>
-			const where: QueryType<VideoCommentUpvote> = {
-				videoId: getVideoCommentUpvoteProps.videoId,
-				uid: getVideoCommentUpvoteProps.uid,
-				invalidFlag: false,
-			}
-
-			const select: SelectType<VideoCommentUpvote> = {
-				videoId: 1,
-				commentId: 1,
-				uid: 1,
-				editDateTime: 1,
-			}
-
 			try {
+				const { collectionName, schemaInstance } = VideoCommentUpvoteSchema
+				type VideoCommentUpvote = InferSchemaType<typeof schemaInstance>
+				const where: QueryType<VideoCommentUpvote> = {
+					videoId: getVideoCommentUpvoteProps.videoId,
+					uid: getVideoCommentUpvoteProps.uid,
+					invalidFlag: false,
+				}
+				const select: SelectType<VideoCommentUpvote> = {
+					videoId: 1,
+					commentId: 1,
+					uid: 1,
+					editDateTime: 1,
+				}
 				const result = await selectDataFromMongoDB(where, select, schemaInstance, collectionName)
 				const videoCommentUpvoteList = result.result
 				if (result.success) {
 					if (videoCommentUpvoteList && videoCommentUpvoteList.length > 0) {
-						return { success: true, message: '获取用户点赞情况成功', videoCommentUpvoteResult: videoCommentUpvoteList }
+						return { success: true, message: 'ユーザーのいいね状況の取得に成功しました', videoCommentUpvoteResult: videoCommentUpvoteList }
 					} else {
-						return { success: true, message: '用户点赞情况为空', videoCommentUpvoteResult: [] }
+						return { success: true, message: 'ユーザーのいいね状況は空です', videoCommentUpvoteResult: [] }
 					}
 				} else {
-					console.warn('WARN', 'WARNING', '获取用户点赞情况失败，查询失败或结果为空：', { getVideoCommentUpvoteProps })
-					return { success: false, message: '获取用户点赞情况失败，查询失败', videoCommentUpvoteResult: [] }
+					console.warn('WARN', 'WARNING', 'ユーザーのいいね状況の取得に失敗しました、クエリ失敗または結果が空です：', { getVideoCommentUpvoteProps })
+					return { success: false, message: 'ユーザーのいいね状況の取得に失敗しました、クエリに失敗しました', videoCommentUpvoteResult: [] }
 				}
 			} catch (error) {
-				console.warn('WARN', 'WARNING', '获取用户点赞情况失败，查询失败：', error, { getVideoCommentUpvoteProps })
-				return { success: false, message: '获取用户点赞情况失败，查询失败', videoCommentUpvoteResult: [] }
+				console.warn('WARN', 'WARNING', 'ユーザーのいいね状況の取得に失敗しました、クエリに失敗しました：', error, { getVideoCommentUpvoteProps })
+				return { success: false, message: 'ユーザーのいいね状況の取得に失敗しました、クエリに失敗しました', videoCommentUpvoteResult: [] }
 			}
 		} else {
-			console.warn('WARN', 'WARNING', '获取用户点赞情况失败，查询参数未通过校验', { getVideoCommentUpvoteProps })
-			return { success: false, message: '获取用户点赞情况失败，必要参数为空', videoCommentUpvoteResult: [] }
+			console.warn('WARN', 'WARNING', 'ユーザーのいいね状況の取得に失敗しました、クエリパラメータの検証に失敗しました', { getVideoCommentUpvoteProps })
+			return { success: false, message: 'ユーザーのいいね状況の取得に失敗しました、必須パラメータが空です', videoCommentUpvoteResult: [] }
 		}
 	} catch (error) {
-		console.warn('WARN', 'WARNING', '获取用户点赞情况失败，错误信息：', error, { getVideoCommentUpvoteProps })
-		return { success: false, message: '获取用户点赞情况失败，未知错误', videoCommentUpvoteResult: [] }
+		console.warn('WARN', 'WARNING', 'ユーザーのいいね状況の取得に失敗しました、エラー情報：', error, { getVideoCommentUpvoteProps })
+		return { success: false, message: 'ユーザーのいいね状況の取得に失敗しました、不明なエラー', videoCommentUpvoteResult: [] }
 	}
 }
 
 /**
- * 获取某个用户对某个视频的评论的点踩情况
- * @param getVideoCommentDownvoteProps 获取某个用户对某个视频的评论的点踩情况的参数
- * @returns 某个用户对某个视频的评论的点踩情况
+ * @param getVideoCommentDownvoteProps 特定のユーザーが特定のビデオのコメントに対して「よくないね」を付けた状況を取得するためのパラメータ
+ * @returns 特定のユーザーが特定のビデオのコメントに対して「よくないね」を付けた状況
  */
 const getVideoCommentDownvoteByUid = async (getVideoCommentDownvoteProps: GetVideoCommentDownvotePropsDto): Promise<GetVideoCommentDownvoteResultDto> => {
 	try {
 		if (checkGetVideoCommentDownvoteProps(getVideoCommentDownvoteProps)) {
-			const { collectionName, schemaInstance } = VideoCommentDownvoteSchema
-			type VideoCommentDownvote = InferSchemaType<typeof schemaInstance>
-			const where: QueryType<VideoCommentDownvote> = {
-				videoId: getVideoCommentDownvoteProps.videoId,
-				uid: getVideoCommentDownvoteProps.uid,
-				invalidFlag: false,
-			}
-
-			const select: SelectType<VideoCommentDownvote> = {
-				videoId: 1,
-				commentId: 1,
-				uid: 1,
-				editDateTime: 1,
-			}
-
 			try {
+				const { collectionName, schemaInstance } = VideoCommentDownvoteSchema
+				type VideoCommentDownvote = InferSchemaType<typeof schemaInstance>
+				const where: QueryType<VideoCommentDownvote> = {
+					videoId: getVideoCommentDownvoteProps.videoId,
+					uid: getVideoCommentDownvoteProps.uid,
+					invalidFlag: false,
+				}
+				const select: SelectType<VideoCommentDownvote> = {
+					videoId: 1,
+					commentId: 1,
+					uid: 1,
+					editDateTime: 1,
+				}
 				const result = await selectDataFromMongoDB(where, select, schemaInstance, collectionName)
 				const videoCommentDownvoteList = result.result
 				if (result.success) {
 					if (videoCommentDownvoteList && videoCommentDownvoteList.length > 0) {
-						return { success: true, message: '获取用户点踩情况成功', videoCommentDownvoteResult: videoCommentDownvoteList }
+						return { success: true, message: 'ユーザーのよくないね状況の取得に成功しました', videoCommentDownvoteResult: videoCommentDownvoteList }
 					} else {
-						return { success: true, message: '用户点踩情况为空', videoCommentDownvoteResult: [] }
+						return { success: true, message: 'ユーザーのよくないね状況は空です', videoCommentDownvoteResult: [] }
 					}
 				} else {
-					console.warn('WARN', 'WARNING', '获取用户点踩情况失败，查询失败或结果为空：', { getVideoCommentDownvoteProps })
-					return { success: false, message: '获取用户点踩情况失败，查询失败', videoCommentDownvoteResult: [] }
+					console.warn('WARN', 'WARNING', 'ユーザーのよくないね状況の取得に失敗しました、クエリ失敗または結果が空です：', { getVideoCommentDownvoteProps })
+					return { success: false, message: 'ユーザーのよくないね状況の取得に失敗しました、クエリに失敗しました', videoCommentDownvoteResult: [] }
 				}
 			} catch (error) {
-				console.warn('WARN', 'WARNING', '获取用户点踩情况失败，查询失败：', error, { getVideoCommentDownvoteProps })
-				return { success: false, message: '获取用户点踩情况失败，查询失败', videoCommentDownvoteResult: [] }
+				console.warn('WARN', 'WARNING', 'ユーザーのよくないね状況の取得に失敗しました、クエリに失敗しました：', error, { getVideoCommentDownvoteProps })
+				return { success: false, message: 'ユーザーのよくないね状況の取得に失敗しました、クエリに失敗しました', videoCommentDownvoteResult: [] }
 			}
 		} else {
-			console.warn('WARN', 'WARNING', '获取用户点踩情况失败，查询参数未通过校验', { getVideoCommentDownvoteProps })
-			return { success: false, message: '获取用户点踩情况失败，必要参数为空', videoCommentDownvoteResult: [] }
+			console.warn('WARN', 'WARNING', 'ユーザーのよくないね状況の取得に失敗しました、クエリパラメータの検証に失敗しました', { getVideoCommentDownvoteProps })
+			return { success: false, message: 'ユーザーのよくないね状況の取得に失敗しました、必須パラメータが空です', videoCommentDownvoteResult: [] }
 		}
 	} catch (error) {
-		console.warn('WARN', 'WARNING', '获取用户点踩情况失败，错误信息：', error, { getVideoCommentDownvoteProps })
-		return { success: false, message: '获取用户点踩情况失败，未知错误', videoCommentDownvoteResult: [] }
+		console.warn('WARN', 'WARNING', 'ユーザーのよくないね状況の取得に失敗しました、エラー情報：', error, { getVideoCommentDownvoteProps })
+		return { success: false, message: 'ユーザーのよくないね状況の取得に失敗しました、不明なエラー', videoCommentDownvoteResult: [] }
 	}
 }
 
 /**
- * 用户给视频评论点赞
- * @param emitVideoCommentUpvoteRequest 用户给视频评论点赞的请求载荷
- * @param uid 用户 UID
- * @param token 用户 UID 对应的 token
- * @returns 用户给视频评论点赞的结果
+ * @param emitVideoCommentUpvoteRequest ユーザーがビデオコメントに「いいね」を付けるリクエストペイロード
+ * @param uid ユーザーUID
+ * @param token ユーザーUIDに対応するトークン
+ * @returns ユーザーがビデオコメントに「いいね」を付けた結果
  */
 export const emitVideoCommentUpvoteService = async (emitVideoCommentUpvoteRequest: EmitVideoCommentUpvoteRequestDto, uid: number, token: string): Promise<EmitVideoCommentUpvoteResponseDto> => {
-	// WARN // TODO 应当添加更多安全验证，防刷！
+	// WARN // TODO さらに多くのセキュリティ検証を追加して、スクレイピングを防止する必要があります！
 	try {
 		if (checkEmitVideoCommentUpvoteRequestData(emitVideoCommentUpvoteRequest)) {
-			if ((await checkUserTokenService(uid, token)).success) { // 校验用户，校验通过才能点赞
-				const UUID = await getUserUuid(uid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+			if ((await checkUserTokenService(uid, token)).success) { // ユーザーを検証し、検証が成功した場合のみいいねを付けられる
+				const UUID = await getUserUuid(uid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 				if (!UUID) {
-					console.error('ERROR', '评论点赞失败，UUID 不存在', { uid })
-					return { success: false, message: '评论点赞失败，UUID 不存在' }
+					console.error('ERROR', 'コメントのいいねに失敗しました、UUIDが存在しません', { uid })
+					return { success: false, message: 'コメントのいいねに失敗しました、UUIDが存在しません' }
 				}
-
 				const { collectionName: videoCommentUpvoteCollectionName, schemaInstance: correctVideoCommentUpvoteSchema } = VideoCommentUpvoteSchema
 				type VideoCommentUpvote = InferSchemaType<typeof correctVideoCommentUpvoteSchema>
 				const videoId = emitVideoCommentUpvoteRequest.videoId
@@ -483,92 +466,91 @@ export const emitVideoCommentUpvoteService = async (emitVideoCommentUpvoteReques
 					editDateTime: nowDate,
 				}
 
-				if (!(await checkUserHasUpvoted(commentId, uid))) { // 用户没有对这条视频评论点赞，才能点赞
+				if (!(await checkUserHasUpvoted(commentId, uid))) { // ユーザーがこのビデオコメントにいいねを付けていない場合のみ、いいねを付けられる
 					try {
 						const insertData2MongoDBResult = await insertData2MongoDB(videoCommentUpvote, correctVideoCommentUpvoteSchema, videoCommentUpvoteCollectionName)
 						if (insertData2MongoDBResult && insertData2MongoDBResult.success) {
-							const { collectionName: videoCommentCollectionName, schemaInstance: correctVideoCommentSchema } = VideoCommentSchema
-							const upvoteBy = 'upvoteCount'
 							try {
+								const { collectionName: videoCommentCollectionName, schemaInstance: correctVideoCommentSchema } = VideoCommentSchema
+								const upvoteBy = 'upvoteCount'
 								const updateResult = await findOneAndPlusByMongodbId(commentId, upvoteBy, correctVideoCommentSchema, videoCommentCollectionName)
 								if (updateResult && updateResult.success) {
-									if (await checkUserHasDownvoted(commentId, uid)) { // 用户在点赞一个视频评论时，如果用户之前对这个视频评论有点踩，需要将视频评论的点踩取消
-										const cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto = {
-											id: commentId,
-											videoId,
-										}
-										try {
+									try {
+										if (await checkUserHasDownvoted(commentId, uid)) { // ユーザーがビデオコメントにいいねを付ける際、以前にこのビデオコメントによくないねを付けていた場合、ビデオコメントのよくないねをキャンセルする必要がある
+											const cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto = {
+												id: commentId,
+												videoId,
+											}
 											const cancelVideoCommentDownvoteResult = await cancelVideoCommentDownvoteService(cancelVideoCommentDownvoteRequest, uid, token)
 											if (cancelVideoCommentDownvoteResult.success) {
-												return { success: true, message: '视频评论点赞成功' }
+												return { success: true, message: 'ビデオコメントのいいねに成功しました' }
 											} else {
-												console.error('ERROR', '视频评论点赞成功，但未能取消点踩', { emitVideoCommentUpvoteRequest, uid })
-												return { success: false, message: '视频评论点赞成功，但未能取消点踩' }
+												console.error('ERROR', 'ビデオコメントのいいねに成功しましたが、よくないねのキャンセルに失敗しました', { emitVideoCommentUpvoteRequest, uid })
+												return { success: false, message: 'ビデオコメントのいいねに成功しましたが、よくないねのキャンセルに失敗しました' }
 											}
 										} catch (error) {
-											console.error('ERROR', '视频评论点赞成功，但取消点踩的请求失败', error, { emitVideoCommentUpvoteRequest, uid })
-											return { success: false, message: '视频评论点赞成功，但取消点踩失败' }
+											console.error('ERROR', 'ビデオコメントのいいねに成功しましたが、よくないねのキャンセルのリクエストに失敗しました', error, { emitVideoCommentUpvoteRequest, uid })
+											return { success: false, message: 'ビデオコメントのいいねに成功しましたが、よくないねのキャンセルに失敗しました' }
 										}
 									} else {
-										return { success: true, message: '视频评论点赞成功' }
+										return { success: true, message: 'ビデオコメントのいいねに成功しました' }
 									}
 								} else {
-									console.error('ERROR', '视频评论点赞数据存储成功，但点赞合计未增加', { emitVideoCommentUpvoteRequest, uid })
-									return { success: false, message: '视频评论点赞数据存储成功，但点赞合计未增加' }
+									console.error('ERROR', 'ビデオコメントのいいねデータの保存に成功しましたが、いいね合計が増加しませんでした', { emitVideoCommentUpvoteRequest, uid })
+									return { success: false, message: 'ビデオコメントのいいねデータの保存に成功しましたが、いいね合計が増加しませんでした' }
 								}
 							} catch (error) {
-								console.error('ERROR', '视频评论点赞数据存储成功，但点赞合计增加失败', error, { emitVideoCommentUpvoteRequest, uid })
-								return { success: false, message: '视频评论点赞数据存储成功，但点赞合计增加失败' }
+								console.error('ERROR', 'ビデオコメントのいいねデータの保存に成功しましたが、いいね合計の増加に失敗しました', error, { emitVideoCommentUpvoteRequest, uid })
+								return { success: false, message: 'ビデオコメントのいいねデータの保存に成功しましたが、いいね合計の増加に失敗しました' }
 							}
 						} else {
-							console.error('ERROR', '视频评论点赞失败', { emitVideoCommentUpvoteRequest, uid })
-							return { success: false, message: '视频评论点赞失败，存储数据失败' }
+							console.error('ERROR', 'ビデオコメントのいいねに失敗しました', { emitVideoCommentUpvoteRequest, uid })
+							return { success: false, message: 'ビデオコメントのいいねに失敗しました、データの保存に失敗しました' }
 						}
 					} catch (error) {
-						console.error('ERROR', '视频评论点赞失败，无法存储到 MongoDB', error, { emitVideoCommentUpvoteRequest, uid })
-						return { success: false, message: '视频评论点赞失败，存储数据失败' }
+						console.error('ERROR', 'ビデオコメントのいいねに失敗しました、MongoDBに保存できませんでした', error, { emitVideoCommentUpvoteRequest, uid })
+						return { success: false, message: 'ビデオコメントのいいねに失敗しました、データの保存に失敗しました' }
 					}
 				} else {
-					console.error('ERROR', '用户点赞时出错，用户已点赞', { emitVideoCommentUpvoteRequest, uid })
-					return { success: false, message: '用户点赞时出错，用户已点赞' }
+					console.error('ERROR', 'ユーザーがいいねを付ける際にエラーが発生しました、ユーザーは既にいいねを付けています', { emitVideoCommentUpvoteRequest, uid })
+					return { success: false, message: 'ユーザーがいいねを付ける際にエラーが発生しました、ユーザーは既にいいねを付けています' }
 				}
 			} else {
-				console.error('ERROR', '用户点赞时出错，用户校验未通过', { emitVideoCommentUpvoteRequest, uid })
-				return { success: false, message: '用户点赞时出错，用户校验未通过' }
+				console.error('ERROR', 'ユーザーがいいねを付ける際にエラーが発生しました、ユーザー検証に失敗しました', { emitVideoCommentUpvoteRequest, uid })
+				return { success: false, message: 'ユーザーがいいねを付ける際にエラーが発生しました、ユーザー検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '用户点赞时出错，点赞数据校验未通过：', { emitVideoCommentUpvoteRequest, uid })
-			return { success: false, message: '用户点赞时出错，数据错误' }
+			console.error('ERROR', 'ユーザーがいいねを付ける際にエラーが発生しました、いいねデータの検証に失敗しました：', { emitVideoCommentUpvoteRequest, uid })
+			return { success: false, message: 'ユーザーがいいねを付ける際にエラーが発生しました、データが不正です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '点赞失败，未知错误：', error, { emitVideoCommentUpvoteRequest, uid })
-		return { success: false, message: '点赞失败，未知错误' }
+		console.error('ERROR', 'いいねに失敗しました、不明なエラー：', error, { emitVideoCommentUpvoteRequest, uid })
+		return { success: false, message: 'いいねに失敗しました、不明なエラー' }
 	}
 }
 
 /**
- * 用户取消点赞一个视频评论
- * @param cancelVideoCommentUpvoteRequest 用户取消点赞一个视频评论的请求参数
- * @param uid 用户 UID
- * @param token 用户 UID 对应的 token
- * @returns 用户取消点赞一个视频评论的结果
+ * @param cancelVideoCommentUpvoteRequest ユーザーがビデオコメントのいいねをキャンセルするリクエストパラメータ
+ * @param uid ユーザーUID
+ * @param token ユーザーUIDに対応するトークン
+ * @returns ユーザーがビデオコメントのいいねをキャンセルした結果
  */
 export const cancelVideoCommentUpvoteService = async (cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto, uid: number, token: string): Promise<CancelVideoCommentUpvoteResponseDto> => {
 	try {
 		if (checkCancelVideoCommentUpvoteRequest(cancelVideoCommentUpvoteRequest)) {
-			if ((await checkUserTokenService(uid, token)).success) { // 校验用户，校验通过才能取消点赞
-				const { collectionName: videoCommentUpvoteCollectionName, schemaInstance: correctVideoCommentUpvoteSchema } = VideoCommentUpvoteSchema
-				type VideoCommentUpvote = InferSchemaType<typeof correctVideoCommentUpvoteSchema>
-				const commentId = cancelVideoCommentUpvoteRequest.id
-				const cancelVideoCommentUpvoteWhere: QueryType<VideoCommentUpvote> = {
-					videoId: cancelVideoCommentUpvoteRequest.videoId,
-					commentId,
-					uid,
-				}
-				const cancelVideoCommentUpvoteUpdate: QueryType<VideoCommentUpvote> = {
-					invalidFlag: true,
-				}
+			if ((await checkUserTokenService(uid, token)).success) { // ユーザーを検証し、検証が成功した場合のみいいねをキャンセルできる
 				try {
+					const { collectionName: videoCommentUpvoteCollectionName, schemaInstance: correctVideoCommentUpvoteSchema } = VideoCommentUpvoteSchema
+					type VideoCommentUpvote = InferSchemaType<typeof correctVideoCommentUpvoteSchema>
+					const commentId = cancelVideoCommentUpvoteRequest.id
+					const cancelVideoCommentUpvoteWhere: QueryType<VideoCommentUpvote> = {
+						videoId: cancelVideoCommentUpvoteRequest.videoId,
+						commentId,
+						uid,
+					}
+					const cancelVideoCommentUpvoteUpdate: QueryType<VideoCommentUpvote> = {
+						invalidFlag: true,
+					}
 					const updateResult = await updateData4MongoDB(cancelVideoCommentUpvoteWhere, cancelVideoCommentUpvoteUpdate, correctVideoCommentUpvoteSchema, videoCommentUpvoteCollectionName)
 					if (updateResult && updateResult.success && updateResult.result) {
 						if (updateResult.result.matchedCount > 0 && updateResult.result.modifiedCount > 0) {
@@ -577,108 +559,100 @@ export const cancelVideoCommentUpvoteService = async (cancelVideoCommentUpvoteRe
 								const upvoteBy = 'upvoteCount'
 								const updateResult = await findOneAndPlusByMongodbId(commentId, upvoteBy, correctVideoCommentSchema, videoCommentCollectionName, -1)
 								if (updateResult.success) {
-									return { success: true, message: '用户取消点赞成功' }
+									return { success: true, message: 'ユーザーのいいねキャンセルに成功しました' }
 								} else {
-									console.warn('WARN', 'WARNING', '用户取消点赞成功，但点赞总数未更新')
-									return { success: true, message: '用户取消点赞成功，但点赞总数未更新' }
+									console.warn('WARN', 'WARNING', 'ユーザーのいいねキャンセルに成功しましたが、いいね総数が更新されませんでした')
+									return { success: true, message: 'ユーザーのいいねキャンセルに成功しましたが、いいね総数が更新されませんでした' }
 								}
 							} catch (error) {
-								console.warn('WARN', 'WARNING', '用户取消点赞成功，但点赞总数更新失败')
-								return { success: true, message: '用户取消点赞成功，但点赞总数更新失败' }
+								console.warn('WARN', 'WARNING', 'ユーザーのいいねキャンセルに成功しましたが、いいね総数の更新に失敗しました')
+								return { success: true, message: 'ユーザーのいいねキャンセルに成功しましたが、いいね総数の更新に失敗しました' }
 							}
 						} else {
-							console.error('ERROR', '用户取消点赞时出错，更新数量为 0', { cancelVideoCommentUpvoteRequest, uid })
-							return { success: false, message: '用户取消点赞时出错，无法更新' }
+							console.error('ERROR', 'ユーザーがいいねをキャンセルする際にエラーが発生しました、更新数が0です', { cancelVideoCommentUpvoteRequest, uid })
+							return { success: false, message: 'ユーザーがいいねをキャンセルする際にエラーが発生しました、更新できません' }
 						}
 					}
 				} catch (error) {
-					console.error('ERROR', '用户取消点赞时出错，更新数据时出错', error, { cancelVideoCommentUpvoteRequest, uid })
-					return { success: false, message: '用户取消点赞时出错，更新数据时出错' }
+					console.error('ERROR', 'ユーザーがいいねをキャンセルする際にエラーが発生しました、データの更新時にエラーが発生しました', error, { cancelVideoCommentUpvoteRequest, uid })
+					return { success: false, message: 'ユーザーがいいねをキャンセルする際にエラーが発生しました、データの更新時にエラーが発生しました' }
 				}
 			} else {
-				console.error('ERROR', '用户取消点赞时出错，用户校验未通过', { cancelVideoCommentUpvoteRequest, uid })
-				return { success: false, message: '用户取消点赞时出错，用户校验未通过' }
+				console.error('ERROR', 'ユーザーがいいねをキャンセルする際にエラーが発生しました、ユーザー検証に失敗しました', { cancelVideoCommentUpvoteRequest, uid })
+				return { success: false, message: 'ユーザーがいいねをキャンセルする際にエラーが発生しました、ユーザー検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '用户取消点赞时出错，参数不合法或必要的参数为空', { cancelVideoCommentUpvoteRequest, uid })
-			return { success: false, message: '用户取消点赞时出错，参数异常' }
+			console.error('ERROR', 'ユーザーがいいねをキャンセルする際にエラーが発生しました、パラメータが不正または必須パラメータが空です', { cancelVideoCommentUpvoteRequest, uid })
+			return { success: false, message: 'ユーザーがいいねをキャンセルする際にエラーが発生しました、パラメータが異常です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '用户取消点赞时出错，未知错误', error, { cancelVideoCommentUpvoteRequest, uid })
-		return { success: false, message: '用户取消点赞时出错，未知错误' }
+		console.error('ERROR', 'ユーザーがいいねをキャンセルする際にエラーが発生しました、不明なエラー', error, { cancelVideoCommentUpvoteRequest, uid })
+		return { success: false, message: 'ユーザーがいいねをキャンセルする際にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 检查用户是否已经对一个视频评论点赞
- * @param commentId 评论的 ID
- * @param uid 用户 UID
- * @returns 校验结果，用户已点赞返回 false, 未点赞返回 true
+ * @param commentId コメントのID
+ * @param uid ユーザーUID
+ * @returns 検証結果、ユーザーが既にいいねを付けている場合はtrue、付けていない場合はfalseを返す
  */
 const checkUserHasUpvoted = async (commentId: string, uid: number): Promise<boolean> => {
 	try {
 		if (commentId && uid !== undefined && uid !== null) {
-			const { collectionName, schemaInstance } = VideoCommentUpvoteSchema
-			type VideoCommentUpvote = InferSchemaType<typeof schemaInstance>
-			const where: QueryType<VideoCommentUpvote> = {
-				uid,
-				commentId,
-				invalidFlag: false,
-			}
-
-			const select: SelectType<VideoCommentUpvote> = {
-				videoId: 1,
-				commentId: 1,
-				uid: 1,
-			}
-
 			try {
+				const { collectionName, schemaInstance } = VideoCommentUpvoteSchema
+				type VideoCommentUpvote = InferSchemaType<typeof schemaInstance>
+				const where: QueryType<VideoCommentUpvote> = {
+					uid,
+					commentId,
+					invalidFlag: false,
+				}
+				const select: SelectType<VideoCommentUpvote> = {
+					videoId: 1,
+					commentId: 1,
+					uid: 1,
+				}
 				const result = await selectDataFromMongoDB(where, select, schemaInstance, collectionName)
 				if (result.success) {
 					if (result.result && result.result.length > 0) {
-						return true // 查询到结果了，证明用户已点赞过了，所以返回 true
+						return true // クエリ結果が見つかった場合、ユーザーが既にいいねを付けていることを証明するため、trueを返す
 					} else {
-						return false // 查询成功但未查询到结果，证明用户未点赞，所以返回 false
+						return false // クエリに成功したが結果が見つからなかった場合、ユーザーがいいねを付けていないことを証明するため、falseを返す
 					}
 				} else {
-					return false // 悲观：查询失败，不算作用户点赞
+					return false // 悲観的：クエリに失敗した場合、ユーザーがいいねを付けていないと見なす
 				}
 			} catch (error) {
-				console.error('在验证用户是否已经对某评论点赞时出错：获取用户点赞数据失败', { commentId, uid })
+				console.error('ユーザーが特定のコメントに既にいいねを付けているか検証中にエラーが発生しました：ユーザーのいいねデータの取得に失敗しました', { commentId, uid })
 				return false
 			}
 		} else {
-			console.error('在验证用户是否已经对某评论点赞时出错：数据校验未通过', { commentId, uid })
+			console.error('ユーザーが特定のコメントに既にいいねを付けているか検証中にエラーが発生しました：データの検証に失敗しました', { commentId, uid })
 			return false
 		}
 	} catch (error) {
-		console.error('在验证用户是否已经对某评论点赞时出错：', error, { commentId, uid })
+		console.error('ユーザーが特定のコメントに既にいいねを付けているか検証中にエラーが発生しました：', error, { commentId, uid })
 		return false
 	}
 }
 
-
-
 /**
- * 用户给视频评论点踩
- * @param emitVideoCommentDownvoteRequest 用户给视频评论点踩的请求载荷
- * @param uid 用户 UID
- * @param token 用户 UID 对应的 token
- * @returns 用户给视频评论点踩的结果
+ * @param emitVideoCommentDownvoteRequest ユーザーがビデオコメントによくないねを付けるリクエストペイロード
+ * @param uid ユーザーUID
+ * @param token ユーザーUIDに対応するトークン
+ * @returns ユーザーがビデオコメントによくないねを付けた結果
  */
 export const emitVideoCommentDownvoteService = async (emitVideoCommentDownvoteRequest: EmitVideoCommentDownvoteRequestDto, uid: number, token: string): Promise<EmitVideoCommentDownvoteResponseDto> => {
-	// WARN // TODO 应当添加更多安全验证，防刷！
+	// WARN // TODO さらに多くのセキュリティ検証を追加して、スクレイピングを防止する必要があります！
 	try {
 		if (checkEmitVideoCommentDownvoteRequestData(emitVideoCommentDownvoteRequest)) {
-			if ((await checkUserTokenService(uid, token)).success) { // 校验用户，校验通过才能点踩
-				const UUID = await getUserUuid(uid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+			if ((await checkUserTokenService(uid, token)).success) { // ユーザーを検証し、検証が成功した場合のみよくないねを付けられる
+				const UUID = await getUserUuid(uid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 				if (!UUID) {
-					console.error('ERROR', '评论点踩失败，UUID 不存在', { uid })
-					return { success: false, message: '评论点踩失败，UUID 不存在' }
+					console.error('ERROR', 'コメントのよくないねに失敗しました、UUIDが存在しません', { uid })
+					return { success: false, message: 'コメントのよくないねに失敗しました、UUIDが存在しません' }
 				}
-
 				const { collectionName: videoCommentDownvoteCollectionName, schemaInstance: correctVideoCommentDownvoteSchema } = VideoCommentDownvoteSchema
-
 				type VideoCommentDownvote = InferSchemaType<typeof correctVideoCommentDownvoteSchema>
 				const videoId = emitVideoCommentDownvoteRequest.videoId
 				const commentId = emitVideoCommentDownvoteRequest.id
@@ -693,92 +667,91 @@ export const emitVideoCommentDownvoteService = async (emitVideoCommentDownvoteRe
 					editDateTime: nowDate,
 				}
 
-				if (!(await checkUserHasDownvoted(commentId, uid))) { // 用户没有对这条视频评论点踩，才能点踩
+				if (!(await checkUserHasDownvoted(commentId, uid))) { // ユーザーがこのビデオコメントによくないねを付けていない場合のみ、よくないねを付けられる
 					try {
 						const insertData2MongoDBResult = await insertData2MongoDB(videoCommentDownvote, correctVideoCommentDownvoteSchema, videoCommentDownvoteCollectionName)
 						if (insertData2MongoDBResult && insertData2MongoDBResult.success) {
-							const { collectionName: videoCommentCollectionName, schemaInstance: correctVideoCommentSchema } = VideoCommentSchema
-							const downvoteBy = 'downvoteCount'
 							try {
+								const { collectionName: videoCommentCollectionName, schemaInstance: correctVideoCommentSchema } = VideoCommentSchema
+								const downvoteBy = 'downvoteCount'
 								const updateResult = await findOneAndPlusByMongodbId(commentId, downvoteBy, correctVideoCommentSchema, videoCommentCollectionName)
 								if (updateResult && updateResult.success) {
-									if (await checkUserHasUpvoted(commentId, uid)) { // 用户在点踩一个视频评论时，如果用户之前对这个视频评论有点赞，需要将视频评论的点赞取消
-										const cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto = {
-											id: commentId,
-											videoId,
-										}
-										try {
+									try {
+										if (await checkUserHasUpvoted(commentId, uid)) { // ユーザーがビデオコメントによくないねを付ける際、以前にこのビデオコメントにいいねを付けていた場合、ビデオコメントのいいねをキャンセルする必要がある
+											const cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto = {
+												id: commentId,
+												videoId,
+											}
 											const cancelVideoCommentUpvoteResult = await cancelVideoCommentUpvoteService(cancelVideoCommentUpvoteRequest, uid, token)
 											if (cancelVideoCommentUpvoteResult.success) {
-												return { success: true, message: '视频评论点踩成功' }
+												return { success: true, message: 'ビデオコメントのよくないねに成功しました' }
 											} else {
-												console.error('ERROR', '视频评论点踩成功，但未能取消点赞', { emitVideoCommentDownvoteRequest, uid })
-												return { success: false, message: '视频评论点踩成功，但未能取消点赞' }
+												console.error('ERROR', 'ビデオコメントのよくないねに成功しましたが、いいねのキャンセルに失敗しました', { emitVideoCommentDownvoteRequest, uid })
+												return { success: false, message: 'ビデオコメントのよくないねに成功しましたが、いいねのキャンセルに失敗しました' }
 											}
 										} catch (error) {
-											console.error('ERROR', '视频评论点踩成功，但取消点赞的请求失败', error, { emitVideoCommentDownvoteRequest, uid })
-											return { success: false, message: '视频评论点踩成功，但取消点赞失败' }
+											console.error('ERROR', 'ビデオコメントのよくないねに成功しましたが、いいねのキャンセルのリクエストに失敗しました', error, { emitVideoCommentDownvoteRequest, uid })
+											return { success: false, message: 'ビデオコメントのよくないねに成功しましたが、いいねのキャンセルに失敗しました' }
 										}
 									} else {
-										return { success: true, message: '视频评论点踩成功' }
+										return { success: true, message: 'ビデオコメントのよくないねに成功しました' }
 									}
 								} else {
-									console.error('ERROR', '视频评论点踩数据存储成功，但点踩合计未增加', { emitVideoCommentDownvoteRequest, uid })
-									return { success: false, message: '视频评论点踩数据存储成功，但点踩合计未增加' }
+									console.error('ERROR', 'ビデオコメントのよくないねデータの保存に成功しましたが、よくないね合計が増加しませんでした', { emitVideoCommentDownvoteRequest, uid })
+									return { success: false, message: 'ビデオコメントのよくないねデータの保存に成功しましたが、よくないね合計が増加しませんでした' }
 								}
 							} catch (error) {
-								console.error('ERROR', '视频评论点踩数据存储成功，但点踩合计增加失败', error, { emitVideoCommentDownvoteRequest, uid })
-								return { success: false, message: '视频评论点踩数据存储成功，但点踩合计增加失败' }
+								console.error('ERROR', 'ビデオコメントのよくないねデータの保存に成功しましたが、よくないね合計の増加に失敗しました', error, { emitVideoCommentDownvoteRequest, uid })
+								return { success: false, message: 'ビデオコメントのよくないねデータの保存に成功しましたが、よくないね合計の増加に失敗しました' }
 							}
 						} else {
-							console.error('ERROR', '视频评论点踩失败', { emitVideoCommentDownvoteRequest, uid })
-							return { success: false, message: '视频评论点踩失败，存储数据失败' }
+							console.error('ERROR', 'ビデオコメントのよくないねに失敗しました', { emitVideoCommentDownvoteRequest, uid })
+							return { success: false, message: 'ビデオコメントのよくないねに失敗しました、データの保存に失敗しました' }
 						}
 					} catch (error) {
-						console.error('ERROR', '视频评论点踩失败，无法存储到 MongoDB', error, { emitVideoCommentDownvoteRequest, uid })
-						return { success: false, message: '视频评论点踩失败，存储数据失败' }
+						console.error('ERROR', 'ビデオコメントのよくないねに失敗しました、MongoDBに保存できませんでした', error, { emitVideoCommentDownvoteRequest, uid })
+						return { success: false, message: 'ビデオコメントのよくないねに失敗しました、データの保存に失敗しました' }
 					}
 				} else {
-					console.error('ERROR', '用户点踩时出错，用户已点踩', { emitVideoCommentDownvoteRequest, uid })
-					return { success: false, message: '用户点踩时出错，用户已点踩' }
+					console.error('ERROR', 'ユーザーがよくないねを付ける際にエラーが発生しました、ユーザーは既によくないねを付けています', { emitVideoCommentDownvoteRequest, uid })
+					return { success: false, message: 'ユーザーがよくないねを付ける際にエラーが発生しました、ユーザーは既によくないねを付けています' }
 				}
 			} else {
-				console.error('ERROR', '用户点踩时出错，用户校验未通过', { emitVideoCommentDownvoteRequest, uid })
-				return { success: false, message: '用户点踩时出错，用户校验未通过' }
+				console.error('ERROR', 'ユーザーがよくないねを付ける際にエラーが発生しました、ユーザー検証に失敗しました', { emitVideoCommentDownvoteRequest, uid })
+				return { success: false, message: 'ユーザーがよくないねを付ける際にエラーが発生しました、ユーザー検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '用户点踩时出错，点踩数据校验未通过：', { emitVideoCommentDownvoteRequest, uid })
-			return { success: false, message: '用户点踩时出错，数据错误' }
+			console.error('ERROR', 'ユーザーがよくないねを付ける際にエラーが発生しました、よくないねデータの検証に失敗しました：', { emitVideoCommentDownvoteRequest, uid })
+			return { success: false, message: 'ユーザーがよくないねを付ける際にエラーが発生しました、データが不正です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '点踩失败，未知错误：', error, { emitVideoCommentDownvoteRequest, uid })
-		return { success: false, message: '点踩失败，未知错误' }
+		console.error('ERROR', 'よくないねに失敗しました、不明なエラー：', error, { emitVideoCommentDownvoteRequest, uid })
+		return { success: false, message: 'よくないねに失敗しました、不明なエラー' }
 	}
 }
 
 /**
- * 用户取消点踩一个视频评论
- * @param cancelVideoCommentDownvoteRequest 用户取消点踩一个视频评论的请求参数
- * @param uid 用户 UID
- * @param token 用户 UID 对应的 token
- * @returns 用户取消点踩一个视频评论的结果
+ * @param cancelVideoCommentDownvoteRequest ユーザーがビデオコメントのよくないねをキャンセルするリクエストパラメータ
+ * @param uid ユーザーUID
+ * @param token ユーザーUIDに対応するトークン
+ * @returns ユーザーがビデオコメントのよくないねをキャンセルした結果
  */
 export const cancelVideoCommentDownvoteService = async (cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto, uid: number, token: string): Promise<CancelVideoCommentDownvoteResponseDto> => {
 	try {
 		if (checkCancelVideoCommentDownvoteRequest(cancelVideoCommentDownvoteRequest)) {
-			if ((await checkUserTokenService(uid, token)).success) { // 校验用户，校验通过才能取消点踩
-				const { collectionName: videoCommentDownvoteCollectionName, schemaInstance: correctVideoCommentDownvoteSchema } = VideoCommentDownvoteSchema
-				type VideoCommentDownvote = InferSchemaType<typeof correctVideoCommentDownvoteSchema>
-				const commentId = cancelVideoCommentDownvoteRequest.id
-				const cancelVideoCommentDownvoteWhere: QueryType<VideoCommentDownvote> = {
-					videoId: cancelVideoCommentDownvoteRequest.videoId,
-					commentId,
-					uid,
-				}
-				const cancelVideoCommentDownvoteUpdate: QueryType<VideoCommentDownvote> = {
-					invalidFlag: true,
-				}
+			if ((await checkUserTokenService(uid, token)).success) { // ユーザーを検証し、検証が成功した場合のみよくないねをキャンセルできる
 				try {
+					const { collectionName: videoCommentDownvoteCollectionName, schemaInstance: correctVideoCommentDownvoteSchema } = VideoCommentDownvoteSchema
+					type VideoCommentDownvote = InferSchemaType<typeof correctVideoCommentDownvoteSchema>
+					const commentId = cancelVideoCommentDownvoteRequest.id
+					const cancelVideoCommentDownvoteWhere: QueryType<VideoCommentDownvote> = {
+						videoId: cancelVideoCommentDownvoteRequest.videoId,
+						commentId,
+						uid,
+					}
+					const cancelVideoCommentDownvoteUpdate: QueryType<VideoCommentDownvote> = {
+						invalidFlag: true,
+					}
 					const updateResult = await updateData4MongoDB(cancelVideoCommentDownvoteWhere, cancelVideoCommentDownvoteUpdate, correctVideoCommentDownvoteSchema, videoCommentDownvoteCollectionName)
 					if (updateResult && updateResult.success && updateResult.result) {
 						if (updateResult.result.matchedCount > 0 && updateResult.result.modifiedCount > 0) {
@@ -787,109 +760,105 @@ export const cancelVideoCommentDownvoteService = async (cancelVideoCommentDownvo
 								const downvoteBy = 'downvoteCount'
 								const updateResult = await findOneAndPlusByMongodbId(commentId, downvoteBy, correctVideoCommentSchema, videoCommentCollectionName, -1)
 								if (updateResult.success) {
-									return { success: true, message: '用户取消点踩成功' }
+									return { success: true, message: 'ユーザーのよくないねキャンセルに成功しました' }
 								} else {
-									console.warn('WARN', 'WARNING', '用户取消点踩成功，但点踩总数未更新')
-									return { success: true, message: '用户取消点踩成功，但点踩总数未更新' }
+									console.warn('WARN', 'WARNING', 'ユーザーのよくないねキャンセルに成功しましたが、よくないね総数が更新されませんでした')
+									return { success: true, message: 'ユーザーのよくないねキャンセルに成功しましたが、よくないね総数が更新されませんでした' }
 								}
 							} catch (error) {
-								console.warn('WARN', 'WARNING', '用户取消点踩成功，但点踩总数更新失败')
-								return { success: true, message: '用户取消点踩成功，但点踩总数更新失败' }
+								console.warn('WARN', 'WARNING', 'ユーザーのよくないねキャンセルに成功しましたが、よくないね総数の更新に失敗しました')
+								return { success: true, message: 'ユーザーのよくないねキャンセルに成功しましたが、よくないね総数の更新に失敗しました' }
 							}
 						} else {
-							console.error('ERROR', '用户取消点踩时出错，更新数量为 0', { cancelVideoCommentDownvoteRequest, uid })
-							return { success: false, message: '用户取消点踩时出错，无法更新' }
+							console.error('ERROR', 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、更新数が0です', { cancelVideoCommentDownvoteRequest, uid })
+							return { success: false, message: 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、更新できません' }
 						}
 					}
 				} catch (error) {
-					console.error('ERROR', '用户取消点踩时出错，更新数据时出错', error, { cancelVideoCommentDownvoteRequest, uid })
-					return { success: false, message: '用户取消点踩时出错，更新数据时出错' }
+					console.error('ERROR', 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、データの更新時にエラーが発生しました', error, { cancelVideoCommentDownvoteRequest, uid })
+					return { success: false, message: 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、データの更新時にエラーが発生しました' }
 				}
 			} else {
-				console.error('ERROR', '用户取消点踩时出错，用户校验未通过', { cancelVideoCommentDownvoteRequest, uid })
-				return { success: false, message: '用户取消点踩时出错，用户校验未通过' }
+				console.error('ERROR', 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、ユーザー検証に失敗しました', { cancelVideoCommentDownvoteRequest, uid })
+				return { success: false, message: 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、ユーザー検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '用户取消点踩时出错，参数不合法或必要的参数为空', { cancelVideoCommentDownvoteRequest, uid })
-			return { success: false, message: '用户取消点踩时出错，参数异常' }
+			console.error('ERROR', 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、パラメータが不正または必須パラメータが空です', { cancelVideoCommentDownvoteRequest, uid })
+			return { success: false, message: 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、パラメータが異常です' }
 		}
 	} catch (error) {
-		console.error('ERROR', '用户取消点踩时出错，未知错误', error, { cancelVideoCommentDownvoteRequest, uid })
-		return { success: false, message: '用户取消点踩时出错，未知错误' }
+		console.error('ERROR', 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、不明なエラー', error, { cancelVideoCommentDownvoteRequest, uid })
+		return { success: false, message: 'ユーザーがよくないねをキャンセルする際にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 检查用户是否已经对一个视频评论点踩
- * @param commentId 评论的 ID
- * @param uid 用户 UID
- * @returns 校验结果，用户已点踩返回 false, 未点踩返回 true
+ * @param commentId コメントのID
+ * @param uid ユーザーUID
+ * @returns 検証結果、ユーザーが既によくないねを付けている場合はtrue、付けていない場合はfalseを返す
  */
 const checkUserHasDownvoted = async (commentId: string, uid: number): Promise<boolean> => {
 	try {
 		if (commentId && uid !== undefined && uid !== null) {
-			const { collectionName, schemaInstance } = VideoCommentDownvoteSchema
-			type VideoCommentDownvote = InferSchemaType<typeof schemaInstance>
-			const where: QueryType<VideoCommentDownvote> = {
-				uid,
-				commentId,
-				invalidFlag: false,
-			}
-
-			const select: SelectType<VideoCommentDownvote> = {
-				videoId: 1,
-				commentId: 1,
-				uid: 1,
-			}
-
 			try {
+				const { collectionName, schemaInstance } = VideoCommentDownvoteSchema
+				type VideoCommentDownvote = InferSchemaType<typeof schemaInstance>
+				const where: QueryType<VideoCommentDownvote> = {
+					uid,
+					commentId,
+					invalidFlag: false,
+				}
+				const select: SelectType<VideoCommentDownvote> = {
+					videoId: 1,
+					commentId: 1,
+					uid: 1,
+				}
 				const result = await selectDataFromMongoDB(where, select, schemaInstance, collectionName)
 				if (result.success) {
 					if (result.result && result.result.length > 0) {
-						return true // 查询到结果了，证明用户已点踩过了，所以返回 true
+						return true // クエリ結果が見つかった場合、ユーザーが既によくないねを付けていることを証明するため、trueを返す
 					} else {
-						return false // 查询成功但未查询到结果，证明用户未点踩，所以返回 false
+						return false // クエリに成功したが結果が見つからなかった場合、ユーザーがよくないねを付けていないことを証明するため、falseを返す
 					}
 				} else {
-					return false // 悲观：查询失败，不算作用户点踩
+					return false // 悲観的：クエリに失敗した場合、ユーザーがよくないねを付けていないと見なす
 				}
 			} catch (error) {
-				console.error('在验证用户是否已经对某评论点踩时出错：获取用户点踩数据失败', { commentId, uid })
+				console.error('ユーザーが特定のコメントに既によくないねを付けているか検証中にエラーが発生しました：ユーザーのよくないねデータの取得に失敗しました', { commentId, uid })
 				return false
 			}
 		} else {
-			console.error('在验证用户是否已经对某评论点踩时出错：数据校验未通过', { commentId, uid })
+			console.error('ユーザーが特定のコメントに既によくないねを付けているか検証中にエラーが発生しました：データの検証に失敗しました', { commentId, uid })
 			return false
 		}
 	} catch (error) {
-		console.error('在验证用户是否已经对某评论点踩时出错：', error, { commentId, uid })
+		console.error('ユーザーが特定のコメントに既によくないねを付けているか検証中にエラーが発生しました：', error, { commentId, uid })
 		return false
 	}
 }
 
 /**
- * 删除一条自己发布的视频评论
- * @param deleteSelfVideoCommentRequest 删除一条自己发布的视频评论请求载荷
- * @param uid 用户 UID
- * @param token 用户 UID 对应的 token
- * @returns 删除一条自己发布的视频评论请求响应
+ * @param deleteSelfVideoCommentRequest 自分が投稿したビデオコメントを削除するリクエストペイロード
+ * @param uid ユーザーUID
+ * @param token ユーザーUIDに対応するトークン
+ * @returns 自分が投稿したビデオコメントを削除するリクエストレスポンス
  */
 export const deleteSelfVideoCommentService = async (deleteSelfVideoCommentRequest: DeleteSelfVideoCommentRequestDto, uid: number, token: string): Promise<DeleteSelfVideoCommentResponseDto> => {
 	try {
 		if (!checkDeleteSelfVideoCommentRequest(deleteSelfVideoCommentRequest)) {
-			console.error('删除视频评论失败，参数不合法')
-			return { success: false, message: '删除视频评论失败，参数不合法' }
+			console.error('ビデオコメントの削除に失敗しました、パラメータが不正です')
+			return { success: false, message: 'ビデオコメントの削除に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenService(uid, token)).success) {
-			console.error('删除视频评论失败，用户校验未通过')
-			return { success: false, message: '删除视频评论失败，用户校验未通过' }
+			console.error('ビデオコメントの削除に失敗しました、ユーザー検証に失敗しました')
+			return { success: false, message: 'ビデオコメントの削除に失敗しました、ユーザー検証に失敗しました' }
 		}
 
-		const UUID = await getUserUuid(uid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+		const UUID = await getUserUuid(uid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 		if (!UUID) {
-			console.error('ERROR', '删除一条自己发布的视频评论失败，UUID 不存在', { uid })
-			return { success: false, message: '删除一条自己发布的视频评论失败，UUID 不存在' }
+			console.error('ERROR', '自分が投稿したビデオコメントの削除に失敗しました、UUIDが存在しません', { uid })
+			return { success: false, message: '自分が投稿したビデオコメントの削除に失敗しました、UUIDが存在しません' }
 		}
 
 		const { commentRoute, videoId } = deleteSelfVideoCommentRequest
@@ -921,97 +890,89 @@ export const deleteSelfVideoCommentService = async (deleteSelfVideoCommentReques
 
 		try {
 			const deleteSelfVideoCommentSelectResult = await selectDataFromMongoDB<VideoComment>(deleteSelfVideoCommentWhere, deleteSelfVideoCommentSelect, videoCommentSchemaInstance, videoCommentSchemaName)
-
 			if (!deleteSelfVideoCommentSelectResult.success || !deleteSelfVideoCommentSelectResult.result || deleteSelfVideoCommentSelectResult.result.length !== 1) {
-				console.error('删除视频评论失败，检索视频评论结果为空或长度超过限制')
-				return { success: false, message: '删除视频评论失败，检索视频评论结果为空或长度超过限制' }
+				console.error('ビデオコメントの削除に失敗しました、ビデオコメントの検索結果が空または長さに制限を超えています')
+				return { success: false, message: 'ビデオコメントの削除に失敗しました、ビデオコメントの検索結果が空または長さに制限を超えています' }
 			}
 
 			const videoData = deleteSelfVideoCommentSelectResult.result[0]
-
 			if (videoData.uid !== uid) {
-				console.error('删除视频评论失败，只能删除自己的评论')
-				return { success: false, message: '删除视频评论失败，只能删除自己的评论' }
+				console.error('ビデオコメントの削除に失敗しました、自分のコメントのみ削除できます')
+				return { success: false, message: 'ビデオコメントの削除に失敗しました、自分のコメントのみ削除できます' }
 			}
 
-			// 启动事务
 			const session = await mongoose.startSession()
 			session.startTransaction()
-
-			const removedVideoCommentData: RemovedVideoComment = {
-				...deleteSelfVideoCommentSelectResult.result[0],
-				_operatorUUID_: UUID,
-				_operatorUid_: uid,
-				editDateTime: now,
-			}
-
 			try {
+				const removedVideoCommentData: RemovedVideoComment = {
+					...deleteSelfVideoCommentSelectResult.result[0],
+					_operatorUUID_: UUID,
+					_operatorUid_: uid,
+					editDateTime: now,
+				}
 				const deleteSelfVideoCommentSaveResult = await insertData2MongoDB<RemovedVideoComment>(removedVideoCommentData, removedVideoCommentSchemaInstance, removedVideoCommentSchemaName, { session })
-
 				if (!deleteSelfVideoCommentSaveResult.success) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('删除视频评论失败，保存已删除视频评论失败')
-					return { success: false, message: '删除视频评论失败，记录失败' }
+					console.error('ビデオコメントの削除に失敗しました、削除済みビデオコメントの保存に失敗しました')
+					return { success: false, message: 'ビデオコメントの削除に失敗しました、記録に失敗しました' }
 				}
 
 				const deleteSelfVideoCommentDeleteResult = await deleteDataFromMongoDB<VideoComment>(deleteSelfVideoCommentWhere, videoCommentSchemaInstance, videoCommentSchemaName, { session })
-
 				if (!deleteSelfVideoCommentDeleteResult.success) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('删除视频评论失败，删除失败')
-					return { success: false, message: '删除视频评论失败，删除失败' }
+					console.error('ビデオコメントの削除に失敗しました、削除に失敗しました')
+					return { success: false, message: 'ビデオコメントの削除に失敗しました、削除に失敗しました' }
 				}
 
 				await session.commitTransaction()
 				session.endSession()
-				return { success: true, message: '删除视频评论成功' }
+				return { success: true, message: 'ビデオコメントの削除に成功しました' }
 			} catch (error) {
 				if (session.inTransaction()) {
 					await session.abortTransaction()
 				}
 				session.endSession()
-				console.error('删除视频评论时出错：保存已删除视频评论出错', error)
-				return { success: false, message: '删除视频评论时出错：无法存储记录' }
+				console.error('ビデオコメントの削除中にエラーが発生しました：削除済みビデオコメントの保存中にエラーが発生しました', error)
+				return { success: false, message: 'ビデオコメントの削除中にエラーが発生しました：記録を保存できません' }
 			}
 		} catch (error) {
-			console.error('删除视频评论时出错：检索视频评论出错', error)
-			return { success: false, message: '删除视频评论时出错：检索视频评论出错' }
+			console.error('ビデオコメントの削除中にエラーが発生しました：ビデオコメントの検索中にエラーが発生しました', error)
+			return { success: false, message: 'ビデオコメントの削除中にエラーが発生しました：ビデオコメントの検索中にエラーが発生しました' }
 		}
 	} catch (error) {
-		console.error('删除视频评论时出错：未知错误', error)
-		return { success: false, message: '删除视频评论时出错：未知错误' }
+		console.error('ビデオコメントの削除中にエラーが発生しました：不明なエラー', error)
+		return { success: false, message: 'ビデオコメントの削除中にエラーが発生しました：不明なエラー' }
 	}
 }
 
 /**
- * 管理员删除一条视频评论
- * @param adminDeleteVideoCommentRequest 管理员删除一个视频评论的请求载荷
- * @param adminUid 管理员 UID
- * @param adminToken 管理员 token
- * @returns 管理员删除一个视频评论的请求响应
+ * @param adminDeleteVideoCommentRequest 管理者がビデオコメントを削除するリクエストペイロード
+ * @param adminUid 管理者UID
+ * @param adminToken 管理者トークン
+ * @returns 管理者がビデオコメントを削除するリクエストレスポンス
  */
 export const adminDeleteVideoCommentService = async (adminDeleteVideoCommentRequest: AdminDeleteVideoCommentRequestDto, adminUid: number, adminToken: string): Promise<AdminDeleteVideoCommentResponseDto> => {
 	try {
 		if (!checkAdminDeleteVideoCommentRequest(adminDeleteVideoCommentRequest)) {
-			console.error('管理员删除视频评论失败，参数不合法')
-			return { success: false, message: '管理员删除视频评论失败，参数不合法' }
+			console.error('管理者がビデオコメントを削除するのに失敗しました、パラメータが不正です')
+			return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenService(adminUid, adminToken)).success) {
-			console.error('管理员删除视频评论失败，用户校验未通过')
-			return { success: false, message: '管理员删除视频评论失败，用户校验未通过' }
+			console.error('管理者がビデオコメントを削除するのに失敗しました、ユーザー検証に失敗しました')
+			return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、ユーザー検証に失敗しました' }
 		}
 
-		const adminUUID = await getUserUuid(adminUid) // DELETE ME 这是一个临时解决方法，Cookie 中应当存储 UUID
+		const adminUUID = await getUserUuid(adminUid) // DELETE ME これは一時的な解決策であり、CookieにはUUIDを保存する必要があります
 		if (!adminUUID) {
-			console.error('ERROR', '管理员删除一条视频评论失败，adminUUID 不存在', { adminUid })
-			return { success: false, message: '管理员删除一条视频评论失败，adminUUID 不存在' }
+			console.error('ERROR', '管理者がビデオコメントを削除するのに失敗しました、adminUUIDが存在しません', { adminUid })
+			return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、adminUUIDが存在しません' }
 		}
 
 		const { commentRoute, videoId } = adminDeleteVideoCommentRequest
@@ -1043,84 +1004,75 @@ export const adminDeleteVideoCommentService = async (adminDeleteVideoCommentRequ
 
 		try {
 			const deleteSelfVideoCommentSelectResult = await selectDataFromMongoDB<VideoComment>(deleteSelfVideoCommentWhere, deleteSelfVideoCommentSelect, videoCommentSchemaInstance, videoCommentSchemaName)
-
 			if (!deleteSelfVideoCommentSelectResult.success || !deleteSelfVideoCommentSelectResult.result || deleteSelfVideoCommentSelectResult.result.length !== 1) {
-				console.error('管理员删除视频评论失败，检索视频评论结果为空或长度超过限制')
-				return { success: false, message: '管理员删除视频评论失败，检索视频评论结果为空或长度超过限制' }
+				console.error('管理者がビデオコメントを削除するのに失敗しました、ビデオコメントの検索結果が空または長さに制限を超えています')
+				return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、ビデオコメントの検索結果が空または長さに制限を超えています' }
 			}
 
-			// 启动事务
 			const session = await mongoose.startSession()
 			session.startTransaction()
-
-			const adminRemovedVideoCommentData: RemovedVideoComment = {
-				...deleteSelfVideoCommentSelectResult.result[0],
-				_operatorUUID_: adminUUID,
-				_operatorUid_: adminUid,
-				editDateTime: now,
-			}
-
 			try {
+				const adminRemovedVideoCommentData: RemovedVideoComment = {
+					...deleteSelfVideoCommentSelectResult.result[0],
+					_operatorUUID_: adminUUID,
+					_operatorUid_: adminUid,
+					editDateTime: now,
+				}
 				const adminDeleteVideoCommentSaveResult = await insertData2MongoDB<VideoComment>(adminRemovedVideoCommentData, removedVideoCommentSchemaInstance, removedVideoCommentSchemaName, { session })
-
 				if (!adminDeleteVideoCommentSaveResult.success) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('管理员删除视频评论失败，保存已删除视频评论失败')
-					return { success: false, message: '管理员删除视频评论失败，记录失败' }
+					console.error('管理者がビデオコメントを削除するのに失敗しました、削除済みビデオコメントの保存に失敗しました')
+					return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、記録に失敗しました' }
 				}
 
 				const deleteSelfVideoCommentDeleteResult = await deleteDataFromMongoDB<VideoComment>(deleteSelfVideoCommentWhere, videoCommentSchemaInstance, videoCommentSchemaName, { session })
-
 				if (!deleteSelfVideoCommentDeleteResult.success) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('管理员删除视频评论失败，删除失败')
-					return { success: false, message: '管理员删除视频评论失败，删除失败' }
+					console.error('管理者がビデオコメントを削除するのに失敗しました、削除に失敗しました')
+					return { success: false, message: '管理者がビデオコメントを削除するのに失敗しました、削除に失敗しました' }
 				}
 
 				await session.commitTransaction()
 				session.endSession()
-				return { success: true, message: '管理员删除视频评论成功' }
+				return { success: true, message: '管理者がビデオコメントを削除するのに成功しました' }
 			} catch (error) {
 				if (session.inTransaction()) {
 					await session.abortTransaction()
 				}
 				session.endSession()
-				console.error('管理员删除视频评论时出错：保存已删除视频评论出错', error)
-				return { success: false, message: '管理员删除视频评论时出错：无法存储记录' }
+				console.error('管理者がビデオコメントを削除する際にエラーが発生しました：削除済みビデオコメントの保存中にエラーが発生しました', error)
+				return { success: false, message: '管理者がビデオコメントを削除する際にエラーが発生しました：記録を保存できません' }
 			}
 		} catch (error) {
-			console.error('管理员删除视频评论时出错：检索视频评论出错', error)
-			return { success: false, message: '管理员删除视频评论时出错：检索视频评论出错' }
+			console.error('管理者がビデオコメントを削除する際にエラーが発生しました：ビデオコメントの検索中にエラーが発生しました', error)
+			return { success: false, message: '管理者がビデオコメントを削除する際にエラーが発生しました：ビデオコメントの検索中にエラーが発生しました' }
 		}
 	} catch (error) {
-		console.error('管理员删除视频评论时出错：未知错误', error)
-		return { success: false, message: '管理员删除视频评论时出错：未知错误' }
+		console.error('管理者がビデオコメントを削除する際にエラーが発生しました：不明なエラー', error)
+		return { success: false, message: '管理者がビデオコメントを削除する際にエラーが発生しました：不明なエラー' }
 	}
 }
 
-
 /**
- * 校验发送视频评论数据是否合法
- * @param emitVideoCommentRequest 视频评论
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param emitVideoCommentRequest ビデオコメント
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkEmitVideoCommentRequest = (emitVideoCommentRequest: EmitVideoCommentRequestDto): boolean => {
 	return (
-		emitVideoCommentRequest.text && emitVideoCommentRequest.text.length < 20000 // 视频评论正文不为空，且不长于 20000 字
-		&& emitVideoCommentRequest.videoId !== undefined && emitVideoCommentRequest.videoId !== null // 视频评论不能缺少视频 ID
+		emitVideoCommentRequest.text && emitVideoCommentRequest.text.length < 20000 // ビデオコメント本文が空でなく、20000文字未満であること
+		&& emitVideoCommentRequest.videoId !== undefined && emitVideoCommentRequest.videoId !== null // ビデオコメントにビデオIDが欠落していないこと
 	)
 }
 
 /**
- * 校验获取某个用户对某个视频的评论的点赞情况的参数
- * @param getVideoCommentUpvoteProps 获取某个用户对某个视频的评论的点赞情况的参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param getVideoCommentUpvoteProps 特定のユーザーが特定のビデオのコメントに対して「いいね」を付けた状況を取得するためのパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetVideoCommentUpvoteProps = (getVideoCommentUpvoteProps: GetVideoCommentUpvotePropsDto): boolean => {
 	return (
@@ -1130,9 +1082,8 @@ const checkGetVideoCommentUpvoteProps = (getVideoCommentUpvoteProps: GetVideoCom
 }
 
 /**
- * 校验获取某个用户对某个视频的评论的点踩情况的参数
- * @param getVideoCommentDownvoteProps 获取某个用户对某个视频的评论的点踩情况的参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param getVideoCommentDownvoteProps 特定のユーザーが特定のビデオのコメントに対して「よくないね」を付けた状況を取得するためのパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetVideoCommentDownvoteProps = (getVideoCommentDownvoteProps: GetVideoCommentDownvotePropsDto): boolean => {
 	return (
@@ -1142,18 +1093,17 @@ const checkGetVideoCommentDownvoteProps = (getVideoCommentDownvoteProps: GetVide
 }
 
 /**
- * 校验根据 KVID 获取视频评论的请求的参数
- * @param getVideoCommentByKvidRequest 根据 KVID 获取视频评论的请求的参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * KVIDに基づいてビデオコメントを取得するリクエストのパラメータを検証する
+ * @param getVideoCommentByKvidRequest KVIDに基づいてビデオコメントを取得するリクエストのパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetVideoCommentByKvidRequest = (getVideoCommentByKvidRequest: GetVideoCommentByKvidRequestDto): boolean => {
 	return (getVideoCommentByKvidRequest.videoId !== undefined && getVideoCommentByKvidRequest.videoId !== null)
 }
 
 /**
- * 校验用户点赞的请求参数
- * @param emitVideoCommentUpvoteRequest 用户点赞的请求参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param emitVideoCommentUpvoteRequest ユーザーがいいねを付けるリクエストパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkEmitVideoCommentUpvoteRequestData = (emitVideoCommentUpvoteRequest: EmitVideoCommentUpvoteRequestDto): boolean => {
 	return (
@@ -1163,9 +1113,8 @@ const checkEmitVideoCommentUpvoteRequestData = (emitVideoCommentUpvoteRequest: E
 }
 
 /**
- * 检查用户取消点赞的请求参数
- * @param cancelVideoCommentUpvoteRequest 用户取消点赞的请求参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param cancelVideoCommentUpvoteRequest ユーザーがいいねをキャンセルするリクエストパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCancelVideoCommentUpvoteRequest = (cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto): boolean => {
 	return (
@@ -1174,11 +1123,9 @@ const checkCancelVideoCommentUpvoteRequest = (cancelVideoCommentUpvoteRequest: C
 	)
 }
 
-
 /**
- * 校验用户点踩的请求参数
- * @param emitVideoCommentDownvoteRequest 用户点踩的请求参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param emitVideoCommentDownvoteRequest ユーザーがよくないねを付けるリクエストパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkEmitVideoCommentDownvoteRequestData = (emitVideoCommentDownvoteRequest: EmitVideoCommentDownvoteRequestDto): boolean => {
 	return (
@@ -1188,9 +1135,8 @@ const checkEmitVideoCommentDownvoteRequestData = (emitVideoCommentDownvoteReques
 }
 
 /**
- * 检查用户取消点踩的请求参数
- * @param cancelVideoCommentDownvoteRequest 用户取消点踩的请求参数
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param cancelVideoCommentDownvoteRequest ユーザーがよくないねをキャンセルするリクエストパラメータ
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCancelVideoCommentDownvoteRequest = (cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto): boolean => {
 	return (
@@ -1200,9 +1146,8 @@ const checkCancelVideoCommentDownvoteRequest = (cancelVideoCommentDownvoteReques
 }
 
 /**
- * 检查删除视频评论的请求载荷
- * @param deleteSelfVideoCommentRequest 删除视频评论的请求载荷
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param deleteSelfVideoCommentRequest ビデオコメントを削除するリクエストペイロード
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkDeleteSelfVideoCommentRequest = (deleteSelfVideoCommentRequest: DeleteSelfVideoCommentRequestDto): boolean => {
 	return (
@@ -1212,9 +1157,8 @@ const checkDeleteSelfVideoCommentRequest = (deleteSelfVideoCommentRequest: Delet
 }
 
 /**
- * 检查管理员删除一个视频评论的请求载荷
- * @param adminDeleteVideoCommentRequest 管理员删除一个视频评论的请求载荷
- * @returns 校验结果，合法返回 true，不合法返回 false
+ * @param adminDeleteVideoCommentRequest 管理者がビデオコメントを削除するリクエストペイロード
+ * @returns 検証結果、有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAdminDeleteVideoCommentRequest = (adminDeleteVideoCommentRequest: AdminDeleteVideoCommentRequestDto): boolean => {
 	return (
