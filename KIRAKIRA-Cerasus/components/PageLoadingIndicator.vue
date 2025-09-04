@@ -1,8 +1,8 @@
 <docs>
-	# 全局加载指示器
-	用于替代 NuxtLoadingIndicator。
+	# グローバルローディングインジケーター
+	NuxtLoadingIndicatorの代替として使用します。
 
-	根据 Nuxt 文档编写：https://nuxt.com/docs/api/components/nuxt-loading-indicator
+	Nuxtのドキュメントに基づいて作成：https://nuxt.com/docs/api/components/nuxt-loading-indicator
 </docs>
 
 <script setup lang="ts">

@@ -27,7 +27,7 @@
 	});
 
 	onUnmounted(async () => {
-		await delay(1000); // 等待界面过渡动画时间。
+		await delay(1000); // UIのトランジションアニメーション時間を待ちます。
 		anim.value && anim.value.destroy();
 	});
 </script>

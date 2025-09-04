@@ -6,9 +6,9 @@
 	import { SoftButton } from "#components";
 
 	const props = defineProps<{
-		/** 视频 ID。 */
+		/** 動画ID。 */
 		videoId: number;
-		/** 是否可以编辑 */
+		/** 編集可能かどうか */
 		editable: boolean;
 	}>();
 
@@ -32,10 +32,10 @@
 			VueComponent.ThumbVideo,
 			VueComponent.CursorShadow,
 		],
-		content: !props.editable ? '您已被该用户屏蔽，无法发送评论。' : undefined, // TODO: 使用多语言
+		content: !props.editable ? 'あなたはこのユーザーによってブロックされているため、コメントを送信できません。' : undefined, // TODO: 多言語対応
 		/* content: `
-			<p>我正在用 Vue.js 运行 Tiptap。🎉</p>
-			<p>你看到了吗？这是 Vue 组件。我们真的生活在未来。</p>
+			<p>私はVue.jsでTiptapを実行しています。🎉</p>
+			<p>見えますか？これはVueコンポーネントです。私たちは本当に未来に生きています。</p>
 		`, */
 		autofocus: false,
 		editable: props.editable,
@@ -52,26 +52,26 @@
 		},
 	});
 
-	/** 切换文本加粗。 */
+	/** テキストを太字に切り替えます。 */
 	const toggleBold = () => { editor.value?.chain().focus().toggleBold().run(); };
-	/** 切换文本倾斜。 */
+	/** テキストを斜体に切り替えます。 */
 	const toggleItalic = () => { editor.value?.chain().focus().toggleItalic().run(); };
-	/** 切换文本下划线。 */
+	/** テキストに下線を引きます。 */
 	const toggleUnderline = () => { editor.value?.chain().focus().toggleUnderline().run(); };
-	// 不知道为什么 StarterKit 中没提供 toggleUnderline，所以只能额外安装 @tiptap/extension-underline。
-	/** 切换文本删除线。 */
+	// なぜかStarterKitにtoggleUnderlineが提供されていないので、@tiptap/extension-underlineを別途インストールするしかありません。
+	/** テキストに取り消し線を引きます。 */
 	const toggleStrike = () => { editor.value?.chain().focus().toggleStrike().run(); };
 
-	/** 在富文本编辑器光标处追加一个 Vue 组件。 */
+	/** リッチテキストエディタのカーソル位置にVueコンポーネントを追加します。 */
 	const addVueComponents = () => { editor.value?.commands.insertContent("<thumb-video></thumb-video>"); };
-	/** 在光标处打开迷你颜文字输入面板。 */
+	/** カーソル位置でミニ顔文字入力パネルを開きます。 */
 	const showRecentKaomojis = () => { flyoutKaomojiMini.value = [getCursorPixel(), "y"]; };
-	/** 打开提及面板。 */
+	/** メンションパネルを開きます。 */
 	const showAtList = () => { };
 
 	/**
-	 * 插入颜文字。
-	 * @param kaomoji - 颜文字。
+	 * 顔文字を挿入します。
+	 * @param kaomoji - 顔文字。
 	 */
 	function insertKaomoji(kaomoji?: string) {
 		editor.value?.commands.focus();
@@ -79,8 +79,8 @@
 	}
 
 	/**
-	 * 获取文本光标位置。
-	 * @returns 文本光标位置。
+	 * テキストカーソルの位置を取得します。
+	 * @returns テキストカーソルの位置。
 	 */
 	function getCursorPixel() {
 		if (!editor.value) return;
@@ -100,13 +100,13 @@
 	async function sendComment() {
 		try {
 			isSendingComment.value = true;
-			// TODO: // WARN 需要对用户输入的文字进行 Base64 编码
+			// TODO: // WARN ユーザーが入力した文字をBase64でエンコードする必要があります
 			const content = editor.value?.getText() ?? ""; // Get plain text currently to avoid web attack.
 			const emitVideoCommentRequest: EmitVideoCommentRequestDto = {
 				videoId: props.videoId,
 				text: content,
 			};
-			// TODO: 虽然我很想非阻塞地发送评论，但是楼层号必须在评论成功提交给后端后才会获得。emmmm...
+			// TODO: 非同期でコメントを送信したいのですが、フロア番号はコメントが正常にバックエンドに送信された後にのみ取得できます。うーん...
 			const emitVideoCommentResult = await api.videoComment.emitVideoComment(emitVideoCommentRequest);
 			const videoComment = emitVideoCommentResult.videoComment;
 			if (emitVideoCommentResult?.success && videoComment) {
@@ -127,9 +127,9 @@
 	}
 
 	/**
-	 * 是否是激活状态？
-	 * @param active - 要验证的选项，如为字符串则会在编辑器中寻找对应格式，如为布尔型则直接返回之。
-	 * @returns 激活状态。
+	 * アクティブ状態ですか？
+	 * @param active - 検証するオプション。文字列の場合はエディタで対応するフォーマットを探し、ブール値の場合はそのまま返します。
+	 * @returns アクティブ状態。
 	 */
 	function isActive(active?: ActiveType) {
 		return typeof active === "boolean" ? active : !!active && editor.value?.isActive(active);
@@ -155,9 +155,9 @@
 	})();
 
 	/*
-	 * 自定义快捷键侦听。
-	 * 目前已有的快捷键：
-	 * `Ctrl + M` - 打开颜文字快捷输入面板。
+	 * カスタムショートカットキーのリッスン。
+	 * 現在のショートカットキー：
+	 * `Ctrl + M` - 顔文字のクイック入力パネルを開きます。
 	 */
 </script>
 

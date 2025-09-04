@@ -6,7 +6,7 @@
 	import { getPosition } from "plugins/vue/tooltip";
 
 	const props = defineProps<{
-		/** 是否避免在鼠标移开菜单时降低不透明度？ */
+		/** マウスがメニューから離れたときに不透明度を下げるのを避けますか？ */
 		noFade?: boolean;
 	}>();
 
@@ -20,7 +20,7 @@
 	}>();
 
 	const model = defineModel<MenuModel | FlyoutModel>();
-	/** 是否显示菜单？ */
+	/** メニューを表示しますか？ */
 	const shown = ref(false);
 	const menu = ref<HTMLMenuElement>();
 	const isContextMenu = ref(false);
@@ -28,7 +28,7 @@
 	const size = ref<TwoD>();
 
 	/**
-	 * 隐藏菜单。
+	 * メニューを非表示にします。
 	 */
 	function hide() {
 		shown.value = false;
@@ -37,10 +37,10 @@
 	}
 
 	/**
-	 * 显示菜单。
-	 * @param target - 如有鼠标事件则为上下文菜单，否则为弹出式菜单。
-	 * @param placement - 上下文菜单出现方向。
-	 * @param offset - 与目标元素距离偏移。
+	 * メニューを表示します。
+	 * @param target - マウスイベントの場合はコンテキストメニュー、それ以外の場合はポップアップメニュー。
+	 * @param placement - コンテキストメニューの表示方向。
+	 * @param offset - ターゲット要素からのオフセット。
 	 */
 	async function show(target: FlyoutModelNS.Target, placement?: Placement | false, offset?: number) {
 		target = toValue(target);
@@ -69,7 +69,7 @@
 
 	watch(model, e => {
 		if (e === undefined) {
-			hide(); // undefined 表示隐藏，null 表示占位菜单而非上下文菜单。
+			hide(); // undefinedは非表示を意味し、nullはコンテキストメニューではなくプレースホルダーメニューを意味します。
 			return;
 		}
 		if (e instanceof Array) {
@@ -87,10 +87,10 @@
 	});
 
 	/**
-	 * 在元素被插入到 DOM 之后的下一帧被调用。
-	 * 用这个来开始进入动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 要素がDOMに挿入された後の次のフレームで呼び出されます。
+	 * これを使用して進入アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - トランジションの終了を示すために呼び出すコールバック関数。
 	 */
 	async function onMenuEnter(el: Element, done: () => void) {
 		await animateSize(el, null, { startHeight: 0, duration: 500, getSize: size, withoutAdjustPadding: "both" });
@@ -98,10 +98,10 @@
 	}
 
 	/**
-	 * 在离开过渡开始时调用。
-	 * 用这个来开始离开动画。
-	 * @param el - HTML DOM 元素。
-	 * @param done - 调用回调函数 done 表示过渡结束。
+	 * 離脱トランジションが開始されるときに呼び出されます。
+	 * これを使用して離脱アニメーションを開始します。
+	 * @param el - HTML DOM要素。
+	 * @param done - トランジションの終了を示すために呼び出すコールバック関数。
 	 */
 	async function onMenuLeave(el: Element, done: () => void) {
 		await animateSize(el, null, { endHeight: 0, duration: 300 });

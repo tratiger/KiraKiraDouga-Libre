@@ -1,28 +1,28 @@
 <docs>
-	# 用户信息管理
-	DELETE: Cerasus内置管理设置即将被单独的控制台Lycoris项目取代。
+	# ユーザー情報管理
+	DELETE: Cerasusに組み込まれている管理設定は、まもなく独立したコンソールプロジェクトLycorisに置き換えられます。
 </docs>
 
 <script setup lang="ts">
 	const selfUserInfoStore = useSelfUserInfoStore();
 	const isAdmin = computed(() => selfUserInfoStore.userInfo.roles?.includes("administrator"));
 
-	const isOnlyShowUserInfoUpdatedAfterReview = ref(false); // 是否只展示在上一次审核通过后修改了用户信息的用户
-	const users = ref<AdminGetUserInfoResponseDto>(); // 用户信息
-	const isLoadingUserInfo = ref(false); // 是否正在加载用户信息
-	const pageSize = 20; // 每页数量
-	const pageCount = computed(() => Math.max(1, Math.ceil(users.value?.totalCount ? users.value.totalCount / pageSize : 0))); // 总页数
+	const isOnlyShowUserInfoUpdatedAfterReview = ref(false); // 前回の審査通過後にユーザー情報を変更したユーザーのみを表示するかどうか
+	const users = ref<AdminGetUserInfoResponseDto>(); // ユーザー情報
+	const isLoadingUserInfo = ref(false); // ユーザー情報を読み込み中かどうか
+	const pageSize = 20; // ページごとのアイテム数
+	const pageCount = computed(() => Math.max(1, Math.ceil(users.value?.totalCount ? users.value.totalCount / pageSize : 0))); // 総ページ数
 
 	const currentPageRef = ref(1);
-	const currentPage = computed({ // 当前页数
+	const currentPage = computed({ // 現在のページ数
 		get() {
 			return currentPageRef.value;
 		},
 		set(page: number) {
-			if (!isLoadingUserInfo.value) // TODO: 当正在加载用户数据时，不能更换页码，即同一时间只允许有一个请求。
+			if (!isLoadingUserInfo.value) // TODO: ユーザーデータ読み込み中はページ番号を変更できないようにする、つまり同時に1つのリクエストのみを許可する。
 				currentPageRef.value = page;
 			else
-				useToast("数据加载中，请稍等。", "warning", 5000);
+				useToast("データを読み込み中です。しばらくお待ちください。", "warning", 5000);
 		},
 	});
 
@@ -32,10 +32,10 @@
 	const clearedUid = ref();
 	const clearedUserInfo = ref<GetUserInfoByUidResponseDto["result"]>();
 
-	const disableCurrentPageEffect = ref(false); // 是否禁用 currentPage 的 watch 副作用被执行
+	const disableCurrentPageEffect = ref(false); // currentPageのwatchの副作用の実行を無効にするかどうか
 
 	/**
-	 * 管理员获取用户信息
+	 * 管理者によるユーザー情報取得
 	 */
 	async function adminGetUserInfo() {
 		isLoadingUserInfo.value = true;
@@ -45,19 +45,19 @@
 			if (adminGetUserInfoResult.success)
 				users.value = adminGetUserInfoResult;
 			else {
-				useToast("获取用户信息失败", "error", 5000);
+				useToast("ユーザー情報の取得に失敗しました", "error", 5000);
 				!!users.value && (users.value = { ...users.value, result: [] });
 			}
 		} catch (error) {
-			useToast("获取用户信息失败，网络请求失败", "error", 5000);
+			useToast("ユーザー情報の取得に失敗しました、ネットワークリクエストの失敗です", "error", 5000);
 			!!users.value && (users.value = { ...users.value, result: [] });
 		}
 		isLoadingUserInfo.value = false;
 	}
 
 	/**
-	 * 管理员通过用户信息审核
-	 * @param UUID - 用户 UUID
+	 * 管理者によるユーザー情報の承認
+	 * @param UUID - ユーザーのUUID
 	 */
 	async function approveUserInfo(UUID: string) {
 		const approveUserInfoRequest: ApproveUserInfoRequestDto = {
@@ -66,17 +66,17 @@
 		const approveUserInfoResult = await api.user.approveUserInfo(approveUserInfoRequest);
 		if (approveUserInfoResult.success) {
 			await adminGetUserInfo();
-			useToast("审核通过！", "success");
+			useToast("審査通過！", "success");
 		}
 	}
 
 	/**
-	 * 打开清理用户信息警告框
+	 * ユーザー情報クリアの警告ダイアログを開く
 	 */
 	async function openClearUserInfoAlert() {
 		const uid = clearedUid.value;
 		if (uid === undefined || uid === null || uid <= 0) {
-			useToast("用户 UID 不合法", "error");
+			useToast("ユーザーUIDが不正です", "error");
 			return;
 		}
 		isOpeningClearUserInfoAlert.value = true;
@@ -88,17 +88,17 @@
 			clearedUserInfo.value = clearedUserInfoResult.result;
 			showClearUserInfoAlert.value = true;
 		} else
-			useToast("无法获取目标用户数据，请检查 UID 是否正确", "error", 5000);
+			useToast("対象ユーザーのデータを取得できません。UIDが正しいか確認してください", "error", 5000);
 		isOpeningClearUserInfoAlert.value = false;
 	}
 
 	/**
-	 * 管理员清空某个用户的信息
+	 * 管理者があるユーザーの情報をクリアする
 	 */
 	async function clearUserInfo() {
 		const uid = clearedUid.value;
 		if (uid === undefined || uid === null || uid <= 0) {
-			useToast("用户 UID 不合法", "error");
+			useToast("ユーザーUIDが不正です", "error");
 			return;
 		}
 		isClearingUserInfo.value = true;
@@ -110,20 +110,20 @@
 			showClearUserInfoAlert.value = false;
 			clearedUid.value = undefined;
 			await adminGetUserInfo();
-			useToast("用户信息已清理", "success");
+			useToast("ユーザー情報をクリアしました", "success");
 		} else
-			useToast("无法清理目标用户信息，请检查 UID 是否正确", "error", 5000);
+			useToast("対象ユーザーの情報をクリアできません。UIDが正しいか確認してください", "error", 5000);
 		isClearingUserInfo.value = false;
 	}
 
 	watch(isOnlyShowUserInfoUpdatedAfterReview, async () => {
-		disableCurrentPageEffect.value = true; // 阻止 currentPage 的 watch 副作用被执行
+		disableCurrentPageEffect.value = true; // currentPageのwatchの副作用の実行を阻止する
 		currentPage.value = 1;
 		await adminGetUserInfo();
-		disableCurrentPageEffect.value = false; // 阻止 currentPage 的 watch 副作用被执行
+		disableCurrentPageEffect.value = false; // currentPageのwatchの副作用の実行を阻止する
 	});
 	watch(currentPage, async () => {
-		!disableCurrentPageEffect.value && await adminGetUserInfo(); // disableCurrentPageEffect 的值为假才执行
+		!disableCurrentPageEffect.value && await adminGetUserInfo(); // disableCurrentPageEffectの値がfalseの場合のみ実行
 	});
 
 	await adminGetUserInfo();
@@ -132,7 +132,7 @@
 		{
 			middleware: [
 				(to: unknown) => {
-					// WARN: 此处需要重新创建 Store
+					// WARN: ここでStoreを再作成する必要があります
 					const selfUserInfoStore = useSelfUserInfoStore();
 					if (!selfUserInfoStore.userInfo.roles?.includes("administrator"))
 						return navigate("/settings/appearance");
@@ -147,15 +147,15 @@
 
 <template>
 	<div>
-		<!-- TODO: 使用多语言 -->
-		<!-- WARN: 该页面需要多语言支持 -->
-		<!-- TODO: 使用多语言 -->
+		<!-- TODO: 多言語対応 -->
+		<!-- WARN: このページは多言語対応が必要です -->
+		<!-- TODO: 多言語対応 -->
 
 		<Alert v-model="showClearUserInfoAlert" static>
-			<h4>确定要清除这个用户的信息吗？</h4>
-			<p>该用户的用户名、昵称、头像、签名、性别、用户 TAG 和 生日等用户信息将会被清空。</p>
-			<p>被清空的用户将会使用 UUID 作为用户名。</p>
-			<p>如果该用户的 UUID 被占用，则无法清空，请联系开发组解决。</p>
+			<h4>このユーザーの情報を本当にクリアしますか？</h4>
+			<p>このユーザーのユーザー名、ニックネーム、アバター、自己紹介、性別、ユーザーTAG、誕生日などのユーザー情報がクリアされます。</p>
+			<p>クリアされたユーザーは、UUIDをユーザー名として使用します。</p>
+			<p>そのユーザーのUUIDが既に使用されている場合、クリアできません。開発チームに連絡して解決してください。</p>
 			<div class="clear-user-display">
 				<div class="user">
 					<UserAvatar :avatar="clearedUserInfo?.avatar" />
@@ -174,40 +174,40 @@
 				</div>
 			</div>
 			<template #footer-left>
-				<Button @click="clearUserInfo" :loading="isClearingUserInfo" :disabled="isClearingUserInfo">确认清空</Button>
+				<Button @click="clearUserInfo" :loading="isClearingUserInfo" :disabled="isClearingUserInfo">クリアを確認</Button>
 			</template>
 			<template #footer-right>
-				<Button @click="showClearUserInfoAlert = false" class="secondary">取消</Button>
+				<Button @click="showClearUserInfoAlert = false" class="secondary">キャンセル</Button>
 			</template>
 		</Alert>
 
-		<InfoBar type="info" title="提示">
-			先改后审：用户修改信息立即公开展示给他人。
+		<InfoBar type="info" title="ヒント">
+			修正後審査：ユーザーが情報を変更すると、すぐに他の人に公開されます。
 			<br />
-			你可以开启“只展示新注册和更新了用户信息的待审核用户”选项来审核用户信息。
+			「新規登録およびユーザー情報を更新した審査待ちのユーザーのみ表示」オプションを有効にして、ユーザー情報を審査できます。
 			<br />
-			被封禁的用户不能修改自己的信息，但封禁用户并不能同时删除用户已有信息，请使用本页面中的 “清空用户信息” 功能。
+			ブロックされたユーザーは自分の情報を変更できませんが、ユーザーをブロックしても既存の情報は削除されません。このページの「ユーザー情報をクリア」機能を使用してください。
 		</InfoBar>
 
-		<Subheader icon="placeholder">清空用户信息</Subheader>
+		<Subheader icon="placeholder">ユーザー情報をクリア</Subheader>
 		<div class="clear-user" v-if="isAdmin">
 			<div class="input">
 				<TextBox
 					type="number"
 					v-model="clearedUid"
-					placeholder="清除用户信息"
+					placeholder="ユーザー情報をクリア"
 					size="large"
 					icon="person"
 				/>
-				<span>输入要清空信息的目标用户 UID，例如 UID114 只需输入数字 114 即可。</span>
+				<span>情報をクリアしたい対象ユーザーのUIDを入力してください。例えば、UID114の場合は数字の114を入力するだけです。</span>
 			</div>
-			<Button @click="openClearUserInfoAlert" :disabled="!isAdmin || isOpeningClearUserInfoAlert" :loading="isOpeningClearUserInfoAlert">清空用户信息</Button>
+			<Button @click="openClearUserInfoAlert" :disabled="!isAdmin || isOpeningClearUserInfoAlert" :loading="isOpeningClearUserInfoAlert">ユーザー情報をクリア</Button>
 		</div>
 
-		<Subheader icon="account_circle" v-if="isOnlyShowUserInfoUpdatedAfterReview">待审核用户</Subheader>
-		<Subheader icon="account_circle" v-else>全部用户</Subheader>
+		<Subheader icon="account_circle" v-if="isOnlyShowUserInfoUpdatedAfterReview">審査待ちユーザー</Subheader>
+		<Subheader icon="account_circle" v-else>すべてのユーザー</Subheader>
 		<section list>
-			<ToggleSwitch v-model="isOnlyShowUserInfoUpdatedAfterReview" icon="visibility">只展示新注册和更新了用户信息的待审核用户</ToggleSwitch>
+			<ToggleSwitch v-model="isOnlyShowUserInfoUpdatedAfterReview" icon="visibility">新規登録およびユーザー情報を更新した審査待ちのユーザーのみ表示</ToggleSwitch>
 		</section>
 
 		<Pagination v-model="currentPage" :pages="pageCount" :displayPageCount="7" />

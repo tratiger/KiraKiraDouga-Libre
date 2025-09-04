@@ -1,18 +1,18 @@
 <docs>
-	允许你在 i18n 的字符串插值中插入其它组件。
-	@deprecated 已弃用。
+	i18nの文字列補間（interpolation）に他のコンポーネントを挿入できます。
+	@deprecated 廃止されました。
 
 	### 使用例
 
-	语言字符串声明：
+	言語文字列の宣言：
 	```json
 	{
-		"contact_me": "欢迎拨打{phone}联系我！",
-		"my_phone": "我的电话",
+		"contact_me": "お電話{phone}でのご連絡をお待ちしております！",
+		"my_phone": "私の電話番号",
 	}
 	```
 
-	Vue 模板使用：
+	Vueテンプレートでの使用：
 	```vue
 	<TransInterpolation :i18nKey="t.contact_me">
 		<template #phone>
@@ -21,9 +21,9 @@
 	</TransInterpolation>
 	```
 
-	最终渲染：
+	最終的なレンダリング：
 	```html
-	欢迎拨打<a href="tel:12345678">我的电话</a>联系我！
+	お電話<a href="tel:12345678">私の電話番号</a>でのご連絡をお待ちしております！
 	```
 </docs>
 
@@ -54,7 +54,7 @@
 	export default defineComponent({
 		props: {
 			/**
-			 * i18n 键，必须以 `t.` 开头。
+			 * i18nキー、`t.`で始まる必要があります。
 			 */
 			i18nKey: {
 				type: Function as never as PropType<string & Function>,

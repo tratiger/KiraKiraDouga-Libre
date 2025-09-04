@@ -1,18 +1,18 @@
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
-		/** 是否显示？（单向绑定使用） */
+		/** 表示しますか？（一方向バインディング用） */
 		shown?: boolean;
-		/** CSS 中的 Z 轴高度。 */
+		/** CSSのz-index。 */
 		zIndex?: number;
-		/** 是否是静态的，即没有外观，形式上的遮罩？ */
+		/** 静的（見た目がなく形式的なマスク）にしますか？ */
 		effectless?: boolean;
-		/** 指定内容的位置。 */
+		/** コンテンツの位置を指定します。 */
 		position?: MaskSlotPosition;
-		/** 聚焦内容。是否**不要**单击空白处关闭？ */
+		/** コンテンツをフォーカスします。空白部分をクリックして閉じないようにしますか？ */
 		focusing?: boolean;
-		/** 禁用？ */
+		/** 無効にしますか？ */
 		disabled?: boolean;
-		/** 是否禁用 Teleport？ */
+		/** Teleportを無効にしますか？ */
 		teleportDisabled?: boolean;
 	}>(), {
 		zIndex: 50,
@@ -24,11 +24,11 @@
 	const mask = ref<HTMLDivElement>();
 
 	/**
-	 * 单击遮罩部分关闭内容。
+	 * マスク部分をクリックしてコンテンツを閉じます。
 	 * @param e - 鼠标单击事件。
 	 */
 	function close(e: MouseEvent) {
-		if (e.target === mask.value) // 单击的最终元素必须是遮罩本身，不能是其内容。
+		if (e.target === mask.value) // クリックされた最終要素はマスク自身である必要があり、そのコンテンツであってはなりません。
 			if (props.focusing) replayAnimation(mask.value, "focusing");
 			else model.value = false;
 	}
@@ -71,7 +71,7 @@
 		&,
 		& #{$slot} {
 			z-index: var(--z-index);
-			// z-index: v-bind(zIndex); // v-bind 在 Teleport 内部不可用。请时刻关注 Vue 的更新：https://github.com/vuejs/core/issues/4605
+			// z-index: v-bind(zIndex); // v-bindはTeleport内では使用できません。Vueの更新に注意してください：https://github.com/vuejs/core/issues/4605
 		}
 
 		&.focusing #{$slot} {

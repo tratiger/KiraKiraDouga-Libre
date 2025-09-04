@@ -1,24 +1,24 @@
 <docs>
-	可拖动模态框
+	ドラッグ可能なモーダル
 </docs>
 
 <script setup lang="ts">
 	import { numbers } from "virtual:scss-var:theme/_variables";
 
 	const props = withDefaults(defineProps<{
-		/** 已打开，单向绑定使用。 */
+		/** 開いているか（一方向バインディング用）。 */
 		open?: boolean;
-		/** 标题。 */
+		/** タイトル。 */
 		title?: string;
-		/** 聚焦内容。是否**不要**单击空白处关闭。 */
+		/** コンテンツをフォーカスします。空白部分をクリックして閉じないようにしますか。 */
 		static?: boolean;
-		/** 应用图标。 */
+		/** アプリケーションアイコン。 */
 		icon?: DeclaredIcons;
-		/** 不显示标题部分。 */
+		/** タイトル部分を非表示にします。 */
 		hideTitle?: boolean;
-		/** 不显示页脚部分 */
+		/** フッター部分を非表示にします。 */
 		hideFooter?: boolean;
-		/** 不显示标题中的关闭按钮 */
+		/** タイトルの閉じるボタンを非表示にします。 */
 		hideTitleCloseIcon?: boolean;
 	}>(), {
 		title: "",
@@ -34,7 +34,7 @@
 	watch(open, async open => {
 		await nextTick();
 		if (open && modal.value)
-			modal.value.focus(); // 打开模态时自动聚焦。
+			modal.value.focus(); // モーダルを開くときに自動的にフォーカスします。
 	}, { immediate: true });
 
 	const windowSize = useWindowSize();
@@ -46,8 +46,8 @@
 	}, { immediate: true });
 
 	/**
-	 * 拖拽模态逻辑处理。
-	 * @param e - 指针事件（包括鼠标和触摸）。
+	 * モーダルのドラッグロジックを処理します。
+	 * @param e - ポインターイベント（マウスとタッチを含む）。
 	 */
 	function onTitleBarDown(e: PointerEvent) {
 		if (!modal.value) return;
@@ -79,9 +79,9 @@
 	}
 
 	/**
-	 * 获取平移值。
-	 * @param el - HTML DOM 元素。
-	 * @returns 平移值。
+	 * 平行移動の値を取得します。
+	 * @param el - HTML DOM要素。
+	 * @returns 平行移動の値。
 	 */
 	function getTranslate(el: HTMLElement) {
 		const translateCss = getComputedStyle(el).translate;
@@ -152,7 +152,7 @@
 		transition: $fallback-transitions, all $ease-out-max 400ms;
 
 		@include not-mobile {
-			@include absolute-center(fixed, false); // TODO: 修改密码模态框出现模糊情况。
+			@include absolute-center(fixed, false); // TODO: パスワード変更モーダルでぼやけが発生する問題を修正。
 			@include round-large;
 			transform-origin: top left;
 

@@ -1,18 +1,18 @@
 <script setup lang="ts">
 	const props = withDefaults(defineProps<{
 		/**
-		 * 页码总数。
+		 * 総ページ数。
 		 *
-		 * 如果该参数是一个字符串数组，则会启用数组模式并显示字符串数组中的内容。
+		 * このパラメータが文字列の配列である場合、配列モードが有効になり、文字列配列の内容が表示されます。
 		 */
 		pages: number | string[];
-		/** 当前页码，单向绑定使用。 */
+		/** 現在のページ番号（一方向バインディング用）。 */
 		current?: number;
-		/** 显示在组件上的最多页码数目。 */
+		/** コンポーネントに表示される最大ページ数。 */
 		displayPageCount?: number;
-		/** 允许用户使用键盘上左右箭头键翻页。 */
+		/** ユーザーがキーボードの左右矢印キーでページをめくることを許可します。 */
 		enableArrowKeyMove?: boolean;
-		/** 禁用？ */
+		/** 無効にしますか？ */
 		disabled?: boolean;
 	}>(), {
 		current: 1,
@@ -26,13 +26,13 @@
 	const pages = computed(() => !(props.pages instanceof Array) ? props.pages : props.pages.length);
 
 	if (pages.value < 1)
-		throw new RangeError(`Pagination pages 参数错误。页码值不能小于 1，当前值为 ${pages.value}。`);
+		throw new RangeError(`Paginationのpagesパラメータが不正です。ページ番号は1未満にできません。現在の値は ${pages.value}。`);
 	if (currentPage.value < 1 || currentPage.value > pages.value)
-		throw new RangeError(`Pagination current 超出页码范围。当前页码值取值范围为 1 ~ ${pages.value}，当前设定值为 ${currentPage.value}。`);
+		throw new RangeError(`Paginationのcurrentがページ範囲外です。現在のページ番号の範囲は1～${pages.value}です。現在の設定値は ${currentPage.value}。`);
 	if (props.displayPageCount < 3)
-		throw new RangeError(`Pagination displayPageCount 参数错误。显示的最多页码数目不能小于 3，当前设定值为 ${props.displayPageCount}。`);
+		throw new RangeError(`PaginationのdisplayPageCountパラメータが不正です。表示される最大ページ数は3未満にできません。現在の設定値は ${props.displayPageCount}。`);
 
-	/** 页码项目坐标与页码值的键值对。 */
+	/** ページアイテムの座標とページ番号のキーと値のペア。 */
 	type PositionPageItemPair = Record<number, number>;
 
 	const showLast = computed(() => props.displayPageCount >= 5);
@@ -50,12 +50,12 @@
 			Math.floor((actualPages.value + 1) / 2)
 		) - 1;
 	});
-	const _currentEdited = ref(String(currentPage.value)); // 注意类型得是 string。
+	const _currentEdited = ref(String(currentPage.value)); // 型はstringである必要があることに注意してください。
 	const currentEdited = computed({
 		get: () => _currentEdited.value,
 		set: async value_str => {
 			const caret = Caret.get();
-			_currentEdited.value = value_str; // 需要设两次来强制刷新。
+			_currentEdited.value = value_str; // 強制的にリフレッシュするには2回設定する必要があります。
 			await nextTick();
 			value_str = value_str.replaceAll(/[^\d]/g, "");
 			if (value_str !== "") {
@@ -79,15 +79,15 @@
 	}>();
 
 	watch(() => currentPage.value, (page, prevPage) => {
-		// #region 导轨动画
+		// #region ガイドレールアニメーション
 		const prevItems = getScrolledItems(prevPage);
 		const nextItems = getScrolledItems(page);
 		const merged = mergePosition(prevItems, nextItems);
 		const animationOptions = (hasExistAnimations: boolean) => ({
 			duration: isPrefersReducedMotion() ? 0 : 500,
-			easing: hasExistAnimations ? eases.easeOutMax : eases.easeInOutSmooth, // 连续快速滚动时切换成缓出插值。
+			easing: hasExistAnimations ? eases.easeOutMax : eases.easeInOutSmooth, // 連続して高速スクロールする場合は、イーズアウト補間に切り替えます。
 		});
-		// `Uncaught (in promise) DOMException: The user aborted a request.` 给👴爬！
+		// `Uncaught (in promise) DOMException: The user aborted a request.` は無視！
 		const IGNORE = useNoop;
 		if (merged) {
 			scrolledPages.value = merged.items;
@@ -106,7 +106,7 @@
 				}
 		}
 		// #endregion
-		// #region 滑块动画
+		// #region スライダーアニメーション
 		const pageLeft = page < prevPage;
 		const setCurrentPage = () => currentEdited.value = String(page);
 		if (pageEdit.value && newPageNumber.value) {
@@ -145,17 +145,17 @@
 	});
 
 	/**
-	 * 改变页码值。
-	 * @param page - 新页码值。
+	 * ページ番号を変更します。
+	 * @param page - 新しいページ番号。
 	 */
 	function changePage(page: number) {
 		if (page < 1 || page > pages.value)
-			throw new RangeError(`超出页码范围。当前页码值取值范围为 1 ~ ${pages.value}，当前设定值为 ${page}。`);
+			throw new RangeError(`ページ範囲外です。現在のページ番号の範囲は1～${pages.value}ですが、設定値は${page}です。`);
 		model.value = page;
 	}
 	/**
-	 * 移动页码值。如 +1、-1。
-	 * @param movement - 移动页码值。
+	 * ページ番号を移動します。例：+1, -1。
+	 * @param movement - 移動するページ数。
 	 */
 	function movePage(movement: number) {
 		if (movement === 0) return;
@@ -164,8 +164,8 @@
 		changePage(newPage);
 	}
 	/**
-	 * 当按下键盘按键左右键时翻页。
-	 * @param e - 键盘按下事件。
+	 * キーボードの左右矢印キーが押されたときにページをめくります。
+	 * @param e - キーボードイベント。
 	 */
 	function onArrowKeydown(e: KeyboardEvent) {
 		if (!props.enableArrowKeyMove || document.activeElement === pageEdit.value) return;
@@ -175,9 +175,9 @@
 		if (movement) movePage(movement);
 	}
 	/**
-	 * 根据当前页码获取显示在页码控制器滚动区域上的页码项目数组。
-	 * @param current - 当前页码。
-	 * @returns 显示在页码控制器滚动区域上的页码项目数组。
+	 * 現在のページ番号に基づいて、ページネーションコントロールのスクロール領域に表示されるページアイテムの配列を取得します。
+	 * @param current - 現在のページ番号。
+	 * @returns ページネーションコントロールのスクロール領域に表示されるページアイテムの配列。
 	 */
 	function getScrolledItems(current: number): number[] {
 		const result: number[] = [];
@@ -194,10 +194,10 @@
 		return result;
 	}
 	/**
-	 * 合并两个数组，并返回页码项目坐标与页码值的键值对。
-	 * @param prevItems - 变化前的页码项目数组。
-	 * @param nextItems - 变化后的页码项目数组。
-	 * @returns 页码项目坐标与页码值的键值对。
+	 * 2つの配列をマージし、ページアイテムの座標とページ番号のキーと値のペアを返します。
+	 * @param prevItems - 変更前のページアイテムの配列。
+	 * @param nextItems - 変更後のページアイテムの配列。
+	 * @returns ページアイテムの座標とページ番号のキーと値のペア。
 	 */
 	function mergePosition(prevItems: number[], nextItems: number[]): {
 		items: PositionPageItemPair;
@@ -217,8 +217,8 @@
 		return { items: result, finallyPosition: nextItems.length * (moveToLeft ? -1 : 1) };
 	}
 	/**
-	 * 编辑页码值时按下回车键事件。
-	 * @param e - 键盘事件。
+	 * ページ番号編集中にEnterキーが押されたときのイベント。
+	 * @param e - キーボードイベント。
 	 */
 	function onEnterEdited(e: KeyboardEvent) {
 		if (e.code === "Enter") {
@@ -228,8 +228,8 @@
 		}
 	}
 	/**
-	 * 编辑页码值时失焦事件。
-	 * 此时应当取消选中文本。
+	 * ページ番号編集中にフォーカスが外れたときのイベント。
+	 * このとき、選択中のテキストを解除する必要があります。
 	 */
 	function onBlurEdited() {
 		if (currentEdited.value.trim() === "")
@@ -238,11 +238,11 @@
 	}
 
 	/**
-	 * 根据页码索引值获取页码索引值（大雾）。
+	 * ページインデックス値に基づいてページインデックス値を取得します（謎）。
 	 *
-	 * 其实是为了兼容数组模式。
-	 * @param index - 页码索引值。其中唯一一次用到字符串参数类型是在用户输入文本跳页的时候。
-	 * @returns 页码索引值或数组中的内容。
+	 * 実は配列モードに対応するためです。
+	 * @param index - ページインデックス値。文字列パラメータ型が唯一使用されるのは、ユーザーがテキストを入力してページをジャンプするときです。
+	 * @returns ページインデックス値または配列内のコンテンツ。
 	 */
 	function getPageName(index: number | string) {
 		return !array.value ? index : array.value[+index - 1];

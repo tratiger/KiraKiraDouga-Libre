@@ -20,13 +20,13 @@
 	const searchMode = ref<typeof searchModes[number]>(querySearchMode);
 	const searchModesSorted = computed(() => searchModes.toSorted((a, b) =>
 		a === searchMode.value ? -1 : b === searchMode.value ? 1 : 0));
-	// 注意：请更新你的 Node.js 版本为 20 及以上才能支持该函数，否则会报错。 // 02: 确实！
-	const currentLanguage = computed(getCurrentLocale); // 当前用户的语言
-	const flyoutTag = ref<FlyoutModel>(); // 绑定到 FlyoutTag 上的参数，当 target 不为空时会显示 Flyout
-	const tags = reactive<Map<VideoTag["tagId"], VideoTag>>(new Map()); // 视频标签
-	const displayTags = computed<DisplayVideoTag[]>(() => [...tags.values()].map(tagName => getDisplayVideoTagWithCurrentLanguage(currentLanguage.value, tagName))); // 用于显示的 TAG，相较于上方的 tags 数据结构更简单。
-	const contextualToolbar = ref<FlyoutModel>(); // TAG 的工具烂浮窗
-	const hoveredTagContent = ref<[number, string]>(); // 鼠标 hover 的 TAG
+	// 注意：この関数をサポートするには、Node.jsのバージョンを20以上に更新してください。そうしないとエラーが発生します。 // 02: 本当に！
+	const currentLanguage = computed(getCurrentLocale); // 現在のユーザーの言語
+	const flyoutTag = ref<FlyoutModel>(); // FlyoutTagにバインドされたパラメータ。targetが空でない場合にFlyoutを表示します
+	const tags = reactive<Map<VideoTag["tagId"], VideoTag>>(new Map()); // 動画タグ
+	const displayTags = computed<DisplayVideoTag[]>(() => [...tags.values()].map(tagName => getDisplayVideoTagWithCurrentLanguage(currentLanguage.value, tagName))); // 表示用のTAG。上記のtagsよりもシンプルなデータ構造です。
+	const contextualToolbar = ref<FlyoutModel>(); // TAGのツールツールチップ
+	const hoveredTagContent = ref<[number, string]>(); // マウスがホバーしているTAG
 	const hideExceptMe = ref(false);
 	const hideTimeoutId = ref<Timeout>();
 
@@ -39,7 +39,7 @@
 	});
 
 	/**
-	 * 通过关键字搜索视频，并赋值给 video
+	 * キーワードで動画を検索し、videoに割り当てます
 	 * @param keyword 关键字
 	 */
 	async function searchVideoByKeyword(keyword: string) {
@@ -52,7 +52,7 @@
 	}
 
 	/**
-	 * 通过关键字搜索视频，并赋值给 video
+	 * タグIDで動画を検索し、videoに割り当てます
 	 * @param tagIds 关键字
 	 */
 	async function searchVideoByTagIds(tagIds: number[]) {
@@ -65,7 +65,7 @@
 	}
 
 	/**
-	 * 像首页一样获取视频，并赋值给 video
+	 * ホームページのように動画を取得し、videoに割り当てます
 	 */
 	async function getHomeVideo() {
 		const videoResult = await api.video.getHomePageThumbVideo();
@@ -76,14 +76,14 @@
 	}
 
 	/**
-	 * 鼠标移入区域，取消自动隐藏。
+	 * 領域にマウスカーソルが入ったら、自動非表示をキャンセルします。
 	 */
 	function reshowContextualToolbar() {
 		clearTimeout(hideTimeoutId.value);
 	}
 
 	/**
-	 * 从视频 TAG 列表中移除一个 TAG（注意，此时 TAG 列表没有传递给后端数据库存储）
+	 * 動画TAGリストからTAGを削除します（注意：この時点ではTAGリストはバックエンドのデータベースに保存されていません）
 	 * @param tagId TAG 编号
 	 */
 	function removeTag(tagId: number) {
@@ -92,7 +92,7 @@
 	}
 
 	/**
-	 * 显示标签的上下文工具栏。
+	 * タグのコンテキストツールバーを表示します。
 	 * @param key - 标签键名。
 	 * @param tag - 标签内容。
 	 * @param e - 鼠标事件。
@@ -110,7 +110,7 @@
 	}
 
 	/**
-	 * 隐藏标签的上下文工具栏。
+	 * タグのコンテキストツールバーを非表示にします。
 	 */
 	function hideContextualToolbar() {
 		hideTimeoutId.value = setTimeout(() => {
@@ -120,11 +120,11 @@
 	}
 
 	/**
-	 * 搜索视频数据
+	 * 動画データを検索
 	 */
 	async function searchVideo() {
-		const query = querySearch.value; // 关键词
-		const tag = tagSearch.value; // 视频标签
+		const query = querySearch.value; // キーワード
+		const tag = tagSearch.value; // 動画タグ
 		switch (searchMode.value) {
 			case "keyword": {
 				if (query)
@@ -163,22 +163,22 @@
 		}
 	}
 
-	/** 创建防抖视频搜索 */
+	/** 動画検索のデバウンスを作成 */
 	const debounceVideoSearcher = useDebounce(searchVideo, 500);
 
-	/** 监听路由中的关键词，如果发生变化，则防抖搜索视频 */
+	/** ルート内のキーワードを監視し、変更があった場合はデバウンスして動画を検索します */
 	watch(querySearch, debounceVideoSearcher);
 
-	/** 监听路由中的 TAG ID，如果发生变化，则防抖搜索视频 */
+	/** ルート内のTAG IDを監視し、変更があった場合はデバウンスして動画を検索します */
 	watch(tagSearch, debounceVideoSearcher);
 
-	// 如果当前是关键字搜索模式，并且搜索关键字发生变化,向 URL 中更新搜索的关键字
+	// 現在がキーワード検索モードで、検索キーワードが変更された場合、URL内の検索キーワードを更新します
 	watch(() => data.search, search => {
 		if (searchMode.value === "keyword")
 			router.push({ path: route.path, query: { ...route.query, query: search || undefined } });
 	});
 
-	// 如果当前是 TAG 搜索模式，并且 TAG 发生变化，则向 URL 中更新 tagIds
+	// 現在がTAG検索モードで、TAGが変更された場合、URL内のtagIdを更新します
 	watch(() => displayTags.value, tags => {
 		if (searchMode.value === "tag") {
 			const tagIds = tags.map(tag => tag.tagId);
@@ -186,21 +186,21 @@
 		}
 	});
 
-	// 向路由中更新当前的搜索模式，立即执行
+	// ルートに現在の検索モードを更新し、即時実行します
 	watch(() => searchMode.value, searchMode => {
 		router.push({ path: route.path, query: { ...route.query, mode: searchMode } });
 	});
 
-	// 页面初始化后设置 URL Query 中包含搜索模式
+	// ページ初期化後、URLクエリに検索モードを含めるように設定します
 	onMounted(() => {
 		router.push({ path: route.path, query: { ...route.query, mode: searchMode.value } });
 	});
 
 	/**
-	 * 搜索页初始化时要执行的一系列操作
+	 * 検索ページの初期化時に実行する一連の操作
 	 */
 	async function searchPageInit() {
-		// SSR 时搜索视频
+		// SSR時に動画を検索
 		await searchVideo();
 
 		if (tagSearch.value.length > 0) {

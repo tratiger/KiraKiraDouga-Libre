@@ -16,7 +16,7 @@
 		{ uid: 3, job: [t.about.staff.frontend, t.about.staff.designer] },
 		{ uid: 12, job: [t.about.staff.frontend] },
 		{ uid: 5, job: [t.about.staff.designer] },
-		// { uid: NaN, name: "鸣", job: [t.about.staff.frontend] },
+		// { uid: NaN, name: "鳴", job: [t.about.staff.frontend] },
 		{ uid: 2, job: [t.about.staff.backend] },
 		{ uid: 9, job: [t.about.staff.translator(getLocaleName("ja"))] },
 		{ uid: 4, job: [t.about.staff.translator(getLocaleName("zh-Hant"))] },
@@ -33,7 +33,7 @@
 		{ name: "Node.js", version: "20", ability: "JavaScript Runtime Environment", icon: "nodejs", link: "https://nodejs.org/" },
 		{ name: "TypeScript", version: "5", ability: "JavaScript with Syntax for Types", icon: "typescript", link: "https://www.typescriptlang.org/" },
 		{ name: "Vercel", ability: "Website Hosting Services", icon: "vercel", monochrome: true, link: "https://vercel.com/" },
-		// 基于前端运行时的版本号可以自动识别，后端和编译时的版本号只能委屈你自己手打了。
+		// フロントエンドのランタイムバージョン番号は自動的に認識できますが、バックエンドとコンパイル時のバージョン番号は手動で入力する必要があります。
 	];
 
 	const versionTag = (gitBranch && gitCommit ? {
@@ -49,7 +49,7 @@
 	const remainingClick = ref(4);
 
 	/**
-	 * 连续点击五次 LOGO 即可进入开发者模式或显示彩蛋。
+	 * LOGOを5回連続でクリックすると、開発者モードに入るか、イースターエッグが表示されます。
 	 * @param e - 鼠标事件。
 	 */
 	function showDevMode(e: MouseEvent) {

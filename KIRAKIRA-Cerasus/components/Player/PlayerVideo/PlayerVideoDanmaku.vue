@@ -1,25 +1,25 @@
 <docs>
-	# 弹幕容器
-	使用 Danmaku 库：https://github.com/weizhenye/Danmaku
+	# 弾幕コンテナ
+	Danmaku ライブラリを使用：https://github.com/weizhenye/Danmaku
 </docs>
 
 <script setup lang="ts">
 	import Danmaku from "danmaku/dist/esm/danmaku.dom.js";
 
 	const props = withDefaults(defineProps<{
-		/** 媒体可以是 `<video>` 或 `<audio>` 元素，如果未提供，会变成实时模式。 */
+		/** メディアは`<video>`または`<audio>`要素です。指定しない場合はライブモードになります。 */
 		media?: MaybeRef<HTMLMediaElement | undefined>;
-		/** 预设的弹幕数据数组，在媒体模式中使用。在 emit API 中有说明格式。 */
+		/** プリセットされた弾幕データ配列。メディアモードで使用します。フォーマットはemit APIで説明されています。 */
 		comments?: DanmakuComment[];
-		/** 支持 DOM 引擎和 canvas 引擎。canvas 引擎比 DOM 更高效，但相对更耗内存。 */
+		/** DOMエンジンとcanvasエンジンをサポートしています。canvasエンジンはDOMよりも効率的ですが、メモリ消費が比較的多くなります。 */
 		engine?: "canvas" | "dom";
 		/**
-		 * 弹幕基准速度，也可以用 speed API 设置。
+		 * 弾幕の基準速度。speed APIでも設定可能です。
 		 *
-		 * 所有弹幕都有一个 `duration` 属性，表示其存活时间。`duration` 由 `舞台宽度 / danmaku.speed` 计算，其中 `danmaku.speed` 是所有弹幕的一个基准速度，因为每条弹幕的实际速度由 `(弹幕宽度 + 舞台宽度) / duration` 计算。默认速度为 `144`。
+		 * すべての弾幕には、その生存期間を示す `duration` プロパティがあります。`duration` は `ステージ幅 / danmaku.speed` で計算されます。ここで `danmaku.speed` はすべての弾幕の基準速度であり、各弾幕の実際の速度は `(弾幕幅 + ステージ幅) / duration` で計算されるためです。デフォルトの速度は `144` です。
 		 */
 		speed?: number;
-		/** 是否隐藏弹幕？ */
+		/** 弾幕を非表示にしますか？ */
 		hidden?: boolean;
 	}>(), {
 		media: undefined,
@@ -34,7 +34,7 @@
 	const resizeObserver = ref<ResizeObserver>();
 
 	/**
-	 * 初始化弹幕组件。
+	 * 弾幕コンポーネントを初期化します。
 	 */
 	function initDanmaku() {
 		if (import.meta.client) { // FIXME: 02: idk why `environment.client` not working here...
@@ -52,7 +52,7 @@
 	}
 
 	watch(() => props.media, initDanmaku);
-	watch(() => props.comments, initDanmaku); // 当请求到新的数据时，重载弹幕组件
+	watch(() => props.comments, initDanmaku); // 新しいデータがリクエストされたら、弾幕コンポーネントをリロードします
 
 	onMounted(() => {
 		if (!danmakuContainer.value) return;
@@ -82,16 +82,16 @@
 	});
 
 	/**
-	 * ### 清屏
-	 * 清除当前舞台上的弹幕。
+	 * ### 画面クリア
+	 * 現在のステージ上の弾幕をクリアします。
 	 */
 	function clear() {
 		danmaku.value?.clear();
 	}
 
 	/**
-	 * 发**射**弹幕（注意不是发**送**弹幕）。
-	 * @param comment - 弹幕内容。
+	 * 弾幕を**発射**します（**送信**ではないことに注意）。
+	 * @param comment - 弾幕の内容。
 	 */
 	function emit(comment: DanmakuComment) {
 		danmaku.value?.emit(comment);

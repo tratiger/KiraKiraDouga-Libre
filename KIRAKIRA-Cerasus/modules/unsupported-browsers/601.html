@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="zh-CN">
-<!-- IE 不支持 zh-Hans-CN 或 zh-Hant-TW，它只支持老旧的 zh-CN 和 zh-TW。 -->
+<html lang="ja-JP" class="ja-JP">
+<!-- IEはzh-Hans-CNやzh-Hant-TWをサポートしておらず、古いzh-CNとzh-TWのみをサポートしています。 -->
 
 <head>
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-	<title>是时候更换你的浏览器了 - KIRAKIRA☆DOUGA</title>
+	<title>ブラウザを変える時が来ました - KIRAKIRA☆DOUGA</title>
 	<script>
 		/** @type Record<"lang" | "next", string> */
 		var params = (function () {
@@ -21,7 +21,7 @@
 			return params;
 		})();
 		(function () {
-			// 设置网页语言。
+			// Webページの言語を設定します。
 			var lang = params.lang;
 			if (!lang) {
 				var isIe11 = navigator.userAgent.indexOf("Trident") >= 0;
@@ -33,7 +33,7 @@
 			else if (lang.match(/^vi/i)) lang = "vi";
 			else if (lang.match(/^id/i)) lang = "id";
 			else if (lang.match(/^fr/i)) lang = "fr";
-			else if (lang.match(/^yue/i)) lang = "zh-HK"; // 没有早期系统支持粤语，因此回退到香港地区中文，否则没机会显示。
+			else if (lang.match(/^yue/i)) lang = "zh-HK"; // 広東語をサポートする古いシステムはないため、香港の中国語にフォールバックします。そうしないと表示されません。
 			else if (lang.match(/^zh/i)) {
 				if (lang.match(/(CN|SG|MY)$/i) || lang === "zhs") lang = "zh-CN";
 				else if (lang.match(/(TW)$/i) || lang === "zht") lang = "zh-TW";
@@ -44,15 +44,15 @@
 			document.documentElement.lang = lang;
 			document.documentElement.className = lang;
 			var titles = {
-				"zh-CN": "是时候更换你的浏览器了",
-				"zh-TW": "是時候更換你的瀏覽器了",
+				"zh-CN": "ブラウザを変える時が来ました",
+				"zh-TW": "ブラウザを交換する時が来ました",
 				en: "Time to Change Your Browser",
-				ja: "ブラウザを変える時だ",
+				ja: "ブラウザを変える時です",
 				ko: "{{!Time to Change Your Browser}}",
 				vi: "Đến lúc đổi trình duyệt rồi",
 				id: "{{!Time to Change Your Browser}}",
 				fr: "Il est temps de changer de navigateur",
-				"zh-HK": "係時候換咗你嘅Browser喇"
+				"zh-HK": "ブラウザを交換する時です"
 			};
 			var title = titles[lang];
 			if (title) document.title = title + " - KIRAKIRA☆DOUGA";
@@ -65,7 +65,7 @@
 		/* stylelint-disable property-no-vendor-prefix */
 		/* stylelint-disable selector-class-pattern */
 
-		/* 使用垂直居中引号。（直接使用 Unicode 垂直居中引号则日语字体太丑。） */
+		/* 縦書き用の中黒を使用します。（Unicodeの縦書き用中黒を直接使用すると、日本語フォントの見栄えが悪くなるため。） */
 		@font-face {
 			font-family: "CJK Ellipsis";
 			src: local("SimSun");
@@ -371,29 +371,29 @@
 
 		<td class="right">
 			<div lang="zh-CN" class="text zh-CN">
-				<h1>是时候更换你的浏览器了</h1>
+				<h1>ブラウザを変える時が来ました</h1>
 				<p>
-					你乘坐着 Internet Explorer 来到了 ACG 的海洋，很可惜，你搁浅了……<br />
-					如此老旧的技术很难适应这片海洋环境，这个苍老的浏览器也难以使你扬帆起航。
+					あなたはInternet Explorerに乗ってACGの海にやって来ましたが、残念ながら座礁してしまいました…<br />
+					このような古い技術ではこの海の環境に適応するのは難しく、この老朽化したブラウザでは航海を続けることは困難です。
 				</p>
 				<p>
-					Internet Explorer 代表了过去，代表了 21 世纪初互联网曾经的美好。<br />
-					虽然你可能和我们一样，厌恶新时代的狂躁、忙碌与封闭，<br />
-					怀念过去的欢笑、慢节奏与开放，但是我们要做的，是像这个网站一样，<br />
-					去改变时代，为这新时代添上一笔自己的色彩，而不是将自己困在过去。
+					Internet Explorerは過去を、21世紀初頭のインターネットの素晴らしさを象徴しています。<br />
+					あなたは私たちと同じように、新しい時代の喧騒、多忙さ、閉鎖性を嫌い、<br />
+					過去の笑い、ゆっくりとしたペース、開放性を懐かしんでいるかもしれませんが、私たちがすべきことは、このサイトのように、<br />
+					時代を変え、この新しい時代に自分たちの色を加え、過去に囚われないことです。
 				</p>
 			</div>
 			<div lang="zh-TW" class="text zh-TW">
-				<h1>是時候更換你的瀏覽器了</h1>
+				<h1>ブラウザを交換する時が来ました</h1>
 				<p>
-					你乘坐著 Internet Explorer 來到了 ACG 的海洋，很可惜，你擱淺了……<br />
-					如此老舊的技術很難適應這片海洋環境，這個蒼老的瀏覽器也難以使你揚帆起航。
+					あなたはInternet Explorerに乗ってACGの海にやって来ましたが、残念ながら座礁してしまいました…<br />
+					このような古い技術ではこの海の環境に適応するのは難しく、この老朽化したブラウザでは航海を続けることは困難です。
 				</p>
 				<p>
-					Internet Explorer 代表了過去，代表了 21 世紀初互聯網曾經的美好。<br />
-					雖然你可能和我們一樣，厭惡新時代的狂躁、忙碌與封閉，<br />
-					懷念過去的歡笑、慢節奏與開放，但是我們要做的，是像這個網站一樣，<br />
-					去改變時代，為這新時代添上一筆自己的色彩，而不是將自己困在過去。
+					Internet Explorerは過去を、21世紀初頭のインターネットの素晴らしさを象徴しています。<br />
+					あなたは私たちと同じように、新しい時代の喧騒、多忙さ、閉鎖性を嫌い、<br />
+					過去の笑い、ゆっくりとしたペース、開放性を懐かしんでいるかもしれませんが、私たちがすべきことは、このサイトのように、<br />
+					時代を変え、この新しい時代に自分たちの色を加え、過去に囚われないことです。
 				</p>
 			</div>
 			<div lang="en" class="text en">
@@ -482,16 +482,16 @@
 			<div class="browers">
 				<span class="browsers-title">
 					<span lang="zh-CN" class="text zh-CN">
-						你可以尝试换乘
+						乗り換えを試すことができます
 					</span>
 					<span lang="zh-TW" class="text zh-TW">
-						你可以嘗試換乘
+						乗り換えを試すことができます
 					</span>
 					<span lang="en" class="text en">
 						You can try transferring
 					</span>
 					<span lang="ja" class="text ja">
-						乗換案内
+						乗り換え案内
 					</span>
 					<span lang="ko" class="text ko">
 						{{!You can try transferring}}
@@ -506,7 +506,7 @@
 						Vous pouvez essayer de transférer
 					</span>
 					<span lang="zh-HK" class="text zh-HK">
-						你可以嘗試轉乘
+						乗り換えを試すことができます
 					</span>
 				</span>
 				<ul class="browser-cards new" id="browser-cards">
@@ -533,9 +533,9 @@
 
 	<script>
 		(function () {
-			// 使 IE 9 及以下版本也可以禁用文字选中。
+			// IE 9以下のバージョンでもテキスト選択を無効にできるようにします。
 			document.body.onselectstart = function () { return false; };
-			// 解决点击 browser-card 外边缘无效的问题。
+			// browser-cardの外側の端をクリックしても無効になる問題を解決します。
 			var links = [
 				"https://www.microsoft.com/edge/download",
 				document.documentElement.lang === "zh-CN" ?
@@ -552,16 +552,16 @@
 					};
 				})(i);
 			}
-			// Windows 8.1 及以下系统改为推荐 Supermium 浏览器。
+			// Windows 8.1以前のシステムでは、Supermiumブラウザを推奨するように変更します。
 			var ua = navigator.userAgent;
 			var browserCardsEl = document.getElementById("browser-cards");
 			var matches = /Windows NT ([0-9.]+)/.exec(ua);
 			if (browserCardsEl && matches) {
 				var winver = parseFloat(matches[1]); // 6.1=Win7, 6.2=Win8, 6.3=Win8.1, 10.0+=Win10/11
 				if (winver < 10 && browserCardsEl.className.indexOf(" old") === -1)
-					browserCardsEl.className = browserCardsEl.className.replace(" new", "") + " old"; // 不直接将 new 替换为 old 是因为万一 new 不存在则替换操作不会被执行。
+					browserCardsEl.className = browserCardsEl.className.replace(" new", "") + " old"; // newを直接oldに置換しないのは、newが存在しない場合に置換操作が実行されないためです。
 			}
-			// 解决窗口过小导致纯 CSS 居中裁掉部分内容问题。
+			// ウィンドウが小さすぎると、純粋なCSSによる中央揃えで一部のコンテンツが切り取られてしまう問題を解決します。
 			function centerMainCard() {
 				var mainCard = document.getElementById("main-card");
 				var minWidth = mainCard.clientWidth,
@@ -579,7 +579,7 @@
 	</script>
 	<script>
 		(function () {
-			// 该部分脚本仅在非 IE 浏览器下才会执行。
+			// この部分のスクリプトはIE以外のブラウザでのみ実行されます。
 			if (!(window.ActiveXObject || "ActiveXObject" in window))
 				if (params.next)
 					location.href = params.next;

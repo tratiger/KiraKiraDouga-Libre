@@ -1,9 +1,9 @@
 <docs>
-	# 视频控制栏浮出菜单
+	# 動画コントロールバーのポップアップメニュー
 </docs>
 
 <script lang="ts">
-	/** 在某个实例中鼠标已按下，因此暂时禁止显示其它菜单。 */
+	/** あるインスタンスでマウスが押されているため、他メニューの一時的な表示を禁止します。 */
 	const preventShowing = ref(false);
 </script>
 
@@ -16,12 +16,12 @@
 	const model = defineModel<MenuModel | number>();
 	const shown = ref(false);
 	const locationStyle = ref<CSSProperties>({});
-	/** 指定在鼠标移出区域多久后自动隐藏。 */
+	/** マウスが領域外に出てから自動的に隠れるまでの時間を指定します。 */
 	const WAITING = 1000;
 	const hideTimeoutId = ref<Timeout>();
-	/** 在请求隐藏本组件的所有实例时，要求本实例不得隐藏。 */
+	/** このコンポーネントの全インスタンスを非表示にするリクエストがあった場合、このインスタンスは非表示にしないように要求します。 */
 	const hideExceptMe = ref(false);
-	/** 视频播放器控制栏中 SoftButton 的水波纹半径与容器半径之差。 */
+	/** 動画プレーヤーコントロールバーのSoftButtonの波紋半径とコンテナ半径の差。 */
 	const isMouseEnter = ref(false);
 	const isMouseDown = ref(false);
 	const { width: menuWidth, margin } = useScssVariables().numbers;
@@ -30,7 +30,7 @@
 	const mobile = () => getResponsiveDevice() === "mobile";
 
 	/**
-	 * 隐藏菜单。
+	 * メニューを非表示にします。
 	 */
 	function hide() {
 		if (!shown.value) return;
@@ -44,7 +44,7 @@
 	}
 
 	/**
-	 * 鼠标移出区域，超时后自动隐藏。
+	 * 領域からマウスが出ると、タイムアウト後に自動的に非表示になります。
 	 */
 	function moveOut() {
 		isMouseEnter.value = false;
@@ -53,7 +53,7 @@
 	}
 
 	/**
-	 * 鼠标移入区域，取消自动隐藏。
+	 * 領域にマウスが入ると、自動非表示をキャンセルします。
 	 */
 	function reshow() {
 		clearTimeout(hideTimeoutId.value);
@@ -64,8 +64,8 @@
 	const CONTROLLER_HEIGHT = 36;
 
 	/**
-	 * 显示菜单。
-	 * @param e - 如有鼠标事件则为上下文菜单，否则显示在屏幕正下方。
+	 * メニューを表示します。
+	 * @param e - マウスイベントがある場合はコンテキストメニュー、ない場合は画面下部に表示します。
 	 */
 	function show(e: MenuModel | number) {
 		if (preventShowing.value) return;
@@ -105,8 +105,8 @@
 	}
 
 	/**
-	 * 当指针在菜单中按下时的事件。
-	 * @param _e - 指针事件。
+	 * ポインターがメニュー内で押されたときのイベント。
+	 * @param _e - ポインターイベント。
 	 */
 	function pointerDown(_e: PointerEvent) {
 		isMouseDown.value = true;

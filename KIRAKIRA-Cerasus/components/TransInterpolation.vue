@@ -1,21 +1,21 @@
 <docs>
-	允许你在 i18n 的字符串插值中插入其它组件。
+	i18nの文字列補間（interpolation）に他のコンポーネントを挿入できます。
 
-	基于 Vue I18n 官方的 `<I18nT>` 组件对项目进行适配。
+	Vue I18n 公式の `<I18nT>` コンポーネントをベースに、プロジェクトに適応させています。
 </docs>
 
 <script lang="tsx">
 	export default defineComponent({
 		inheritAttrs: false,
 		props: {
-			/** i18n 键。 */
+			/** i18nキー。 */
 			keypath: {
 				type: String,
 				required: true,
 			},
 		},
 		render() {
-			// 直接写 `this.$slots` 会返回 Proxy 不能正常渲染，只能浅复制一次才行。
+			// `this.$slots` を直接書くとProxyが返ってきて正常にレンダリングできないため、一度シャローコピーする必要があります。
 			return <I18nT keypath={this.$props.keypath} scope="global">{{ ...this.$slots }}</I18nT>;
 		},
 	});

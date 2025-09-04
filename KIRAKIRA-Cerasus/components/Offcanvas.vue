@@ -1,5 +1,5 @@
 <docs>
-	# 缩放式侧滑导航菜单（类旧版手机 QQ）
+	# ズーム式サイドスライドナビゲーションメニュー（旧版モバイルQQ風）
 </docs>
 
 <script setup lang="ts">
@@ -12,8 +12,8 @@
 	];
 
 	/**
-	 * 前往路由。
-	 * @param route - 路由。
+	 * ルートに移動します。
+	 * @param route - ルート。
 	 */
 	function to(route?: string) {
 		if (route === undefined) return;
@@ -24,7 +24,7 @@
 	const selfUserInfoStore = useSelfUserInfoStore();
 
 	/**
-	 * 点击用户头像事件。未登录时提示登录，已登录时导航到个人主页。
+	 * ユーザーアバタークリックイベント。未ログイン時はログインを促し、ログイン済みなら個人ページに移動します。
 	 */
 	function onClickUser() {
 		shown.value = false;
@@ -51,7 +51,7 @@
 				<label>{{ item.name }}</label>
 			</div>
 		</div>
-		<div class="tab-bar vertical"><!-- 假装是 TabBar -->
+		<div class="tab-bar vertical"><!-- TabBarのふり -->
 			<TabItem id="settings" v-ripple icon="settings" _internalIsVertical @click="to('/settings')">{{ t.settings }}</TabItem>
 		</div>
 	</Comp>
