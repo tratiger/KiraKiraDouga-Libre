@@ -1,18 +1,18 @@
 import { Point } from "classes/Point";
 
 /**
- * 根据一个数值、数组、点创建一个平滑的响应式引用变量。
- * @param current - 不平滑的当前值。
- * @param speed - 平滑速度。
- * @returns 平滑值响应式引用变量。
- * @see https://codepen.io/nanonansen/pen/oRWmaY 参考自视差平滑移动。
+ * 数値、配列、または点に基づいて、滑らかなリアクティブ参照変数を作成します。
+ * @param current - 滑らかでない現在の値。
+ * @param speed - 滑らかさの速度。
+ * @returns 滑らかな値のリアクティブ参照変数。
+ * @see https://codepen.io/nanonansen/pen/oRWmaY 視差の滑らかな移動を参考にしています。
  */
 export function useSmoothValue<T extends number | number[] | Point>(current: MaybeRef<T>, speed: number) {
 	if (speed <= 0 || speed > 1)
-		throw new RangeError(`useSmoothValue speed 参数取值范围错误。参数值必须在 (0 ~ 1] 区间内，当前值为 ${speed}。`);
+		throw new RangeError(`useSmoothValue speed パラメータの値の範囲が間違っています。パラメータ値は(0 ~ 1]の範囲内である必要がありますが、現在の値は ${speed} です。`);
 	const smoothValue = ref(toValue(current)) as Ref<T>;
 	const animationId = ref<number>();
-	const FRACTION_DIGITS = 6; // 保留 6 位小数。
+	const FRACTION_DIGITS = 6; // 小数点以下6桁を保持します。
 	onMounted(() => {
 		const animation = () => {
 			const _speed = isPrefersReducedMotion() ? 1 : speed;

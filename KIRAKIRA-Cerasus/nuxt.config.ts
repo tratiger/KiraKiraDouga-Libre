@@ -9,12 +9,12 @@ import scssVariablesLoader from "./plugins/vite/scss-variables-loader";
 import devtoolsJson from "vite-plugin-devtools-json";
 /* import vueNestedSFC from "vite-plugin-vue-nested-sfc"; */
 type OriginalNuxtConfig = Parameters<typeof defineNuxtConfig>[0];
-type BroadNuxtConfig = OriginalNuxtConfig & Record<Exclude<string, keyof OriginalNuxtConfig>, object | string>; // 还敢报错吗？
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // 支持 HTTPS。
+type BroadNuxtConfig = OriginalNuxtConfig & Record<Exclude<string, keyof OriginalNuxtConfig>, object | string>; // まだエラーを報告しますか？
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // HTTPSをサポートします。
 const dev = process.env.NODE_ENV === "development";
 
 export default defineNuxtConfig({
-	// HACK: 以下为还原 Nuxt 3 目录结构的配置，请尽量在之后改为 Nuxt 4 的目录结构。
+	// HACK: 以下はNuxt 3のディレクトリ構造を復元するための設定です。将来的にはNuxt 4のディレクトリ構造に変更してください。
 	// This reverts the new srcDir default from `app` back to your root directory
 	srcDir: ".",
 	// This specifies the directory prefix for `router.options.ts` and `spa-loading-template.html`
@@ -95,7 +95,7 @@ export default defineNuxtConfig({
 			}),
 		],
 		optimizeDeps: {
-			// 防止「optimized dependencies changed. reloading」
+			// 「optimized dependencies changed. reloading」を防ぐ
 			include: [
 				"lottie-web",
 				"vue-cropper",
@@ -187,7 +187,7 @@ export default defineNuxtConfig({
 					tag.includes("-") ||
 					[
 						"marquee",
-						// dev && "SvgIcon", // 将非开发/生产环境的对应组件故意视为原生元素。
+						// dev && "SvgIcon", // 開発/本番環境以外の対応するコンポーネントを意図的にネイティブ要素として扱います。
 						// !dev && "NuxtIcon",
 					].includes(tag)
 				);
@@ -215,7 +215,7 @@ export default defineNuxtConfig({
 			alwaysRedirect: true,
 		},
 		bundle: {
-			// 非预期错误，临时解决办法。参考：https://github.com/intlify/bundle-tools/issues/423#issuecomment-2525540710
+			// 予期せぬエラー、一時的な解決策。参考：https://github.com/intlify/bundle-tools/issues/423#issuecomment-2525540710
 			optimizeTranslationDirective: false,
 		},
 		experimental: {
@@ -224,7 +224,7 @@ export default defineNuxtConfig({
 	},
 
 	image: {
-		format: ["avif", "webp"], // 只适用于 <NuxtImg>，对 <NuxtImg> 无效。
+		format: ["avif", "webp"], // <NuxtImg>にのみ適用され、<NuxtImg>には無効です。
 		providers: {
 			cloudflareProd: {
 				name: "cloudflare-prod", // optional value to overrider provider name

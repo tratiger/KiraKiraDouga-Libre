@@ -1,8 +1,8 @@
 /**
- * 监听是否有伪类 `:active` 的事件。
- * @param el - HTML DOM 元素。
- * @param onPress - 指针按下回调事件。
- * @param onLift - 指针松开回调事件。
+ * :active 疑似クラスのイベントを監視します。
+ * @param el - HTML DOM 要素。
+ * @param onPress - ポインターが押されたときのコールバックイベント。
+ * @param onLift - ポインターが離されたときのコールバックイベント。
  */
 export function usePressed(el: MaybeRef<HTMLElement | ComponentPublicInstance | undefined>, onPress?: Function, onLift?: Function) {
 	const isPointerDown = ref(false);
@@ -12,8 +12,8 @@ export function usePressed(el: MaybeRef<HTMLElement | ComponentPublicInstance | 
 	useEventListener(el, "pointerenter", onPointerEnter);
 	
 	/**
-	 * 指针按下事件。
-	 * @param e - 指针事件。
+	 * ポインターが押されたときのイベント。
+	 * @param e - ポインターイベント。
 	 */
 	function onPointerDown(e: PointerEvent) {
 		const div = e.currentTarget as HTMLDivElement;
@@ -25,8 +25,8 @@ export function usePressed(el: MaybeRef<HTMLElement | ComponentPublicInstance | 
 	}
 
 	/**
-	 * 指针进入事件。
-	 * @param e - 指针事件。
+	 * ポインターが要素に入ったときのイベント。
+	 * @param e - ポインターイベント。
 	 */
 	function onPointerEnter(e: PointerEvent) {
 		if (isPointerDown.value)
@@ -34,8 +34,8 @@ export function usePressed(el: MaybeRef<HTMLElement | ComponentPublicInstance | 
 	}
 
 	/**
-	 * 指针松开事件。
-	 * @param e - 指针事件。
+	 * ポインターが離されたときのイベント。
+	 * @param e - ポインターイベント。
 	 */
 	function onPointerUp(e: PointerEvent) {
 		isPointerDown.value = false;
@@ -44,8 +44,8 @@ export function usePressed(el: MaybeRef<HTMLElement | ComponentPublicInstance | 
 	}
 
 	/**
-	 * 指针离开事件。
-	 * @param _e - 指针事件。
+	 * ポインターが要素から離れたときのイベント。
+	 * @param _e - ポインターイベント。
 	 */
 	function onPointerLeave(_e: PointerEvent) {
 		if (isPointerEnter.value)

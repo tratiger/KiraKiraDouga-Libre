@@ -1,37 +1,37 @@
 /**
- * 时长对象。
+ * 時間オブジェクト。
  *
- * 用于更方便地输入时间间隔、时长。
+ * 時間間隔、長さをより便利に入力するために使用します。
  *
- * 内置的 `Date` 对象是时刻，还得处理时区等无关信息。
+ * 組み込みの `Date` オブジェクトは時刻であり、タイムゾーンなどの無関係な情報を処理する必要があります。
  */
 export class Duration {
-	/** 秒值。 */
+	/** 秒の値。 */
 	private seconds: number;
-	/** 时间中间的分隔符。 */
+	/** 時間の間の区切り文字。 */
 	private static colon = ":" as const;
-	/** 负号。 */
+	/** マイナス記号。 */
 	private static minus = "−" as const;
-	/** 当没有时间数据时显示的占位符划线。 */
+	/** 時間データがない場合に表示されるプレースホルダーのダッシュ。 */
 	private static dash = "‒" as const;
-	/** 当没有时间数据时显示的占位符字符串。 */
+	/** 時間データがない場合に表示されるプレースホルダー文字列。 */
 	static placeholder = "‒‒:‒‒" as const;
 
 	/**
-	 * 通过秒构造时长对象。
-	 * @param seconds - 秒数。如为空表示占位符。
+	 * 秒から期間オブジェクトを構築します。
+	 * @param seconds - 秒数。空の場合はプレースホルダーを表します。
 	 */
 	constructor(seconds?: number);
 	/**
-	 * 通过分、秒构造时长对象。
-	 * @param minutes - 分钟数。
+	 * 分、秒から期間オブジェクトを構築します。
+	 * @param minutes - 分数。
 	 * @param seconds - 秒数。
 	 */
 	constructor(minutes: number, seconds: number);
 	/**
-	 * 通过时、分、秒构造时长对象。
-	 * @param hours - 小时数。
-	 * @param minutes - 分钟数。
+	 * 時、分、秒から期間オブジェクトを構築します。
+	 * @param hours - 時間数。
+	 * @param minutes - 分数。
 	 * @param seconds - 秒数。
 	 */
 	constructor(hours: number, minutes: number, seconds: number);
@@ -47,27 +47,27 @@ export class Duration {
 			this.seconds = this.seconds * 60 + v3;
 	}
 
-	/** 获取秒的绝对值。 */
+	/** 秒の絶対値を取得します。 */
 	private get abs() { return Math.abs(this.seconds); }
-	/** 获取秒钟 (0~59)。 */
+	/** 秒を取得します (0〜59)。 */
 	get s() { return this.abs % 60 | 0; }
-	/** 获取分钟 (0~59)。 */
+	/** 分を取得します (0〜59)。 */
 	get m() { return this.abs / 60 % 60 | 0; }
-	/** 获取小时。 */
+	/** 時間を取得します。 */
 	get h() { return this.abs / 60 / 60 % 60 | 0; }
-	/** 是否是负数？ */
+	/** 負の数ですか？ */
 	get negative() { return this.seconds < 0; }
-	/** 是否有时间数据？ */
+	/** 時間データはありますか？ */
 	get valid() { return Number.isFinite(this.seconds); }
 
 	/**
-	 * 返回对象的字符串表示形式。
-	 * @deprecated 请使用官方内置的实现方式。
-	 * @returns 对象的字符串表示形式。
+	 * オブジェクトの文字列表現を返します。
+	 * @deprecated 公式の組み込み実装を使用してください。
+	 * @returns オブジェクトの文字列表現。
 	 */
 	private toString_legacy() {
 		if (!this.valid)
-			return Duration.placeholder; // 当没有时间数据时显示占位符字符串。
+			return Duration.placeholder; // 時間データがない場合は、プレースホルダー文字列を表示します。
 		let result = `${padTo2Digit(this.m)}${Duration.colon}${padTo2Digit(this.s)}`;
 		if (this.h) result = `${padTo2Digit(this.h)}${Duration.colon}${result}`;
 		if (this.negative) result = Duration.minus + result;
@@ -75,9 +75,9 @@ export class Duration {
 	}
 
 	/**
-	 * 返回对象的字符串表示形式。
-	 * @note 至少要求 Chromium 129，否则自动使用旧的私有实现。
-	 * @returns 对象的字符串表示形式。
+	 * オブジェクトの文字列表現を返します。
+	 * @note Chromium 129以降が必要です。そうでない場合は、古いプライベート実装が自動的に使用されます。
+	 * @returns オブジェクトの文字列表現。
 	 */
 	toString() {
 		if (!("DurationFormat" in Intl)) return this.toString_legacy();
@@ -91,11 +91,11 @@ export class Duration {
 	}
 
 	/**
-	 * 获取本地化的时长字符串中冒号所使用的字符。
+	 * ローカライズされた期間文字列で使用されるコロン文字を取得します。
 	 *
-	 * @remarks 不同语言使用不同的时长分隔符，如印尼语使用点号而不是冒号作为分隔符。
+	 * @remarks 言語によって期間の区切り文字が異なります。たとえば、インドネシア語ではコロンの代わりにドットが使用されます。
 	 *
-	 * @note 至少要求 Chromium 129，否则固定返回冒号字符本身。
+	 * @note Chromium 129以降が必要です。そうでない場合は、コロン文字自体が固定で返されます。
 	 */
 	static get localedColon() {
 		if (!("DurationFormat" in Intl)) return Duration.colon;
@@ -104,8 +104,8 @@ export class Duration {
 	}
 
 	/**
-	 * 将对象转换成基本类型值。
-	 * @returns 转换成对象的 this 值。
+	 * オブジェクトをプリミティブ値に変換します。
+	 * @returns オブジェクトのthis値に変換されます。
 	 */
 	valueOf() { return this.seconds; }
 }

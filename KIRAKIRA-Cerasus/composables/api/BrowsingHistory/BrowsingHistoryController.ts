@@ -4,10 +4,10 @@ const BACK_END_URI = environment.backendUri;
 const BROWSING_HISTORY_API_URI = `${BACK_END_URI}history`;
 
 /**
- * 获取全部或过滤后的用户浏览历史，按对某一内容的最后访问时间降序排序
- * @param getUserBrowsingHistoryWithFilterRequest - 获取全部或过滤后的用户浏览历史的请求参数
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 获取全部或过滤后的用户浏览历史的请求响应结果
+ * すべてまたはフィルタリングされたユーザーの閲覧履歴を、特定のコンテンツの最終アクセス日時で降順にソートして取得します
+ * @param getUserBrowsingHistoryWithFilterRequest - すべてまたはフィルタリングされたユーザーの閲覧履歴を取得するためのリクエストパラメータ
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns すべてまたはフィルタリングされたユーザーの閲覧履歴を取得するリクエストのレスポンス結果
  */
 export const getUserBrowsingHistoryWithFilter = async (getUserBrowsingHistoryWithFilterRequest: GetUserBrowsingHistoryWithFilterRequestDto, headerCookie: { cookie?: string | undefined }): Promise<GetUserBrowsingHistoryWithFilterResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -16,5 +16,5 @@ export const getUserBrowsingHistoryWithFilter = async (getUserBrowsingHistoryWit
 	if (result.value)
 		return result.value;
 	else
-		return { success: false, message: "获取全部或过滤后的用户浏览历史失败" };
+		return { success: false, message: "すべてまたはフィルタリングされたユーザーの閲覧履歴の取得に失敗しました" };
 };

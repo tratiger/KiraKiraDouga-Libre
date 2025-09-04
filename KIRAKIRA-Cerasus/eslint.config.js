@@ -150,7 +150,7 @@ export default [
 			"object-shorthand": "error",
 			"prefer-template": "off",
 			"@stylistic/template-curly-spacing": "error",
-			"no-undef": "off", // 这波 nuxt 的锅。
+			"no-undef": "off", // これはnuxtのせいです。
 			"@stylistic/multiline-ternary": "off",
 			"@stylistic/operator-linebreak": ["error", "after"],
 			"@stylistic/no-trailing-spaces": ["error", { "skipBlankLines": true }],
@@ -161,7 +161,7 @@ export default [
 				"exceptions": ["+", "-", "*", "/"],
 				"markers": ["/", "!", "@", "#", "#region", "#endregion"],
 			}],
-			"radix": "error", // parseInt 必须要指明是十进制。
+			"radix": "error", // parseIntは10進数であることを明記する必要があります。
 			"no-self-assign": "off",
 			"no-debugger": "warn",
 			"no-use-before-define": "off",
@@ -173,11 +173,11 @@ export default [
 			"no-redeclare": "off",
 			"@stylistic/no-mixed-operators": "off",
 			"@stylistic/no-extra-parens": ["error", "all", { "ignoreJSX": "multi-line", "conditionalAssign": false }],
-			"no-void": ["off", { "allowAsStatement": true }], // 我就是要使用 void。
+			"no-void": ["off", { "allowAsStatement": true }], // 私はvoidを使いたいです。
 			"no-labels": "off",
 			"no-label-var": "error",
 			"default-case-last": "off",
-			"no-useless-constructor": "off", // private constructor() { } 你跟我说无用？
+			"no-useless-constructor": "off", // private constructor() { } これが無駄だと言うのですか？
 			"@stylistic/no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0, "maxBOF": 0 }],
 			"no-unused-expressions": ["error", {
 				"allowShortCircuit": true,
@@ -186,7 +186,7 @@ export default [
 				"enforceForJSX": true,
 			}],
 			"@stylistic/max-statements-per-line": "off",
-			// "no-useless-assignment": "error", // 不支持 Vue 模板变量引用。
+			// "no-useless-assignment": "error", // Vueテンプレート変数の参照をサポートしていません。
 			"no-control-regex": "off",
 			"prefer-numeric-literals": "error",
 			"@stylistic/generator-star-spacing": ["error", {
@@ -199,11 +199,11 @@ export default [
 				"alphabetize": { "order": "asc", "orderImportKind": "asc", "caseInsensitive": false },
 				"named": true,
 			}],
-			"import/first": "off", // 与 Vue 特性冲突。
-			"import/named": "off", // 与 TypeScript 特性冲突。
-			"import/no-named-as-default": "off", // 似乎与文件命名方式有点出入。
-			"import/no-named-as-default-member": "off", // 某些库在导出成员时用 TS 命名空间欺诈。
-			"n/no-callback-literal": "off", // 这是啥？
+			"import/first": "off", // Vueの特性と競合します。
+			"import/named": "off", // TypeScriptの特性と競合します。
+			"import/no-named-as-default": "off", // ファイルの命名規則と少し違うようです。
+			"import/no-named-as-default-member": "off", // 一部のライブラリは、メンバーをエクスポートする際にTSの名前空間でごまかしています。
+			"n/no-callback-literal": "off", // これは何ですか？
 			"unicorn/escape-case": ["error", "lowercase"],
 			"unicorn/number-literal-case": ["error", { "hexadecimalValue": "lowercase" }],
 			"unicorn/prefer-code-point": "error",
@@ -242,7 +242,7 @@ export default [
 			// }],
 			"jsdoc/require-returns-check": "off",
 			"jsdoc/empty-tags": "off",
-			"@typescript-eslint/no-unused-vars": ["warn", { // 非要使用未使用变量，前面加下划线。
+			"@typescript-eslint/no-unused-vars": ["warn", { // 未使用の変数を使用する必要がある場合は、前にアンダースコアを追加してください。
 				"argsIgnorePattern": "^_",
 				"varsIgnorePattern": "^_|^props$|^emits$",
 				"caughtErrorsIgnorePattern": "^_",
@@ -279,10 +279,10 @@ export default [
 			"@stylistic/indent-binary-ops": "error",
 			"@stylistic/type-generic-spacing": "error",
 			"@stylistic/type-named-tuple-spacing": "error",
-			"@typescript-eslint/no-confusing-void-expression": "off", // 不是很好用。
-			"@typescript-eslint/no-floating-promises": "off", // 不是很好用。
+			"@typescript-eslint/no-confusing-void-expression": "off", // あまり使いやすくありません。
+			"@typescript-eslint/no-floating-promises": "off", // あまり使いやすくありません。
 			"@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
-			"@typescript-eslint/strict-boolean-expressions": ["off", { // 如需检查错误时可再临时手动开启。
+			"@typescript-eslint/strict-boolean-expressions": ["off", { // エラーをチェックする必要がある場合は、一時的に手動で再度有効にすることができます。
 				"allowString": false,
 				"allowNumber": false,
 				"allowNullableObject": false,
@@ -297,7 +297,7 @@ export default [
 			"@typescript-eslint/no-unnecessary-type-parameters": "error",
 			"@typescript-eslint/no-unnecessary-type-arguments": "error",
 			"@typescript-eslint/no-unnecessary-template-expression": "error",
-			"@typescript-eslint/no-unnecessary-qualifier": "off", // 开启后，某些包含复杂类型的特殊文件会把 eslint 弄崩。
+			"@typescript-eslint/no-unnecessary-qualifier": "off", // 有効にすると、複雑な型を含む一部の特殊なファイルでeslintがクラッシュします。
 			"@typescript-eslint/no-unnecessary-parameter-property-assignment": "error",
 			"@typescript-eslint/no-unnecessary-condition": ["off", { "allowConstantLoopConditions": true }],
 			"@typescript-eslint/no-empty-object-type": "off",
@@ -389,7 +389,7 @@ export default [
 				"multiline": "always",
 				"maxEmptyLines": 0,
 			}],
-			"vue/define-macros-order": ["off", { // 与 typescript 冲突了。
+			"vue/define-macros-order": ["off", { // typescriptと競合しました。
 				"order": ["defineProps", "defineEmits"],
 			}],
 			"vue/component-options-name-casing": ["error", "PascalCase"],
@@ -402,9 +402,9 @@ export default [
 			"vue/multiline-html-element-content-newline": "off",
 			"vue/no-template-shadow": "off",
 			"vue/no-mutating-props": ["off", { "shallowOnly": false }],
-			"vue/no-deprecated-filter": "off", // 我要按位或，不是要什么过滤器。
+			"vue/no-deprecated-filter": "off", // ビット単位のORが必要であり、フィルターは必要ありません。
 			"vue/no-dupe-keys": "off",
-			"vue/no-v-for-template-key": "off", // 官方说明：它会和 vue/no-v-for-template-key-on-child 规则打架。
+			"vue/no-v-for-template-key": "off", // 公式の説明：これはvue/no-v-for-template-key-on-childルールと競合します。
 			"vue/v-on-event-hyphenation": ["error", "never", { "autofix": true }],
 			"vue/max-attributes-per-line": ["error", {
 				"singleline": 5,
@@ -531,7 +531,7 @@ export default [
 		rules: {
 			"@typescript-eslint/no-explicit-any": "off",
 			"@typescript-eslint/no-unused-vars": "off",
-			"no-var": "off", // 在 globalThis 中声明成员时必须要用 var（不能使用 let 或 const）！参见：https://stackoverflow.com/a/69429093/19553213
+			"no-var": "off", // globalThisでメンバーを宣言するときは、varを使用する必要があります（letまたはconstは使用できません）！参照：https://stackoverflow.com/a/69429093/19553213
 		},
 	},
 	{

@@ -16,7 +16,7 @@
 	const enter = ref(true);
 
 	/**
-	 * 一键柴又！
+	 * ワンクリックで柴又！
 	 */
 	function otomading() {
 		if (!audio.value) return;
@@ -31,8 +31,8 @@
 	}
 
 	/**
-	 * 字幕改变事件。
-	 * @param e - 普通事件。
+	 * 字幕変更イベント。
+	 * @param e - 通常のイベント。
 	 */
 	function onCueChange(e: Event) {
 		const track = e.target as HTMLTrackElement;
@@ -46,8 +46,8 @@
 	}
 
 	/**
-	 * 在上传图片时调用。
-	 * @param e - 普通事件。
+	 * 画像アップロード時に呼び出されます。
+	 * @param e - 通常のイベント。
 	 */
 	async function onChangePhoto(e: Event) {
 		const input = e.target as HTMLInputElement;
@@ -57,8 +57,8 @@
 	}
 
 	/**
-	 * 点击图片更换图片。
-	 * @param e - 普通事件。
+	 * 画像をクリックして画像を変更します。
+	 * @param e - 通常のイベント。
 	 */
 	function onClickPhoto(e: Event) {
 		replayAnimation(e.currentTarget as HTMLDivElement, "swing");
@@ -66,7 +66,7 @@
 	}
 
 	/**
-	 * 滑动滑动条完成后事件。
+	 * スライダーをスライドさせた後のイベント。
 	 */
 	function onSliding() {
 		if (!audio.value) return;
@@ -74,8 +74,8 @@
 	}
 
 	/**
-	 * 当音频改变播放速度事件。
-	 * @param e - 普通事件。
+	 * オーディオの再生速度が変更されたときのイベント。
+	 * @param e - 通常のイベント。
 	 */
 	function onRateChange(e: Event) {
 		const audio = e.currentTarget as HTMLAudioElement;
@@ -90,10 +90,10 @@
 <template>
 	<div class="container">
 		<div class="left">
-			<h2>测试相簿功能</h2>
+			<h2>アルバム機能のテスト</h2>
 			<Button @click="otomading">音MADing!</Button>
 			<p class="pitch">{{ currentPitch }}</p>
-			<ToggleSwitch v-model="enter">进入</ToggleSwitch>
+			<ToggleSwitch v-model="enter">入る</ToggleSwitch>
 			<Slider v-model="pitch" :min="-24" :max="24" :defaultValue="0" @changing="onSliding" />
 			<audio ref="audio" loop controls @ratechange="onRateChange">
 				<source :src="shibamata" />
@@ -144,7 +144,7 @@
 			text-align: center;
 
 			&:empty::after {
-				content: "\a0"; // 当无内容时，依然保持高度占位防止布局跳动。
+				content: "\a0"; // コンテンツがない場合でも、レイアウトのずれを防ぐために高さを保持します。
 			}
 		}
 

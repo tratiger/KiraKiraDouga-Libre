@@ -1,7 +1,7 @@
 /**
- * 重定向到 GitHub issues 页面。
+ * GitHub issues ページにリダイレクトします。
  *
- * 由于就一个简单的功能，没必要再单独开一个新的模块，故挂靠在 noscript 模块上运行。
+ * 単純な機能なので、新しいモジュールを別途作成する必要はなく、noscript モジュール上で実行されます。
  */
 
 import { defineEventHandler, setHeader } from "h3";

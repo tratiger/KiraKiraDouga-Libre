@@ -1,5 +1,5 @@
 <docs>
-	### 评论标题
+	### コメントの見出し
 </docs>
 
 <script setup lang="ts">

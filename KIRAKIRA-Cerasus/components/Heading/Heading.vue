@@ -1,10 +1,10 @@
 <docs>
-	顶部的大标题。
+	トップの大きな見出し。
 
-	~~不叫 Title 是因为和 HTML title 标签冲突了。~~
-	~~不叫 Head 是因为和 HTML head 标签冲突了。~~
-	~~不叫 Header 是因为和 HTML header 标签冲突了。~~
-	而 HTML h1~h6 标签的对应类名就是 HTML**Heading**Element。
+	~~HTMLのtitleタグと競合するため、Titleとは呼びません。~~
+	~~HTMLのheadタグと競合するため、Headとは呼びません。~~
+	~~HTMLのheaderタグと競合するため、Headerとは呼びません。~~
+	HTMLのh1〜h6タグに対応するクラス名はHTML**Heading**Elementです。
 </docs>
 
 <script setup lang="ts">
@@ -35,7 +35,7 @@
 			font-weight: 900;
 			font-size: 40px;
 			text-transform: capitalize;
-			transform: skewX(-10deg); // 不要使用 `font-style: italic;`，因为太斜了。
+			transform: skewX(-10deg); // `font-style: italic;` は傾きすぎるため使用しないでください。
 			transform-origin: left bottom;
 			font-variant-caps: small-caps;
 			transition: none;

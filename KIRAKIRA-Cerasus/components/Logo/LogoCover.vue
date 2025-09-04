@@ -2,19 +2,19 @@
 	import { vElementSize } from "@vueuse/components";
 
 	const props = defineProps<{
-		/** 如是则将 LOGO 切换为 Welcome 字样。 */
+		/** その場合、ロゴを「Welcome」という言葉に切り替えます。 */
 		welcome?: boolean;
-		/** 是否**禁用**动画以节省性能？ */
+		/** パフォーマンスを節約するためにアニメーションを**無効**にしますか？ */
 		noAnimation?: boolean;
-		/** 如是则禁止显示标题。 */
+		/** その場合、タイトルの表示を禁止します。 */
 		noTitle?: boolean;
 	}>();
 
 	const linesWidth = ref("400px");
 
 	/**
-	 * 处理元素大小变化。
-	 * @param width - 宽度。
+	 * 要素のサイズ変更を処理します。
+	 * @param width - 幅。
 	 */
 	function onResize({ width }: { width: number }) {
 		linesWidth.value = width + "px";
@@ -53,9 +53,9 @@
 <style scoped lang="scss">
 	@layer props {
 		:comp {
-			/// 封面宽度。
+			/// カバーの幅。
 			--width: 400px; // v-bind 基于运行时，因此没办法赋值给 scss 变量。
-			/// 封面高度。
+			/// カバーの高さ。
 			--height: 400px;
 		}
 	}

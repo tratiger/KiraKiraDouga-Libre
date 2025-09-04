@@ -1,11 +1,11 @@
 <docs>
-	TODO 建议重构该组件中的动画。
+	TODO: このコンポーネントのアニメーションをリファクタリングすることをお勧めします。
 </docs>
 
 <script setup lang="ts">
 	import makeUsername from "pomsky/username.pom";
 	const props = defineProps<{
-		/** 已打开，单向绑定使用。 */
+		/** 開いている、一方向のバインディングで使用。 */
 		open?: boolean;
 	}>();
 
@@ -18,10 +18,10 @@
 	const coverMoveLeft = computed(() => !["login1", "login2-2fa", "login2-email"].includes(currentPage.value));
 	const email = ref("");
 	const password = ref("");
-	const clientOtp = ref(""); // TOTP 2FA 登录时的一次性密码
-	const loginVerificationCode = ref(""); // Email 2FA 登录时的验证码
-	const confirmPassword = ref(""); // 二次确认的密码
-	const registrationVerificationCode = ref(""); // 注册时的验证码
+	const clientOtp = ref(""); // TOTP 2FA ログイン時の一時パスワード
+	const loginVerificationCode = ref(""); // メール2FAログイン時の認証コード
+	const confirmPassword = ref(""); // 二次確認用のパスワード
+	const registrationVerificationCode = ref(""); // 登録時の認証コード
 	const passwordHint = ref("");
 	const loginAnimationText = ref<HTMLDivElement>();
 	const avatarMovement = ref(0);
@@ -36,8 +36,8 @@
 			if (value) closeLater();
 		},
 	});
-	const isChecking2FA = ref(false); // 正在检查用户是否开启 2FA
-	const isTryingLogin = ref(false); // 正在尝试登录
+	const isChecking2FA = ref(false); // ユーザーが2FAを有効にしているか確認中
+	const isTryingLogin = ref(false); // ログイン試行中
 	const isTryingRegistration = ref(false);
 	const isCheckingEmail = ref(false);
 	const invitationCode = ref("");
@@ -69,16 +69,16 @@
 	const username = ref("");
 	const nickname = ref("");
 
-	const resetPasswordVerificationCode = ref(""); // 重置密码时的验证码
-	const newPassword = ref(""); // 新密码
-	const confirmNewPassword = ref(""); // 确认新密码
-	const isSendingForgotPasswordVerificationCode = ref(false); // 正在发送忘记密码的验证码
-	const isResetPasssword = ref(false); // 正在重置密码
+	const resetPasswordVerificationCode = ref(""); // パスワードリセット時の認証コード
+	const newPassword = ref(""); // 新しいパスワード
+	const confirmNewPassword = ref(""); // 新しいパスワードの確認
+	const isSendingForgotPasswordVerificationCode = ref(false); // パスワード忘れの認証コードを送信中
+	const isResetPasssword = ref(false); // パスワードをリセット中
 
-	const timeout = useSendVerificationCodeTimeout(); // 全局的验证码倒计时
+	const timeout = useSendVerificationCodeTimeout(); // グローバルな認証コードのタイムアウト
 
 	/**
-	 * 更新登录动画中头像向左滑动的距离。
+	 * ログインアニメーション中のアバターの左へのスライド距離を更新します。
 	 */
 	function updateAvatarMovement() {
 		const windowWidth = loginWindow.value!.offsetWidth;
@@ -92,8 +92,8 @@
 	}
 
 	/**
-	 * 发送登录验证码
-	 * @returns 是否成功发送登录验证码
+	 * ログイン認証コードを送信します
+	 * @returns ログイン認証コードの送信に成功したかどうか
 	 */
 	async function sentLoginVerificationCode(): Promise<boolean> {
 		try {
@@ -113,7 +113,7 @@
 				clientLanguage: locale,
 			};
 			const sendUserEmailAuthenticatorVerificationCodeResult = await api.user.sendUserEmailAuthenticatorVerificationCode(sendUserEmailAuthenticatorVerificationCodeRequest);
-			timeout.startTimeout(); // 开始倒计时
+			timeout.startTimeout(); // カウントダウンを開始
 
 			if (!sendUserEmailAuthenticatorVerificationCodeResult.success) {
 				useToast(t.toast.verification_code_send_failed, "error", 5000);
@@ -136,7 +136,7 @@
 	}
 
 	/**
-	 * 登录账户，其一。
+	 * アカウントにログイン、その1。
 	 */
 	async function check2FA() {
 		isChecking2FA.value = true;
@@ -160,17 +160,17 @@
 			};
 			const check2FAByEmailResult = await api.user.checkUserHave2FAByEmail(checkUserHave2FARequest);
 
-			if (!check2FAByEmailResult.success) { // 查询用户是否开启 2FA 失败，通常是因为用户不存在
+			if (!check2FAByEmailResult.success) { // ユーザーが2FAを有効にしているかどうかのクエリに失敗しました。通常はユーザーが存在しないためです
 				useToast(t.validation.failed.user_info, "error", 5000);
 				isChecking2FA.value = false;
 				return;
 			}
 
-			// 如果有 2FA，则跳转到对应的 2FA 登录页面，如果没有 2FA 则直接登录
+			// 2FAが有効な場合は、対応する2FAログインページにリダイレクトします。2FAがない場合は直接ログインします
 			if (check2FAByEmailResult.have2FA)
 				if (check2FAByEmailResult.type === "email") {
 					const sendResult = await sentLoginVerificationCode();
-					if (sendResult) // 如果成功发送则进入下一页，否则在原地等待。
+					if (sendResult) // 成功した場合は次のページに進み、それ以外の場合は現在の場所で待機します。
 						currentPage.value = "login2-email";
 				} else
 					currentPage.value = "login2-2fa";
@@ -184,7 +184,7 @@
 	}
 
 	/**
-	 * 登录账户，其二。
+	 * アカウントにログイン、その2。
 	 */
 	async function loginUser() {
 		if (password.value && email.value) {
@@ -203,12 +203,12 @@
 				if (loginResponse.success && loginResponse.uid && loginResponse.token) {
 					selfUserInfoStore.tempHideAvatarFromSidebar = true;
 
-					// 登录后，将用户设置存储到 cookie，然后调用 cookieBinding 从 cookie 中获取样式设置并追加到 dom 根节点
+					// ログイン後、ユーザー設定をクッキーに保存し、cookieBindingを呼び出してクッキーからスタイル設定を取得し、DOMのルートノードに追加します
 					const userSettings = await api.user.getUserSettings();
 					saveUserSetting2BrowserCookieStore(userSettings);
 					cookieBinding();
 
-					// NOTE: 触发用户登录事件，应当放在最后，等待上方的一系列业务逻辑执行完成之后在发送事件
+					// NOTE: ユーザーログインイベントのトリガーは、上記の一連のビジネスロジックが完了するのを待ってから、最後に送信する必要があります
 					useEvent("user:login", true);
 					isLogining.value = true;
 				} else {
@@ -224,7 +224,7 @@
 	}
 
 	/**
-	 * 用户注册，其一。
+	 * ユーザー登録、その1。
 	 */
 	async function checkUsernameAndJumpNextPage() {
 		if (!username.value && username.value.length <= 0) {
@@ -253,18 +253,18 @@
 		isCheckingUsername.value = false;
 	}
 
-	const PASSWORD_HINT_DO_NOT_ALLOW_INCLUDES_PASSWORD = "密码提示中不允许包含密码本身"; // TODO: 使用多语言
+	const PASSWORD_HINT_DO_NOT_ALLOW_INCLUDES_PASSWORD = "パスワードヒントにパスワード自体を含めることはできません"; // TODO: 多言語対応
 	const INVITATION_CODE_INVALID_TEXT = t.validation.invalid_format.invitation_code;
 	/**
-	 * 用户注册，其二。
+	 * ユーザー登録、その2。
 	 */
 	async function checkAndJumpNextPage() {
-		if (!invitationCode.value || !invitationCodeInvalidText) { // 判断邀请码为空或者格式错误
+		if (!invitationCode.value || !invitationCodeInvalidText) { // 招待コードが空または形式が間違っているか判断する
 			useToast(INVITATION_CODE_INVALID_TEXT, "error");
 			return;
 		}
 
-		if (password.value && passwordHint.value && passwordHint.value.includes(password.value)) { // 判断密码提示中是否包含密码自身
+		if (password.value && passwordHint.value && passwordHint.value.includes(password.value)) { // パスワードヒントにパスワード自体が含まれているか判断する
 			useToast(PASSWORD_HINT_DO_NOT_ALLOW_INCLUDES_PASSWORD, "error");
 			return;
 		}
@@ -295,7 +295,7 @@
 	}
 
 	/**
-	 * 用户注册，其三。
+	 * ユーザー登録、その3。
 	 */
 	async function registerUser() {
 		if (!registrationVerificationCode.value) {
@@ -322,22 +322,22 @@
 		try {
 			const registrationResponse = await api.user.registration(userRegistrationRequest);
 
-			if (registrationResponse.success) { // 如果注册成功
-				await api.user.getSelfUserInfo({ getSelfUserInfoRequest: undefined, appSettingsStore: useAppSettingsStore(), selfUserInfoStore: useSelfUserInfoStore(), headerCookie: undefined }); // 根据获取到的用户 UID 和 Token 获取用户数据，相当于自动登录
-				isTryingRegistration.value = false; // 停止注册按钮加载动画
-				open.value = false; // 关闭登录页
-				currentPage.value = "login1"; // 将登录页设为登录窗口默认页
+			if (registrationResponse.success) { // 登録に成功した場合
+				await api.user.getSelfUserInfo({ getSelfUserInfoRequest: undefined, appSettingsStore: useAppSettingsStore(), selfUserInfoStore: useSelfUserInfoStore(), headerCookie: undefined }); // 取得したユーザーUIDとトークンに基づいてユーザーデータを取得します。これは自動ログインに相当します
+				isTryingRegistration.value = false; // 登録ボタンの読み込みアニメーションを停止する
+				open.value = false; // ログインページを閉じる
+				currentPage.value = "login1"; // ログインページをログインウィンドウのデフォルトページに設定する
 			} else
 				useToast(t.toast.something_went_wrong, "error");
 		} catch (error) {
 			useToast(t.toast.something_went_wrong, "error");
 			console.error("ERROR", "Registration failed:", error);
 		}
-		isTryingRegistration.value = false; // 停止注册按钮加载动画
+		isTryingRegistration.value = false; // 登録ボタンの読み込みアニメーションを停止する
 	}
 
 	/**
-	 * 跳转到重置密码页面。
+	 * パスワードリセットページに移動します。
 	 */
 	async function jump2ResetPasswordPage() {
 		isChecking2FA.value = true;
@@ -354,7 +354,7 @@
 				email: emailStr,
 			};
 			const check2FAByEmailResult = await api.user.checkUserHave2FAByEmail(checkUserHave2FARequest);
-			if (!check2FAByEmailResult.success) { // 查询用户是否开启 2FA 失败，通常是因为用户不存在
+			if (!check2FAByEmailResult.success) { // ユーザーが2FAを有効にしているかどうかのクエリに失敗しました。通常はユーザーが存在しないためです
 				useToast(t.validation.failed.user_info, "error", 5000);
 				isChecking2FA.value = false;
 				return;
@@ -368,7 +368,7 @@
 
 				isSendingForgotPasswordVerificationCode.value = true;
 				const sendResult = await api.user.requestSendForgotPasswordVerificationCode(requestSendForgotPasswordVerificationCodeRequest);
-				timeout.startTimeout(); // 开始倒计时
+				timeout.startTimeout(); // カウントダウンを開始
 				isSendingForgotPasswordVerificationCode.value = false;
 				
 				if (sendResult.isCoolingDown)
@@ -390,7 +390,7 @@
 	}
 
 	/**
-	 * 重置密码。
+	 * パスワードをリセットします。
 	 */
 	async function resetPassword() {
 		isResetPasssword.value = true;
@@ -426,14 +426,14 @@
 	}
 
 	/**
-	 * // TODO: 对于使用 TOTP 的用户，无法找回密码。只能跳转到 GitHub 联系管理员手动找回。
+	 * // TODO: TOTPを使用しているユーザーはパスワードを回復できません。GitHubにリダイレクトして管理者に連絡し、手動で回復する必要があります。
 	 */
 	function jump2GitHub() {
 		window.open("https://github.com/KIRAKIRA-DOUGA/KIRAKIRA-Cerasus/issues", "_blank");
 	}
 
 	/**
-	 * 稍后关闭。
+	 * 後で閉じる。
 	 */
 	async function closeLater() {
 		await nextTick();
@@ -448,8 +448,8 @@
 	const passwordHintInvalidText = ref<string | boolean>();
 
 	/**
-	 * 校验密码提示中是否包含密码自身。
-	 * @param e - 用户输入事件。
+	 * パスワードヒントにパスワード自体が含まれているかどうかを確認します。
+	 * @param e - ユーザー入力イベント。
 	 */
 	function checkPasswordHintIncludesPassword(e: InputEvent) {
 		const targe = e.target as HTMLInputElement;
@@ -484,7 +484,7 @@
 			>
 
 				<div class="main left">
-					<!-- 登录 其一 Login #1 -->
+					<!-- ログイン その1 Login #1 -->
 					<div class="login1">
 						<HeadingGroup :name="t.login" englishName="Login" />
 						<form class="form">
@@ -522,7 +522,7 @@
 						</div>
 					</div>
 
-					<!-- 登录 其二点一 Login #2.1 -->
+					<!-- ログイン その2.1 Login #2.1 -->
 					<div class="login2-2fa">
 						<HeadingGroup :name="t.login" englishName="Login" />
 						<span><Preserves>{{ t.loginwindow.login_totp_info }}</Preserves></span>
@@ -545,7 +545,7 @@
 							<Button>{{ t.need_help }}</Button>
 						</div>
 					</div>
-					<!-- 登录 其二点二 Login #2.2 -->
+					<!-- ログイン その2.2 Login #2.2 -->
 					<div class="login2-email">
 						<HeadingGroup :name="t.login" englishName="Login" />
 						<span>{{ t.loginwindow.login_email_info }}</span>
@@ -571,7 +571,7 @@
 				</div>
 
 				<div class="main right">
-					<!-- 注册 其一 Register #1 -->
+					<!-- 登録 その1 Register #1 -->
 					<div class="register1">
 						<HeadingGroup :name="t.register" englishName="Register" class="collapse" />
 						<div class="form textbox-with-span">
@@ -607,7 +607,7 @@
 						</div>
 					</div>
 
-					<!-- 注册 其二 Register #2 -->
+					<!-- 登録 その2 Register #2 -->
 					<div class="register2">
 						<HeadingGroup :name="t.register" englishName="Register" class="collapse" />
 						<div class="form">
@@ -651,7 +651,7 @@
 						</div>
 					</div>
 
-					<!-- 注册 其三 Register #3 -->
+					<!-- 登録 その3 Register #3 -->
 					<div class="register3">
 						<HeadingGroup :name="t.register" englishName="Register" class="collapse" />
 						<div class="form">
@@ -672,7 +672,7 @@
 						</div>
 					</div>
 
-					<!-- 忘记密码 其一 Forgot Password #1 -->
+					<!-- パスワード忘れ その1 Forgot Password #1 -->
 					<div class="forgot1">
 						<HeadingGroup :name="t.loginwindow.forgot_title" englishName="forgot" class="collapse" />
 						<div class="form">
@@ -698,7 +698,7 @@
 						</div>
 					</div>
 
-					<!-- 重设密码 其二点一 Forgot Passsword (Email) #2.1 -->
+					<!-- パスワードリセット その2.1 Forgot Passsword (Email) #2.1 -->
 					<div class="forgot2-email">
 						<HeadingGroup :name="t.loginwindow.forgot_title" englishName="forgot" class="collapse" />
 						<div class="form">
@@ -731,7 +731,7 @@
 						</div>
 					</div>
 
-					<!-- 重设密码 其二点二 Forgot Passsword (Totp) #2.2 -->
+					<!-- パスワードリセット その2.2 Forgot Passsword (Totp) #2.2 -->
 					<div class="forgot2-totp">
 						<HeadingGroup :name="t.loginwindow.forgot_title" englishName="forgot" class="collapse" />
 						<div class="form">
@@ -755,7 +755,7 @@
 					<LogoCover :welcome="isWelcome" />
 				</div>
 
-				<!-- 登录动画 Login Animation -->
+				<!-- ログインアニメーション Login Animation -->
 				<div class="login-animation">
 					<div class="add"></div>
 					<div class="burst">
@@ -875,7 +875,7 @@
 			padding: 35px 45px;
 
 			@if true {
-				// HACK: 为了故意不应用排序规则而将下面这部分页面声明单独提炼在下方。
+				// HACK: ソート順を意図的に適用しないために、以下のページ宣言を個別に抽出しています。
 				@include page("!.login1", ".login1", left);
 
 				@include page("!.login2-2fa", ".login2-2fa", left);
@@ -1108,7 +1108,7 @@
 	.add {
 		@include square(12px);
 		@include absolute-center-sized;
-		$thickness: 1px; // 加号符号粗细的一半。
+		$thickness: 1px; // プラス記号の太さの半分。
 		background-color: c(main-bg);
 		scale: 0;
 		clip-path:

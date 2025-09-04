@@ -3,8 +3,8 @@ export const useRecentKaomojiStore = defineStore("recent-kaomoji", () => {
 	const kaomojis = reactive(["(╯￣Д￣)╯╘═╛ ", " (ノ=Д=)ノ┻━┻ ", "（╯#-皿-)╯~~╧═╧", "(╯’ – ‘)╯︵ ┻━┻"]);
 
 	/**
-	 * 添加颜文字到最近中。
-	 * @param kaomoji - 最近选择的颜文字。
+	 * 最近使用した顔文字に追加します。
+	 * @param kaomoji - 最近選択した顔文字。
 	 */
 	function add(kaomoji: string) {
 		kaomojis.unshift(kaomoji);

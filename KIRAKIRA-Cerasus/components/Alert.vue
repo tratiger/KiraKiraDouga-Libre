@@ -46,7 +46,7 @@
 					</div>
 					<div class="right">
 						<slot name="footer-right">
-							<Button @click="open = false">了解</Button>
+							<Button @click="open = false">OK</Button>
 						</slot>
 					</div>
 				</div>

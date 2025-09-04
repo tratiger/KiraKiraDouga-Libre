@@ -38,9 +38,9 @@ const BACK_END_URI = environment.backendUri;
 const USER_API_URI = `${BACK_END_URI}user`;
 
 /**
- * 用户注册
- * @param userRegistrationData - 用户注册提交的参数
- * @returns 用户注册的返回参数
+ * ユーザー登録
+ * @param userRegistrationData - ユーザー登録時に送信されるパラメータ
+ * @returns ユーザー登録のレスポンスパラメータ
  */
 export const registration = async (userRegistrationData: UserRegistrationRequestDto): Promise<UserRegistrationResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -48,9 +48,9 @@ export const registration = async (userRegistrationData: UserRegistrationRequest
 };
 
 /**
- * 用户登录
- * @param userLoginRequest - 用户登录提交的参数
- * @returns 用户登录的返回参数
+ * ユーザーログイン
+ * @param userLoginRequest - ユーザーログイン時に送信されるパラメータ
+ * @returns ユーザーログインのレスポンスパラメータ
  */
 export const login = async (userLoginRequest: UserLoginRequestDto): Promise<UserLoginResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -58,27 +58,27 @@ export const login = async (userLoginRequest: UserLoginRequestDto): Promise<User
 };
 
 /**
- * 检查用户邮箱是否已经注册过
- * @param userExistsCheckRequest - 验证用户邮箱是否存在提交的参数
- * @returns 验证用户邮箱是否已经存在的返回参数
+ * ユーザーのメールアドレスが既に登録されているかを確認します
+ * @param userExistsCheckRequest - ユーザーのメールアドレスが存在するかどうかを検証するために送信されるパラメータ
+ * @returns ユーザーのメールアドレスが既に存在するかどうかを検証した後のレスポンスパラメータ
  */
 export const userExistsCheck = async (userExistsCheckRequest: UserEmailExistsCheckRequestDto): Promise<UserEmailExistsCheckResponseDto> => {
 	return await GET(`${USER_API_URI}/existsCheck?email=${userExistsCheckRequest.email}`) as UserEmailExistsCheckResponseDto;
 };
 
 /**
- * 用户更改邮箱
- * @param updateUserEmailRequest - 用户更改邮箱的请求的请求载荷
- * @returns 用户更改邮箱返回的参数
+ * ユーザーのメールアドレス変更
+ * @param updateUserEmailRequest - ユーザーのメールアドレス変更リクエストのペイロード
+ * @returns ユーザーのメールアドレス変更のレスポンスパラメータ
  */
 export const updateUserEmail = async (updateUserEmailRequest: UpdateUserEmailRequestDto): Promise<UpdateUserEmailResponseDto> => {
 	return await POST(`${USER_API_URI}/update/email`, updateUserEmailRequest, { credentials: "include" }) as UpdateUserEmailResponseDto;
 };
 
 /**
- * 创建或更新用户信息
- * @param updateOrCreateUserInfoRequest - 创建或更新用户信息的请求载荷
- * @returns 创建或更新用户信息的响应结果
+ * ユーザー情報の作成または更新
+ * @param updateOrCreateUserInfoRequest - ユーザー情報の作成または更新リクエストのペイロード
+ * @returns ユーザー情報の作成または更新のレスポンス結果
  */
 export const updateOrCreateUserInfo = async (updateOrCreateUserInfoRequest: UpdateOrCreateUserInfoRequestDto): Promise<UpdateOrCreateUserInfoResponseDto> => {
 	return await POST(`${USER_API_URI}/update/info`, updateOrCreateUserInfoRequest, { credentials: "include" }) as UpdateOrCreateUserInfoResponseDto;
@@ -87,10 +87,10 @@ export const updateOrCreateUserInfo = async (updateOrCreateUserInfoRequest: Upda
 type AppSettingsStoreType = ReturnType<typeof useAppSettingsStore>;
 type SelfUserInfoStoreType = ReturnType<typeof useSelfUserInfoStore>;
 /**
- * 获取当前登录的用户信息，前提是 token 中包含正确的 uid 和 token，同时丰富全局变量中的用户信息
- * @param getSelfUserInfoRequest - 获取当前登录的用户信息的请求参数
+ * 現在ログインしているユーザーの情報を取得します。前提として、トークンに正しいuidとtokenが含まれている必要があります。同時に、グローバル変数のユーザー情報を充実させます
+ * @param getSelfUserInfoRequest - 現在ログインしているユーザーの情報を取得するためのリクエストパラメータ
  * @param pinia - pinia
- * @returns 用户信息
+ * @returns ユーザー情報
  */
 export const getSelfUserInfo = async (props: { getSelfUserInfoRequest: GetSelfUserInfoRequestDto | undefined; appSettingsStore: AppSettingsStoreType | undefined; selfUserInfoStore: SelfUserInfoStoreType | undefined; headerCookie: { cookie?: string | undefined } | undefined }): Promise<GetSelfUserInfoResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -109,7 +109,7 @@ export const getSelfUserInfo = async (props: { getSelfUserInfoRequest: GetSelfUs
 		if (props.appSettingsStore)
 			props.appSettingsStore.authenticatorType = selfUserInfoResult.authenticatorType || "none";
 		if (props.selfUserInfoStore) {
-			props.selfUserInfoStore.isEffectiveCheckOnce = true; // 成功 fetch 用户信息时才能设为 true
+			props.selfUserInfoStore.isEffectiveCheckOnce = true; // ユーザー情報の取得に成功した場合にのみtrueに設定
 			props.selfUserInfoStore.isLogined = true;
 			props.selfUserInfoStore.userInfo = data.value.result ?? {};
 		}
@@ -119,10 +119,10 @@ export const getSelfUserInfo = async (props: { getSelfUserInfoRequest: GetSelfUs
 };
 
 /**
- * 通过传入的 UID 获取一个用户的信息（已启用服务端渲染）
- * @param getUserInfoByUidRequest - 传入的 UID
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户信息
+ * 渡されたUIDでユーザー情報を取得します（サーバーサイドレンダリング有効）
+ * @param getUserInfoByUidRequest - 渡されたUID
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザー情報
  */
 export const getUserInfo = async (getUserInfoByUidRequest: GetUserInfoByUidRequestDto, headerCookie?: { cookie?: string | undefined }): Promise<GetUserInfoByUidResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -139,21 +139,21 @@ export const getUserInfo = async (getUserInfoByUidRequest: GetUserInfoByUidReque
 };
 
 /**
- * 通过传入的 UID 检验一个用户是否存在
- * @param userExistsCheckByUIDRequest - 用户是否存在的请求载荷
- * @returns 用户是否存在的响应结果
+ * 渡されたUIDでユーザーが存在するかどうかを確認します
+ * @param userExistsCheckByUIDRequest - ユーザーが存在するかどうかのリクエストペイロード
+ * @returns ユーザーが存在するかどうかのレスポンス結果
  */
 export const userExistsCheckByUID = async (userExistsCheckByUIDRequest: UserExistsCheckByUIDRequestDto): Promise<UserExistsCheckByUIDResponseDto> => {
 	if (userExistsCheckByUIDRequest && userExistsCheckByUIDRequest.uid) {
-		const { data: result } = await useFetch(`${USER_API_URI}/exists?uid=${userExistsCheckByUIDRequest.uid}`, { credentials: "include" }); // 使用 useFetch 以启用服务端渲染
+		const { data: result } = await useFetch(`${USER_API_URI}/exists?uid=${userExistsCheckByUIDRequest.uid}`, { credentials: "include" }); // useFetchを使用してサーバーサイドレンダリングを有効にする
 		return result.value as UserExistsCheckByUIDResponseDto;
 	}
-	return { success: false, message: "未传入 UID", exists: false };
+	return { success: false, message: "UIDが渡されていません", exists: false };
 };
 
 /**
- * 校验用户 token 是否合法，同时可以验证用户是否已经登录
- * @returns 用户信息
+ * ユーザートークンが正当かどうかを検証し、同時にユーザーがログインしているかどうかも検証できます
+ * @returns ユーザー情報
  */
 export const checkUserToken = async (): Promise<CheckUserTokenResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -168,8 +168,8 @@ export const checkUserToken = async (): Promise<CheckUserTokenResponseDto> => {
 };
 
 /**
- * 用户登出
- * @returns 什么也不返回，但是会携带立即清除的 cookie 并覆盖原本的 cookie，同时将全局变量中的用户信息置空
+ * ユーザーログアウト
+ * @returns 何も返しませんが、即時クリアされるクッキーを携帯し、元のクッキーを上書きします。同時に、グローバル変数のユーザー情報を空にします
  */
 export async function userLogout(props: { appSettingsStore: AppSettingsStoreType | undefined; selfUserInfoStore: SelfUserInfoStoreType | undefined }): Promise<UserLogoutResponseDto> {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -182,44 +182,44 @@ export async function userLogout(props: { appSettingsStore: AppSettingsStoreType
 			props.selfUserInfoStore.userInfo = {};
 		}
 	} else
-		console.error("ERROR", "Logout failed.", logoutResult);
+		console.error("ERROR", "ログアウトに失敗しました。", logoutResult);
 	return logoutResult;
 }
 
 /**
- * 更新用户头像：获取用于用户上传头像的预签名 URL, 上传限时 60 秒
- * @returns 获取用户头像上传的预签名 URL 的请求响应
+ * ユーザーアバターの更新：ユーザーがアバターをアップロードするための署名付きURLを取得します。アップロードは60秒に制限されています
+ * @returns ユーザーアバターアップロード用の署名付きURL取得リクエストのレスポンス
  */
 export const getUserAvatarUploadSignedUrl = async (): Promise<GetUserAvatarUploadSignedUrlResponseDto> => {
 	return await GET(`${USER_API_URI}/avatar/preUpload`, { credentials: "include" }) as GetUserAvatarUploadSignedUrlResponseDto;
 };
 
 /**
- * 根据预签名 URL 上传用户头像
- * @param fileName - 头像文件名
- * @param avatarBlobData - 用 Blob 编码的用户头像文件
- * @param signedUrl - 预签名 URL
- * @returns 是否上传成功，成功返回 true，失败返回 false
+ * 署名付きURLに基づいてユーザーアバターをアップロードします
+ * @param fileName - アバターのファイル名
+ * @param avatarBlobData - Blobでエンコードされたユーザーアバターファイル
+ * @param signedUrl - 署名付きURL
+ * @returns アップロードに成功した場合はtrue、失敗した場合はfalseを返します
  */
 export const uploadUserAvatar = async (fileName: string, avatarBlobData: Blob, signedUrl: string): Promise<boolean> => {
 	try {
 		await uploadFile2CloudflareImages(fileName, signedUrl, avatarBlobData, 60000);
 		return true;
 	} catch (error) {
-		console.error("ERROR", "Failed to upload avatar:", error, { avatarBlobData, signedUrl });
+		console.error("ERROR", "アバターのアップロードに失敗しました:", error, { avatarBlobData, signedUrl });
 		return false;
 	}
 };
 
 /**
- * 获取用户设置，如果传入了 getUserSettingsRequest 且为提供 cookie（uid, token），则使用 getUserSettingsRequest 中的参数
- * @param getUserSettingsRequest - 用户令牌
- * @returns 用户设置
+ * ユーザー設定を取得します。getUserSettingsRequestが渡され、cookie（uid、token）が提供されている場合は、getUserSettingsRequestのパラメータを使用します
+ * @param getUserSettingsRequest - ユーザートークン
+ * @returns ユーザー設定
  */
 export const getUserSettings = async (request?: { getUserSettingsRequest?: GetUserSettingsRequestDto; headerCookie?: { cookie?: string | undefined } }): Promise<GetUserSettingsResponseDto> => {
 	// NOTE: use { Cookie: request?.headerCookie?.cookie ?? "" } to passing client-side cookies to backend API when SSR.
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
-	const userSettings = await POST( // WARN: 此处必须使用原生 fetch 方法，不要使用 useFetch，因为 getUserSettings 被 Nuxt 管辖之外的中间件调用了。
+	const userSettings = await POST( // WARN: ここではネイティブのfetchメソッドを使用する必要があります。useFetchは使用しないでください。なぜなら、getUserSettingsはNuxtの管理外のミドルウェアから呼び出されるためです。
 		`${USER_API_URI}/settings`,
 		request?.getUserSettingsRequest,
 		{
@@ -233,9 +233,9 @@ export const getUserSettings = async (request?: { getUserSettingsRequest?: GetUs
 };
 
 /**
- * 更新用户设置
- * @param updateOrCreateUserSettingsRequest - 更新的设置项
- * @returns 用户设置，同时更新的设置项会产生一个 set-cookie 的响应头
+ * ユーザー設定を更新します
+ * @param updateOrCreateUserSettingsRequest - 更新する設定項目
+ * @returns ユーザー設定。同時に、更新された設定項目はset-cookieレスポンスヘッダーを生成します
  */
 export const updateUserSettings = async (updateOrCreateUserSettingsRequest: UpdateOrCreateUserSettingsRequestDto): Promise<UpdateOrCreateUserSettingsResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -243,9 +243,9 @@ export const updateUserSettings = async (updateOrCreateUserSettingsRequest: Upda
 };
 
 /**
- * 请求发送验证码
- * @param requestSendVerificationCodeRequest - 请求发送验证码的请求载荷
- * @returns 请求发送验证码的请求响应
+ * 確認コードの送信を要求します
+ * @param requestSendVerificationCodeRequest - 確認コード送信リクエストのペイロード
+ * @returns 確認コード送信リクエストのレスポンス
  */
 export const requestSendVerificationCode = async (requestSendVerificationCodeRequest: RequestSendVerificationCodeRequestDto): Promise<RequestSendVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -253,9 +253,9 @@ export const requestSendVerificationCode = async (requestSendVerificationCodeReq
 };
 
 /**
- * 检查一个邀请码是否可用
- * @param checkInvitationCodeRequestDto - 检查一个邀请码是否可用的请求载荷
- * @returns 检查一个邀请码是否可用的请求响应
+ * 招待コードが利用可能かを確認します
+ * @param checkInvitationCodeRequestDto - 招待コードが利用可能かを確認するリクエストのペイロード
+ * @returns 招待コードが利用可能かを確認するリクエストのレスポンス
  */
 export const checkInvitationCode = async (checkInvitationCodeRequestDto: CheckInvitationCodeRequestDto): Promise<CheckInvitationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -263,8 +263,8 @@ export const checkInvitationCode = async (checkInvitationCodeRequestDto: CheckIn
 };
 
 /**
- * 生成邀请码
- * @returns 生成邀请码的请求响应
+ * 招待コードを生成します
+ * @returns 招待コード生成リクエストのレスポンス
  */
 export const createInvitationCode = async (): Promise<CreateInvitationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -272,9 +272,9 @@ export const createInvitationCode = async (): Promise<CreateInvitationCodeRespon
 };
 
 /**
- * 获取用户所有的邀请码
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户所有的邀请码
+ * ユーザーのすべての招待コードを取得します
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザーのすべての招待コード
  */
 export const getMyInvitationCode = async (headerCookie: { cookie?: string | undefined }): Promise<GetMyInvitationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -283,15 +283,15 @@ export const getMyInvitationCode = async (headerCookie: { cookie?: string | unde
 		const { data: result } = await useFetch(`${USER_API_URI}/myInvitationCode`, { headers: headerCookie, credentials: "include" });
 		return result.value as GetMyInvitationCodeResponseDto;
 	} catch (error) {
-		console.error("ERROR", "获取用户邀请码失败", error);
-		return { success: false, message: "获取用户邀请码失败", invitationCodeResult: [] };
+		console.error("ERROR", "ユーザーの招待コードの取得に失敗しました", error);
+		return { success: false, message: "ユーザーの招待コードの取得に失敗しました", invitationCodeResult: [] };
 	}
 };
 
 /**
- * 请求发送修改邮箱的邮箱验证码
- * @param requestSendChangeEmailVerificationCodeRequest - 请求发送修改邮箱的邮箱验证码的请求载荷
- * @returns 请求发送修改邮箱的邮箱验证码的请求响应
+ * メールアドレス変更の確認メール送信を要求します
+ * @param requestSendChangeEmailVerificationCodeRequest - メールアドレス変更の確認メール送信リクエストのペイロード
+ * @returns メールアドレス変更の確認メール送信リクエストのレスポンス
  */
 export const requestSendChangeEmailVerificationCode = async (requestSendChangeEmailVerificationCodeRequest: RequestSendChangeEmailVerificationCodeRequestDto): Promise<RequestSendChangeEmailVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -299,9 +299,9 @@ export const requestSendChangeEmailVerificationCode = async (requestSendChangeEm
 };
 
 /**
- * 请求发送修改密码的邮箱验证码
- * @param requestSendChangePasswordVerificationCodeRequest - 请求发送修改密码的邮箱验证码的请求载荷
- * @returns 请求发送修改密码的邮箱验证码的请求响应
+ * パスワード変更の確認メール送信を要求します
+ * @param requestSendChangePasswordVerificationCodeRequest - パスワード変更の確認メール送信リクエストのペイロード
+ * @returns パスワード変更の確認メール送信リクエストのレスポンス
  */
 export const requestSendChangePasswordVerificationCode = async (requestSendChangePasswordVerificationCodeRequest: RequestSendChangePasswordVerificationCodeRequestDto): Promise<RequestSendChangePasswordVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -309,9 +309,9 @@ export const requestSendChangePasswordVerificationCode = async (requestSendChang
 };
 
 /**
- * 用户更改密码
- * @param updateUserPasswordRequest - 用户更改密码的请求的请求载荷
- * @returns 用户更改密码返回的参数
+ * ユーザーのパスワード変更
+ * @param updateUserPasswordRequest - ユーザーのパスワード変更リクエストのペイロード
+ * @returns ユーザーのパスワード変更のレスポンスパラメータ
  */
 export const updateUserPassword = async (updateUserPasswordRequest: UpdateUserPasswordRequestDto): Promise<UpdateUserPasswordResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -319,9 +319,9 @@ export const updateUserPassword = async (updateUserPasswordRequest: UpdateUserPa
 };
 
 /**
- * 请求发送忘记密码的邮箱验证码
- * @param requestSendForgotPasswordVerificationCodeRequest - 请求发送忘记密码的邮箱验证码的请求载荷
- * @returns 请求发送忘记密码的邮箱验证码的请求响应
+ * パスワードを忘れた場合の確認メール送信を要求します
+ * @param requestSendForgotPasswordVerificationCodeRequest - パスワードを忘れた場合の確認メール送信リクエストのペイロード
+ * @returns パスワードを忘れた場合の確認メール送信リクエストのレスポンス
  */
 export const requestSendForgotPasswordVerificationCode = async (requestSendForgotPasswordVerificationCodeRequest: RequestSendForgotPasswordVerificationCodeRequestDto): Promise<RequestSendForgotPasswordVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -329,9 +329,9 @@ export const requestSendForgotPasswordVerificationCode = async (requestSendForgo
 };
 
 /**
- * 找回密码（更新密码）
- * @param forgotPasswordRequest - 忘记密码（更新密码）的请求载荷
- * @returns 忘记密码（更新密码）的请求响应
+ * パスワードの回復（更新）
+ * @param forgotPasswordRequest - パスワードの回復（更新）リクエストのペイロード
+ * @returns パスワードの回復（更新）リクエストのレスポンス
  */
 export const forgotAndResetPassword = async (forgotPasswordRequest: ForgotPasswordRequestDto): Promise<ForgotPasswordResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -339,9 +339,9 @@ export const forgotAndResetPassword = async (forgotPasswordRequest: ForgotPasswo
 };
 
 /**
- * 检查用户名是否可用
- * @param checkUsernameRequest - 用户更改密码的请求的请求载荷
- * @returns 用户更改密码返回的参数
+ * ユーザー名が利用可能かを確認します
+ * @param checkUsernameRequest - ユーザーのパスワード変更リクエストのペイロード
+ * @returns ユーザーのパスワード変更のレスポンスパラメータ
  */
 export const checkUsername = async (checkUsernameRequest: CheckUsernameRequestDto): Promise<CheckUsernameResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -349,9 +349,9 @@ export const checkUsername = async (checkUsernameRequest: CheckUsernameRequestDt
 };
 
 // /**
-//  * 根据 UID 封禁一个用户
-//  * @param blockUserByUIDRequest 封禁用户的请求载荷
-//  * @returns 封禁用户的请求响应
+//  * UIDに基づいてユーザーをブロックする
+//  * @param blockUserByUIDRequest ブロックするユーザーのリクエストペイロード
+//  * @returns ブロックするユーザーのリクエストのレスポンス
 //  */
 // export const blockUserByUID = async (blockUserByUIDRequest: BlockUserByUIDRequestDto): Promise<BlockUserByUIDResponseDto> => {
 // 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -359,9 +359,9 @@ export const checkUsername = async (checkUsernameRequest: CheckUsernameRequestDt
 // };
 
 // /**
-//  * 根据 UID 重新激活一个用户
-//  * @param reactivateUserByUIDRequest 重新激活一个用户的请求载荷
-//  * @returns 重新激活一个用户的请求响应
+//  * UIDに基づいてユーザーを再アクティブ化する
+//  * @param reactivateUserByUIDRequest 再アクティブ化するユーザーのリクエストペイロード
+//  * @returns 再アクティブ化するユーザーのリクエストのレスポンス
 //  */
 // export const reactivateUserByUID = async (reactivateUserByUIDRequest: ReactivateUserByUIDRequestDto): Promise<ReactivateUserByUIDResponseDto> => {
 // 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -369,9 +369,9 @@ export const checkUsername = async (checkUsernameRequest: CheckUsernameRequestDt
 // };
 
 /**
- * 获取所有被封禁用户的信息
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 获取所有被封禁用户的信息的请求响应
+ * すべてのブロックされたユーザーの情報を取得します
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns すべてのブロックされたユーザーの情報を取得するリクエストのレスポンス
  */
 export const getBlockedUser = async (headerCookie: { cookie?: string | undefined }): Promise<GetBlockedUserResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -389,12 +389,12 @@ export const getBlockedUser = async (headerCookie: { cookie?: string | undefined
 };
 
 /**
- * 管理员获取用户信息
- * @param isOnlyShowUserInfoUpdatedAfterReview - 是否只展示在上一次审核通过后修改了用户信息的用户
- * @param page - 当前在第几页
- * @param pageSize - 每页显示多少项目
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 管理员获取用户信息的请求响应
+ * 管理者がユーザー情報を取得します
+ * @param isOnlyShowUserInfoUpdatedAfterReview - 最終レビュー承認後にユーザー情報が変更されたユーザーのみを表示するかどうか
+ * @param page - 現在のページ番号
+ * @param pageSize - 1ページに表示するアイテム数
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns 管理者がユーザー情報を取得するためのリクエストのレスポンス
  */
 export const adminGetUserInfo = async (isOnlyShowUserInfoUpdatedAfterReview: boolean, page: number, pageSize: number, headerCookie: { cookie?: string | undefined }): Promise<AdminGetUserInfoResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -404,9 +404,9 @@ export const adminGetUserInfo = async (isOnlyShowUserInfoUpdatedAfterReview: boo
 };
 
 /**
- * 管理员通过用户信息审核
- * @param approveUserInfoRequest - 管理员通过用户信息审核的请求载荷
- * @returns 管理员通过用户信息审核的请求响应
+ * 管理者によるユーザー情報審査承認
+ * @param approveUserInfoRequest - 管理者によるユーザー情報審査承認のリクエストペイロード
+ * @returns 管理者によるユーザー情報審査承認のリクエストのレスポンス
  */
 export const approveUserInfo = async (approveUserInfoRequest: ApproveUserInfoRequestDto): Promise<ApproveUserInfoResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -414,9 +414,9 @@ export const approveUserInfo = async (approveUserInfoRequest: ApproveUserInfoReq
 };
 
 /**
- * 管理员清空某个用户的信息
- * @param adminClearUserInfoRequest - 管理员清空某个用户的信息的请求载荷
- * @returns 管理员清空某个用户的信息的请求响应
+ * 管理者が特定のユーザーの情報をクリアします
+ * @param adminClearUserInfoRequest - 管理者が特定のユーザーの情報をクリアするためのリクエストペイロード
+ * @returns 管理者が特定のユーザーの情報をクリアするためのリクエストのレスポンス
  */
 export const adminClearUserInfo = async (adminClearUserInfoRequest: AdminClearUserInfoRequestDto): Promise<AdminClearUserInfoResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -424,9 +424,9 @@ export const adminClearUserInfo = async (adminClearUserInfoRequest: AdminClearUs
 };
 
 /**
- * 通过 UUID 检查用户是否已开启 2FA 身份验证器
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 通过 UUID 检查用户是否已开启 2FA 身份验证器的请求响应
+ * UUIDでユーザーが2FA認証を有効にしているか確認します
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns UUIDでユーザーが2FA認証を有効にしているか確認するリクエストのレスポンス
  */
 export const checkUserHave2FAByUUID = async (headerCookie: { cookie?: string | undefined }): Promise<CheckUserHave2FAResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -441,9 +441,9 @@ export const checkUserHave2FAByUUID = async (headerCookie: { cookie?: string | u
 };
 
 /**
- * 通过 Email 检查用户是否已开启 2FA 身份验证器
- * @param checkUserHave2FARequest - 通过 Email 检查用户是否已开启 2FA 身份验证器的请求载荷
- * @returns 通过 Email 检查用户是否已开启 2FA 身份验证器的请求响应
+ * メールアドレスでユーザーが2FA認証を有効にしているか確認します
+ * @param checkUserHave2FARequest - メールアドレスでユーザーが2FA認証を有効にしているか確認するリクエストのペイロード
+ * @returns メールアドレスでユーザーが2FA認証を有効にしているか確認するリクエストのレスポンス
  */
 export const checkUserHave2FAByEmail = async (checkUserHave2FARequest: CheckUserHave2FARequestDto): Promise<CheckUserHave2FAResponseDto> => {
 	const { data: result } = await useFetch(`${USER_API_URI}/checkUserHave2FAByEmail?email=${checkUserHave2FARequest.email}`);
@@ -451,9 +451,9 @@ export const checkUserHave2FAByEmail = async (checkUserHave2FARequest: CheckUser
 };
 
 /**
- * 用户创建 TOTP 身份验证器
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户创建 TOTP 身份验证器的请求响应
+ * ユーザーがTOTP認証システムを作成します
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザーがTOTP認証システムを作成するリクエストのレスポンス
  */
 export const createTotpAuthenticator = async (headerCookie: { cookie?: string | undefined }): Promise<CreateUserTotpAuthenticatorResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -463,10 +463,10 @@ export const createTotpAuthenticator = async (headerCookie: { cookie?: string | 
 };
 
 /**
- * 用户确认绑定 TOTP 设备
- * @param confirmUserTotpAuthenticatorRequest - 用户确认绑定 TOTP 设备的请求载荷
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户确认绑定 TOTP 设备的请求响应
+ * ユーザーがTOTPデバイスの紐付けを確認します
+ * @param confirmUserTotpAuthenticatorRequest - ユーザーがTOTPデバイスの紐付けを確認するリクエストのペイロード
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザーがTOTPデバイスの紐付けを確認するリクエストのレスポンス
  */
 export const confirmUserTotpAuthenticator = async (confirmUserTotpAuthenticatorRequest: ConfirmUserTotpAuthenticatorRequestDto, headerCookie: { cookie?: string | undefined }): Promise<ConfirmUserTotpAuthenticatorResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -484,10 +484,10 @@ export const confirmUserTotpAuthenticator = async (confirmUserTotpAuthenticatorR
 };
 
 /**
- * 已登录用户通过密码和 TOTP 验证码删除身份验证器
- * @param deleteTotpAuthenticatorByTotpVerificationCodeRequest - 已登录用户通过密码和 TOTP 验证码删除身份验证器的请求载荷
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 已登录用户通过密码和 TOTP 验证码删除身份验证器的请求响应
+ * ログイン済みユーザーがパスワードとTOTP認証コードで認証システムを削除します
+ * @param deleteTotpAuthenticatorByTotpVerificationCodeRequest - ログイン済みユーザーがパスワードとTOTP認証コードで認証システムを削除するためのリクエストペイロード
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ログイン済みユーザーがパスワードとTOTP認証コードで認証システムを削除するためのリクエストのレスポンス
  */
 export const deleteTotpByVerificationCode = async (deleteTotpAuthenticatorByTotpVerificationCodeRequest: DeleteTotpAuthenticatorByTotpVerificationCodeRequestDto, headerCookie: { cookie?: string | undefined }): Promise<DeleteTotpAuthenticatorByTotpVerificationCodeResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -505,9 +505,9 @@ export const deleteTotpByVerificationCode = async (deleteTotpAuthenticatorByTotp
 };
 
 /**
- * 用户创建 Email 身份验证器
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户创建 Email 身份验证器的请求响应
+ * ユーザーがメール認証システムを作成します
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザーがメール認証システムを作成するリクエストのレスポンス
  */
 export const createEmail2FA = async (headerCookie: { cookie?: string | undefined }): Promise<CreateUserEmailAuthenticatorResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.
@@ -525,9 +525,9 @@ export const createEmail2FA = async (headerCookie: { cookie?: string | undefined
 };
 
 /**
- * 发送 Email 身份验证器验证码
- * @param sendUserEmailAuthenticatorVerificationCodeRequest - 发送 Email 身份验证器验证码的请求载荷
- * @returns 发送 Email 身份验证器验证码的请求响应
+ * メール認証システムの確認コードを送信します
+ * @param sendUserEmailAuthenticatorVerificationCodeRequest - メール認証システムの確認コードを送信するリクエストのペイロード
+ * @returns メール認証システムの確認コードを送信するリクエストのレスポンス
  */
 export const sendUserEmailAuthenticatorVerificationCode = async (sendUserEmailAuthenticatorVerificationCodeRequest: SendUserEmailAuthenticatorVerificationCodeRequestDto): Promise<SendUserEmailAuthenticatorVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -535,9 +535,9 @@ export const sendUserEmailAuthenticatorVerificationCode = async (sendUserEmailAu
 };
 
 /**
- * 发送删除 Email 身份验证器验证码
- * @param sendDeleteUserEmailAuthenticatorVerificationCodeRequest - 发送删除 Email 身份验证器验证码的请求载荷
- * @returns 发送删除 Email 身份验证器验证码的请求响应
+ * メール認証システムの削除確認コードを送信します
+ * @param sendDeleteUserEmailAuthenticatorVerificationCodeRequest - メール認証システムの削除確認コードを送信するリクエストのペイロード
+ * @returns メール認証システムの削除確認コードを送信するリクエストのレスポンス
  */
 export const sendDeleteUserEmailAuthenticatorVerificationCode = async (sendDeleteUserEmailAuthenticatorVerificationCodeRequest: SendDeleteUserEmailAuthenticatorVerificationCodeRequestDto): Promise<SendDeleteUserEmailAuthenticatorVerificationCodeResponseDto> => {
 	// TODO: use { credentials: "include" } to allow save/read cookies from cross-origin domains. Maybe we should remove it before deployment to production env.
@@ -545,10 +545,10 @@ export const sendDeleteUserEmailAuthenticatorVerificationCode = async (sendDelet
 };
 
 /**
- * 用户删除 Email 2FA
- * @param deleteUserEmailAuthenticatorRequest - 用户删除 Email 2FA 的请求载荷
- * @param headerCookie - 从客户端发起 SSR 请求时传递的 Header 中的 Cookie 部分，在 SSR 时将其转交给后端 API
- * @returns 用户删除 Email 2FA 的请求响应
+ * ユーザーがメール2FAを削除します
+ * @param deleteUserEmailAuthenticatorRequest - ユーザーがメール2FAを削除するリクエストのペイロード
+ * @param headerCookie - クライアントサイドからSSRリクエストを行う際に渡されるヘッダーのCookie部分。SSR時にバックエンドAPIに渡します
+ * @returns ユーザーがメール2FAを削除するリクエストのレスポンス
  */
 export const deleteEmail2FA = async (deleteUserEmailAuthenticatorRequest: DeleteUserEmailAuthenticatorRequestDto, headerCookie: { cookie?: string | undefined }): Promise<DeleteUserEmailAuthenticatorResponseDto> => {
 	// NOTE: use { headers: headerCookie } to passing client-side cookies to backend API when SSR.

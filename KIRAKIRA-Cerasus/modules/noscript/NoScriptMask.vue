@@ -1,11 +1,11 @@
 <script lang="tsx">
-	// 写个屁的 script，你写了它也不会跑的。
+	// スクリプトを書いたって、実行されないんだから意味ないよ。
 
 	export default defineComponent({
 		render() {
 			const styles = useCssModule();
 
-			// 已知特性之一，使用 template 写会导入不进样式，只能用 tsx 写。
+			// 既知の特性の1つ、templateを使用するとスタイルがインポートされないため、tsxで記述するしかありません。
 			return (
 				<noscript>
 					<div class={styles.mask}>
@@ -14,22 +14,22 @@
 								{forMap(2, i => <Icon name="settings" class={styles.settingsIcon} key={`settings-${i}`} />, 1)}
 							</div>
 							<div class={styles.cardBody}>
-								<h1>警告，JavaScript被禁用</h1>
+								<h1>警告、JavaScriptが無効になっています</h1>
 								<LogoDisableJavascript class={styles.logo} />
 								<p>
-									嘿！为什么禁用JavaScript？<br />
-									我们的站点使用了大量JavaScript技术，<br />
-									需要启用JavaScript才能使用。<br />
-									<a href="https://www.enable-javascript.com/" target="_blank">如何启用JavaScript？</a>
+									おい！なぜJavaScriptを無効にするのですか？<br />
+									私たちのサイトは多くのJavaScript技術を使用しており、<br />
+									使用するにはJavaScriptを有効にする必要があります。<br />
+									<a href="https://www.enable-javascript.com/" target="_blank">JavaScriptを有効にする方法は？</a>
 								</p>
 							</div>
 						</div>
 					</div>
 				</noscript>
 			);
-			// 在 Vue 中一旦包含 noscript 标签，会在控制台打印一个警告和一个错误，但不影响使用。
-			// 此题无解：https://github.com/nuxt/framework/issues/9988
-			// OK，现在已经解决了。
+			// Vueでnoscriptタグを含めると、コンソールに警告とエラーが1つずつ表示されますが、使用には影響しません。
+			// この問題は解決できません：https://github.com/nuxt/framework/issues/9988
+			// OK、今は解決済みです。
 		},
 	});
 </script>

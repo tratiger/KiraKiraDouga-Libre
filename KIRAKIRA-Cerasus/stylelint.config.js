@@ -7,7 +7,7 @@ export default {
 		"stylelint-config-standard",
 		"stylelint-config-standard-scss",
 	],
-	overrides: [ // 扫描 .vue/html 文件中的 <style> 标签内的样式
+	overrides: [ // .vue/html ファイルの <style> タグ内のスタイルをスキャンします
 		{
 			files: ["**/*.{vue,html}"],
 			customSyntax: "postcss-html",
@@ -40,19 +40,19 @@ export default {
 		},
 	},
 	rules: {
-		"media-feature-name-no-vendor-prefix": true, // 不要使用已被 autoprefixer 支持的浏览器前缀。
+		"media-feature-name-no-vendor-prefix": true, // autoprefixerでサポートされているブラウザプレフィックスを使用しないでください。
 		"at-rule-no-vendor-prefix": true,
 		"selector-no-vendor-prefix": true,
 		"property-no-vendor-prefix": true,
 		"value-no-vendor-prefix": true,
-		"@stylistic/color-hex-case": "lower", // 颜色值要小写。
-		"color-hex-length": "short", // 颜色值能短则短。
-		"color-named": "always-where-possible", // 颜色若有名字则必须写为其名字。
-		"function-disallowed-list": [/^rgb/, /^hsl/, /^hwb/], // 只允许用 16 进制表示颜色，不允许使用 rgb、rgba 等表示颜色。
+		"@stylistic/color-hex-case": "lower", // カラー値は小文字にする必要があります。
+		"color-hex-length": "short", // カラー値は可能な限り短くする必要があります。
+		"color-named": "always-where-possible", // 色に名前がある場合は、その名前で記述する必要があります。
+		"function-disallowed-list": [/^rgb/, /^hsl/, /^hwb/], // 色は16進数でのみ表現でき、rgb、rgbaなどでの表現は許可されていません。
 		"@stylistic/indentation": ["tab", { baseIndentLevel: "auto" }],
 		"length-zero-no-unit": true,
-		// "selector-class-pattern": /^[A-Za-z0-9]+$/, // 换回连字符了。
-		"value-keyword-case": null, // 与 v-bind 冲突了。
+		// "selector-class-pattern": /^[A-Za-z0-9]+$/, // ハイフンに戻しました。
+		"value-keyword-case": null, // v-bindと競合します。
 		"@stylistic/value-list-comma-newline-after": null,
 		"@stylistic/max-line-length": null,
 		"@stylistic/no-eol-whitespace": [true, { "ignore": ["empty-lines"] }],
@@ -82,7 +82,7 @@ export default {
 		"font-family-no-missing-generic-family-keyword": true,
 		"font-family-name-quotes": "always-where-recommended",
 		"comment-empty-line-before": null,
-		"function-calc-no-unspaced-operator": null, // 暂时解决一打 calc() 还没打完内容右下角就开始疯狂报错的问题。
+		"function-calc-no-unspaced-operator": null, // calc() を入力し終える前に右下隅でエラーが頻発する問題を一時的に解決します。
 		/* "comment-empty-line-before": ["always", {
 			"except": ["first-nested"],
 			"ignore": ["stylelint-commands"],
@@ -94,8 +94,8 @@ export default {
 			"ignoreAtRules": ["import", "include", "else", "return", "forward", "use", "debug", "extend"],
 		}],
 		"unit-disallowed-list": [
-			"vw", "vh", "vmin", "vmax", // 请使用 dvw、dvh、dvmin、dvmax 代替之。
-			"cm", "mm", "Q", "in", "pc", "pt", "mozmm", // 你觉得这种单位可能合理吗？
+			"vw", "vh", "vmin", "vmax", // 代わりに dvw、dvh、dvmin、dvmax を使用してください。
+			"cm", "mm", "Q", "in", "pc", "pt", "mozmm", // このような単位が合理的だと思いますか？
 		],
 		"number-max-precision": null,
 		"scss/dollar-variable-empty-line-before": null,
@@ -105,7 +105,7 @@ export default {
 			"ignore": ["between-comments", "stylelint-commands"],
 			"severity": "warning",
 		}], */
-		"scss/at-extend-no-missing-placeholder": null, // 可继承一般的类名。
+		"scss/at-extend-no-missing-placeholder": null, // 通常のクラス名を継承できます。
 		/* "scss/dollar-variable-first-in-block": [true, {
 			"ignore": ["comments", "imports"],
 			"except": ["root", "function"],

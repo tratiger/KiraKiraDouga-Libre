@@ -1,7 +1,7 @@
 <script setup lang="ts">
-	const searchText = ref(""); // 用户输入的搜索字符
-	const browsingHistory = ref<GetUserBrowsingHistoryWithFilterResponseDto["result"]>([]); // 获取到的浏览历史
-	const browsingHistoryGroupedByDays = computed(() => { // 将浏览历史按当前语言所在时区的日期按天分组
+	const searchText = ref(""); // ユーザーが入力した検索文字列
+	const browsingHistory = ref<GetUserBrowsingHistoryWithFilterResponseDto["result"]>([]); // 取得した閲覧履歴
+	const browsingHistoryGroupedByDays = computed(() => { // 閲覧履歴を現在の言語のタイムゾーンの日付でグループ化する
 		return browsingHistory.value?.reduce((acc, video) => {
 			const date = formatLocalizationSemanticDateTime(video.lastUpdateDateTime, 2);
 			if (!acc[date])
@@ -12,7 +12,7 @@
 	});
 
 	/**
-	 * 获取全部或过滤后的用户浏览历史
+	 * すべてまたはフィルターされたユーザーの閲覧履歴を取得する
 	 */
 	async function getUserBrowsingHistory() {
 		const getUserBrowsingHistoryWithFilterRequest: GetUserBrowsingHistoryWithFilterRequestDto = {
@@ -49,7 +49,7 @@
 								:watchedCount="browsingHistoryItem.watchedCount"
 								:duration="new Duration(0, browsingHistoryItem.duration ?? 0)"
 							>{{ browsingHistoryItem.title }}</ThumbVideo>
-							<!-- TODO: 现在只能显示视频，以后应该可以可以显示其他类型的历史记录 -->
+							<!-- TODO: 現在は動画のみ表示可能ですが、将来的には他の種類の履歴も表示できるようにするべきです -->
 						</template>
 					</ThumbGrid>
 				</section>

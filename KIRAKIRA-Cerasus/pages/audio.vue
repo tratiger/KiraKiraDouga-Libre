@@ -23,7 +23,7 @@
 	});
 
 	/**
-	 * 滑动滑动条完成后事件。
+	 * スライダーをスライドさせた後のイベント。
 	 */
 	function onSliding() {
 		if (!player.value) return;
@@ -31,8 +31,8 @@
 	}
 
 	/**
-	 * 当音频改变播放速度事件。
-	 * @param e - 普通事件。
+	 * オーディオの再生速度が変更されたときのイベント。
+	 * @param e - 通常のイベント。
 	 */
 	function onRateChange(e: Event) {
 		const audio = e.currentTarget as HTMLAudioElement;
@@ -42,7 +42,7 @@
 
 <template>
 	<div class="container">
-		<h2>测试音频与频谱功能</h2>
+		<h2>オーディオとスペクトルのテスト機能</h2>
 		<audio ref="player" :src="audio" controls loop @ratechange="onRateChange" />
 		<Slider v-model="pitch" :min="-24" :max="24" :defaultValue="0" @changing="onSliding" />
 		<canvas ref="canvas" />

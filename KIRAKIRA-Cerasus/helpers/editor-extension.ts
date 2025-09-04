@@ -90,11 +90,11 @@ export default {
 	<NodeViewWrapper>
 		<ThumbVideo
 			link="video"
-			uploader="艾了个拉"
+			uploader="アイラ"
 			:date="new Date()"
 			:watchedCount="233_0000"
 			:duration="new Duration(2, 33)"
-		>测试视频</ThumbVideo>
+		>テストビデオ</ThumbVideo>
 	</NodeViewWrapper>
 </template> */
 
