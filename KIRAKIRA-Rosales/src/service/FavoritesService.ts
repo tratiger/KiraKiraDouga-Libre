@@ -7,11 +7,11 @@ import { getNextSequenceValueService } from './SequenceValueService.js'
 import { checkUserTokenService } from './UserService.js'
 
 /**
- * 创建收藏夹
- * @param createFavoritesRequest 创建收藏夹的请求载荷
- * @param uid 用户 ID
- * @param token 用户安全令牌
- * @returns 创建收藏夹的请求响应
+ * お気に入りフォルダを作成
+ * @param createFavoritesRequest お気に入りフォルダ作成のリクエストペイロード
+ * @param uid ユーザーID
+ * @param token ユーザーセキュリティトークン
+ * @returns お気に入りフォルダ作成のリクエストレスポンス
  */
 export const createFavoritesService = async (createFavoritesRequest: CreateFavoritesRequestDto, uid: number, token: string): Promise<CreateFavoritesResponseDto> => {
 	try {
@@ -20,81 +20,73 @@ export const createFavoritesService = async (createFavoritesRequest: CreateFavor
 				const { favoritesTitle, favoritesBio, favoritesCover, favoritesVisibility } = createFavoritesRequest
 				const { collectionName, schemaInstance } = FavoritesSchema
 				const now = new Date().getTime()
-
 				type FavoritesType = InferSchemaType<typeof schemaInstance>
-
-				// 启动事务
 				const session = await mongoose.startSession()
 				session.startTransaction()
-
-				const favoritesId = (await getNextSequenceValueService('favorites', 1, 1, session))?.sequenceValue
-
-				const createFavoritesData: FavoritesType = {
-					favoritesId,
-					creator: uid,
-					editor: [],
-					favoritesTitle,
-					favoritesBio,
-					favoritesCover,
-					favoritesVisibility,
-					favoritesCreateDateTime: now,
-					createDateTime: now,
-					editDateTime: now,
-				}
-
 				try {
+					const favoritesId = (await getNextSequenceValueService('favorites', 1, 1, session))?.sequenceValue
+					const createFavoritesData: FavoritesType = {
+						favoritesId,
+						creator: uid,
+						editor: [],
+						favoritesTitle,
+						favoritesBio,
+						favoritesCover,
+						favoritesVisibility,
+						favoritesCreateDateTime: now,
+						createDateTime: now,
+						editDateTime: now,
+					}
+
 					const createFavoritesResult = await insertData2MongoDB<FavoritesType>(createFavoritesData, schemaInstance, collectionName)
 					if (createFavoritesResult.success && createFavoritesResult.result?.length === 1 && createFavoritesResult.result?.[0]) {
 						await session.commitTransaction()
 						session.endSession()
-						return { success: true, message: '创建收藏夹成功', result: createFavoritesResult.result[0] }
+						return { success: true, message: 'お気に入りフォルダの作成に成功しました', result: createFavoritesResult.result[0] }
 					} else {
 						if (session.inTransaction()) {
 							await session.abortTransaction()
 						}
 						session.endSession()
-						console.error('ERROR', '创建收藏夹失败，数据存储失败')
-						return { success: false, message: '创建收藏夹失败，数据存储失败' }
+						console.error('ERROR', 'お気に入りフォルダの作成に失敗しました、データ保存に失敗しました')
+						return { success: false, message: 'お気に入りフォルダの作成に失敗しました、データ保存に失敗しました' }
 					}
 				} catch (error) {
 					if (session.inTransaction()) {
 						await session.abortTransaction()
 					}
 					session.endSession()
-					console.error('ERROR', '创建收藏夹失败，数据存储时出错：', error)
-					return { success: false, message: '创建收藏夹失败，数据存储时出错' }
+					console.error('ERROR', 'お気に入りフォルダの作成に失敗しました、データ保存時にエラーが発生しました：', error)
+					return { success: false, message: 'お気に入りフォルダの作成に失敗しました、データ保存時にエラーが発生しました' }
 				}
 			} else {
-				console.error('ERROR', '创建收藏夹失败，用户校验失败')
-				return { success: false, message: '创建收藏夹失败，用户校验失败' }
+				console.error('ERROR', 'お気に入りフォルダの作成に失敗しました、ユーザー検証に失敗しました')
+				return { success: false, message: 'お気に入りフォルダの作成に失敗しました、ユーザー検証に失敗しました' }
 			}
 		} else {
-			console.error('ERROR', '创建收藏夹失败，数据校验失败')
-			return { success: false, message: '创建收藏夹失败，数据校验失败' }
+			console.error('ERROR', 'お気に入りフォルダの作成に失敗しました、データ検証に失敗しました')
+			return { success: false, message: 'お気に入りフォルダの作成に失敗しました、データ検証に失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '创建收藏夹失败，未知原因：', error)
-		return { success: false, message: '创建收藏夹失败，未知原因' }
+		console.error('ERROR', 'お気に入りフォルダの作成に失敗しました、原因不明：', error)
+		return { success: false, message: 'お気に入りフォルダの作成に失敗しました、原因不明' }
 	}
 }
 
 /**
- * 获取当前登录用户的收藏夹列表
- * @param uid 用户 ID
- * @param token 用户安全令牌
- * @returns 获取当前登录用户的收藏夹列表的请求响应
+ * 現在ログインしているユーザーのお気に入りフォルダリストを取得
+ * @param uid ユーザーID
+ * @param token ユーザーセキュリティトークン
+ * @returns 現在ログインしているユーザーのお気に入りフォルダリスト取得リクエストのレスポンス
  */
 export const getFavoritesService = async (uid: number, token: string): Promise<GetFavoritesResponseDto> => {
 	try {
 		if ((await checkUserTokenService(uid, token)).success) {
 			const { collectionName, schemaInstance } = FavoritesSchema
-
 			type FavoritesType = InferSchemaType<typeof schemaInstance>
-
 			const getFavoritesQuery: QueryType<FavoritesType> = {
 				creator: uid,
 			}
-
 			const getFavoritesSelect: SelectType<FavoritesType> = {
 				favoritesId: 1,
 				creator: 1,
@@ -105,38 +97,37 @@ export const getFavoritesService = async (uid: number, token: string): Promise<G
 				favoritesVisibility: 1,
 				favoritesCreateDateTime: 1,
 			}
-
 			try {
 				const getFavoritesResult = await selectDataFromMongoDB<FavoritesType>(getFavoritesQuery, getFavoritesSelect, schemaInstance, collectionName)
 				const favorites = getFavoritesResult?.result
 				if (getFavoritesResult.success && favorites) {
 					if (favorites?.length > 0) {
-						return { success: true, message: '获取收藏夹列表成功', result: favorites }
+						return { success: true, message: 'お気に入りフォルダリストの取得に成功しました', result: favorites }
 					} else {
-						return { success: true, message: '收藏夹列表为空', result: [] }
+						return { success: true, message: 'お気に入りフォルダリストは空です', result: [] }
 					}
 				} else {
-					console.error('ERROR', '获取收藏夹失败，请求收藏夹数据失败')
-					return { success: false, message: '获取收藏夹失败，请求收藏夹数据失败' }
+					console.error('ERROR', 'お気に入りフォルダの取得に失敗しました、お気に入りフォルダデータの要求に失敗しました')
+					return { success: false, message: 'お気に入りフォルダの取得に失敗しました、お気に入りフォルダデータの要求に失敗しました' }
 				}
 			} catch (error) {
-				console.error('ERROR', '获取收藏夹失败，请求收藏夹数据时出错', error)
-				return { success: false, message: '获取收藏夹失败，请求收藏夹数据时出错' }
+				console.error('ERROR', 'お気に入りフォルダの取得に失敗しました、お気に入りフォルダデータの要求時にエラーが発生しました', error)
+				return { success: false, message: 'お気に入りフォルダの取得に失敗しました、お気に入りフォルダデータの要求時にエラーが発生しました' }
 			}
 		} else {
-			console.error('ERROR', '获取收藏夹失败，用户校验失败')
-			return { success: false, message: '获取收藏夹失败，用户校验失败' }
+			console.error('ERROR', 'お気に入りフォルダの取得に失敗しました、ユーザー検証に失敗しました')
+			return { success: false, message: 'お気に入りフォルダの取得に失敗しました、ユーザー検証に失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取收藏夹失败，未知原因：', error)
-		return { success: false, message: '获取收藏夹失败，未知原因' }
+		console.error('ERROR', 'お気に入りフォルダの取得に失敗しました、原因不明：', error)
+		return { success: false, message: 'お気に入りフォルダの取得に失敗しました、原因不明' }
 	}
 }
 
 /**
- * 检查创建收藏夹的请求载荷
- * @param createFavoritesRequest  创建收藏夹的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * お気に入りフォルダ作成リクエストのペイロードを検証
+ * @param createFavoritesRequest  お気に入りフォルダ作成のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequestDto): boolean => {
 	return (!!createFavoritesRequest.favoritesTitle && createFavoritesRequest.favoritesTitle.length < 200)
@@ -156,14 +147,13 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 				if ((await checkUserTokenService(uid, token)).success) {
 // 					const { collectionName, schemaInstance } = BrowsingHistorySchema
 // 					type BrowsingHistoryType = InferSchemaType<typeof schemaInstance>
-
 // 					const uid = createOrUpdateBrowsingHistoryRequest.uid
 // 					const category = createOrUpdateBrowsingHistoryRequest.category
 // 					const id = createOrUpdateBrowsingHistoryRequest.id
 // 					const anchor = createOrUpdateBrowsingHistoryRequest.anchor
 // 					const nowDate = new Date().getTime()
 
-// 					// 搜索数据
+// 					// 准备查询数据
 // 					const BrowsingHistoryWhere: QueryType<BrowsingHistoryType> = {
 // 						uid,
 // 						category,
@@ -179,7 +169,6 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 						lastUpdateDateTime: nowDate,
 // 						editDateTime: nowDate,
 // 					}
-
 // 					try {
 // 						const insert2MongoDResult = await findOneAndUpdateData4MongoDB(BrowsingHistoryWhere, BrowsingHistoryData, schemaInstance, collectionName)
 // 						const result = insert2MongoDResult.result
@@ -209,7 +198,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 获取全部或过滤后的用户浏览历史，按对某一内容的最后访问时间降序排序
+//  * 获取全部或筛选后的用户浏览历史，并按最新访问特定内容的时间倒序排序
 //  * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
 //  * @param uid 用户 ID
 //  * @param token 用户安全令牌
@@ -309,7 +298,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // 			}
 // 		} else {
 // 			console.error('ERROR', '获取用户浏览历史时出错，请求参数不合法')
-// 			return { success: false, message: '获取用户浏览历史时出错，请求参数不合法' }
+// 			return { success: false, message: '获取用户浏览歴史時出錯，請求參數不合法' }
 // 		}
 // 	} catch (error) {
 // 		console.error('ERROR', '获取用户浏览历史时出错，未知原因：', error)
@@ -318,7 +307,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 校验创建用户浏览历史的请求参数
+//  * 验证创建用户浏览历史的请求参数
 //  * @param createBrowsingHistoryRequest 创建用户浏览历史的请求参数
 //  * @returns 合法返回 true, 不合法返回 false
 //  */
@@ -331,7 +320,7 @@ const checkCreateFavoritesRequest = (createFavoritesRequest: CreateFavoritesRequ
 // }
 
 // /**
-//  * 校验获取用户浏览历史的请求载荷
+//  * 验证获取用户浏览历史的请求载荷
 //  * @param getUserBrowsingHistoryWithFilterRequest 获取用户浏览历史的请求载荷
 //  * @returns 合法返回 true, 不合法返回 false
 //  */

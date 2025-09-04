@@ -1,23 +1,23 @@
 # BY: ChatGPT-4, 02
-# 尽可能为 AMD64 与 ARM64 平台提供兼容性
+# AMD64とARM64プラットフォームに可能な限り互換性を提供します
 
-# 使用官方的 node 基础镜像
+# 公式のnodeベースイメージを使用します
 FROM node:alpine
 
-# 设置工作目录
+# 作業ディレクトリを設定します
 WORKDIR /usr/src/app
 
-# 将 package.json 和 package-lock.json 复制到工作目录
+# package.json と package-lock.json を作業ディレクトリにコピーします
 COPY package*.json ./
 
-# 安装依赖
+# 依存関係をインストールします
 RUN npm install
 
-# 将其他源代码文件复制到工作目录
+# 他のソースコードファイルを作業ディレクトリにコピーします
 COPY . .
 
 # build
 RUN npm run build
 
-# 运行命令
+# コマンドを実行します
 CMD [ "node", "./dist/app.js" ]

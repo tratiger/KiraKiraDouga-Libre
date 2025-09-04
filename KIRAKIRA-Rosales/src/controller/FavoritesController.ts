@@ -3,7 +3,7 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { CreateFavoritesRequestDto } from './FavoritesControllerDto.js'
 
 /**
- * 创建收藏夹
+ * お気に入りを作成
  * @param ctx context
  * @param next context
  */
@@ -12,13 +12,13 @@ export const createFavoritesController = async (ctx: koaCtx, next: koaNext) => {
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const createFavoritesRequest: CreateFavoritesRequestDto = {
-		/** 收藏夹标题 - 非空 */
+		/** お気に入りタイトル - 空でないこと */
 		favoritesTitle: data?.favoritesTitle ?? '',
-		/** 收藏夹简介 */
+		/** お気に入り紹介 */
 		favoritesBio: data.favoritesBio,
-		/** 收藏夹封面 */
+		/** お気に入りカバー */
 		favoritesCover: data.favoritesCover,
-		/** 收藏夹可见性，默认 -1（私有） */
+		/** お気に入りの公開設定、デフォルト -1（非公開） */
 		favoritesVisibility: data.favoritesVisibility ?? -1,
 	}
 	const createFavoritesResponse = await createFavoritesService(createFavoritesRequest, uid, token)
@@ -27,7 +27,7 @@ export const createFavoritesController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 获取当前登录用户的收藏夹列表
+ * 現在ログインしているユーザーのお気に入りリストを取得
  * @param ctx context
  * @param next context
  */

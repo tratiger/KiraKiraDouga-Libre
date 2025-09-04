@@ -16,7 +16,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # 获取完整历史记录，以便删除远程分支
+        fetch-depth: 0  # 完全な履歴を取得して、リモートブランチを削除できるようにする
 
     - name: Set up Node.js
       uses: actions/setup-node@v4

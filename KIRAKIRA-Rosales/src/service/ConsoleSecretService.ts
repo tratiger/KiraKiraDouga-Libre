@@ -14,56 +14,56 @@ const AWS_SECRET_NAME = process.env.AWS_SECRET_NAME
 if (!!SERVER_ENV && ['dev', 'prod'].includes(SERVER_ENV)) {
 	try {
 		if (!AWS_SECRET_REGION || !AWS_SECRET_ACCESS_KEY || !AWS_SECRET_ACCESS_SECRET) {
-			console.error("ERROR", "缺少 AWS 认证信息，请检查环境变量 AWS_SECRET_REGION、AWS_SECRET_ACCESS_KEY 和 AWS_SECRET_ACCESS_SECRET")
+			console.error("ERROR", "AWS認証情報が不足しています。環境変数 AWS_SECRET_REGION、AWS_SECRET_ACCESS_KEY、AWS_SECRET_ACCESS_SECRET を確認してください。")
 			process.exit()
 		}
 	
-		// 创建 AWS Secrets Manager 客户端
+		// AWS Secrets Manager クライアントを作成
 		client = new SecretsManagerClient({
-			region: AWS_SECRET_REGION, // 自定义 AWS 区域
+			region: AWS_SECRET_REGION, // カスタムAWSリージョン
 			credentials: {
-				accessKeyId: AWS_SECRET_ACCESS_KEY, // 自定义 Access Key
-				secretAccessKey: AWS_SECRET_ACCESS_SECRET, // 自定义 Secret Key
+				accessKeyId: AWS_SECRET_ACCESS_KEY, // カスタムアクセスキー
+				secretAccessKey: AWS_SECRET_ACCESS_SECRET, // カスタムシークレットキー
 			},
 		})
 	
 		console.info()
-		console.info('Created an AWS Sercret Manager Client base on the environment variables you provided!')
+		console.info('環境変数に基づいてAWS Secret Managerクライアントを作成しました！')
 	} catch(error) {
-		console.error('ERROR', '创建 AWS Secrets Manager 客户端失败：', error)
+		console.error('ERROR', 'AWS Secrets Manager クライアントの作成に失敗しました：', error)
 		process.exit()
 	}
 } else {
 	console.info()
-	console.info('Now starting the server without created an AWS Sercret Manager Client.')
+	console.info('AWS Secret Managerクライアントを作成せずにサーバーを起動します。')
 }
 
 /**
- * 获取预生产环境后端环境变量机密
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 获取预生产环境后端环境变量机密的请求响应
+ * ステージング環境のバックエンド環境変数シークレットを取得する
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns ステージング環境のバックエンド環境変数シークレット取得リクエストのレスポンス
  */
 export async function getStgEnvBackEndSecretService(uuid: string, token: string): Promise<GetStgEnvBackEndSecretResponse> {
 	try {
 		if (!SERVER_ENV || !['dev', 'prod'].includes(SERVER_ENV)) {
-			console.error('ERROR', '获取预生产环境后端环境变量机密失败，连接的后端并非生产或本地环境')
-			return { success: false, message: '获取预生产环境后端环境变量机密失败，连接的后端并非生产或本地环境', result: {} }
+			console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。接続先のバックエンドが本番またはローカル環境ではありません。')
+			return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。接続先のバックエンドが本番またはローカル環境ではありません。', result: {} }
 		}
 
 		if (!client) {
-			console.error('ERROR', '获取预生产环境后端环境变量机密失败，未连接 AWS Secret Manager')
-			return { success: false, message: '获取预生产环境后端环境变量机密失败，未连接 AWS Secret Manage', result: {} }
+			console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。AWS Secret Managerに接続されていません。')
+			return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。AWS Secret Managerに接続されていません。', result: {} }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '获取预生产环境后端环境变量机密失败，用户 Token 校验未通过')
-			return { success: false, message: '获取预生产环境后端环境变量机密失败，用户 Token 校验未通过', result: {} }
+			console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。ユーザートークンの検証に失敗しました。')
+			return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。ユーザートークンの検証に失敗しました。', result: {} }
 		}
 
 		if (!AWS_SECRET_NAME) {
-			console.error('ERROR', '获取预生产环境后端环境变量机密失败，环境变量中未提供机密名，请设置 AWS_SECRET_REGION 环境变量。')
-			return { success: false, message: '获取预生产环境后端环境变量机密失败，环境变量中未提供机密名', result: {} }
+			console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。環境変数にシークレット名が指定されていません。AWS_SECRET_REGION 環境変数を設定してください。')
+			return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットの取得に失敗しました。環境変数にシークレット名が指定されていません。', result: {} }
 		}
 		
 		try {
@@ -72,17 +72,17 @@ export async function getStgEnvBackEndSecretService(uuid: string, token: string)
 
 			try {
 				const secerts: Record<string, string> = JSON.parse(response.SecretString);
-				return { success: true, message: '获取预生产环境后端环境变量机密成功', result: { envs: secerts } }
+				return { success: true, message: 'ステージング環境のバックエンド環境変数シークレットの取得に成功しました。', result: { envs: secerts } }
 			} catch(error) {
-				console.error('ERROR', '获取预生产环境后端环境变量机密时出错，解析 JSON 失败：', error)
-				return { success: false, message: '获取预生产环境后端环境变量机密时出错，解析 JSON 失败', result: {} }
+				console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。JSONの解析に失敗しました：', error)
+				return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。JSONの解析に失敗しました。', result: {} }
 			}
 		} catch(error) {
-			console.error('ERROR', '获取预生产环境后端环境变量机密时出错，获取数据失败：', error)
-			return { success: false, message: '获取预生产环境后端环境变量机密时出错，获取数据失败', result: {} }
+			console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。データの取得に失敗しました：', error)
+			return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。データの取得に失敗しました。', result: {} }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取预生产环境后端环境变量机密时出错，未知错误：', error)
-		return { success: false, message: '获取预生产环境后端环境变量机密时出错，未知错误', result: {} }
+		console.error('ERROR', 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。不明なエラー：', error)
+		return { success: false, message: 'ステージング環境のバックエンド環境変数シークレットを取得中にエラーが発生しました。不明なエラー。', result: {} }
 	}
 }

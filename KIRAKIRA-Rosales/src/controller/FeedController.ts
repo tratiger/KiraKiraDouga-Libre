@@ -4,10 +4,10 @@ import { koaCtx, koaNext } from "../type/koaTypes.js";
 import { AddNewUid2FeedGroupRequestDto, AdministratorApproveFeedGroupInfoChangeRequestDto, AdministratorDeleteFeedGroupRequestDto, CreateFeedGroupRequestDto, CreateOrEditFeedGroupInfoRequestDto, DeleteFeedGroupRequestDto, FollowingUploaderRequestDto, GetFeedContentRequestDto, RemoveUidFromFeedGroupRequestDto, UnfollowingUploaderRequestDto } from "./FeedControllerDto.js";
 
 /**
- * 用户关注一个创作者
+ * ユーザーがクリエイターをフォロー
  * @param ctx context
  * @param next context
- * @return 用户关注一个创作者的请求响应
+ * @return ユーザーがクリエイターをフォローするレスポンス
  */
 export const followingUploaderController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -15,12 +15,12 @@ export const followingUploaderController = async (ctx: koaCtx, next: koaNext) =>
 	const data = ctx.request.body as Partial<FollowingUploaderRequestDto>
 	const { followingUid } = data
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
-	// RBAC 权限验证，对于关注目标用户
+	// RBAC 権限検証、フォロー対象ユーザーに対して
 	if (!await isPassRbacCheck({ uid: followingUid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -35,10 +35,10 @@ export const followingUploaderController = async (ctx: koaCtx, next: koaNext) =>
 }
 
 /**
- * 用户取消关注一个创作者
+ * ユーザーがクリエイターのフォローを解除
  * @param ctx context
  * @param next context
- * @return 用户取消关注一个创作者的请求响应
+ * @return ユーザーがクリエイターのフォローを解除するレスポンス
  */
 export const unfollowingUploaderController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -55,17 +55,17 @@ export const unfollowingUploaderController = async (ctx: koaCtx, next: koaNext) 
 }
 
 /**
- * 创建动态分组
+ * フィードグループを作成
  * @param ctx context
  * @param next context
- * @return 创建动态分组的请求响应
+ * @return フィードグループ作成レスポンス
  */
 export const createFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 	const data = ctx.request.body as Partial<CreateFeedGroupRequestDto>
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -82,17 +82,17 @@ export const createFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 向一个动态分组中添加新的 UID
+ * フィードグループに新しいUIDを追加
  * @param ctx context
  * @param next context
- * @return 向一个动态分组中添加新的 UID 的请求响应
+ * @return フィードグループに新しいUIDを追加するレスポンス
  */
 export const addNewUid2FeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 	const data = ctx.request.body as Partial<AddNewUid2FeedGroupRequestDto>
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -108,10 +108,10 @@ export const addNewUid2FeedGroupController = async (ctx: koaCtx, next: koaNext) 
 }
 
 /**
- * 从一个动态分组中移除 UID
+ * フィードグループからUIDを削除
  * @param ctx context
  * @param next context
- * @return 从一个动态分组中移除 UID 的请求响应
+ * @return フィードグループからUIDを削除するレスポンス
  */
 export const removeUidFromFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -129,10 +129,10 @@ export const removeUidFromFeedGroupController = async (ctx: koaCtx, next: koaNex
 }
 
 /**
- * 删除动态分组
+ * フィードグループを削除
  * @param ctx context
  * @param next context
- * @return 删除动态分组的请求响应
+ * @return フィードグループ削除レスポンス
  */
 export const deleteFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -149,10 +149,10 @@ export const deleteFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 }
 
 /**
- * 获取用于用户上传头像的预签名 URL, 上传限时 60 秒
+ * ユーザーのアバターアップロード用署名付きURLを取得（60秒間有効）
  * @param ctx context
  * @param next context
- * @return 获取用于用户上传头像的预签名 URL 的请求响应
+ * @return ユーザーのアバターアップロード用署名付きURL取得レスポンス
  */
 export const getFeedGroupCoverUploadSignedUrlController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -162,18 +162,18 @@ export const getFeedGroupCoverUploadSignedUrlController = async (ctx: koaCtx, ne
 }
 
 /**
- * 创建或更新动态分组信息
- * 更新动态分组的名称或者头像 URL 都是这个接口
+ * フィードグループ情報を作成または更新
+ * フィードグループの名前やアバターURLの更新もこのインターフェースを使用
  * @param ctx context
  * @param next context
- * @return 创建或更新动态分组信息的请求响应
+ * @return フィードグループ情報作成・更新レスポンス
  */
 export const createOrEditFeedGroupInfoController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 	const data = ctx.request.body as Partial<CreateOrEditFeedGroupInfoRequestDto>
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -189,18 +189,18 @@ export const createOrEditFeedGroupInfoController = async (ctx: koaCtx, next: koa
 }
 
 /**
- * // WARN: 仅限管理员
- * 管理员通过动态分组信息更新审核
+ * // WARN: 管理者のみ
+ * 管理者がフィードグループ情報の更新レビューを承認
  * @param ctx context
  * @param next context
- * @return 管理员通过动态分组信息更新审核的请求响应
+ * @return 管理者がフィードグループ情報の更新レビューを承認するレスポンス
  */
 export const administratorApproveFeedGroupInfoChangeController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 	const data = ctx.request.body as Partial<AdministratorApproveFeedGroupInfoChangeRequestDto>
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -214,18 +214,18 @@ export const administratorApproveFeedGroupInfoChangeController = async (ctx: koa
 }
 
 /**
- * // WARN: 仅限管理员
- * 管理员删除动态分组
+ * // WARN: 管理者のみ
+ * 管理者がフィードグループを削除
  * @param ctx context
  * @param next context
- * @return 管理员删除动态分组的请求响应
+ * @return 管理者がフィードグループを削除するレスポンス
  */
 export const administratorDeleteFeedGroupController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 	const data = ctx.request.body as Partial<AdministratorDeleteFeedGroupRequestDto>
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
@@ -239,10 +239,10 @@ export const administratorDeleteFeedGroupController = async (ctx: koaCtx, next: 
 }
 
 /**
- * 获取动态分组
+ * フィードグループを取得
  * @param ctx context
  * @param next context
- * @return 获取动态分组的请求响应
+ * @return フィードグループ取得レスポンス
  */
 export const getFeedGroupListController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')
@@ -253,10 +253,10 @@ export const getFeedGroupListController = async (ctx: koaCtx, next: koaNext) => 
 }
 
 /**
- * 获取动态内容
+ * フィードコンテンツを取得
  * @param ctx context
  * @param next context
- * @return 获取动态内容的请求响应
+ * @return フィードコンテンツ取得レスポンス
  */
 export const getFeedContentController = async (ctx: koaCtx, next: koaNext) => {
 	const uuid = ctx.cookies.get('uuid')

@@ -55,15 +55,15 @@ const router = new Router()
 
 // router-begin
 
-router.get('/', helloWorld) // 测试 // DELETE ME
-router.get('/02/koa/hello', helloWorld) // 测试 // DELETE ME
+router.get('/', helloWorld) // テスト // DELETE ME
+router.get('/02/koa/hello', helloWorld) // テスト // DELETE ME
 
 
 
 
 
 
-router.post('/user/registering', userRegistrationController) // 用户注册
+router.post('/user/registering', userRegistrationController) // ユーザー登録
 // https://localhost:9999/user/registering
 // {
 // 	"email": "aaa@aaa.aaa",
@@ -73,38 +73,38 @@ router.post('/user/registering', userRegistrationController) // 用户注册
 // 	"invitationCode": "KIRA-XXXX-XXXX"
 // }
 
-router.post('/user/login', userLoginController) // 用户登录
+router.post('/user/login', userLoginController) // ユーザーログイン
 // https://localhost:9999/user/login
 // {
 // 	"email": "aaa@aaa.aaa",
 // 	"passwordHash": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-// 	"clientOtp": "XXXXXX" //非必须
-//  "verificationCode": "XXXXXX" //非必须
+// 	"clientOtp": "XXXXXX" // オプション
+//  "verificationCode": "XXXXXX" // オプション
 // }
 
-router.post('/user/createTotpAuthenticator', createUserTotpAuthenticatorController) // 用户创建 TOTP 身份验证器
+router.post('/user/createTotpAuthenticator', createUserTotpAuthenticatorController) // ユーザーがTOTP認証を作成
 // https://localhost:9999/user/createTotpAuthenticator
 // cookie: uuid, token
 
-router.post('/user/confirmUserTotpAuthenticator', confirmUserTotpAuthenticatorController) // 用户确认绑定 TOTP 设备
+router.post('/user/confirmUserTotpAuthenticator', confirmUserTotpAuthenticatorController) // ユーザーがTOTPデバイスのバインドを確認
 // https://localhost:9999/user/confirmUserTotpAuthenticator
 // {
 // 	"clientOtp": "XXXXXX",
 // 	"otpAuth": "YYYYYYYYYYYYYYYYYYYYYYYYYY"
 // }
 
-router.delete('/user/deleteTotpAuthenticatorByTotpVerificationCodeController', deleteTotpAuthenticatorByTotpVerificationCodeController) // 已登录用户通过密码和 TOTP 验证码删除身份验证器
+router.delete('/user/deleteTotpAuthenticatorByTotpVerificationCodeController', deleteTotpAuthenticatorByTotpVerificationCodeController) // ログイン済みユーザーがパスワードとTOTP認証コードで認証を削除
 // cookie: uuid, token
 // {
 // 	 "clientOtp": "XXXXXX",
 // 	 "passwordHash": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 // }
 
-router.post('/user/createEmailAuthenticator', createUserEmailAuthenticatorController) // 用户创建 Email 身份验证器
+router.post('/user/createEmailAuthenticator', createUserEmailAuthenticatorController) // ユーザーがEmail認証を作成
 // https://localhost:9999/user/createEmailAuthenticator
 // cookie: uuid, token
 
-router.post('/user/sendUserEmailAuthenticator', sendUserEmailAuthenticatorController) // 用户发送 Email 身份验证器验证码
+router.post('/user/sendUserEmailAuthenticator', sendUserEmailAuthenticatorController) // ユーザーがEmail認証コードを送信
 // https://localhost:9999/user/sendUserEmailAuthenticator
 // {
 // 	 "email": "aaa@aaa.aaa",
@@ -112,14 +112,14 @@ router.post('/user/sendUserEmailAuthenticator', sendUserEmailAuthenticatorContro
 //   "clientLanguage": "zh-Hans-CN",
 // }
 
-router.post('/user/sendDeleteUserEmailAuthenticator', sendDeleteUserEmailAuthenticatorController) // 用户发送删除 Email 身份验证器验证码
+router.post('/user/sendDeleteUserEmailAuthenticator', sendDeleteUserEmailAuthenticatorController) // ユーザーがEmail認証削除の認証コードを送信
 // https://localhost:9999/user/sendDeleteUserEmailAuthenticator
 // cookie: uuid, token
 // {
 //   "clientLanguage": "zh-Hans-CN",
 // }
 
-router.delete('/user/deleteUserEmailAuthenticator', deleteUserEmailAuthenticatorController) // 用户删除 Email 2FA
+router.delete('/user/deleteUserEmailAuthenticator', deleteUserEmailAuthenticatorController) // ユーザーがEmail 2FAを削除
 // https://localhost:9999/user/deleteUserEmailAuthenticator
 // cookie: uuid, token
 // {
@@ -127,17 +127,17 @@ router.delete('/user/deleteUserEmailAuthenticator', deleteUserEmailAuthenticator
 // 	 "verificationCode": "YYYYYY"
 // }
 
-router.get('/user/checkUserHave2FAByEmail', checkUserHave2FAByEmailController) // 通过 Email 检查用户是否已开启 2FA 身份验证器
+router.get('/user/checkUserHave2FAByEmail', checkUserHave2FAByEmailController) // Emailでユーザーが2FAを有効にしているか確認
 // https://localhost:9999/user/checkUserHave2FAByEmail?email=xxxxxxx
 
-router.get('/user/checkUserHave2FAByUUID', checkUserHave2FAByUUIDController) // 通过 UUID 检查用户是否已开启 2FA 身份验证器
+router.get('/user/checkUserHave2FAByUUID', checkUserHave2FAByUUIDController) // UUIDでユーザーが2FAを有効にしているか確認
 // https://localhost:9999/user/checkUserHave2FAByUUID
 // cookie: uuid, token
 
-router.get('/user/existsCheck', userEmailExistsCheckController) // 注册用户时检查用户邮箱是否存在
+router.get('/user/existsCheck', userEmailExistsCheckController) // ユーザー登録時にメールアドレスが存在するか確認
 // https://localhost:9999/user/existsCheck?email=xxxxxxx
 
-router.post('/user/update/email', updateUserEmailController) // 更新用户邮箱
+router.post('/user/update/email', updateUserEmailController) // ユーザーのメールアドレスを更新
 // https://localhost:9999/user/update/email
 // cookie: uid, token
 // {
@@ -148,7 +148,7 @@ router.post('/user/update/email', updateUserEmailController) // 更新用户邮�
 // 	"verificationCode": "XXXXXX"
 // }
 
-router.post('/user/update/info', updateOrCreateUserInfoController) // 更新或创建用户信息
+router.post('/user/update/info', updateOrCreateUserInfoController) // ユーザー情報の更新または作成
 // https://localhost:9999/user/update/info
 // cookie: uuid, token
 // {
@@ -164,7 +164,7 @@ router.post('/user/update/info', updateOrCreateUserInfoController) // 更新或�
 // 			}
 // 	],
 // 	"userBirthday": "",
-// 	"userProfileMarkdown": "### 小作文时间！",
+// 	"userProfileMarkdown": "### 作文の時間！",
 // 	"userLinkAccounts": [
 // 			{
 // 					"accountType": "X",
@@ -182,7 +182,7 @@ router.post('/user/update/info', updateOrCreateUserInfoController) // 更新或�
 // }
 
 
-router.post('/user/self', getSelfUserInfoController) // 获取当前登录的用户信息，可以通过 cookie 传递，也可以通过请求体
+router.post('/user/self', getSelfUserInfoController) // 現在ログインしているユーザーの情報を取得（cookieまたはリクエストボディ経由）
 // https://localhost:9999/user/self
 // cookie: uid, token
 // or
@@ -191,25 +191,25 @@ router.post('/user/self', getSelfUserInfoController) // 获取当前登录的用
 // 	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 // }
 
-router.get('/user/info', getUserInfoByUidController) // 根据 uid 获取用户信息
+router.get('/user/info', getUserInfoByUidController) // uidに基づいてユーザー情報を取得
 // https://localhost:9999/user/info?uid=10
 // optional: cookie: uuid, token
 
-router.get('/user/exists', userExistsCheckByUIDController) // 检查用户是否存在
+router.get('/user/exists', userExistsCheckByUIDController) // ユーザーが存在するか確認
 // https://localhost:9999/user/exists?uid=10
 
-router.get('/user/check', checkUserTokenController) // 根据 uid, token 校验用户
+router.get('/user/check', checkUserTokenController) // uidとtokenでユーザーを検証
 // https://localhost:9999/user/check
 // cookie: uid, token
 
-router.get('/user/logout', userLogoutController) // 清除浏览器中的 cookie（用户登出）
+router.get('/user/logout', userLogoutController) // ブラウザのcookieをクリア（ユーザーログアウト）
 // https://localhost:9999/user/logout
 
-router.get('/user/avatar/preUpload', getUserAvatarUploadSignedUrlController) // 获取用于上传头像的预签名 URL, 上传限时 60 秒
+router.get('/user/avatar/preUpload', getUserAvatarUploadSignedUrlController) // アバターアップロード用の署名付きURLを取得（60秒間有効）
 // https://localhost:9999/user/avatar/preUpload
 // cookie: uid, token
 
-router.post('/user/settings', getUserSettingsController) // 在服务端或客户端获取用户设置信息用以正确渲染页面
+router.post('/user/settings', getUserSettingsController) // サーバーまたはクライアントでユーザー設定情報を取得し、ページを正しくレンダリング
 // https://localhost:9999/user/settings
 // cookie: uid, token
 // or
@@ -218,53 +218,53 @@ router.post('/user/settings', getUserSettingsController) // 在服务端或客�
 // 	"token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 // }
 
-router.post('/user/settings/update', updateOrCreateUserSettingsController) // 更新或创建用户设置
+router.post('/user/settings/update', updateOrCreateUserSettingsController) // ユーザー設定の更新または作成
 // https://localhost:9999/user/settings/update
 // cookie: uid, token
 // {
 // 	"coloredSideBar": "true"
 // }
 
-router.post('/user/requestSendVerificationCode', requestSendVerificationCodeController) // 请求发送验证码，用于注册时验证用户邮箱
+router.post('/user/requestSendVerificationCode', requestSendVerificationCodeController) // 登録時のメール認証コード送信をリクエスト
 // https://localhost:9999/user/requestSendVerificationCode
 // {
 // 	"email": "aaa@bbb.com",
 // 	"clientLanguage": "zh-Hans-CN"
 // }
 
-router.post('/user/createInvitationCode', createInvitationCodeController) // 生成邀请码
+router.post('/user/createInvitationCode', createInvitationCodeController) // 招待コードを生成
 // https://localhost:9999/user/createInvitationCode
 // cookie: uid, token
 
-router.get('/user/myInvitationCode', getMyInvitationCodeController) // 获取某位用户的所有的邀请码
+router.get('/user/myInvitationCode', getMyInvitationCodeController) // 特定ユーザーの全招待コードを取得
 // https://localhost:9999/user/myInvitationCode
 // cookie: uid, token
 
-router.post('/user/checkInvitationCode', checkInvitationCodeController) // 检查一个邀请码是否可用
+router.post('/user/checkInvitationCode', checkInvitationCodeController) // 招待コードが利用可能か確認
 // https://localhost:9999/user/checkInvitationCode
 // {
 // 	"invitationCode": "KIRA-XXXX-XXXX"
 // }
 
-router.get('/user/getUserByInvitationCode', adminGetUserByInvitationCodeController) // 管理员根据邀请码查询用户 // WARN: 仅限管理员
+router.get('/user/getUserByInvitationCode', adminGetUserByInvitationCodeController) // 管理者が招待コードでユーザーを検索 // WARN: 管理者のみ
 // https://localhost:9999/user/getUserByInvitationCode?invitationCode=KIRA-XXXX-XXXX
 // cookie: uuid, token
 
-router.post('/user/requestSendChangeEmailVerificationCode', requestSendChangeEmailVerificationCodeController) // 请求发送验证码，用于修改邮箱
+router.post('/user/requestSendChangeEmailVerificationCode', requestSendChangeEmailVerificationCodeController) // メールアドレス変更用の認証コード送信をリクエスト
 // https://localhost:9999/user/requestSendChangeEmailVerificationCode
 // cookie: uid, token
 // {
 // 	"clientLanguage": "zh-Hans-CN"
 // }
 
-router.post('/user/requestSendChangePasswordVerificationCode', requestSendChangePasswordVerificationCodeController) // 请求发送验证码，用于修改密码
+router.post('/user/requestSendChangePasswordVerificationCode', requestSendChangePasswordVerificationCodeController) // パスワード変更用の認証コード送信をリクエスト
 // https://localhost:9999/user/requestSendChangePasswordVerificationCode
 // cookie: uid, token
 // {
 // 	"clientLanguage": "zh-Hans-CN"
 // }
 
-router.post('/user/update/password', updateUserPasswordController) // 更新用户密码
+router.post('/user/update/password', updateUserPasswordController) // ユーザーパスワードを更新
 // https://localhost:9999/user/update/password
 // cookie: uid, token
 // {
@@ -273,14 +273,14 @@ router.post('/user/update/password', updateUserPasswordController) // 更新用�
 // 	"verificationCode": "XXXXXX"
 // }
 
-router.post('/user/requestSendForgotPasswordVerificationCode', requestSendForgotPasswordVerificationCodeController) // 请求发送忘记密码的邮箱验证码
+router.post('/user/requestSendForgotPasswordVerificationCode', requestSendForgotPasswordVerificationCodeController) // パスワード忘れの認証コード送信をリクエスト
 // https://localhost:9999/user/requestSendForgotPasswordVerificationCode
 // {
 // 	"clientLanguage": "zh-Hans-CN",
 // 	"email": "your-email@website.com"
 // }
 
-router.post('/user/forgot/password', forgotPasswordController) // 找回密码（更新密码）
+router.post('/user/forgot/password', forgotPasswordController) // パスワードの回復（更新）
 // https://localhost:9999/user/forgot/password
 // {
 // 	"email": "your-email@website.com",
@@ -288,18 +288,18 @@ router.post('/user/forgot/password', forgotPasswordController) // 找回密码�
 // 	"verificationCode": "XXXXXX"
 // }
 
-router.get('/user/checkUsername', checkUsernameController) // 检查用户名是否可用
+router.get('/user/checkUsername', checkUsernameController) // ユーザー名が利用可能か確認
 // https://localhost:9999/user/checkUsername?username=xxxxxxxx
 
-router.get('/user/blocked/info', getBlockedUserController) // 获取所有被封禁用户的信息 // WARN: 仅限管理员
+router.get('/user/blocked/info', getBlockedUserController) // 全ブロックユーザーの情報を取得 // WARN: 管理者のみ
 // https://localhost:9999/user/blocked/info
 // cookie: uid, token
 
-router.get('/user/adminGetUserInfo', adminGetUserInfoController) // 管理员获取用户信息 // WARN: 仅限管理员
+router.get('/user/adminGetUserInfo', adminGetUserInfoController) // 管理者がユーザー情報を取得 // WARN: 管理者のみ
 // https://localhost:9999/user/adminGetUserInfo?isOnlyShowUserInfoUpdatedAfterReview=true&page=1&pageSize=20
 // cookie: UUID, token
 
-router.post('/user/adminEditUserInfo', adminEditUserInfoController) // 管理员强制更新用户信息 // WARN: 仅限管理员
+router.post('/user/adminEditUserInfo', adminEditUserInfoController) // 管理者がユーザー情報を強制更新 // WARN: 管理者のみ
 // https://localhost:9999/user/adminEditUserInfo
 // cookie: UUID, token
 // {
@@ -311,14 +311,14 @@ router.post('/user/adminEditUserInfo', adminEditUserInfoController) // 管理员
 // 	}
 // }
 
-router.post('/user/approveUserInfo', approveUserInfoController) // 管理员通过用户信息审核 // WARN: 仅限管理员
+router.post('/user/approveUserInfo', approveUserInfoController) // 管理者がユーザー情報のレビューを承認 // WARN: 管理者のみ
 // https://localhost:9999/user/approveUserInfo
 // cookie: UUID, token
 // {
 // 	"UUID": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 // }
 
-router.post('/user/adminClearUserInfo', adminClearUserInfoController) // 管理员清空某个用户的信息 // WARN: 仅限管理员
+router.post('/user/adminClearUserInfo', adminClearUserInfoController) // 管理者が特定ユーザーの情報をクリア // WARN: 管理者のみ
 // https://localhost:9999/user/adminClearUserInfo
 // cookie: UUID, token
 // {
@@ -330,76 +330,76 @@ router.post('/user/adminClearUserInfo', adminClearUserInfoController) // 管理�
 
 
 
-router.post('/block/user', blockUserByUidController) // 用户屏蔽用户
+router.post('/block/user', blockUserByUidController) // ユーザーがユーザーをブロック
 // https://localhost:9999/block/user
 // cookie: UUID, token
 // {
 // 	"blockUid": XXXX
 // }
 
-router.post('/block/hideuser', hideUserByUidController) // 用户隐藏用户
+router.post('/block/hideuser', hideUserByUidController) // ユーザーがユーザーを非表示
 // https://localhost:9999/block/hideuser
 // cookie: UUID, token
 // {
 //	"hideUid": XXXX
 // }
 
-router.post('/block/tag', blockTagController) // 用户屏蔽标签
+router.post('/block/tag', blockTagController) // ユーザーがタグをブロック
 // https://localhost:9999/block/tag
 // cookie: UUID, token
 // {
 //	"tagId": XXXX
 // }
 
-router.post('/block/keyword', blockKeywordController) // 用户屏蔽关键词
+router.post('/block/keyword', blockKeywordController) // ユーザーがキーワードをブロック
 // https://localhost:9999/block/keyword
 // cookie: UUID, token
 // {
 // 	"blockKeyword": "XXXXXX"
 // }
 
-router.post('/block/regex', addRegexController) // 用户添加正则表达式
+router.post('/block/regex', addRegexController) // ユーザーが正規表現を追加
 // https://localhost:9999/block/regex
 // cookie: UUID, token
 // {
 //	"blockRegex": "XXXXXX"
 // }
 
-router.delete('/block/delete/user', unblockUserByUidController) // 用户解封用户
+router.delete('/block/delete/user', unblockUserByUidController) // ユーザーがユーザーのブロックを解除
 // https://localhost:9999/block/delete/user
 // cookie: UUID, token
 // {
 //	"blockUid": XXXX
 // }
 
-router.delete('/block/delete/hideuser', showUserByUidController) // 用户取消隐藏用户
+router.delete('/block/delete/hideuser', showUserByUidController) // ユーザーがユーザーの非表示を解除
 // https://localhost:9999/block/delete/hideuser
 // {
 //	"hideUid": XXXX
 // }
 
-router.delete('/block/delete/tag', unblockTagController) // 用户解封标签
+router.delete('/block/delete/tag', unblockTagController) // ユーザーがタグのブロックを解除
 // https://localhost:9999/block/delete/tag
 // cookie: UUID, token
 // {
 //	"blockTag": XXXX
 // }
 
-router.delete('/block/delete/keyword', unblockKeywordController) // 用户解封关键词
+router.delete('/block/delete/keyword', unblockKeywordController) // ユーザーがキーワードのブロックを解除
 // https://localhost:9999/block/delete/keyword
 // cookie: UUID, token
 // {
 //	"blockKeyword": "XXXXXX"
 // }
 
-router.delete('/block/delete/regex', removeRegexController) // 用户解封正则表达式
+router.delete('/block/delete/regex', removeRegexController) // ユーザーが正規表現のブロックを解除
 // https://localhost:9999/block/delete/regex
 // cookie: UUID, token
 // {
 //	"blockRegex": "XXXXXX"
 // }
 
-router.get('/block/list', getBlockListController) // 获取用户的黑名单列表
+router.get('/block/list', getBlockListController) // ユーザーのブラックリストを取得
 // https://localhost:9999/block/list?type=block&page=0&pageSize=10
 // cookie: UUID, token
 
@@ -412,7 +412,7 @@ router.get('/block/list', getBlockListController) // 获取用户的黑名单列
 
 
 
-router.post('/video/upload', updateVideoController) // 上传视频
+router.post('/video/upload', updateVideoController) // 動画をアップロード
 // https://localhost:9999/video/upload
 // {
 // 	"videoPart": [
@@ -422,56 +422,56 @@ router.post('/video/upload', updateVideoController) // 上传视频
 // 			"link": "https://xxx.xxx.xxx/xxx.mp4"
 // 		}
 // 	],
-// 	"title": "[博物馆奇妙夜] 2953 公民控 VRC 虚拟观赏会（第一天）",
+// 	"title": "[ナイトミュージアム] 2953 シチズンコン VRCバーチャル鑑賞会（1日目）",
 // 	"image": "https://xxx.xxx.xxx/xxx.png",
 // 	"uploader": "cfdxkk@kirakira.moe",
 // 	"uploaderId": "123",
 // 	"duration": "19573",
-// 	"description": "和群里的朋友一起熬夜从凌晨两点看到早上八点。不得不说今年的公民控是真的很精彩。"
+// 	"description": "グループの友達と夜更かしして深夜2時から朝8時まで見ました。今年のシチズンコンは本当に素晴らしかったです。"
 // }
 
-router.get('/video/home', getThumbVideoController) // 获取首页视频
+router.get('/video/home', getThumbVideoController) // ホームページの動画を取得
 // https://localhost:9999/video/home
 
-router.get('/video/exists', checkVideoExistController) // 根据视频 ID (KVID) 检查视频是否存在
+router.get('/video/exists', checkVideoExistController) // 動画ID (KVID) で動画が存在するか確認
 // https://localhost:9999/video/exists?videoId=1
 
-router.get('/video', getVideoByKvidController) // 根据视频 ID (KVID) 获取视频的数据
+router.get('/video', getVideoByKvidController) // 動画ID (KVID) で動画データを取得
 // https://localhost:9999/video?videoId=1
 // cookie: uid, token (optional, if have it will try to record the video browsing history)
 
-router.get('/video/user', getVideoByUidController) // 根据 UID 获取该用户上传的视频
+router.get('/video/user', getVideoByUidController) // UIDでユーザーがアップロードした動画を取得
 // https://localhost:9999/video/user?uid=2
 
-router.get('/video/search', searchVideoByKeywordController) // 根据关键字搜索视频
+router.get('/video/search', searchVideoByKeywordController) // キーワードで動画を検索
 // https://localhost:9999/video/search?keyword=fate
 
-router.post('/video/search/tag', searchVideoByVideoTagIdController) // 根据 TAG ID 来搜索视频
+router.post('/video/search/tag', searchVideoByVideoTagIdController) // TAG IDで動画を検索
 // https://localhost:9999/video/search/tag
 // {
 // 	"tagId": [1, 2]
 // }
 
-router.post('/video/tus', getVideoFileTusEndpointController) // 获取 TUS 上传 Endpoint
+router.post('/video/tus', getVideoFileTusEndpointController) // TUSアップロードエンドポイントを取得
 // https://localhost:9999/video/tus
 // cookie: uid, token
 
-router.get('/video/cover/preUpload', getVideoCoverUploadSignedUrlController) // 获取用于上传视频封面图的预签名 URL
+router.get('/video/cover/preUpload', getVideoCoverUploadSignedUrlController) // 動画カバー画像アップロード用の署名付きURLを取得
 // https://localhost:9999/video/cover/preUpload
 // cookie: uid, token
 
-router.delete('/video/delete', deleteVideoByKvidController) // 根据视频 ID 删除视频 // WARN: 仅限管理员
+router.delete('/video/delete', deleteVideoByKvidController) // 動画IDで動画を削除 // WARN: 管理者のみ
 // https://localhost:9999/video/delete
 // cookie: uid, token
 // {
 // 	"videoId": XXX
 // }
 
-router.get('/video/pending', getPendingReviewVideoController) // 获取待审核视频列表 // WARN: 仅限管理员
+router.get('/video/pending', getPendingReviewVideoController) // レビュー待ち動画リストを取得 // WARN: 管理者のみ
 // https://localhost:9999/video/pending
 // cookie: uid, token
 
-router.post('/video/pending/approved', approvePendingReviewVideoController) // 通过一个待审核视频 // WARN: 仅限管理员
+router.post('/video/pending/approved', approvePendingReviewVideoController) // レビュー待ち動画を承認 // WARN: 管理者のみ
 // https://localhost:9999/video/pending/approved
 // cookie: uid, token
 
@@ -483,20 +483,20 @@ router.post('/video/pending/approved', approvePendingReviewVideoController) // �
 
 
 
-router.post('/video/danmaku/emit', emitDanmakuController) // 发送弹幕的接口
+router.post('/video/danmaku/emit', emitDanmakuController) // 弾幕送信インターフェース
 // https://localhost:9999/video/danmaku/emit
 // cookie: uid, token, uuid
 // {
 // 	"videoId": 10,
 // 	"time": 5,
-// 	"text": "这是一条测试弹幕",
+// 	"text": "これはテスト弾幕です",
 // 	"color": "#66CCFF",
 // 	"fontSIze": "medium",
 // 	"mode": "rtl",
 // 	"enableRainbow": false
 // }
 
-router.get('/video/danmaku', getDanmakuListByKvidController) // 根据视频 ID 获取弹幕
+router.get('/video/danmaku', getDanmakuListByKvidController) // 動画IDで弾幕リストを取得
 // https://localhost:9999/video/danmaku?videoId=10
 
 
@@ -504,19 +504,19 @@ router.get('/video/danmaku', getDanmakuListByKvidController) // 根据视频 ID 
 
 
 
-router.post('/video/comment/emit', emitVideoCommentController) // 发送视频评论的接口
+router.post('/video/comment/emit', emitVideoCommentController) // 動画コメント送信インターフェース
 // https://localhost:9999/video/comment/emit
 // cookie: uid, token
 // {
 // 	"videoId": 13,
-// 	"text": "这是一条测试评论"
+// 	"text": "これはテストコメントです"
 // }
 
-router.get('/video/comment', getVideoCommentListByKvidController) // 根据 KVID 获取视频评论列表，并检查当前用户是否对获取到的评论有点赞/点踩，如果有，相应的值会变为 true
+router.get('/video/comment', getVideoCommentListByKvidController) // KVIDで動画コメントリストを取得し、現在のユーザーが高評価/低評価しているか確認。していれば対応する値がtrueになる
 // https://localhost:9999/video/comment?videoId=13
-// 可选：cookie: uid, token
+// オプション：cookie: uid, token
 
-router.post('/video/comment/upvote', emitVideoCommentUpvoteController) // 用户为视频评论点赞
+router.post('/video/comment/upvote', emitVideoCommentUpvoteController) // ユーザーが動画コメントに高評価
 // https://localhost:9999/video/comment/upvote
 // cookie: uid, token
 // {
@@ -524,7 +524,7 @@ router.post('/video/comment/upvote', emitVideoCommentUpvoteController) // 用户
 // 	"id": "65859fbfae7bd341a408fe42"
 // }
 
-router.post('/video/comment/downvote', emitVideoCommentDownvoteController) // 用户为视频评论点踩
+router.post('/video/comment/downvote', emitVideoCommentDownvoteController) // ユーザーが動画コメントに低評価
 // https://localhost:9999/video/comment/downvote
 // cookie: uid, token
 // {
@@ -532,7 +532,7 @@ router.post('/video/comment/downvote', emitVideoCommentDownvoteController) // �
 // 	"id": "65859fbfae7bd341a408fe42"
 // }
 
-router.delete('/video/comment/upvote/cancel', cancelVideoCommentUpvoteController) // 用户取消一个视频评论的点赞
+router.delete('/video/comment/upvote/cancel', cancelVideoCommentUpvoteController) // ユーザーが動画コメントの高評価を取り消し
 // https://localhost:9999/video/comment/upvote/cancel
 // cookie: uid, token
 // {
@@ -540,7 +540,7 @@ router.delete('/video/comment/upvote/cancel', cancelVideoCommentUpvoteController
 // 	"id": "65859fbfae7bd341a408fe42"
 // }
 
-router.delete('/video/comment/downvote/cancel', cancelVideoCommentDownvoteController) // 用户取消一个视频评论的点踩
+router.delete('/video/comment/downvote/cancel', cancelVideoCommentDownvoteController) // ユーザーが動画コメントの低評価を取り消し
 // https://localhost:9999/video/comment/downvote/cancel
 // cookie: uid, token
 // {
@@ -548,7 +548,7 @@ router.delete('/video/comment/downvote/cancel', cancelVideoCommentDownvoteContro
 // 	"id": "65859fbfae7bd341a408fe42"
 // }
 
-router.delete('/video/comment/deleteSelfComment', deleteSelfVideoCommentController) // 删除一条自己发布的视频评论
+router.delete('/video/comment/deleteSelfComment', deleteSelfVideoCommentController) // 自身が投稿した動画コメントを削除
 // https://localhost:9999/video/comment/deleteSelfComment
 // cookie: uid, token
 // {
@@ -556,7 +556,7 @@ router.delete('/video/comment/deleteSelfComment', deleteSelfVideoCommentControll
 // 	"commentRoute": "13.10"
 // }
 
-router.delete('/video/comment/adminDeleteComment', adminDeleteVideoCommentController) // 管理员删除一条视频评论 // WARN: 仅限管理员
+router.delete('/video/comment/adminDeleteComment', adminDeleteVideoCommentController) // 管理者が動画コメントを削除 // WARN: 管理者のみ
 // https://localhost:9999/video/comment/adminDeleteComment
 // cookie: uid, token
 // {
@@ -568,7 +568,7 @@ router.delete('/video/comment/adminDeleteComment', adminDeleteVideoCommentContro
 
 
 
-router.post('/video/tag/create', createVideoTagController) // 用户创建视频 TAG
+router.post('/video/tag/create', createVideoTagController) // ユーザーが動画TAGを作成
 // https://localhost:9999/video/tag/create
 // cookie: uid, token
 // {
@@ -590,7 +590,7 @@ router.post('/video/tag/create', createVideoTagController) // 用户创建视频
 // 			"lang": "zhs",
 // 			"tagName": [
 // 				{
-// 					"name": "星际公民",
+// 					"name": "スターシチズン",
 // 					"isDefault": false,
 // 					"isOriginalTagName": false
 // 				}
@@ -599,10 +599,10 @@ router.post('/video/tag/create', createVideoTagController) // 用户创建视频
 // 	]
 // }
 
-router.get('/video/tag/search', searchVideoTagController) // 根据关键词搜索视频 TAG
+router.get('/video/tag/search', searchVideoTagController) // キーワードで動画TAGを検索
 // https://localhost:9999/video/tag/search?tagName=hello
 
-router.post('/video/tag/get', getVideoTagByTagIdController) // 根据 TAG ID 在数据库中匹配视频 TAG // WARN: 注意本接口为 POST 方法
+router.post('/video/tag/get', getVideoTagByTagIdController) // TAG IDでデータベース内の動画TAGを検索 // WARN: このインターフェースはPOSTメソッドです
 // https://localhost:9999/video/tag/get
 // {
 // 	"tagId": [1, 2]
@@ -615,7 +615,7 @@ router.post('/video/tag/get', getVideoTagByTagIdController) // 根据 TAG ID 在
 
 
 
-router.post('/history/merge', createOrUpdateUserBrowsingHistoryController) // 更新或创建用户浏览历史 // DELETE: 该接口没必要暴露
+router.post('/history/merge', createOrUpdateUserBrowsingHistoryController) // ユーザーの閲覧履歴を更新または作成 // DELETE: このインターフェースを公開する必要はない
 // https://localhost:9999/history/merge
 // cookie: uid, token
 // {
@@ -624,10 +624,10 @@ router.post('/history/merge', createOrUpdateUserBrowsingHistoryController) // �
 // 	"id": "32"
 // }
 
-router.get('/history/filter', getUserBrowsingHistoryWithFilterController) // 获取全部或过滤后的用户浏览历史，按对某一内容的最后访问时间降序排序
+router.get('/history/filter', getUserBrowsingHistoryWithFilterController) // 全てまたはフィルタリングされたユーザーの閲覧履歴を、最終閲覧日時順（降順）で取得
 // https://localhost:9999/history/filter?videoTitle=foo
 // cookie: uid, token
-// > 或者你可以不包含 URL 查询以获取当前用户全部浏览历史 -> https://localhost:9999/history/filter
+// > または、URLクエリなしで現在のユーザーの全閲覧履歴を取得できます -> https://localhost:9999/history/filter
 
 
 
@@ -637,17 +637,17 @@ router.get('/history/filter', getUserBrowsingHistoryWithFilterController) // 获
 
 
 
-router.post('/favorites/create', createFavoritesController) // 创建收藏夹
+router.post('/favorites/create', createFavoritesController) // お気に入りを作成
 // https://localhost:9999/favorites/create
 // cookie: uid, token
 // {
-// 	"favoritesTitle": "好康的视频",
-// 	"favoritesBio": "这里都是好康的视频捏",
+// 	"favoritesTitle": "おすすめ動画",
+// 	"favoritesBio": "ここはおもしろ動画でいっぱいです",
 // 	"favoritesCover": "f907a7bd-3247-4415-1f5e-a67a5d3ea100",
 // 	"favoritesVisibility": 1
 // }
 
-router.get('/favorites', getFavoritesController) // 获取当前登录用户的收藏夹列表
+router.get('/favorites', getFavoritesController) // 現在ログインしているユーザーのお気に入りリストを取得
 // https://localhost:9999/favorites
 // cookie: uid, token
 
@@ -661,21 +661,21 @@ router.get('/favorites', getFavoritesController) // 获取当前登录用户的�
 
 
 
-router.post('/feed/following', followingUploaderController) // 关注一个用户
+router.post('/feed/following', followingUploaderController) // ユーザーをフォロー
 // https://localhost:9999/feed/following
 // cookie: uuid, token
 // {
 // 	"followingUid": 999
 // }
 
-router.post('/feed/unfollowing', unfollowingUploaderController) // 取消关注一个用户
+router.post('/feed/unfollowing', unfollowingUploaderController) // ユーザーのフォローを解除
 // https://localhost:9999/feed/unfollowing
 // cookie: uuid, token
 // {
 // 	"unfollowingUid": 999
 // }
 
-router.post('/feed/createFeedGroup', createFeedGroupController) // 创建动态分组
+router.post('/feed/createFeedGroup', createFeedGroupController) // フィードグループを作成
 // https://localhost:9999/feed/createFeedGroup
 // cookie: uuid, token
 // {
@@ -684,7 +684,7 @@ router.post('/feed/createFeedGroup', createFeedGroupController) // 创建动态�
 // 	"withCustomCoverUrl": "xxxxxxxxxxxxxxxxxxxxxxxxxx"
 // }
 
-router.post('/feed/addNewUid2FeedGroup', addNewUid2FeedGroupController) // 向一个动态分组中添加新的 UID
+router.post('/feed/addNewUid2FeedGroup', addNewUid2FeedGroupController) // フィードグループに新しいUIDを追加
 // https://localhost:9999/feed/addNewUid2FeedGroup
 // cookie: uuid, token
 // {
@@ -692,7 +692,7 @@ router.post('/feed/addNewUid2FeedGroup', addNewUid2FeedGroupController) // 向�
 // 	"uidList": [1, 2]
 // }
 
-router.post('/feed/removeUidFromFeedGroup', removeUidFromFeedGroupController) // 从一个动态分组中移除 UID
+router.post('/feed/removeUidFromFeedGroup', removeUidFromFeedGroupController) // フィードグループからUIDを削除
 // https://localhost:9999/feed/removeUidFromFeedGroup
 // cookie: uuid, token
 // {
@@ -700,18 +700,18 @@ router.post('/feed/removeUidFromFeedGroup', removeUidFromFeedGroupController) //
 // 	"uidList": [1, 2]
 // }
 
-router.delete('/feed/deleteFeedGroup', deleteFeedGroupController) // 删除动态分组
+router.delete('/feed/deleteFeedGroup', deleteFeedGroupController) // フィードグループを削除
 // https://localhost:9999/feed/deleteFeedGroup
 // cookie: uuid, token
 // {
 // 	"feedGroupUuid": "xxxxxxxxxxxxxxxxxxxxx"
 // }
 
-router.get('/feed/getFeedGroupCoverUploadSignedUrl', getFeedGroupCoverUploadSignedUrlController) // 获取用于用户上传头像的预签名 URL, 上传限时 60 秒
+router.get('/feed/getFeedGroupCoverUploadSignedUrl', getFeedGroupCoverUploadSignedUrlController) // ユーザーのアバターアップロード用の署名付きURLを取得（60秒間有効）
 // https://localhost:9999/feed/getFeedGroupCoverUploadSignedUrl
 // cookie: uuid, token
 
-router.post('/feed/createOrEditFeedGroupInfo', createOrEditFeedGroupInfoController) // 创建或更新动态分组信息
+router.post('/feed/createOrEditFeedGroupInfo', createOrEditFeedGroupInfoController) // フィードグループ情報の作成または更新
 // https://localhost:9999/feed/createOrEditFeedGroupInfo
 // cookie: uuid, token
 // {
@@ -720,26 +720,26 @@ router.post('/feed/createOrEditFeedGroupInfo', createOrEditFeedGroupInfoControll
 // 	"feedGroupCustomCoverUrl": "xxxxxxxxxxxxxxxxxxxxxxxxxxx",
 // }
 
-router.post('/feed/administratorApproveFeedGroupInfoChange', administratorApproveFeedGroupInfoChangeController) // 管理员通过动态分组信息更新审核
+router.post('/feed/administratorApproveFeedGroupInfoChange', administratorApproveFeedGroupInfoChangeController) // 管理者がフィードグループ情報の更新レビューを承認
 // https://localhost:9999/feed/administratorApproveFeedGroupInfoChange
 // cookie: uuid, token
 // {
 // 	"feedGroupUuid": "xxxxxxxxxxxxxxxxxxxxx"
 // }
 
-router.delete('/feed/administratorDeleteFeedGroup', administratorDeleteFeedGroupController) // 管理员删除动态分组
+router.delete('/feed/administratorDeleteFeedGroup', administratorDeleteFeedGroupController) // 管理者がフィードグループを削除
 // https://localhost:9999/feed/administratorDeleteFeedGroup
 // cookie: uuid, token
 // {
 // 	"feedGroupUuid": "xxxxxxxxxxxxxxxxxxxxx"
 // }
 
-router.get('/feed/getFeedGroupList', getFeedGroupListController) // 获取动态分组
+router.get('/feed/getFeedGroupList', getFeedGroupListController) // フィードグループを取得
 // https://localhost:9999/feed/getFeedGroupList
 // cookie: uuid, token
 
 
-router.get('/feed/getFeedContent', getFeedContentController) // 获取动态分组
+router.get('/feed/getFeedContent', getFeedContentController) // フィードグループを取得
 // https://localhost:9999/feed/getFeedContent?page=1&pageSize=30
 // cookie: uuid, token
 // {
@@ -757,24 +757,24 @@ router.get('/feed/getFeedContent', getFeedContentController) // 获取动态分�
 
 
 
-router.post('/rbac/createRbacApiPath', createRbacApiPathController) // 创建 RBAC API 路径
+router.post('/rbac/createRbacApiPath', createRbacApiPathController) // RBAC APIパスを作成
 // https://localhost:9999/rbac/createRbacApiPath
 // cookie: uuid, token
 // {
 // 	"apiPath": "/luo/tian/yi",
 // 	"apiPathType": "tian-yi",
 // 	"apiPathColor": "#66CCFFFF",
-// 	"apiPathDescription": "这里是简介"
+// 	"apiPathDescription": "ここに概要"
 // }
 
-router.delete('/rbac/deleteRbacApiPath', deleteRbacApiPathController) // 删除 RBAC API 路径
+router.delete('/rbac/deleteRbacApiPath', deleteRbacApiPathController) // RBAC APIパスを削除
 // https://localhost:9999/rbac/deleteRbacApiPath
 // cookie: uuid, token
 // {
 // 	"apiPath": "/luo/tian/yi"
 // }
 
-router.get('/rbac/getRbacApiPath', getRbacApiPathController) // 获取 RBAC API 路径
+router.get('/rbac/getRbacApiPath', getRbacApiPathController) // RBAC APIパスを取得
 // https://localhost:9999/rbac/getRbacApiPath
 // cookie: uuid, token
 //
@@ -786,24 +786,24 @@ router.get('/rbac/getRbacApiPath', getRbacApiPathController) // 获取 RBAC API 
 // page
 // pageSize
 
-router.post('/rbac/createRbacRole', createRbacRoleController) // 创建 RBAC 角色
+router.post('/rbac/createRbacRole', createRbacRoleController) // RBACロールを作成
 // https://localhost:9999/rbac/createRbacRole
 // cookie: uuid, token
 // {
 // 	"roleName": "administrator",
 // 	"apiPathType": "administrator",
 // 	"apiPathColor": "#66CCFFFF",
-// 	"apiPathDescription": "这是一个管理员角色，拥有绝大部分内容的管理权限，除了分配角色和其他 ROOT 角色专属的权限。"
+// 	"apiPathDescription": "これは管理者ロールで、ロールの割り当てや他のROOTロール専用の権限を除く、ほとんどのコンテンツの管理権限を持ちます。"
 // }
 
-router.delete('/rbac/deleteRbacRole', deleteRbacRoleController) // 删除 RBAC 角色
+router.delete('/rbac/deleteRbacRole', deleteRbacRoleController) // RBACロールを削除
 // https://localhost:9999/rbac/deleteRbacRole
 // cookie: uuid, token
 // {
 // 	"roleName": "administrator"
 // }
 
-router.get('/rbac/getRbacRole', getRbacRoleController) // 获取 RBAC 角色
+router.get('/rbac/getRbacRole', getRbacRoleController) // RBACロールを取得
 // https://localhost:9999/rbac/getRbacRole
 // cookie: uuid, token
 //
@@ -815,7 +815,7 @@ router.get('/rbac/getRbacRole', getRbacRoleController) // 获取 RBAC 角色
 // page
 // pageSize
 
-router.post('/rbac/updateApiPathPermissionsForRole', updateApiPathPermissionsForRoleController) // 为角色更新 API 路径权限
+router.post('/rbac/updateApiPathPermissionsForRole', updateApiPathPermissionsForRoleController) // ロールのAPIパス権限を更新
 // https://localhost:9999/rbac/updateApiPathPermissionsForRole
 // cookie: uuid, token
 // {
@@ -825,10 +825,10 @@ router.post('/rbac/updateApiPathPermissionsForRole', updateApiPathPermissionsFor
 // 	]
 // }
 
-router.post('/rbac/adminUpdateUserRole', adminUpdateUserRoleController) // 管理员更新用户角色 // WARN: 仅限管理员
+router.post('/rbac/adminUpdateUserRole', adminUpdateUserRoleController) // 管理者がユーザーロールを更新 // WARN: 管理者のみ
 // https://localhost:9999/rbac/adminUpdateUserRole
 // cookie: uuid, token
-// uuid 和 uid 二选一即可
+// uuidかuidのどちらか一方で可
 // {
 // 	"uuid": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
 // 	"uid": 123,
@@ -838,7 +838,7 @@ router.post('/rbac/adminUpdateUserRole', adminUpdateUserRoleController) // 管�
 // 	]
 // }
 
-router.get('/rbac/adminGetUserRolesByUid', adminGetUserRolesByUidController) // 通过 UID 获取一个用户的角色
+router.get('/rbac/adminGetUserRolesByUid', adminGetUserRolesByUidController) // UIDでユーザーのロールを取得
 // https://localhost:9999/rbac/adminGetUserRolesByUid
 // cookie: uuid, token
 //
@@ -862,7 +862,7 @@ router.get('/rbac/adminGetUserRolesByUid', adminGetUserRolesByUidController) // 
 
 
 
-router.get('/secret/getStgEnvBackEndSecret', getStgEnvBackEndSecretController) // 获取预生产环境后端环境变量机密
+router.get('/secret/getStgEnvBackEndSecret', getStgEnvBackEndSecretController) // ステージング環境のバックエンド環境変数シークレットを取得
 // https://localhost:9999/secret/getStgEnvBackEndSecret
 // cookie: uuid, token
 

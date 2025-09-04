@@ -1,447 +1,447 @@
 import { Schema } from 'mongoose'
 
 /**
- * 用户安全认证集合
+ * ユーザーセキュリティ認証コレクション
  */
 class UserAuthSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 - 唯一 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと - ユニーク */
 		UUID: { type: String, required: true, unique: true },
-		/** 用户的 UID - 非空 */
+		/** ユーザーのUID - 空でないこと */
 		uid: { type: Number, required: true, unique: true },
-		/** 用户邮箱 - 非空 */
+		/** ユーザーのメールアドレス - 空でないこと */
 		email: { type: String, required: true, unique: true },
-		/** 全小写的用户邮箱 - 非空 */
+		/** すべて小文字のユーザーメールアドレス - 空でないこと */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 被两次 Bcrypt Hash 的密码 - 非空 */
+		/** 2回Bcryptハッシュ化されたパスワード - 空でないこと */
 		passwordHashHash: { type: String, required: true },
-		/** 用户的身分令牌 - 非空 */
+		/** ユーザーのIDトークン - 空でないこと */
 		token: { type: String, required: true },
-		/** 密码提示 */
-		passwordHint: String, // TODO: 如何确保密码提示的安全性？
-		// /** 用户的角色 */
+		/** パスワードのヒント */
+		passwordHint: String, // TODO: パスワードのヒントのセキュリティをどのように確保するか？
+		// /** ユーザーのロール */
 		// role: { type: String, required: true },
-		/** 用户的角色 */
+		/** ユーザーのロール */
 		roles: { type: [String], required: true },
-		/** 用户开启的 2FA 类型 - 非空 */ /* 可以为 email, totp 或 none（表示未开启） */
+		/** ユーザーが有効にした2FAタイプ - 空でないこと */ /* email, totp, または none（未有効化）が可能です */
 		authenticatorType: { type: String, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		userCreateDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-auth'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserAuthSchema = new UserAuthSchemaFactory()
 
 /**
- * 用户的个人标签
+ * ユーザーの個人タグ
  */
 const UserLabelSchema = {
-	/** 标签 ID - 非空 */
+	/** タグID - 空でないこと */
 	id: { type: Number, required: true },
-	/** 标签名 - 非空 */
+	/** タグ名 - 空でないこと */
 	labelName: { type: String, required: true },
 }
 
 /**
- * 用户的关联账户
+ * ユーザーの連携アカウント
  */
 const UserLinkedAccountsSchema = {
-	/** 关联账户的平台 - 非空 - 例："X" */
+	/** 連携アカウントのプラットフォーム - 空でないこと - 例: "X" */
 	platformId: { type: String, required: true },
-	/** 关联账户唯一标识 - 非空 */
+	/** 連携アカウントのユニークID - 空でないこと */
 	accountUniqueId: { type: String, required: true },
 }
 
 /**
- * 用户的关联网站
+ * ユーザーの連携ウェブサイト
  */
 const UserWebsiteSchema = {
-	/** 关联网站名 - 非空 - 例："我的个人主页" */
+	/** 連携ウェブサイト名 - 空でないこと - 例: "私のホームページ" */
 	websiteName: { type: String, required: true },
-	/** 关联网站 URL - 非空 */
+	/** 連携ウェブサイトURL - 空でないこと */
 	websiteUrl: { type: String, required: true },
 }
 
 /**
- * 用户信息集合
+ * ユーザー情報コレクション
  */
 class UserInfoSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 - 唯一 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと - ユニーク */
 		UUID: { type: String, required: true, unique: true },
-		/** 用户的 UID - 非空 - 唯一 */
+		/** ユーザーのUID - 空でないこと - ユニーク */
 		uid: { type: Number, required: true, unique: true },
-		/** 用户名 - 唯一 */
+		/** ユーザー名 - ユニーク */
 		username: { type: String, unique: true },
-		/** 用户昵称 */
+		/** ニックネーム */
 		userNickname: { type: String },
-		/** 用户头像的链接 */
+		/** アバターのリンク */
 		avatar: { type: String },
-		/** 用户背景图片的链接 */
+		/** ユーザー背景画像のリンク */
 		userBannerImage: { type: String },
-		/** 用户的个性签名 */
+		/** 自己紹介 */
 		signature: { type: String },
-		/** 用户的性别，男、女和自定义（字符串）v */
+		/** 性別、男性、女性、カスタム（文字列） */
 		gender: { type: String },
-		/** 用户的个人标签 */
+		/** 個人タグ */
 		label: { type: [UserLabelSchema], required: false },
-		/** 用户生日 */
+		/** 誕生日 */
 		userBirthday: { type: String },
-		/** 用户主页 Markdown */
+		/** プロフィールページのMarkdown */
 		userProfileMarkdown: { type: String },
-		/** 用户的关联账户 */
+		/** 連携アカウント */
 		userLinkedAccounts: { type: [UserLinkedAccountsSchema], required: false },
-		/** 用户关联网站 */
+		/** 連携ウェブサイト */
 		userWebsite: { type: UserWebsiteSchema },
-		/** 是否在上一次审核通过后修改了用户信息，当第一次创建用户信息以及发生了更新时需要设为 true，当管理员通过审核时时将其改为 false */
+		/** 前回のレビュー承認後にユーザー情報が変更されたかどうか。初回作成時や更新時にtrueに設定し、管理者が承認した際にfalseに変更する必要があります */
 		isUpdatedAfterReview: { type: Boolean, required: true },
-		/** 编辑操作人 */
+		/** 編集者 */
 		editOperatorUUID: { type: String },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-info'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserInfoSchema = new UserInfoSchemaFactory()
 
 /**
- * 用户关联平台的隐私可见性设置
+ * 連携プラットフォームのプライバシー表示設定
  */
 const UserLinkedAccountsVisibilitiesSettingSchema = {
-	/** 关联平台的 ID - 非空 - 例：'X', 'wechat', 'bilibili' */
+	/** プラットフォームID - 空でないこと - 例: 'X', 'wechat', 'bilibili' */
 	platformId: { type: String, required: true },
-	/** 显示方式 - 非空 - 允许的值有：{public: 公开, following: 仅关注, private: 隐藏} */
+	/** 表示方法 - 空でないこと - 許可される値: {public: 公開, following: フォロー中のみ, private: 非公開} */
 	visibilitiesType: { type: String, required: true },
 }
 
 /**
- * 用户隐私数据可见性设置
+ * ユーザープライバシーデータの表示設定
  */
 const UserPrivaryVisibilitiesSettingSchema = {
-	/** 用户隐私数据项的 ID - 非空 - 例：'birthday', 'follow', 'fans' */
+	/** プライバシーデータ項目ID - 空でないこと - 例: 'birthday', 'follow', 'fans' */
 	privaryId: { type: String, required: true },
-	/** 显示方式 - 非空 - 允许的值有：{public: 公开, following: 仅关注, private: 隐藏} */
+	/** 表示方法 - 空でないこと - 許可される値: {public: 公開, following: フォロー中のみ, private: 非公開} */
 	visibilitiesType: { type: String, required: true },
 }
 
 /**
- * 用户个性设定集合
+ * ユーザー個人設定コレクション
  */
 class UserSettingsSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 - 唯一 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと - ユニーク */
 		UUID: { type: String, required: true, unique: true },
-		/** 用户的 UID - 非空 - 唯一 */
+		/** ユーザーのUID - 空でないこと - ユニーク */
 		uid: { type: Number, required: true, unique: true },
-		/** 是否启用 Cookie - 布尔 */
+		/** Cookieを有効にするか - 真偽値 */
 		enableCookie: { type: Boolean },
-		/** 主题外观设置（主题类型） - 可选的值：{light: 浅色, dark: 深色, system: 跟随系统} */
+		/** テーマ設定（テーマタイプ） - 選択可能な値: {light: ライト, dark: ダーク, system: システムに従う} */
 		themeType: { type: String },
-		/** 主题颜色 - 字符串，颜色字符串 */
+		/** テーマカラー - 文字列、カラーコード */
 		themeColor: { type: String },
-		/** 用户自定义主题颜色 - 字符串，HAX 颜色字符串，不包含井号 */
+		/** カスタムテーマカラー - 文字列、#を含まない16進数カラーコード */
 		themeColorCustom: { type: String },
-		/** 壁纸（背景图 URL） - 字符串 */
+		/** 壁紙（背景画像URL） - 文字列 */
 		wallpaper: { type: String },
-		/** 是否启用彩色导航栏 - 布尔 */
+		/** カラーナビゲーションバーを有効にするか - 真偽値 */
 		coloredSideBar: { type: Boolean },
-		/** 节流模式 - 字符串，{standard: 标准, limit: 节流模式, preview: 超前加载} */
+		/** データ節約モード - 文字列, {standard: 標準, limit: 節約, preview: 先読み} */
 		dataSaverMode: { type: String },
-		/** 禁用搜索推荐 - 布尔 */
+		/** 検索推薦を無効にする - 真偽値 */
 		noSearchRecommendations: { type: Boolean },
-		/** 禁用相关视频推荐 - 布尔 */
+		/** 関連動画の推薦を無効にする - 真偽値 */
 		noRelatedVideos: { type: Boolean },
-		/** 禁用搜索历史 - 布尔 */
+		/** 検索履歴を無効にする - 真偽値 */
 		noRecentSearch: { type: Boolean },
-		/** 禁用视频历史 - 布尔 */
+		/** 視聴履歴を無効にする - 真偽値 */
 		noViewHistory: { type: Boolean },
-		/** 是否在新窗口打开视频 - 布尔 */
+		/** 動画を新しいウィンドウで開くか - 真偽値 */
 		openInNewWindow: { type: Boolean },
-		/** 显示语言 - 字符串 */
+		/** 表示言語 - 文字列 */
 		currentLocale: { type: String },
-		/** 用户时区 - 字符串 */
+		/** タイムゾーン - 文字列 */
 		timezone: { type: String },
-		/** 用户单位制度 - 字符串，刻度制或分度值，英制或美制等内容 */
+		/** 単位系 - 文字列、メートル法、ヤード・ポンド法など */
 		unitSystemType: { type: String },
-		/** 是否进入了开发者模式 - 布尔 */
+		/** 開発者モードを有効にするか - 真偽値 */
 		devMode: { type: Boolean },
-		/** 实验性：启用动态背景 - 布尔 */
+		/** 実験的機能: 動的背景を有効にする - 真偽値 */
 		showCssDoodle: { type: Boolean },
-		/** 实验性：启用直角模式 - 布尔 */
+		/** 実験的機能: 直角モードを有効にする - 真偽値 */
 		sharpAppearanceMode: { type: Boolean },
-		/** 实验性：启用扁平模式 - 布尔 */
+		/** 実験的機能: フラットモードを有効にする - 真偽値 */
 		flatAppearanceMode: { type: Boolean },
-		/** 用户关联网站的隐私设置 */
+		/** 連携ウェブサイトのプライバシー設定 */
 		userWebsitePrivacySetting: { type: String },
-		/** 用户隐私数据可见性设置 */
+		/** プライバシーデータの表示設定 */
 		userPrivaryVisibilitiesSetting: { type: [UserPrivaryVisibilitiesSettingSchema] },
-		/** 用户关联平台的隐私可见性设置 */
+		/** 連携プラットフォームのプライバシー表示設定 */
 		userLinkedAccountsVisibilitiesSetting: { type: [UserLinkedAccountsVisibilitiesSettingSchema] },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 // WARN 不要使用单词的复数形式，Mongoose 会自动添加！ */
+	/** MongoDBコレクション名 // WARN 単語の複数形を使用しないでください。Mongooseが自動的に追加します！ */
 	collectionName = 'user-setting'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserSettingsSchema = new UserSettingsSchemaFactory()
 
 /**
- * 用户注册邮箱验证码
+ * ユーザー登録メール認証コード
  */
 class UserVerificationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的邮箱 - 非空 - 唯一 */
+		/** ユーザーのメールアドレス - 空でないこと - ユニーク */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 用户的验证码 - 非空 */
+		/** 認証コード - 空でないこと */
 		verificationCode: { type: String, required: true },
-		/** 用户的验证码过期时间 - 非空 */
+		/** 認証コードの有効期限 - 空でないこと */
 		overtimeAt: { type: Number, required: true, unique: true },
-		/** 用户今日请求的次数，用于防止滥用 - 非空 */
+		/** 本日のリクエスト回数、乱用防止のため - 空でないこと */
 		attemptsTimes: { type: Number, required: true },
-		/** 用户上一次请求验证码的时间，用于防止滥用 - 非空 */
+		/** 最終リクエスト日時、乱用防止のため - 空でないこと */
 		lastRequestDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-verification-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserVerificationCodeSchema = new UserVerificationCodeSchemaFactory()
 
 /**
- * 用户邀请码
+ * ユーザー招待コード
  */
 class UserInvitationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 生成邀请码的用户 UUID，关联用户安全集合的 UUID - 非空 */
+		/** 招待コード生成ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと */
 		creatorUUID: { type: String, required: true },
-		/** 生成邀请码的用户 - 非空 */
+		/** 招待コード生成ユーザー - 空でないこと */
 		creatorUid: { type: Number, required: true },
-		/** 邀请码 - 非空 - 唯一 */
+		/** 招待コード - 空でないこと - ユニーク */
 		invitationCode: { type: String, required: true, unique: true },
-		/** 生成邀请码的时间 - 非空 */
+		/** 招待コード生成日時 - 空でないこと */
 		generationDateTime: { type: Number, required: true },
-		/** 邀请码被标记为等待使用中 - 非空 */
+		/** 招待コードが使用待ちとしてマークされているか - 空でないこと */
 		isPending: { type: Boolean, required: true },
-		/** 邀请码被标记为无法使用 - 非空 */
+		/** 招待コードが使用不可としてマークされているか - 空でないこと */
 		disabled: { type: Boolean, required: true },
-		/** 使用这个邀请码的用户 UUID */
+		/** この招待コードを使用したユーザーのUUID */
 		assigneeUUID: { type: String },
-		/** 使用这个邀请码的用户 */
+		/** この招待コードを使用したユーザー */
 		assignee: { type: Number },
-		/** 邀请码被使用的时间 */
+		/** 招待コード使用日時 */
 		usedDateTime: { type: Number },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-invitation-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserInvitationCodeSchema = new UserInvitationCodeSchemaFactory()
 
 /**
- * 用户更改邮箱的邮箱验证码
+ * メールアドレス変更用の認証コード
  */
 class UserChangeEmailVerificationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的邮箱 - 非空 - 唯一 */
+		/** ユーザーのメールアドレス - 空でないこと - ユニーク */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 用户的验证码 - 非空 */
+		/** 認証コード - 空でないこと */
 		verificationCode: { type: String, required: true },
-		/** 用户的验证码过期时间 - 非空 */
+		/** 認証コードの有効期限 - 空でないこと */
 		overtimeAt: { type: Number, required: true, unique: true },
-		/** 用户今日请求的次数，用于防止滥用 - 非空 */
+		/** 本日のリクエスト回数、乱用防止のため - 空でないこと */
 		attemptsTimes: { type: Number, required: true },
-		/** 用户上一次请求验证码的时间，用于防止滥用 - 非空 */
+		/** 最終リクエスト日時、乱用防止のため - 空でないこと */
 		lastRequestDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-change-email-verification-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserChangeEmailVerificationCodeSchema = new UserChangeEmailVerificationCodeSchemaFactory()
 
 /**
- * 用户更改密码的邮箱验证码
+ * パスワード変更用の認証コード
  */
 class UserChangePasswordVerificationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと */
 		UUID: { type: String, required: true },
-		/** 用户 ID - 非空 */
+		/** ユーザーID - 空でないこと */
 		uid: { type: Number, required: true },
-		/** 用户的邮箱 - 非空 - 唯一 */
+		/** ユーザーのメールアドレス - 空でないこと - ユニーク */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 用户的验证码 - 非空 */
+		/** 認証コード - 空でないこと */
 		verificationCode: { type: String, required: true },
-		/** 用户的验证码过期时间 - 非空 */
+		/** 認証コードの有効期限 - 空でないこと */
 		overtimeAt: { type: Number, required: true, unique: true },
-		/** 用户今日请求的次数，用于防止滥用 - 非空 */
+		/** 本日のリクエスト回数、乱用防止のため - 空でないこと */
 		attemptsTimes: { type: Number, required: true },
-		/** 用户上一次请求验证码的时间，用于防止滥用 - 非空 */
+		/** 最終リクエスト日時、乱用防止のため - 空でないこと */
 		lastRequestDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-change-password-verification-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserChangePasswordVerificationCodeSchema = new UserChangePasswordVerificationCodeSchemaFactory()
 
 /**
- * 用户 TOTP 身份验证器
+ * ユーザーTOTP認証
  */
 class UserTotpAuthenticatorSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと */
 		UUID: { type: String, required: true },
-		/** 是否启用 TOTP 身份验证器 - 非空 - 默认值：false */
+		/** TOTP認証を有効にするか - 空でないこと - デフォルト: false */
 		enabled: { type: Boolean, required: true, default: false },
-		/** 验证器密钥 */
+		/** 認証キー */
 		secret: { type: String },
-		/** 恢复码 */
+		/** リカバリーコード */
 		recoveryCodeHash: { type: String },
-		/** 备份码 */
+		/** バックアップコード */
 		backupCodeHash: { type: [String] },
 		/** QRcode */
 		otpAuth: { type: String, unique: true },
-		/** 尝试次数 */
+		/** 試行回数 */
 		attempts: { type: Number },
-		/** 上次尝试登录时间 */
+		/** 最終試行日時 */
 		lastAttemptTime: { type: Number },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-totp-authenticator'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 
-	// 构造器
+	// コンストラクタ
 	constructor() {
-		// 添加 UUID 和 secret 组合的唯一索引
+		// UUIDとsecretの組み合わせでユニークインデックスを追加
 		this.schemaInstance.index({ UUID: 1, secret: 1 }, { unique: true });
 	}
 }
 export const UserTotpAuthenticatorSchema = new UserTotpAuthenticatorSchemaFactory()
 
 /**
- * 用户 Email 身份验证器
+ * ユーザーメール認証
  */
 class UserEmailAuthenticatorSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと */
 		UUID: { type: String, required: true },
-		/** 用户的 Email */
+		/** ユーザーのメールアドレス */
 		emailLowerCase: { type: String, required: true },
-		/** 是否启用 Email 身份验证器 - 非空 - 默认值：false */
+		/** メール認証を有効にするか - 空でないこと - デフォルト: false */
 		enabled: { type: Boolean, required: true, default: false },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-email-authenticator'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 
-	// 构造器
+	// コンストラクタ
 	constructor() {
-		// 添加 UUID 和 secret 组合的唯一索引
+		// UUIDとsecretの組み合わせでユニークインデックスを追加
 		this.schemaInstance.index({ UUID: 1, email: 1 }, { unique: true });
 	}
 }
 export const UserEmailAuthenticatorSchema = new UserEmailAuthenticatorSchemaFactory()
 
 /**
- * 用户验证 Email 身份验证器的邮箱验证码
+ * メール認証用の認証コード
  */
 class UserEmailAuthenticatorVerificationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的 UUID，关联用户安全集合的 UUID - 非空 */
+		/** ユーザーのUUID、ユーザーセキュリティコレクションのUUIDに関連付け - 空でないこと */
 		UUID: { type: String, required: true },
-		/** 用户 ID - 非空 */
+		/** ユーザーID - 空でないこと */
 		uid: { type: Number, required: true },
-		/** 用户的邮箱 - 非空 - 唯一 */
+		/** ユーザーのメールアドレス - 空でないこと - ユニーク */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 用户的验证码 - 非空 */
+		/** 認証コード - 空でないこと */
 		verificationCode: { type: String, required: true },
-		/** 用户的验证码过期时间 - 非空 */
+		/** 認証コードの有効期限 - 空でないこと */
 		overtimeAt: { type: Number, required: true, unique: true },
-		/** 用户今日请求的次数，用于防止滥用 - 非空 */
+		/** 本日のリクエスト回数、乱用防止のため - 空でないこと */
 		attemptsTimes: { type: Number, required: true },
-		/** 用户上一次请求验证码的时间，用于防止滥用 - 非空 */
+		/** 最終リクエスト日時、乱用防止のため - 空でないこと */
 		lastRequestDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-email-authenticator-verification-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserEmailAuthenticatorVerificationCodeSchema = new UserEmailAuthenticatorVerificationCodeSchemaFactory()
 
 /**
- * 用户找回密码的邮箱验证码
+ * パスワード再設定用の認証コード
  */
 class UserForgotPasswordVerificationCodeSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 用户的邮箱 - 非空 - 唯一 */
+		/** ユーザーのメールアドレス - 空でないこと - ユニーク */
 		emailLowerCase: { type: String, required: true, unique: true },
-		/** 用户的验证码 - 非空 */
+		/** 認証コード - 空でないこと */
 		verificationCode: { type: String, required: true },
-		/** 用户的验证码过期时间 - 非空 */
+		/** 認証コードの有効期限 - 空でないこと */
 		overtimeAt: { type: Number, required: true, unique: true },
-		/** 用户今日请求的次数，用于防止滥用 - 非空 */
+		/** 本日のリクエスト回数、乱用防止のため - 空でないこと */
 		attemptsTimes: { type: Number, required: true },
-		/** 用户上一次请求验证码的时间，用于防止滥用 - 非空 */
+		/** 最終リクエスト日時、乱用防止のため - 空でないこと */
 		lastRequestDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'user-reset-password-verification-code'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const UserForgotPasswordVerificationCodeSchema = new UserForgotPasswordVerificationCodeSchemaFactory()

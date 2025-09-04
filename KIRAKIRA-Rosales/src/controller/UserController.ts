@@ -497,7 +497,7 @@ export const userLogoutController = async (ctx: koaCtx, next: koaNext) => {
 	ctx.cookies.set('uid', '', cookieOption)
 	ctx.cookies.set('uuid', '', cookieOption)
 
-	ctx.body = { success: true, message: '登出成功' } as UserLogoutResponseDto
+	ctx.body = { success: true, message: 'ログアウトに成功しました' } as UserLogoutResponseDto
 
 	await next()
 }

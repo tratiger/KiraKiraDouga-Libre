@@ -12,17 +12,17 @@ import { createCloudflareImageUploadSignedUrl } from "../cloudflare/index.js";
 import { VideoSchema } from "../dbPool/schema/VideoSchema.js";
 
 /**
- * 用户关注一个创作者
- * @param followingUploaderRequest 用户关注一个创作者的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 用户关注一个创作者的请求响应
+ * ユーザーがクリエイターをフォローする
+ * @param followingUploaderRequest ユーザーがクリエイターをフォローするリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns ユーザーがクリエイターをフォローするリクエストレスポンス
  */
 export const followingUploaderService = async (followingUploaderRequest: FollowingUploaderRequestDto, uuid: string, token: string): Promise<FollowingUploaderResponseDto> => {
 	try {
 		if (!checkFollowingUploaderRequest(followingUploaderRequest)) {
-			console.error('ERROR', '关注用户失败：参数不合法。')
-			return { success: false, message: '关注用户失败：参数不合法。' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました：パラメータが不正です。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました：パラメータが不正です。' }
 		}
 
 		const now = new Date().getTime()
@@ -32,19 +32,19 @@ export const followingUploaderService = async (followingUploaderRequest: Followi
 		const followingUuid = await getUserUuid(followingUid) as string
 
 		if (followerUuid === followingUuid) {
-			console.error('ERROR', '关注用户失败，不能自己关注自己。')
-			return { success: false, message: '关注用户失败：不能自己关注自己。' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました、自分自身をフォローすることはできません。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました：自分自身をフォローすることはできません。' }
 		}
 
 		if (!(await checkUserTokenByUuidService(followerUuid, token)).success) {
-			console.error('ERROR', '关注用户失败，非法用户。')
-			return { success: false, message: '关注用户失败，非法用户' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました、不正なユーザーです。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました、不正なユーザー' }
 		}
 
 		const checkFollowingUuidResult = await checkUserExistsByUuidService({ uuid: followingUuid })
 		if (!checkFollowingUuidResult.success || (checkFollowingUuidResult.success && !checkFollowingUuidResult.exists)) {
-			console.error('ERROR', '关注用户失败，被关注用户不存在。')
-			return { success: false, message: '关注用户失败，被关注用户不存在。' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました、フォロー対象のユーザーが存在しません。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました、フォロー対象のユーザーが存在しません。' }
 		}
 
 		const { collectionName: followingCollectionName, schemaInstance: followingSchemaInstance } = FollowingSchema
@@ -66,8 +66,8 @@ export const followingUploaderService = async (followingUploaderRequest: Followi
 		const getFollowingDataResult = getFollowingData.result
 		if (getFollowingDataResult.length > 0) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '关注用户失败，用户已被关注。')
-			return { success: false, message: '关注用户失败，用户已被关注。' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました、ユーザーは既にフォローされています。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました、ユーザーは既にフォローされています。' }
 		}
 
 		const followingData: Following = {
@@ -83,30 +83,30 @@ export const followingUploaderService = async (followingUploaderRequest: Followi
 
 		if (!insertFollowingDataResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '关注用户失败，插入数据失败。')
-			return { success: false, message: '关注用户失败，插入数据失败。' }
+			console.error('ERROR', 'ユーザーのフォローに失敗しました、データの挿入に失敗しました。')
+			return { success: false, message: 'ユーザーのフォローに失敗しました、データの挿入に失敗しました。' }
 		}
 
 		await commitAndEndSession(session)
-		return { success: true, message: '关注用户成功！' }
+		return { success: true, message: 'ユーザーのフォローに成功しました！' }
 	} catch (error) {
-		console.error('ERROR', '关注用户时出错：未知原因。', error)
-		return { success: false, message: '关注用户时出错：未知原因。' }
+		console.error('ERROR', 'ユーザーのフォロー中にエラーが発生しました：原因不明。', error)
+		return { success: false, message: 'ユーザーのフォロー中にエラーが発生しました：原因不明。' }
 	}
 }
 
 /**
- * 用户取消关注一个创作者
- * @param followingUploaderRequest 用户取消关注一个创作者的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 用户取消关注一个创作者的请求响应
+ * ユーザーがクリエイターのフォローを解除する
+ * @param unfollowingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns ユーザーがクリエイターのフォローを解除するリクエストレスポンス
  */
 export const unfollowingUploaderService = async (unfollowingUploaderRequest: UnfollowingUploaderRequestDto, uuid: string, token: string): Promise<UnfollowingUploaderResponseDto> => {
 	try {
 		if (!checkUnfollowingUploaderRequest(unfollowingUploaderRequest)) {
-			console.error('ERROR', '取消关注用户失败，参数不合法。')
-			return { success: false, message: '取消关注用户失败：参数不合法。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、パラメータが不正です。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました：パラメータが不正です。' }
 		}
 
 		const now = new Date().getTime()
@@ -116,19 +116,19 @@ export const unfollowingUploaderService = async (unfollowingUploaderRequest: Unf
 		const unfollowingUuid = await getUserUuid(unfollowingUid) as string
 
 		if (followerUuid === unfollowingUuid) {
-			console.error('ERROR', '取消关注用户失败，不能取消关注自己。')
-			return { success: false, message: '取消关注用户失败：不能取消关注自己。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、自分自身のフォローは解除できません。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました：自分自身のフォローは解除できません。' }
 		}
 
 		if (!(await checkUserTokenByUuidService(followerUuid, token)).success) {
-			console.error('ERROR', '取消关注用户失败，非法用户。')
-			return { success: false, message: '取消关注用户失败，非法用户' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、不正なユーザーです。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました、不正なユーザー' }
 		}
 
 		const checkFollowingUuidResult = await checkUserExistsByUuidService({ uuid: unfollowingUuid })
 		if (!checkFollowingUuidResult.success || (checkFollowingUuidResult.success && !checkFollowingUuidResult.exists)) {
-			console.error('ERROR', '取消关注用户失败，被关注用户不存在。')
-			return { success: false, message: '取消关注用户失败，被关注用户不存在。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、フォロー解除対象のユーザーが存在しません。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました、フォロー解除対象のユーザーが存在しません。' }
 		}
 
 		const { collectionName: followingCollectionName, schemaInstance: followingSchemaInstance } = FollowingSchema
@@ -156,8 +156,8 @@ export const unfollowingUploaderService = async (unfollowingUploaderRequest: Unf
 
 		if (!selectUnfollowingDataResult.success || selectUnfollowingDataResult.result.length !== 1 || !selectUnfollowingData) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '取消关注用户失败，读取关注数据失败。')
-			return { success: false, message: '取消关注用户失败，读取关注数据失败。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、フォローデータの読み取りに失敗しました。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました、フォローデータの読み取りに失敗しました。' }
 		}
 
 		const unfollowingData: Unfollowing = {
@@ -172,51 +172,51 @@ export const unfollowingUploaderService = async (unfollowingUploaderRequest: Unf
 
 		if (!insertUnfollowingDataResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '取消关注用户失败，记录处理失败。')
-			return { success: false, message: '取消关注用户失败，记录处理失败。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、レコードの処理に失敗しました。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました、レコードの処理に失敗しました。' }
 		}
 
 		const deleteFollowingDataResult = await deleteDataFromMongoDB<Following>(followingWhere, followingSchemaInstance, followingCollectionName, { session })
 
 		if (!deleteFollowingDataResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '取消关注用户失败，删除关注记录失败。')
-			return { success: false, message: '取消关注用户失败，删除关注记录失败。' }
+			console.error('ERROR', 'ユーザーのフォロー解除に失敗しました、フォローレコードの削除に失敗しました。')
+			return { success: false, message: 'ユーザーのフォロー解除に失敗しました、フォローレコードの削除に失敗しました。' }
 		}
 
 		await commitAndEndSession(session)
-		return { success: true, message: '取消关注用户成功！' }
+		return { success: true, message: 'ユーザーのフォロー解除に成功しました！' }
 	} catch (error) {
-		console.error('ERROR', '取消关注用户时出错：未知原因。', error)
-		return { success: false, message: '取消关注用户时出错：未知原因。' }
+		console.error('ERROR', 'ユーザーのフォロー解除中にエラーが発生しました：原因不明。', error)
+		return { success: false, message: 'ユーザーのフォロー解除中にエラーが発生しました：原因不明。' }
 	}
 }
 
 /**
- * 创建动态分组
- * @param createFeedGroupRequest 创建动态分组的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 创建动态分组的请求响应
+ * フィードグループを作成
+ * @param createFeedGroupRequest フィードグループ作成のリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループ作成のリクエストレスポンス
  */
 export const createFeedGroupService = async (createFeedGroupRequest: CreateFeedGroupRequestDto, uuid: string, token: string): Promise<CreateFeedGroupResponseDto> => {
 	try {
 		if (!checkCreateFeedGroupRequest(createFeedGroupRequest)) {
-			console.error('ERROR', '创建动态分组失败，参数不合法。')
-			return { success: false, tooManyUidInOnce: false, message: '创建动态分组失败，参数不合法。' }
+			console.error('ERROR', 'フィードグループの作成に失敗しました、パラメータが不正です。')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループの作成に失敗しました、パラメータが不正です。' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '创建动态分组失败，非法用户。')
-			return { success: false, tooManyUidInOnce: false, message: '创建动态分组失败，非法用户' }
+			console.error('ERROR', 'フィードグループの作成に失敗しました、不正なユーザーです。')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループの作成に失敗しました、不正なユーザー' }
 		}
 
 		const { feedGroupName, withUidList: uidList, withCustomCoverUrl } = createFeedGroupRequest
 		const uuidList = []
 		if (uidList && Array.isArray(uidList) && uidList.length > 0) {
 			if (uidList.length > 50) {
-				console.error('ERROR', '创建动态分组失败，一次性添加的 UID 太多了')
-				return { success: false, tooManyUidInOnce: true, message: '创建动态分组失败，一次性添加的 UID 太多了' }
+				console.error('ERROR', 'フィードグループの作成に失敗しました、一度に追加するUIDが多すぎます')
+				return { success: false, tooManyUidInOnce: true, message: 'フィードグループの作成に失敗しました、一度に追加するUIDが多すぎます' }
 			}
 
 			let isCorrectUuidList = true
@@ -234,8 +234,8 @@ export const createFeedGroupService = async (createFeedGroupRequest: CreateFeedG
 			})
 
 			if (!isCorrectUuidList) {
-				console.error('ERROR', '创建动态分组失败，UUID 列表不合法。')
-				return { success: false, tooManyUidInOnce: false, message: '创建动态分组失败，UUID 列表不合法' }
+				console.error('ERROR', 'フィードグループの作成に失敗しました、UUIDリストが不正です。')
+				return { success: false, tooManyUidInOnce: false, message: 'フィードグループの作成に失敗しました、UUIDリストが不正です' }
 			}
 		}
 
@@ -259,34 +259,34 @@ export const createFeedGroupService = async (createFeedGroupRequest: CreateFeedG
 		const insertFeedGroupDataResult = await insertData2MongoDB<FeedGroup>(feedGroupData, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!insertFeedGroupDataResult.success) {
-			console.error('ERROR', '创建动态分组失败，插入数据失败。')
-			return { success: false, tooManyUidInOnce: false, message: '创建动态分组失败，插入数据失败' }
+			console.error('ERROR', 'フィードグループの作成に失敗しました、データの挿入に失敗しました。')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループの作成に失敗しました、データの挿入に失敗しました' }
 		}
 
-		return { success: true, tooManyUidInOnce: false, message: '创建动态分组成功。' }
+		return { success: true, tooManyUidInOnce: false, message: 'フィードグループの作成に成功しました。' }
 	} catch (error) {
-		console.error('ERROR', '创建动态分组时出错：未知原因。', error)
-		return { success: false, tooManyUidInOnce: false, message: '创建动态分组时出错：未知原因。' }
+		console.error('ERROR', 'フィードグループの作成中にエラーが発生しました：原因不明。', error)
+		return { success: false, tooManyUidInOnce: false, message: 'フィードグループの作成中にエラーが発生しました：原因不明。' }
 	}
 }
 
 /**
- * 向一个动态分组中添加新的 UID
- * @param addNewUser2FeedGroupRequest 向一个动态分组中添加新的 UID 的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 向一个动态分组中添加新的 UID 的请求响应
+ * フィードグループに新しいUIDを追加する
+ * @param addNewUser2FeedGroupRequest フィードグループに新しいUIDを追加するリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループに新しいUIDを追加するリクエストレスポンス
  */
 export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: AddNewUid2FeedGroupRequestDto, uuid: string, token: string): Promise<AddNewUid2FeedGroupResponseDto> => {
 	try {
 		if (!checkAddNewUser2FeedGroupRequest(addNewUser2FeedGroupRequest)) {
-			console.error('ERROR', '向一个动态分组中添加新的 UID 失败，参数不合法。')
-			return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，参数不合法。' }
+			console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、パラメータが不正です。')
+			return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、パラメータが不正です。' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '向一个动态分组中添加新的 UID 失败，非法用户。')
-			return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，非法用户' }
+			console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、不正なユーザーです。')
+			return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、不正なユーザー' }
 		}
 
 		const { feedGroupUuid, uidList } = addNewUser2FeedGroupRequest
@@ -294,8 +294,8 @@ export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: Ad
 		const uuidList = []
 		if (uidList && Array.isArray(uidList) && uidList.length > 0) {
 			if (uidList.length > 50) {
-				console.error('ERROR', '向一个动态分组中添加新的 UID 失败，一次性添加的 UID 太多了')
-				return { success: false, tooManyUidInOnce: true, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，一次性添加的 UID 太多了' }
+				console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、一度に追加するUIDが多すぎます')
+				return { success: false, tooManyUidInOnce: true, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、一度に追加するUIDが多すぎます' }
 			}
 
 			let isCorrectUuidList = true
@@ -313,8 +313,8 @@ export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: Ad
 			})
 
 			if (!isCorrectUuidList) {
-				console.error('ERROR', '向一个动态分组中添加新的 UID 失败，UUID 列表不合法。')
-				return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，UUID 列表不合法' }
+				console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、UUIDリストが不正です。')
+				return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、UUIDリストが不正です' }
 			}
 		}
 
@@ -327,7 +327,7 @@ export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: Ad
 		}
 		const feedGroupWhere: QueryType<FeedGroup> = {
 			feedGroupUuid,
-			feedGroupCreatorUuid: uuid, // 确保修改的是自己创建的动态分组
+			feedGroupCreatorUuid: uuid, // 変更するのが自分が作成したフィードグループであることを確認
 		}
 
 		const session = await createAndStartSession()
@@ -337,16 +337,16 @@ export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: Ad
 
 		if (!getFeedGroupDataResult.success || !getFeedGroupData.feedGroupUuid) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '向一个动态分组中添加新的 UID 失败，更新的动态列表不存在或者不是由当前用户创建')
-			return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，更新的动态列表不存在或者不是由当前用户创建' }
+			console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、更新するフィードリストが存在しないか、現在のユーザーによって作成されたものではありません')
+			return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、更新するフィードリストが存在しないか、現在のユーザーによって作成されたものではありません' }
 		}
 
 		const newUuidList = [...new Set<string>(uuidList.concat(getFeedGroupData.uuidList ?? []))]
 
 		if (newUuidList.length > 10000) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '向一个动态分组中添加新的 UID 失败，动态分组中用户太多了')
-			return { success: false, tooManyUidInOnce: false, isOverload: true, message: '向一个动态分组中添加新的 UID 失败，动态分组中用户太多了' }
+			console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、フィードグループのユーザーが多すぎます')
+			return { success: false, tooManyUidInOnce: false, isOverload: true, message: 'フィードグループへの新しいUIDの追加に失敗しました、フィードグループのユーザーが多すぎます' }
 		}
 
 		const now = new Date().getTime()
@@ -360,35 +360,35 @@ export const addNewUid2FeedGroupService = async (addNewUser2FeedGroupRequest: Ad
 
 		if (!findOneAndUpdateFeedGroupDataResult.success || !findOneAndUpdateFeedGroupData) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '向一个动态分组中添加新的 UID 失败，更新失败')
-			return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 失败，更新失败' }
+			console.error('ERROR', 'フィードグループへの新しいUIDの追加に失敗しました、更新に失敗しました')
+			return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に失敗しました、更新に失敗しました' }
 		}
 
 		await commitAndEndSession(session)
-		return { success: true, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 成功', feedGroupResult: findOneAndUpdateFeedGroupData }
+		return { success: true, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加に成功しました', feedGroupResult: findOneAndUpdateFeedGroupData }
 	} catch (error) {
-		console.error('ERROR', '向一个动态分组中添加新的 UID 时出错：未知原因。', error)
-		return { success: false, tooManyUidInOnce: false, isOverload: false, message: '向一个动态分组中添加新的 UID 时出错：未知原因。' }
+		console.error('ERROR', 'フィードグループへの新しいUIDの追加中にエラーが発生しました：原因不明。', error)
+		return { success: false, tooManyUidInOnce: false, isOverload: false, message: 'フィードグループへの新しいUIDの追加中にエラーが発生しました：原因不明。' }
 	}
 }
 
 /**
- * 从一个动态分组中移除 UID
- * @param removeUidFromFeedGroupRequest 从一个动态分组中移除 UID 的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 从一个动态分组中移除 UID 的请求响应
+ * フィードグループからUIDを削除する
+ * @param removeUidFromFeedGroupRequest フィードグループからUIDを削除するリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループからUIDを削除するリクエストレスポンス
  */
 export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupRequest: RemoveUidFromFeedGroupRequestDto, uuid: string, token: string): Promise<RemoveUidFromFeedGroupResponseDto> => {
 	try {
 		if (!checkRemoveUidFromFeedGroupRequest(removeUidFromFeedGroupRequest)) {
-			console.error('ERROR', '从一个动态分组中移除 UID 失败，参数不合法。')
-			return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 失败，参数不合法。' }
+			console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、パラメータが不正です。')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に失敗しました、パラメータが不正です。' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '从一个动态分组中移除 UID 失败，非法用户。')
-			return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 失败，非法用户' }
+			console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、不正なユーザーです。')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に失敗しました、不正なユーザー' }
 		}
 
 		const { feedGroupUuid, uidList } = removeUidFromFeedGroupRequest
@@ -396,8 +396,8 @@ export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupReques
 		const uuidList = []
 		if (uidList && Array.isArray(uidList) && uidList.length > 0) {
 			if (uidList.length > 50) {
-				console.error('ERROR', '从一个动态分组中移除 UID 失败，一次性移除的 UID 太多了')
-				return { success: false, tooManyUidInOnce: true, message: '从一个动态分组中移除 UID 失败，一次性移除的 UID 太多了' }
+				console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、一度に削除するUIDが多すぎます')
+				return { success: false, tooManyUidInOnce: true, message: 'フィードグループからのUIDの削除に失敗しました、一度に削除するUIDが多すぎます' }
 			}
 
 			let isCorrectUuidList = true
@@ -415,8 +415,8 @@ export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupReques
 			})
 
 			if (!isCorrectUuidList) {
-				console.error('ERROR', '从一个动态分组中移除 UID 失败，UUID 列表不合法。')
-				return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 失败，UUID 列表不合法' }
+				console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、UUIDリストが不正です。')
+				return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に失敗しました、UUIDリストが不正です' }
 			}
 		}
 
@@ -429,7 +429,7 @@ export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupReques
 		}
 		const feedGroupWhere: QueryType<FeedGroup> = {
 			feedGroupUuid,
-			feedGroupCreatorUuid: uuid, // 确保修改的是自己创建的动态分组
+			feedGroupCreatorUuid: uuid, // 変更するのが自分が作成したフィードグループであることを確認
 		}
 
 		const session = await createAndStartSession()
@@ -439,8 +439,8 @@ export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupReques
 
 		if (!getFeedGroupDataResult.success || !getFeedGroupData.feedGroupUuid) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '从一个动态分组中移除 UID 失败，更新的动态列表不存在或者不是由当前用户创建')
-			return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 失败，更新的动态列表不存在或者不是由当前用户创建' }
+			console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、更新するフィードリストが存在しないか、現在のユーザーによって作成されたものではありません')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に失敗しました、更新するフィードリストが存在しないか、現在のユーザーによって作成されたものではありません' }
 		}
 
 		const oldUuidList = [...new Set<string>(getFeedGroupData.uuidList ?? [])]
@@ -457,35 +457,35 @@ export const removeUidFromFeedGroupService = async (removeUidFromFeedGroupReques
 
 		if (!findOneAndUpdateFeedGroupDataResult.success || !findOneAndUpdateFeedGroupData) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '从一个动态分组中移除 UID 失败，更新失败')
-			return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 失败，更新失败' }
+			console.error('ERROR', 'フィードグループからのUIDの削除に失敗しました、更新に失敗しました')
+			return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に失敗しました、更新に失敗しました' }
 		}
 
 		await commitAndEndSession(session)
-		return { success: true, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 成功', feedGroupResult: findOneAndUpdateFeedGroupData }
+		return { success: true, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除に成功しました', feedGroupResult: findOneAndUpdateFeedGroupData }
 	} catch (error) {
-		console.error('ERROR', '从一个动态分组中移除 UID 时出错：未知原因。', error)
-		return { success: false, tooManyUidInOnce: false, message: '从一个动态分组中移除 UID 时出错：未知原因。' }
+		console.error('ERROR', 'フィードグループからのUIDの削除中にエラーが発生しました：原因不明。', error)
+		return { success: false, tooManyUidInOnce: false, message: 'フィードグループからのUIDの削除中にエラーが発生しました：原因不明。' }
 	}
 }
 
 /**
- * 删除动态分组
- * @param deleteFeedGroupRequest 删除动态分组的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 删除动态分组的请求响应
+ * フィードグループを削除
+ * @param deleteFeedGroupRequest フィードグループ削除のリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループ削除のリクエストレスポンス
  */
 export const deleteFeedGroupService = async (deleteFeedGroupRequest: DeleteFeedGroupRequestDto, uuid: string, token: string): Promise<DeleteFeedGroupResponseDto> => {
 	try {
 		if (!checkDeleteFeedGroupRequest(deleteFeedGroupRequest)) {
-			console.error('ERROR', '删除动态分组失败，参数不合法')
-			return { success: false, message: '删除动态分组失败，参数不合法' }
+			console.error('ERROR', 'フィードグループの削除に失敗しました、パラメータが不正です')
+			return { success: false, message: 'フィードグループの削除に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '删除动态分组失败，非法用户')
-			return { success: false, message: '删除动态分组失败，非法用户' }
+			console.error('ERROR', 'フィードグループの削除に失敗しました、不正なユーザーです')
+			return { success: false, message: 'フィードグループの削除に失敗しました、不正なユーザー' }
 		}
 
 		const { feedGroupUuid } = deleteFeedGroupRequest
@@ -494,71 +494,71 @@ export const deleteFeedGroupService = async (deleteFeedGroupRequest: DeleteFeedG
 
 		const deleteFeedGroupWhere: QueryType<FeedGroup> = {
 			feedGroupUuid,
-			feedGroupCreatorUuid: uuid, // 确保删除的是自己创建的动态分组
+			feedGroupCreatorUuid: uuid, // 削除するのが自分が作成したフィードグループであることを確認
 		}
 
 		const deleteFeedGroupResult = await deleteDataFromMongoDB<FeedGroup>(deleteFeedGroupWhere, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!deleteFeedGroupResult.success) {
-			console.error('ERROR', '删除动态分组失败，删除失败')
-			return { success: false, message: '删除动态分组失败，删除失败' }
+			console.error('ERROR', 'フィードグループの削除に失敗しました、削除に失敗しました')
+			return { success: false, message: 'フィードグループの削除に失敗しました、削除に失敗しました' }
 		}
 
-		return { success: true, message: '删除动态分组成功' }
+		return { success: true, message: 'フィードグループの削除に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '删除动态分组时出错：未知原因', error)
-		return { success: false, message: '删除动态分组时出错：未知原因' }
+		console.error('ERROR', 'フィードグループの削除中にエラーが発生しました：原因不明', error)
+		return { success: false, message: 'フィードグループの削除中にエラーが発生しました：原因不明' }
 	}
 }
 
 /**
- * 获取用于上传动态分组封面图的预签名 URL
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns GetFeedGroupCoverUploadSignedUrlResponseDto 获取用于上传动态分组封面图的预签名 URL 的请求响应
+ * フィードグループのカバー画像をアップロードするための署名付きURLを取得する
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns GetFeedGroupCoverUploadSignedUrlResponseDto フィードグループのカバー画像をアップロードするための署名付きURLを取得するリクエストレスポンス
  */
 export const getFeedGroupCoverUploadSignedUrlService = async (uuid: string, token: string): Promise<GetFeedGroupCoverUploadSignedUrlResponseDto> => {
 	try {
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '获取用于上传动态分组封面图的预签名 URL 失败，用户校验未通过')
-			return { success: false, message: '获取用于上传动态分组封面图的预签名 URL 失败，用户校验未通过' }
+			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました')
+			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
 		}
 		const now = new Date().getTime()
 		const fileName = `feed-group-cover-${uuid}-${generateSecureRandomString(32)}-${now}`
 		try {
 			const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
 			if (signedUrl) {
-				return { success: true, message: '获取用于上传动态分组封面图的预签名 URL 成功', result: { fileName, signedUrl } }
+				return { success: true, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
 			}
 		} catch (error) {
-			console.error('ERROR', '获取用于上传动态分组封面图的预签名 URL 失败，请求失败', error)
-			return { success: false, message: '获取用于上传动态分组封面图的预签名 URL 失败，请求失败' }
+			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
+			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取用于上传动态分组封面图的预签名 URL 时出错：', error)
-		return { success: false, message: '获取用于上传动态分组封面图的预签名 URL 时出错，未知原因' }
+		console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました：', error)
+		return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * 创建或更新动态分组信息
- * 更新动态分组的名称或者头像 URL 都是这个接口
+ * フィードグループ情報を作成または更新する
+ * フィードグループの名前やアバターURLの更新はすべてこのインターフェースで行う
  *
- * @param createOrEditFeedGroupInfoRequest 创建或更新动态分组信息的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 创建或更新动态分组信息的请求响应
+ * @param createOrEditFeedGroupInfoRequest フィードグループ情報を作成または更新するリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループ情報を作成または更新するリクエストレスポンス
  */
 export const createOrEditFeedGroupInfoService = async (createOrEditFeedGroupInfoRequest: CreateOrEditFeedGroupInfoRequestDto, uuid: string, token: string): Promise<CreateOrEditFeedGroupInfoResponseDto> => {
 	try {
 		if (!checkCreateOrEditFeedGroupInfoRequest(createOrEditFeedGroupInfoRequest)) {
-			console.error('ERROR', '创建或更新动态分组信息失败，参数不合法')
-			return { success: false, message: '创建或更新动态分组信息失败，参数不合法' }
+			console.error('ERROR', 'フィードグループ情報の作成または更新に失敗しました、パラメータが不正です')
+			return { success: false, message: 'フィードグループ情報の作成または更新に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '创建或更新动态分组信息失败，非法用户')
-			return { success: false, message: '创建或更新动态分组信息失败，非法用户' }
+			console.error('ERROR', 'フィードグループ情報の作成または更新に失敗しました、不正なユーザーです')
+			return { success: false, message: 'フィードグループ情報の作成または更新に失敗しました、不正なユーザーです' }
 		}
 
 		const { feedGroupUuid, feedGroupName, feedGroupCustomCoverUrl } = createOrEditFeedGroupInfoRequest
@@ -569,7 +569,7 @@ export const createOrEditFeedGroupInfoService = async (createOrEditFeedGroupInfo
 
 		const updateFeedGroupWhere: QueryType<FeedGroup> = {
 			feedGroupUuid,
-			feedGroupCreatorUuid: uuid, // 确保修改的是自己创建的动态分组
+			feedGroupCreatorUuid: uuid, // 変更するのが自分が作成したフィードグループであることを確認
 		}
 		const updateFeedGroupData: UpdateType<FeedGroup> = {
 			feedGroupName,
@@ -581,35 +581,35 @@ export const createOrEditFeedGroupInfoService = async (createOrEditFeedGroupInfo
 		const findOneAndUpdateFeedGroupDataResult = await findOneAndUpdateData4MongoDB<FeedGroup>(updateFeedGroupWhere, updateFeedGroupData, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!findOneAndUpdateFeedGroupDataResult.success || !findOneAndUpdateFeedGroupDataResult.result) {
-			console.error('ERROR', '创建或更新动态分组信息失败，更新失败')
-			return { success: false, message: '创建或更新动态分组信息失败，更新失败' }
+			console.error('ERROR', 'フィードグループ情報の作成または更新に失敗しました、更新に失敗しました')
+			return { success: false, message: 'フィードグループ情報の作成または更新に失敗しました、更新に失敗しました' }
 		}
 
-		return { success: false, message: '创建或更新动态分组信息成功', feedGroupResult: findOneAndUpdateFeedGroupDataResult.result }
+		return { success: false, message: 'フィードグループ情報の作成または更新に成功しました', feedGroupResult: findOneAndUpdateFeedGroupDataResult.result }
 	} catch (error) {
-		console.error('ERROR', '创建或更新动态分组信息时出错：未知原因', error)
-		return { success: false, message: '创建或更新动态分组信息时出错：未知原因' }
+		console.error('ERROR', 'フィードグループ情報の作成または更新中にエラーが発生しました：原因不明', error)
+		return { success: false, message: 'フィードグループ情報の作成または更新中にエラーが発生しました：原因不明' }
 	}
 }
 
 /**
- * // WARN: 仅限管理员
- * 管理员通过动态分组信息更新审核
- * @param administratorApproveFeedGroupInfoChangeRequest 管理员通过动态分组信息更新审核的请求载荷
- * @param administratorUuid 管理员的 UUID
- * @param administratorToken 管理员的 token
- * @returns 管理员通过动态分组信息更新审核的请求响应
+ * // WARN: 管理者のみ
+ * 管理者がフィードグループ情報の更新レビューを承認する
+ * @param administratorApproveFeedGroupInfoChangeRequest 管理者がフィードグループ情報の更新レビューを承認するリクエストペイロード
+ * @param administratorUuid 管理者のUUID
+ * @param administratorToken 管理者のトークン
+ * @returns 管理者がフィードグループ情報の更新レビューを承認するリクエストレスポンス
  */
 export const administratorApproveFeedGroupInfoChangeService = async (administratorApproveFeedGroupInfoChangeRequest: AdministratorApproveFeedGroupInfoChangeRequestDto, administratorUuid: string, administratorToken: string): Promise<AdministratorApproveFeedGroupInfoChangeResponseDto> => {
 	try {
 		if (!checkAdministratorApproveFeedGroupInfoChangeRequest(administratorApproveFeedGroupInfoChangeRequest)) {
-			console.error('ERROR', '管理员通过动态分组信息更新审核失败，参数不合法')
-			return { success: false, message: '管理员通过动态分组信息更新审核失败，参数不合法' }
+			console.error('ERROR', '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、パラメータが不正です')
+			return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(administratorUuid, administratorToken)).success) {
-			console.error('ERROR', '管理员通过动态分组信息更新审核失败，非法用户')
-			return { success: false, message: '管理员通过动态分组信息更新审核失败，非法用户' }
+			console.error('ERROR', '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、不正なユーザーです')
+			return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、不正なユーザーです' }
 		}
 
 		const { feedGroupUuid } = administratorApproveFeedGroupInfoChangeRequest
@@ -629,35 +629,35 @@ export const administratorApproveFeedGroupInfoChangeService = async (administrat
 		const findOneAndUpdateFeedGroupDataResult = await findOneAndUpdateData4MongoDB<FeedGroup>(updateFeedGroupWhere, updateFeedGroupData, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!findOneAndUpdateFeedGroupDataResult.success || !findOneAndUpdateFeedGroupDataResult.result) {
-			console.error('ERROR', '管理员通过动态分组信息更新审核失败，更新失败')
-			return { success: false, message: '管理员通过动态分组信息更新审核失败，更新失败' }
+			console.error('ERROR', '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、更新に失敗しました')
+			return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認に失敗しました、更新に失敗しました' }
 		}
 
-		return { success: false, message: '管理员通过动态分组信息更新审核成功' }
+		return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '管理员通过动态分组信息更新审核时出错：', error)
-		return { success: false, message: '管理员通过动态分组信息更新审核时出错，未知原因' }
+		console.error('ERROR', '管理者によるフィードグループ情報の更新レビュー承認中にエラーが発生しました：', error)
+		return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * // WARN: 仅限管理员
- * 管理员删除动态分组
- * @param administratorDeleteFeedGroupRequest 管理员删除动态分组的请求载荷
- * @param administratorUuid 管理员的 UUID
- * @param administratorToken 管理员的 token
- * @returns 管理员删除动态分组的请求响应
+ * // WARN: 管理者のみ
+ * 管理者がフィードグループを削除する
+ * @param administratorDeleteFeedGroupRequest 管理者がフィードグループを削除するリクエストペイロード
+ * @param administratorUuid 管理者のUUID
+ * @param administratorToken 管理者のトークン
+ * @returns 管理者がフィードグループを削除するリクエストレスポンス
  */
 export const administratorDeleteFeedGroupService = async (administratorDeleteFeedGroupRequest: AdministratorDeleteFeedGroupRequestDto, administratorUuid: string, administratorToken: string): Promise<AdministratorDeleteFeedGroupResponseDto> => {
 	try {
 		if (!checkAdministratorDeleteFeedGroupRequest(administratorDeleteFeedGroupRequest)) {
-			console.error('ERROR', '管理员删除动态分组失败，参数不合法')
-			return { success: false, message: '管理员删除动态分组失败，参数不合法' }
+			console.error('ERROR', '管理者によるフィードグループの削除に失敗しました、パラメータが不正です')
+			return { success: false, message: '管理者によるフィードグループの削除に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(administratorUuid, administratorToken)).success) {
-			console.error('ERROR', '管理员删除动态分组失败，非法用户')
-			return { success: false, message: '管理员删除动态分组失败，非法用户' }
+			console.error('ERROR', '管理者によるフィードグループの削除に失敗しました、不正なユーザーです')
+			return { success: false, message: '管理者によるフィードグループの削除に失敗しました、不正なユーザーです' }
 		}
 
 		const { feedGroupUuid } = administratorDeleteFeedGroupRequest
@@ -671,28 +671,28 @@ export const administratorDeleteFeedGroupService = async (administratorDeleteFee
 		const administratorDeleteFeedGroupResult = await deleteDataFromMongoDB<FeedGroup>(deleteFeedGroupWhere, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!administratorDeleteFeedGroupResult.success) {
-			console.error('ERROR', '管理员删除动态分组失败，更新失败')
-			return { success: false, message: '管理员删除动态分组失败，更新失败' }
+			console.error('ERROR', '管理者によるフィードグループの削除に失敗しました、更新に失敗しました')
+			return { success: false, message: '管理者によるフィードグループの削除に失敗しました、更新に失敗しました' }
 		}
 
-		return { success: false, message: '管理员通过动态分组信息更新审核成功' }
+		return { success: false, message: '管理者によるフィードグループ情報の更新レビュー承認に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '管理员删除动态分组时出错：', error)
-		return { success: false, message: '管理员删除动态分组时出错，未知原因' }
+		console.error('ERROR', '管理者によるフィードグループの削除中にエラーが発生しました：', error)
+		return { success: false, message: '管理者によるフィードグループの削除中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * 获取动态分组
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 获取动态分组的请求响应
+ * フィードグループを取得
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードグループ取得のリクエストレスポンス
  */
 export const getFeedGroupListService = async (uuid: string, token: string): Promise<GetFeedGroupListResponseDto> => {
 	try {
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '获取动态分组失败，非法用户')
-			return { success: false, message: '获取动态分组失败，非法用户' }
+			console.error('ERROR', 'フィードグループの取得に失敗しました、不正なユーザーです')
+			return { success: false, message: 'フィードグループの取得に失敗しました、不正なユーザーです' }
 		}
 
 		const { collectionName: feedGroupCollectionName, schemaInstance: feedGroupSchemaInstance } = FeedGroupSchema
@@ -703,46 +703,46 @@ export const getFeedGroupListService = async (uuid: string, token: string): Prom
 		}
 
 		const getFeedGroupSelect: SelectType<FeedGroup> = {
-			feedGroupUuid: 1, // 动态分组的 UUID
-			feedGroupName: 1, // 动态分组的名称
-			feedGroupCreatorUuid: 1, // 动态分组创建者 UUID
-			uuidList: 1, // 动态分组中的用户
-			customCover: 1, // 动态分组的自定义封面
-			editDateTime: 1, // 系统专用字段-最后编辑时间
-			createDateTime: 1, // 系统专用字段-创建时间
+			feedGroupUuid: 1, // フィードグループのUUID
+			feedGroupName: 1, // フィードグループの名前
+			feedGroupCreatorUuid: 1, // フィードグループ作成者のUUID
+			uuidList: 1, // フィードグループ内のユーザー
+			customCover: 1, // フィードグループのカスタムカバー
+			editDateTime: 1, // システム専用フィールド - 最終編集日時
+			createDateTime: 1, // システム専用フィールド - 作成日時
 		}
 
 		const getFeedGroupResult = await selectDataFromMongoDB<FeedGroup>(getFeedGroupWhere, getFeedGroupSelect, feedGroupSchemaInstance, feedGroupCollectionName)
 
 		if (!getFeedGroupResult.success || !getFeedGroupResult.result) {
-			console.error('ERROR', '获取动态分组失败，查询失败')
-			return { success: false, message: '获取动态分组失败，查询失败' }
+			console.error('ERROR', 'フィードグループの取得に失敗しました、クエリに失敗しました')
+			return { success: false, message: 'フィードグループの取得に失敗しました、クエリに失敗しました' }
 		}
 
-		return { success: true, message: '获取动态分组成功', result: getFeedGroupResult.result }
+		return { success: true, message: 'フィードグループの取得に成功しました', result: getFeedGroupResult.result }
 	} catch (error) {
-		console.error('ERROR', '获取动态分组时出错：', error)
-		return { success: false, message: '获取动态分组时出错，未知原因' }
+		console.error('ERROR', 'フィードグループの取得中にエラーが発生しました：', error)
+		return { success: false, message: 'フィードグループの取得中にエラーが発生しました、原因不明' }
 	}
 }
 
 /**
- * 获取动态内容
- * @param getFeedContentRequest 获取动态内容的请求载荷
- * @param uuid 用户的 UUID
- * @param token 用户的 token
- * @returns 获取动态内容的请求响应
+ * フィードコンテンツを取得
+ * @param getFeedContentRequest フィードコンテンツ取得のリクエストペイロード
+ * @param uuid ユーザーのUUID
+ * @param token ユーザーのトークン
+ * @returns フィードコンテンツ取得のリクエストレスポンス
  */
 export const getFeedContentService = async (getFeedContentRequest: GetFeedContentRequestDto, uuid: string, token: string): Promise<GetFeedContentResponseDto> => {
 	try {
 		if (!checkGetFeedContentRequest(getFeedContentRequest)) {
-			console.error('ERROR', '获取动态内容失败，参数不合法')
-			return { success: false, message: '获取动态内容失败，参数不合法', isLonely: false }
+			console.error('ERROR', 'フィードコンテンツの取得に失敗しました、パラメータが不正です')
+			return { success: false, message: 'フィードコンテンツの取得に失敗しました、パラメータが不正です', isLonely: false }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, uuid)).success) {
-			console.error('ERROR', '获取动态内容失败，非法用户')
-			return { success: false, message: '获取动态内容失败，非法用户', isLonely: false }
+			console.error('ERROR', 'フィードコンテンツの取得に失敗しました、不正なユーザーです')
+			return { success: false, message: 'フィードコンテンツの取得に失敗しました、不正なユーザーです', isLonely: false }
 		}
 
 		const { feedGroupUuid, pagination } = getFeedContentRequest
@@ -757,20 +757,20 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			}
 
 			const getFeedGroupUuidListSelect: SelectType<FeedGroup> = {
-				uuidList: 1, // 动态分组中的用户
+				uuidList: 1, // フィードグループ内のユーザー
 			}
 
 			const getFeedGroupUserListResult = await selectDataFromMongoDB<FeedGroup>(getFeedGroupUuidListWhere, getFeedGroupUuidListSelect, feedGroupSchemaInstance, feedGroupCollectionName)
 			const uuidListResult = getFeedGroupUserListResult.result?.[0]?.uuidList
 
 			if (!getFeedGroupUserListResult.success) {
-				console.error('ERROR', '获取动态内容失败，查询动态分组中的用户失败')
-				return { success: false, message: '获取动态内容失败，查询动态分组中的用户失败', isLonely: { noUserInFeedGroup: true } }
+				console.error('ERROR', 'フィードコンテンツの取得に失敗しました、フィードグループ内のユーザーのクエリに失敗しました')
+				return { success: false, message: 'フィードコンテンツの取得に失敗しました、フィードグループ内のユーザーのクエリに失敗しました', isLonely: { noUserInFeedGroup: true } }
 			}
 
 			if (Array.isArray(uuidListResult) && uuidList.length <= 0) {
-				console.warn('WARN', 'WARNING', '你选择动态分组中没有用户')
-				return { success: true, message: '你选择动态分组中没有用户', isLonely: { noUserInFeedGroup: true }, result: { count: 0, content: [] } }
+				console.warn('WARN', 'WARNING', '選択したフィードグループにユーザーがいません')
+				return { success: true, message: '選択したフィードグループにユーザーがいません', isLonely: { noUserInFeedGroup: true }, result: { count: 0, content: [] } }
 			}
 
 			uuidList.push(uuidListResult)
@@ -790,19 +790,19 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			const uuidListResult = getFollowingUserListResult.result?.map(followingResult => followingResult.followingUuid)
 
 			if (!getFollowingUserListResult.success) {
-				console.error('ERROR', '获取动态内容失败，查询用户关注的用户失败')
-				return { success: false, message: '获取动态内容失败，查询用户关注的用户失败', isLonely: { noFollowing: true } }
+				console.error('ERROR', 'フィードコンテンツの取得に失敗しました、ユーザーがフォローしているユーザーのクエリに失敗しました')
+				return { success: false, message: 'フィードコンテンツの取得に失敗しました、ユーザーがフォローしているユーザーのクエリに失敗しました', isLonely: { noFollowing: true } }
 			}
 
 			if (Array.isArray(uuidListResult) && uuidList.length <= 0) {
-				console.warn('WARN', 'WARNING', '你没有关注任何用户')
-				return { success: true, message: '你没有关注任何用户', isLonely: { noFollowing: true }, result: { count: 0, content: [] } }
+				console.warn('WARN', 'WARNING', 'あなたは誰もフォローしていません')
+				return { success: true, message: 'あなたは誰もフォローしていません', isLonely: { noFollowing: true }, result: { count: 0, content: [] } }
 			}
 
 			uuidList.push(uuidListResult)
 		}
 
-		// 根据 uuid 匹配视频的基础 pipeline
+		// uuidに基づいて動画を照合する基本パイプライン
 		const feedContentMatchPipeline: PipelineStage[] = [
 			{
 				$match: {
@@ -811,10 +811,10 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			},
 		]
 
-		// 获取动态视频总数的 pipeline
+		// フィード動画の総数を取得するパイプライン
 		const countFeedContentBasePipeline: PipelineStage[] = [
 			{
-				$count: 'totalCount', // 统计总文档数
+				$count: 'totalCount', // 総ドキュメント数をカウント
 			}
 		]
 
@@ -825,7 +825,7 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			pageSize = pagination.pageSize
 		}
 
-		// 匹配视频信息的 pipeline
+		// 動画情報を照合するパイプライン
 		const getFeedContentBasePipeline: PipelineStage[] = [
 			{
 				$lookup: {
@@ -835,14 +835,14 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 					as: 'uploader_info',
 				},
 			},
-			{ $skip: skip }, // 跳过指定数量的文档
-			{ $limit: pageSize }, // 限制返回的文档数量
+			{ $skip: skip }, // 指定された数のドキュメントをスキップ
+			{ $limit: pageSize }, // 返されるドキュメントの数を制限
 			{
 				$unwind: '$uploader_info',
 			},
 			{
 				$sort: {
-					uploadDate: -1, // 按 uploadDate 降序排序
+					uploadDate: -1, // uploadDateで降順ソート
 				},
 			},
 			{
@@ -852,12 +852,12 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 					image: 1,
 					uploadDate: 1,
 					watchedCount: 1,
-					uploaderId: 1, // 上传者 UID
+					uploaderId: 1, // アップローダーのUID
 					duration: 1,
 					description: 1,
 					editDateTime: 1,
-					uploader: '$uploader_info.username', // 上传者的名字
-					uploaderNickname: '$uploader_info.userNickname', // 上传者的昵称
+					uploader: '$uploader_info.username', // アップローダーの名前
+					uploaderNickname: '$uploader_info.userNickname', // アップローダーのニックネーム
 				}
 			}
 		]
@@ -879,13 +879,13 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			|| typeof count !== 'number' || count < 0
 			|| ( Array.isArray(content) && !content )
 		) {
-			console.error('ERROR', '获取动态内容失败，查询视频数据失败')
-			return { success: false, message: '获取动态内容失败，查询视频数据失败', isLonely: false }
+			console.error('ERROR', 'フィードコンテンツの取得に失敗しました、動画データのクエリに失敗しました')
+			return { success: false, message: 'フィードコンテンツの取得に失敗しました、動画データのクエリに失敗しました', isLonely: false }
 		}
 
 		return {
 			success: true,
-			message: count > 0 ? '获取动态内容成功' : '获取动态内容成功，长度为零',
+			message: count > 0 ? 'フィードコンテンツの取得に成功しました' : 'フィードコンテンツの取得に成功しました、長さはゼロです',
 			isLonely: false,
 			result: {
 				count,
@@ -893,42 +893,42 @@ export const getFeedContentService = async (getFeedContentRequest: GetFeedConten
 			},
 		}
 	} catch (error) {
-		console.error('ERROR', '获取动态内容时出错：', error)
-		return { success: false, message: '获取动态内容时出错，未知原因', isLonely: false }
+		console.error('ERROR', 'フィードコンテンツの取得中にエラーが発生しました：', error)
+		return { success: false, message: 'フィードコンテンツの取得中にエラーが発生しました、原因不明', isLonely: false }
 	}
 }
 
 /**
- * 校验用户关注一个创作者的请求载荷
- * @param followingUploaderRequest 用户关注一个创作者的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * ユーザーがクリエイターをフォローするリクエストペイロードを検証する
+ * @param followingUploaderRequest ユーザーがクリエイターをフォローするリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkFollowingUploaderRequest = (followingUploaderRequest: FollowingUploaderRequestDto): boolean => {
 	return ( followingUploaderRequest.followingUid !== undefined && followingUploaderRequest.followingUid !== null && followingUploaderRequest.followingUid > 0 )
 }
 
 /**
- * 校验用户取消关注一个创作者的请求载荷
- * @param followingUploaderRequest 用户取消关注一个创作者的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * ユーザーがクリエイターのフォローを解除するリクエストペイロードを検証する
+ * @param unfollowingUploaderRequest ユーザーがクリエイターのフォローを解除するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkUnfollowingUploaderRequest = (unfollowingUploaderRequest: UnfollowingUploaderRequestDto): boolean => {
 	return ( unfollowingUploaderRequest.unfollowingUid !== undefined && unfollowingUploaderRequest.unfollowingUid !== null && unfollowingUploaderRequest.unfollowingUid > 0 )
 }
 
 /**
- * 校验创建动态分组的请求载荷
- * @param createFeedGroupRequest 创建动态分组的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードグループ作成リクエストのペイロードを検証する
+ * @param createFeedGroupRequest フィードグループ作成のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateFeedGroupRequest = (createFeedGroupRequest: CreateFeedGroupRequestDto): boolean => {
 	return ( !!createFeedGroupRequest.feedGroupName )
 }
 
 /**
- * 校验向一个动态分组中添加新的 UID 的请求载荷
- * @param addNewUser2FeedGroupRequest 向一个动态分组中添加新的 UID 的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードグループに新しいUIDを追加するリクエストペイロードを検証する
+ * @param addNewUser2FeedGroupRequest フィードグループに新しいUIDを追加するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAddNewUser2FeedGroupRequest = (addNewUser2FeedGroupRequest: AddNewUid2FeedGroupRequestDto): boolean => {
 	return (
@@ -938,9 +938,9 @@ const checkAddNewUser2FeedGroupRequest = (addNewUser2FeedGroupRequest: AddNewUid
 }
 
 /**
- * 校验从一个动态分组中移除 UID 的请求载荷
- * @param removeUidFromFeedGroupRequest 从一个动态分组中移除 UID 的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードグループからUIDを削除するリクエストペイロードを検証する
+ * @param removeUidFromFeedGroupRequest フィードグループからUIDを削除するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkRemoveUidFromFeedGroupRequest = (removeUidFromFeedGroupRequest: RemoveUidFromFeedGroupRequestDto): boolean => {
 	return (
@@ -950,45 +950,45 @@ const checkRemoveUidFromFeedGroupRequest = (removeUidFromFeedGroupRequest: Remov
 }
 
 /**
- * 校验删除动态分组的请求载荷
- * @param deleteFeedGroupRequest 删除动态分组的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードグループ削除リクエストのペイロードを検証する
+ * @param deleteFeedGroupRequest フィードグループ削除のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkDeleteFeedGroupRequest = (deleteFeedGroupRequest: DeleteFeedGroupRequestDto): boolean => {
 	return ( !!deleteFeedGroupRequest.feedGroupUuid )
 }
 
 /**
- * 校验创建或更新动态分组信息的请求载荷
- * @param createOrEditFeedGroupInfoRequest 创建或更新动态分组信息的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードグループ情報を作成または更新するリクエストペイロードを検証する
+ * @param createOrEditFeedGroupInfoRequest フィードグループ情報を作成または更新するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateOrEditFeedGroupInfoRequest = (createOrEditFeedGroupInfoRequest: CreateOrEditFeedGroupInfoRequestDto): boolean => {
 	return ( !!createOrEditFeedGroupInfoRequest.feedGroupUuid )
 }
 
 /**
- * 校验管理员通过动态分组信息更新审核的请求载荷
- * @param administratorApproveFeedGroupInfoChangeRequest 管理员通过动态分组信息更新审核的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * 管理者がフィードグループ情報の更新レビューを承認するリクエストペイロードを検証する
+ * @param administratorApproveFeedGroupInfoChangeRequest 管理者がフィードグループ情報の更新レビューを承認するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAdministratorApproveFeedGroupInfoChangeRequest = (administratorApproveFeedGroupInfoChangeRequest: AdministratorApproveFeedGroupInfoChangeRequestDto): boolean => {
 	return ( !!administratorApproveFeedGroupInfoChangeRequest.feedGroupUuid )
 }
 
 /**
- * 校验管理员通过动态分组信息更新审核的请求载荷
- * @param administratorDeleteFeedGroupRequest 管理员通过动态分组信息更新审核的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * 管理者がフィードグループ情報の更新レビューを承認するリクエストペイロードを検証する
+ * @param administratorDeleteFeedGroupRequest 管理者がフィードグループ情報の更新レビューを承認するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAdministratorDeleteFeedGroupRequest = (administratorDeleteFeedGroupRequest: AdministratorDeleteFeedGroupRequestDto): boolean => {
 	return ( !!administratorDeleteFeedGroupRequest.feedGroupUuid )
 }
 
 /**
- * 校验获取动态内容的请求载荷
- * @param getFeedContentRequest 获取动态内容的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * フィードコンテンツ取得リクエストのペイロードを検証する
+ * @param getFeedContentRequest フィードコンテンツ取得のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetFeedContentRequest = (getFeedContentRequest: GetFeedContentRequestDto): boolean => {
 	return (

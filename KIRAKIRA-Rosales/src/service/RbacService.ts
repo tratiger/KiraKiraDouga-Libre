@@ -11,9 +11,9 @@ import { koaCtx } from "../type/koaTypes.js";
 import { clearUndefinedItemInObject, isEmptyObject } from "../common/ObjectTool.js";
 
 /**
- * 通过 RBAC 检查用户的权限
- * @param params 通过 RBAC 检查用户的权限的参数
- * @returns 通过 RBAC 检查用户的权限的结果
+ * RBAC経由でユーザーの権限を確認する
+ * @param params RBAC経由でユーザーの権限を確認するためのパラメータ
+ * @returns RBAC経由でユーザーの権限を確認した結果
  */
 export const checkUserByRbac = async (params: CheckUserRbacParams): Promise<CheckUserRbacResult> => {
 	try {
@@ -24,19 +24,19 @@ export const checkUserByRbac = async (params: CheckUserRbacParams): Promise<Chec
 		if ('uid' in params) uid = params.uid
 
 		if (!uuid && uid === undefined) {
-			console.error('ERROR', '用户执行 RBAC 鉴权时失败，未提供 UUID 或 UID')
-			return { status: 500, message: `用户执行 RBAC 鉴权时失败，未提供 UUID 或 UID` }
+			console.error('ERROR', 'ユーザーがRBAC認証を実行する際に失敗しました、UUIDまたはUIDが提供されていません')
+			return { status: 500, message: `ユーザーがRBAC認証を実行する際に失敗しました、UUIDまたはUIDが提供されていません` }
 		}
 
 		const match = { UUID: uuid, uid }
 		const clearedMatch = clearUndefinedItemInObject(match)
 
 		const checkUserRbacPipeline: PipelineStage[] = [
-			// 匹配用户
+			// ユーザーを照合
 			{
 				$match: clearedMatch,
 			},
-			// 关联 roles 集合
+			// rolesコレクションを関連付け
 			{
 				$lookup: {
 					from: "rbac-roles",
@@ -45,17 +45,17 @@ export const checkUserByRbac = async (params: CheckUserRbacParams): Promise<Chec
 					as: "rolesData"
 				}
 			},
-			// 展开 rolesData 数组（多个角色）
+			// rolesData配列を展開（複数のロール）
 			{ $unwind: "$rolesData" },
-			// 展开 apiPathNamePermissions 数组（多个权限）
+			// apiPathNamePermissions配列を展開（複数の権限）
 			{ $unwind: "$rolesData.apiPathPermissions" },
-			// 过滤出匹配的 API 路径
+			// 一致するAPIパスをフィルタリング
 			{
 				$match: {
 					"rolesData.apiPathPermissions": apiPath
 				}
 			},
-			// 只返回有权限的数据
+			// 権限のあるデータのみを返す
 			{ $project: { UUID: 1 } }
 		]
 
@@ -64,22 +64,22 @@ export const checkUserByRbac = async (params: CheckUserRbacParams): Promise<Chec
 		const checkUserRbacResult = await selectDataByAggregateFromMongoDB<UserAuth>(userAuthSchemaInstance, userAuthCollectionName, checkUserRbacPipeline)
 
 		if (checkUserRbacResult && checkUserRbacResult.success && checkUserRbacResult.result && Array.isArray(checkUserRbacResult.result) && checkUserRbacResult.result.length > 0) {
-			return { status: 200, message: `用户 ${uuid ? `UUID: ${uuid}` : `UID: ${uid}`} 有权限访问 ${apiPath}` }
+			return { status: 200, message: `ユーザー ${uuid ? `UUID: ${uuid}` : `UID: ${uid}`} は ${apiPath} へのアクセス権を持っています` }
 		} else {
-			return { status: 403, message: `用户 ${uuid ? `UUID: ${uuid}` : `UID: ${uid}`} 在访问 ${apiPath} 的权限不足，或者用户不存在` }
+			return { status: 403, message: `ユーザー ${uuid ? `UUID: ${uuid}` : `UID: ${uid}`} は ${apiPath} へのアクセス権が不足しているか、ユーザーが存在しません` }
 		}
 	} catch (error) {
-		console.error('ERROR', '用户执行 RBAC 鉴权时出现错误，未知错误：', error)
-		return { status: 500, message: '用户执行 RBAC 鉴权时出现错误，未知错误' }
+		console.error('ERROR', 'ユーザーがRBAC認証を実行中にエラーが発生しました、不明なエラー：', error)
+		return { status: 500, message: 'ユーザーがRBAC認証を実行中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 在 Controller 层通过 RBAC 检查用户的权限
- * 该函数是 checkUserByRbac 的二次封装，包含校验失败时 ctx 中状态码和错误信息的补全功能，并返回简单的 boolean 类型结果，该结果用于在 Controller 中判断后续代码是否需要继续执行
- * @param params 通过 RBAC 检查用户的权限的参数
+ * Controller層でRBAC経由でユーザーの権限を確認する
+ * この関数はcheckUserByRbacの二次的なカプセル化であり、検証失敗時にctxのステータスコードとエラーメッセージを補完する機能を含み、単純なboolean型の結果を返します。この結果はControllerで後続のコードを実行する必要があるかどうかを判断するために使用されます
+ * @param params RBAC経由でユーザーの権限を確認するためのパラメータ
  * @param ctx koa context
- * @returns boolean 类型的权限检查结果，通过返回 true，不通过返回 false
+ * @returns boolean型の権限チェック結果、成功した場合はtrue、失敗した場合はfalseを返す
  */
 export const isPassRbacCheck = async (params: CheckUserRbacParams, ctx: koaCtx): Promise<boolean> => {
 	try {
@@ -94,30 +94,30 @@ export const isPassRbacCheck = async (params: CheckUserRbacParams, ctx: koaCtx):
 
 		return true
 	} catch (error) {
-		console.error('ERROR', '在 Controller 层执行 RBAC 鉴权时出现错误，未知错误：', error)
+		console.error('ERROR', 'Controller層でRBAC認証を実行中にエラーが発生しました、不明なエラー：', error)
 		ctx.status = 500
-		ctx.body = '在 Controller 层执行 RBAC 鉴权时出现错误，未知错误'
+		ctx.body = 'Controller層でRBAC認証を実行中にエラーが発生しました、不明なエラー'
 		return false
 	}
 }
 
 /**
- * 创建 RBAC API 路径
- * @param createRbacApiPathRequest 创建 RBAC API 路径的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 创建 RBAC API 路径的请求响应
+ * RBAC APIパスを作成
+ * @param createRbacApiPathRequest RBAC APIパス作成のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBAC APIパス作成のリクエストレスポンス
  */
 export const createRbacApiPathService = async (createRbacApiPathRequest: CreateRbacApiPathRequestDto, uuid: string, token: string): Promise<CreateRbacApiPathResponseDto> => {
 	try {
 		if (!checkCreateRbacApiPathRequest(createRbacApiPathRequest)) {
-			console.error('ERROR', '创建 RBAC API 路径失败，参数不合法')
-			return { success: false, message: '创建 RBAC API 路径失败，参数不合法' }
+			console.error('ERROR', 'RBAC APIパスの作成に失敗しました、パラメータが不正です')
+			return { success: false, message: 'RBAC APIパスの作成に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '创建 RBAC API 路径失败，用户 Token 校验未通过')
-			return { success: false, message: '创建 RBAC API 路径失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBAC APIパスの作成に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'RBAC APIパスの作成に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { apiPath, apiPathType, apiPathColor, apiPathDescription } = createRbacApiPathRequest
@@ -143,13 +143,13 @@ export const createRbacApiPathService = async (createRbacApiPathRequest: CreateR
 		const insertResultData = insertResult?.result?.[0]
 
 		if (!insertResult.success || !insertResultData) {
-			console.error('ERROR', '创建 RBAC API 路径失败，数据插入失败')
-			return { success: false, message: '创建 RBAC API 路径失败，数据插入失败' }
+			console.error('ERROR', 'RBAC APIパスの作成に失敗しました、データの挿入に失敗しました')
+			return { success: false, message: 'RBAC APIパスの作成に失敗しました、データの挿入に失敗しました' }
 		}
 
 		return {
 			success: true,
-			message: '创建 RBAC API 路径成功',
+			message: 'RBAC APIパスの作成に成功しました',
 			result: {
 				apiPathUuid: insertResultData.apiPathUuid,
 				apiPath: insertResultData.apiPath,
@@ -164,28 +164,28 @@ export const createRbacApiPathService = async (createRbacApiPathRequest: CreateR
 			}
 		}
 	} catch (error) {
-		console.error('ERROR', '创建 RBAC API 路径时出错，未知错误：', error)
-		return { success: false, message: '创建 RBAC API 路径时出错，未知错误' }
+		console.error('ERROR', 'RBAC APIパスの作成中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: 'RBAC APIパスの作成中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 删除 RBAC API 路径
- * @param deleteRbacApiPathRequest 删除 RBAC API 路径的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 删除 RBAC API 路径的请求响应
+ * RBAC APIパスを削除
+ * @param deleteRbacApiPathRequest RBAC APIパス削除のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBAC APIパス削除のリクエストレスポンス
  */
 export const deleteRbacApiPathService = async (deleteRbacApiPathRequest: DeleteRbacApiPathRequestDto, uuid: string, token: string): Promise<DeleteRbacApiPathResponseDto> => {
 	try {
 		if (!checkDeleteRbacApiPathRequest(deleteRbacApiPathRequest)) {
-			console.error('ERROR', '删除 RBAC API 路径失败，参数不合法')
-			return { success: false, isAssigned: false, message: '删除 RBAC API 路径失败，参数不合法' }
+			console.error('ERROR', 'RBAC APIパスの削除に失敗しました、パラメータが不正です')
+			return { success: false, isAssigned: false, message: 'RBAC APIパスの削除に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '删除 RBAC API 路径失败，用户 Token 校验未通过')
-			return { success: false, isAssigned: false, message: '删除 RBAC API 路径失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBAC APIパスの削除に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, isAssigned: false, message: 'RBAC APIパスの削除に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { apiPath } = deleteRbacApiPathRequest
@@ -206,8 +206,8 @@ export const deleteRbacApiPathService = async (deleteRbacApiPathRequest: DeleteR
 
 		if (chackApiPathUnassignedResult.result?.length > 0) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '删除 RBAC API 路径失败，该 API 路径已经被绑定到一个角色，请先将其从角色中移出才能删除。')
-			return { success: false, isAssigned: true, message: '删除 RBAC API 路径失败，该 API 路径已经被绑定到一个角色，请先将其从角色中移出才能删除。' }
+			console.error('ERROR', 'RBAC APIパスの削除に失敗しました、このAPIパスは既にロールにバインドされています。削除する前にロールから削除してください。')
+			return { success: false, isAssigned: true, message: 'RBAC APIパスの削除に失敗しました、このAPIパスは既にロールにバインドされています。削除する前にロールから削除してください。' }
 		}
 
 		const { collectionName: rbacApiCollectionName, schemaInstance: rbacApiSchemaInstance } = RbacApiSchema
@@ -221,35 +221,35 @@ export const deleteRbacApiPathService = async (deleteRbacApiPathRequest: DeleteR
 
 		if (!deleteRbacApiResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '删除 RBAC API 路径失败，数据删除失败')
-			return { success: false, isAssigned: false, message: '删除 RBAC API 路径失败，数据删除失败' }
+			console.error('ERROR', 'RBAC APIパスの削除に失敗しました、データの削除に失敗しました')
+			return { success: false, isAssigned: false, message: 'RBAC APIパスの削除に失敗しました、データの削除に失敗しました' }
 		}
 
 		await commitAndEndSession(session)
-		return { success: true, isAssigned: false, message: '删除 RBAC API 路径成功' }
+		return { success: true, isAssigned: false, message: 'RBAC APIパスの削除に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '创建 RBAC API 路径时出错，未知错误：', error)
-		return { success: false, isAssigned: false, message: '创建 RBAC API 路径时出错，未知错误' }
+		console.error('ERROR', 'RBAC APIパスの作成中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, isAssigned: false, message: 'RBAC APIパスの作成中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 获取 RBAC API 路径
- * @param getRbacApiPathRequest 获取 RBAC API 路径的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 获取 RBAC API 路径的请求响应
+ * RBAC APIパスを取得
+ * @param getRbacApiPathRequest RBAC APIパス取得のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBAC APIパス取得のリクエストレスポンス
  */
 export const getRbacApiPathService = async (getRbacApiPathRequest: GetRbacApiPathRequestDto, uuid: string, token: string): Promise<GetRbacApiPathResponseDto> => {
 	try {
 		if (!checkGetRbacApiPathRequest(getRbacApiPathRequest)) {
-			console.error('ERROR', '获取 RBAC API 路径失败，参数不合法')
-			return { success: false, message: '获取 RBAC API 路径失败，参数不合法' }
+			console.error('ERROR', 'RBAC APIパスの取得に失敗しました、パラメータが不正です')
+			return { success: false, message: 'RBAC APIパスの取得に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '获取 RBAC API 路径失败，用户 Token 校验未通过')
-			return { success: false, message: '获取 RBAC API 路径失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBAC APIパスの取得に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'RBAC APIパスの取得に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { search, pagination } = getRbacApiPathRequest
@@ -266,12 +266,12 @@ export const getRbacApiPathService = async (getRbacApiPathRequest: GetRbacApiPat
 			...(!isEmptyObject(clearedSearch) ? [{
 				$match: {
 					$and: Object.entries(clearedSearch).map(([key, value]) => ({
-						[key]: { $regex: value, $options: "i" } // 生成模糊查询
+						[key]: { $regex: value, $options: "i" } // あいまい検索を生成
 					}))
 				},
 			}] : []),
 			{
-				$count: 'totalCount', // 统计总文档数
+				$count: 'totalCount', // 総ドキュメント数をカウント
 			},
 		]
 
@@ -279,7 +279,7 @@ export const getRbacApiPathService = async (getRbacApiPathRequest: GetRbacApiPat
 			...(!isEmptyObject(clearedSearch) ? [{
 				$match: {
 					$and: Object.entries(clearedSearch).map(([key, value]) => ({
-						[key]: { $regex: value, $options: "i" } // 生成模糊查询
+						[key]: { $regex: value, $options: "i" } // あいまい検索を生成
 					}))
 				},
 			}] : []),
@@ -293,16 +293,16 @@ export const getRbacApiPathService = async (getRbacApiPathRequest: GetRbacApiPat
 			},
 			{
 				$addFields: {
-					isAssignedOnce: { $gt: [{ $size: "$matchedDocs" }, 0] } // 如果 matchedDocs 有数据，则为 true
+					isAssignedOnce: { $gt: [{ $size: "$matchedDocs" }, 0] } // matchedDocsにデータがあればtrue
 				}
 			},
 			{
 				$project: {
-					matchedDocs: 0 // 删除 matchedDocs 字段，保持 A 集合的原始结构
+					matchedDocs: 0 // matchedDocsフィールドを削除し、Aコレクションの元の構造を維持
 				}
 			},
-			{ $skip: skip }, // 跳过指定数量的文档
-			{ $limit: pageSize }, // 限制返回的文档数量
+			{ $skip: skip }, // 指定された数のドキュメントをスキップ
+			{ $limit: pageSize }, // 返されるドキュメントの数を制限
 		]
 
 		const { collectionName: rbacApiCollectionName, schemaInstance: rbacApiSchemaInstance } = RbacApiSchema
@@ -319,38 +319,38 @@ export const getRbacApiPathService = async (getRbacApiPathRequest: GetRbacApiPat
 			|| typeof count !== 'number' || count < 0
 			|| ( Array.isArray(result) && !result )
 		) {
-			console.error('ERROR', '获取 RBAC API 路径失败，获取数据失败')
-			return { success: false, message: '获取 RBAC API 路径失败，获取数据失败' }
+			console.error('ERROR', 'RBAC APIパスの取得に失敗しました、データの取得に失敗しました')
+			return { success: false, message: 'RBAC APIパスの取得に失敗しました、データの取得に失敗しました' }
 		}
 
 		if (count === 0) {
-			return { success: true, message: '未查询到 RBAC API 路径', count: 0, result: [] }
+			return { success: true, message: 'RBAC APIパスが見つかりませんでした', count: 0, result: [] }
 		} else {
-			return { success: true, message: '查询 RBAC API 路径成功', count, result }
+			return { success: true, message: 'RBAC APIパスのクエリに成功しました', count, result }
 		}
 	} catch (error) {
-		console.error('ERROR', '获取 RBAC API 路径时出错，未知错误', error)
-		return { success: false, message: '获取 RBAC API 路径时出错，未知错误' }
+		console.error('ERROR', 'RBAC APIパスの取得中にエラーが発生しました、不明なエラー', error)
+		return { success: false, message: 'RBAC APIパスの取得中にエラーが発生しました、不明なエラー' }
 	}
 } 
 
 /**
- * 创建 RBAC 角色
- * @param createRbacRoleRequest 创建 RBAC 角色的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 创建 RBAC 角色的请求响应
+ * RBACロールを作成
+ * @param createRbacRoleRequest RBACロール作成のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBACロール作成のリクエストレスポンス
  */
 export const createRbacRoleService = async (createRbacRoleRequest: CreateRbacRoleRequestDto, uuid: string, token: string): Promise<CreateRbacRoleResponseDto> => {
 	try {
 		if (!checkCreateRbacRoleRequest(createRbacRoleRequest)) {
-			console.error('ERROR', '创建 RBAC 角色失败，参数不合法')
-			return { success: false, message: '创建 RBAC 角色失败，参数不合法' }
+			console.error('ERROR', 'RBACロールの作成に失敗しました、パラメータが不正です')
+			return { success: false, message: 'RBACロールの作成に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '创建 RBAC 角色失败，用户 Token 校验未通过')
-			return { success: false, message: '创建 RBAC 角色失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBACロールの作成に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'RBACロールの作成に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { roleName, roleType, roleColor, roleDescription } = createRbacRoleRequest
@@ -377,34 +377,34 @@ export const createRbacRoleService = async (createRbacRoleRequest: CreateRbacRol
 		const insertResultData = insertResult?.result?.[0]
 
 		if (!insertResult.success || !insertResultData) {
-			console.error('ERROR', '创建 RBAC 角色失败，数据插入失败')
-			return { success: false, message: '创建 RBAC 角色失败，数据插入失败' }
+			console.error('ERROR', 'RBACロールの作成に失敗しました、データの挿入に失敗しました')
+			return { success: false, message: 'RBACロールの作成に失敗しました、データの挿入に失敗しました' }
 		}
 
-		return { success: true, message: '创建 RBAC 角色成功', result: insertResultData }
+		return { success: true, message: 'RBACロールの作成に成功しました', result: insertResultData }
 	} catch (error) {
-		console.error('ERROR', '创建 RBAC 角色时出错，未知错误：', error)
-		return { success: false, message: '创建 RBAC 角色时出错，未知错误' }
+		console.error('ERROR', 'RBACロールの作成中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: 'RBACロールの作成中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 删除 RBAC 角色
- * @param deleteRbacRoleRequest 删除 RBAC 角色的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 删除 RBAC 角色的请求响应
+ * RBACロールを削除
+ * @param deleteRbacRoleRequest RBACロール削除のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBACロール削除のリクエストレスポンス
  */
 export const deleteRbacRoleService = async (deleteRbacRoleRequest: DeleteRbacRoleRequestDto, uuid: string, token: string): Promise<DeleteRbacRoleResponseDto> => {
 	try {
 		if (!checkDeleteRbacRoleRequest(deleteRbacRoleRequest)) {
-			console.error('ERROR', '删除 RBAC 角色失败，参数不合法')
-			return { success: false, message: '删除 RBAC 角色失败，参数不合法' }
+			console.error('ERROR', 'RBACロールの削除に失敗しました、パラメータが不正です')
+			return { success: false, message: 'RBACロールの削除に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '删除 RBAC 角色失败，用户 Token 校验未通过')
-			return { success: false, message: '删除 RBAC 角色失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBACロールの削除に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'RBACロールの削除に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { roleName } = deleteRbacRoleRequest
@@ -419,34 +419,34 @@ export const deleteRbacRoleService = async (deleteRbacRoleRequest: DeleteRbacRol
 		const deleteResult = await deleteDataFromMongoDB(deleteRbacRoleWhere, rbacRoleSchemaInstance, rbacRoleCollectionName)
 
 		if (!deleteResult.success) {
-			console.error('ERROR', '删除 RBAC 角色失败，数据插入失败')
-			return { success: false, message: '删除 RBAC 角色失败，数据插入失败' }
+			console.error('ERROR', 'RBACロールの削除に失敗しました、データの挿入に失敗しました')
+			return { success: false, message: 'RBACロールの削除に失敗しました、データの挿入に失敗しました' }
 		}
 
-		return { success: true, message: '删除 RBAC 角色成功' }
+		return { success: true, message: 'RBACロールの削除に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '删除 RBAC 角色时出错，未知错误：', error)
-		return { success: false, message: '删除 RBAC 角色时出错，未知错误' }
+		console.error('ERROR', 'RBACロールの削除中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: 'RBACロールの削除中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 获取 RBAC 角色
- * @param getRbacRoleRequest 获取 RBAC 角色的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 获取 RBAC 角色的请求响应
+ * RBACロールを取得
+ * @param getRbacRoleRequest RBACロール取得のリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns RBACロール取得のリクエストレスポンス
  */
 export const getRbacRoleService = async (getRbacRoleRequest: GetRbacRoleRequestDto, uuid: string, token: string): Promise<GetRbacRoleResponseDto> => {
 	try {
 		if (!checkGetRbacRoleRequest(getRbacRoleRequest)) {
-			console.error('ERROR', '获取 RBAC 角色失败，参数不合法')
-			return { success: false, message: '获取 RBAC 角色失败，参数不合法' }
+			console.error('ERROR', 'RBACロールの取得に失敗しました、パラメータが不正です')
+			return { success: false, message: 'RBACロールの取得に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '获取 RBAC 角色失败，用户 Token 校验未通过')
-			return { success: false, message: '获取 RBAC 角色失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'RBACロールの取得に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'RBACロールの取得に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { search, pagination } = getRbacRoleRequest
@@ -463,12 +463,12 @@ export const getRbacRoleService = async (getRbacRoleRequest: GetRbacRoleRequestD
 			...(!isEmptyObject(clearedSearch) ? [{
 				$match: {
 					$and: Object.entries(clearedSearch).map(([key, value]) => ({
-						[key]: { $regex: value, $options: "i" } // 生成模糊查询
+						[key]: { $regex: value, $options: "i" } // あいまい検索を生成
 					}))
 				},
 			}] : []),
 			{
-				$count: 'totalCount', // 统计总文档数
+				$count: 'totalCount', // 総ドキュメント数をカウント
 			},
 		]
 
@@ -476,7 +476,7 @@ export const getRbacRoleService = async (getRbacRoleRequest: GetRbacRoleRequestD
 			...(!isEmptyObject(clearedSearch) ? [{
 				$match: {
 					$and: Object.entries(clearedSearch).map(([key, value]) => ({
-						[key]: { $regex: value, $options: "i" } // 生成模糊查询
+						[key]: { $regex: value, $options: "i" } // あいまい検索を生成
 					}))
 				},
 			}] : []),
@@ -493,8 +493,8 @@ export const getRbacRoleService = async (getRbacRoleRequest: GetRbacRoleRequestD
 					apiPathList: "$apiPathList"
 				}
 			},
-			{ $skip: skip }, // 跳过指定数量的文档
-			{ $limit: pageSize }, // 限制返回的文档数量
+			{ $skip: skip }, // 指定された数のドキュメントをスキップ
+			{ $limit: pageSize }, // 返されるドキュメントの数を制限
 		]
 		
 		const { collectionName: rbacRoleCollectionName, schemaInstance: rbacRoleSchemaInstance } = RbacRoleSchema
@@ -511,39 +511,39 @@ export const getRbacRoleService = async (getRbacRoleRequest: GetRbacRoleRequestD
 			|| typeof count !== 'number' || count < 0
 			|| ( Array.isArray(result) && !result )
 		) {
-			console.error('ERROR', '获取 RBAC 角色失败，获取数据失败')
-			return { success: false, message: '获取 RBAC 角色失败，获取数据失败' }
+			console.error('ERROR', 'RBACロールの取得に失敗しました、データの取得に失敗しました')
+			return { success: false, message: 'RBACロールの取得に失敗しました、データの取得に失敗しました' }
 		}
 
 		if (count === 0) {
-			return { success: true, message: '未查询到 RBAC 角色', count: 0, result: [] }
+			return { success: true, message: 'RBACロールが見つかりませんでした', count: 0, result: [] }
 		} else {
-			return { success: true, message: '查询 RBAC API 路径成功', count, result }
+			return { success: true, message: 'RBAC APIパスのクエリに成功しました', count, result }
 		}
 
 	} catch (error) {
-		console.error('ERROR', '获取 RBAC 角色时出错，未知错误', error)
-		return { success: false, message: '获取 RBAC 角色时出错，未知错误' }
+		console.error('ERROR', 'RBACロールの取得中にエラーが発生しました、不明なエラー', error)
+		return { success: false, message: 'RBACロールの取得中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 为角色更新 API 路径权限
- * @param updateApiPathPermissionsForRoleRequest 为角色更新 API 路径权限的请求载荷
- * @param uuid 用户 UUID
- * @param token 用户 Token
- * @returns 为角色更新 API 路径权限的请求响应
+ * ロールにAPIパス権限を更新する
+ * @param updateApiPathPermissionsForRoleRequest ロールにAPIパス権限を更新するリクエストペイロード
+ * @param uuid ユーザーUUID
+ * @param token ユーザートークン
+ * @returns ロールにAPIパス権限を更新するリクエストレスポンス
  */
 export const updateApiPathPermissionsForRoleService = async (updateApiPathPermissionsForRoleRequest: UpdateApiPathPermissionsForRoleRequestDto, uuid: string, token: string): Promise<UpdateApiPathPermissionsForRoleResponseDto> => {
 	try {
 		if (!checkUpdateApiPathPermissionsForRoleRequest(updateApiPathPermissionsForRoleRequest)) {
-			console.error('ERROR', '为角色更新 API 路径权限失败，参数不合法')
-			return { success: false, message: '为角色更新 API 路径权限失败，参数不合法' }
+			console.error('ERROR', 'ロールのAPIパス権限の更新に失敗しました、パラメータが不正です')
+			return { success: false, message: 'ロールのAPIパス権限の更新に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', '为角色更新 API 路径权限失败，用户 Token 校验未通过')
-			return { success: false, message: '为角色更新 API 路径权限失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'ロールのAPIパス権限の更新に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'ロールのAPIパス権限の更新に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { roleName, apiPathPermissions } = updateApiPathPermissionsForRoleRequest
@@ -566,14 +566,14 @@ export const updateApiPathPermissionsForRoleService = async (updateApiPathPermis
 
 		if (!checkApiPathPermissionsCountResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '为角色更新 API 路径权限失败，检查 API 路径失败')
-			return { success: false, message: '为角色更新 API 路径权限失败，检查 API 路径失败' }
+			console.error('ERROR', 'ロールのAPIパス権限の更新に失敗しました、APIパスの確認に失敗しました')
+			return { success: false, message: 'ロールのAPIパス権限の更新に失敗しました、APIパスの確認に失敗しました' }
 		}
 
 		if (checkApiPathPermissionsCountResult.result.length !== uniqueApiPathPermissions.length) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '为角色更新 API 路径权限失败，检查 API 路径未通过，可能是因为将一个不存在的路径添加到角色中')
-			return { success: false, message: '为角色更新 API 路径权限失败，检查 API 路径未通过，可能是因为将一个不存在的路径添加到角色中' }
+			console.error('ERROR', 'ロールのAPIパス権限の更新に失敗しました、APIパスの確認に失敗しました。存在しないパスをロールに追加しようとした可能性があります。')
+			return { success: false, message: 'ロールのAPIパス権限の更新に失敗しました、APIパスの確認に失敗しました。存在しないパスをロールに追加しようとした可能性があります。' }
 		}
 
 		const { collectionName: rbacRoleCollectionName, schemaInstance: rbacRoleSchemaInstance } = RbacRoleSchema
@@ -594,34 +594,34 @@ export const updateApiPathPermissionsForRoleService = async (updateApiPathPermis
 
 		if (!updateApiPathPermissions4Role.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '为角色更新 API 路径权限失败，更新失败')
-			return { success: false, message: '为角色更新 API 路径权限失败，更新失败' }
+			console.error('ERROR', 'ロールのAPIパス権限の更新に失敗しました、更新に失敗しました')
+			return { success: false, message: 'ロールのAPIパス権限の更新に失敗しました、更新に失敗しました' }
 		}
 
-		return { success: true, message: '为角色更新 API 路径权限成功', result: updateApiPathPermissions4Role.result }
+		return { success: true, message: 'ロールのAPIパス権限の更新に成功しました', result: updateApiPathPermissions4Role.result }
 	} catch (error) {
-		console.error('ERROR', '为角色更新 API 路径权限时出错，未知错误：', error)
-		return { success: false, message: '为角色更新 API 路径权限时出错，未知错误' }
+		console.error('ERROR', 'ロールのAPIパス権限の更新中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: 'ロールのAPIパス権限の更新中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 管理员更新用户角色
- * @param adminUpdateUserRoleRequest 管理员更新用户角色的请求载荷
- * @param adminUuid 管理员 UUID
- * @param adminToken 管理员 Token
- * @returns 管理员更新用户角色的请求响应
+ * 管理者がユーザーのロールを更新する
+ * @param adminUpdateUserRoleRequest 管理者がユーザーのロールを更新するリクエストペイロード
+ * @param adminUuid 管理者のUUID
+ * @param adminToken 管理者のトークン
+ * @returns 管理者がユーザーのロールを更新するリクエストレスポンス
  */
 export const adminUpdateUserRoleService = async (adminUpdateUserRoleRequest: AdminUpdateUserRoleRequestDto, adminUuid: string, adminToken: string): Promise<AdminUpdateUserRoleResponseDto> => {
 	try {
 		if (!checkAdminUpdateUserRoleRequest(adminUpdateUserRoleRequest)) {
-			console.error('ERROR', '管理员更新用户角色失败，参数不合法')
-			return { success: false, message: '管理员更新用户角色失败，参数不合法' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、パラメータが不正です')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(adminUuid, adminToken)).success) {
-			console.error('ERROR', '管理员更新用户角色失败，用户 Token 校验未通过')
-			return { success: false, message: '管理员更新用户角色失败，用户 Token 校验未通过' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { uid, newRoles } = adminUpdateUserRoleRequest
@@ -633,8 +633,8 @@ export const adminUpdateUserRoleService = async (adminUpdateUserRoleRequest: Adm
 		}
 
 		if (!uuid) {
-			console.error('ERROR', '管理员更新用户角色失败，未找到用户 UUID')
-			return { success: false, message: '管理员更新用户角色失败，未找到用户 UUID' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、ユーザーUUIDが見つかりません')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、ユーザーUUIDが見つかりません' }
 		}
 
 		const { collectionName: rbacRoleCollectionName, schemaInstance: rbacRoleSchemaInstance } = RbacRoleSchema
@@ -654,14 +654,14 @@ export const adminUpdateUserRoleService = async (adminUpdateUserRoleRequest: Adm
 
 		if (!checkNewRoelsCountResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '管理员更新用户角色失败，检查 API 路径失败')
-			return { success: false, message: '管理员更新用户角色失败，检查 API 路径失败' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、APIパスの確認に失敗しました')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、APIパスの確認に失敗しました' }
 		}
 
 		if (checkNewRoelsCountResult.result.length !== uniqueNewRoels.length) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '管理员更新用户角色失败，检查角色未通过，可能是因为将一个不存在的角色绑定给用户')
-			return { success: false, message: '管理员更新用户角色失败，检查角色未通过，可能是因为将一个不存在的角色绑定给用户' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、ロールの確認に失敗しました。存在しないロールをユーザーにバインドしようとした可能性があります')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、ロールの確認に失敗しました。存在しないロールをユーザーにバインドしようとした可能性があります' }
 		}
 
 		const { collectionName: userAuthCollectionName, schemaInstance: userAuthSchemaInstance } = UserAuthSchema
@@ -681,35 +681,35 @@ export const adminUpdateUserRoleService = async (adminUpdateUserRoleRequest: Adm
 
 		if (!updateRoles4UserResult.success) {
 			await abortAndEndSession(session)
-			console.error('ERROR', '管理员更新用户角色失败，更新失败')
-			return { success: false, message: '管理员更新用户角色失败，更新失败' }
+			console.error('ERROR', '管理者によるユーザーロールの更新に失敗しました、更新に失敗しました')
+			return { success: false, message: '管理者によるユーザーロールの更新に失敗しました、更新に失敗しました' }
 		}
 
-		return { success: true, message: '管理员更新用户角色成功' }
+		return { success: true, message: '管理者によるユーザーロールの更新に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '管理员更新用户角色时出错，未知错误：', error)
-		return { success: false, message: '管理员更新用户角色时出错，未知错误' }
+		console.error('ERROR', '管理者によるユーザーロールの更新中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: '管理者によるユーザーロールの更新中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 
 /**
- * 通过 UID 获取一个用户的角色
- * @param adminGetUserRolesByUidRequest 通过 UID 获取一个用户的角色的请求载荷
- * @param adminUuid 管理员 UUID
- * @param adminToken 管理员 Token
- * @returns 通过 UID 获取一个用户的角色的请求响应
+ * UIDでユーザーのロールを取得する
+ * @param adminGetUserRolesByUidRequest UIDでユーザーのロールを取得するリクエストペイロード
+ * @param adminUuid 管理者のUUID
+ * @param adminToken 管理者のトークン
+ * @returns UIDでユーザーのロールを取得するリクエストレスポンス
  */
 export const adminGetUserRolesByUidService = async (adminGetUserRolesByUidRequest: AdminGetUserRolesByUidRequestDto, adminUuid: string, adminToken: string): Promise<AdminGetUserRolesByUidResponseDto> => {
 	try {
 		if (!checkAdminGetUserRolesByUidRequest(adminGetUserRolesByUidRequest)) {
-			console.error('ERROR', '通过 UID 获取一个用户的角色失败，参数不合法')
-			return { success: false, message: '通过 UID 获取一个用户的角色失败，参数不合法' }
+			console.error('ERROR', 'UIDによるユーザーロールの取得に失敗しました、パラメータが不正です')
+			return { success: false, message: 'UIDによるユーザーロールの取得に失敗しました、パラメータが不正です' }
 		}
 
 		if (!(await checkUserTokenByUuidService(adminUuid, adminToken)).success) {
-			console.error('ERROR', '通过 UID 获取一个用户的角色失败，用户 Token 校验未通过')
-			return { success: false, message: '通过 UID 获取一个用户的角色失败，用户 Token 校验未通过' }
+			console.error('ERROR', 'UIDによるユーザーロールの取得に失敗しました、ユーザートークンの検証に失敗しました')
+			return { success: false, message: 'UIDによるユーザーロールの取得に失敗しました、ユーザートークンの検証に失敗しました' }
 		}
 
 		const { uid } = adminGetUserRolesByUidRequest
@@ -772,33 +772,33 @@ export const adminGetUserRolesByUidService = async (adminGetUserRolesByUidReques
 		const adminGerUserRolesData = adminGerUserRolesResult.result?.[0]
 
 		if (!adminGerUserRolesResult.success || !adminGerUserRolesData) {
-			console.error('ERROR', '通过 UID 获取一个用户的角色失败，查询数据失败')
-			return { success: false, message: '通过 UID 获取一个用户的角色失败，查询数据失败' }
+			console.error('ERROR', 'UIDによるユーザーロールの取得に失敗しました、データクエリに失敗しました')
+			return { success: false, message: 'UIDによるユーザーロールの取得に失敗しました、データクエリに失敗しました' }
 		}
 
-		return { success: true, message: '通过 UID 获取一个用户的角色成功', result: adminGerUserRolesData }
+		return { success: true, message: 'UIDによるユーザーロールの取得に成功しました', result: adminGerUserRolesData }
 	} catch (error) {
-		console.error('ERROR', '通过 UID 获取一个用户的角色时出错，未知错误：', error)
-		return { success: false, message: '通过 UID 获取一个用户的角色时出错，未知错误' }
+		console.error('ERROR', 'UIDによるユーザーロールの取得中にエラーが発生しました、不明なエラー：', error)
+		return { success: false, message: 'UIDによるユーザーロールの取得中にエラーが発生しました、不明なエラー' }
 	}
 }
 
 /**
- * 校验创建 RBAC API 路径的请求载荷
- * @param createRbacApiPathRequest 创建 RBAC API 路径的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBAC APIパス作成リクエストのペイロードを検証する
+ * @param createRbacApiPathRequest RBAC APIパス作成のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateRbacApiPathRequest = (createRbacApiPathRequest: CreateRbacApiPathRequestDto): boolean => {
 	return (
 		!!createRbacApiPathRequest.apiPath
-		&& createRbacApiPathRequest.apiPathColor ? /^#([0-9A-Fa-f]{8})$/.test(createRbacApiPathRequest.apiPathColor) : true // 如果 apiPathColor 不为空，则测试是否符合八位 HAX 颜色代码格式（例如：#66CCFFFF），如果 apiPathColor 为空，则直接为 true
+		&& createRbacApiPathRequest.apiPathColor ? /^#([0-9A-Fa-f]{8})$/.test(createRbacApiPathRequest.apiPathColor) : true // apiPathColorが空でない場合は、8桁のHAXカラーコード形式（例：#66CCFFFF）に一致するかどうかをテストし、空の場合は直接true
 	)
 }
 
 /**
- * 校验删除 RBAC API 路径的请求载荷
- * @param deleteRbacApiPathRequest 删除 RBAC API 路径的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBAC APIパス削除リクエストのペイロードを検証する
+ * @param deleteRbacApiPathRequest RBAC APIパス削除のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkDeleteRbacApiPathRequest = (deleteRbacApiPathRequest: DeleteRbacApiPathRequestDto): boolean => {
 	return ( !!deleteRbacApiPathRequest.apiPath )
@@ -806,48 +806,48 @@ const checkDeleteRbacApiPathRequest = (deleteRbacApiPathRequest: DeleteRbacApiPa
 
 
 /**
- * 校验获取 RBAC API 路径的请求载荷
- * @param getRbacApiPathRequest 获取 RBAC API 路径的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBAC APIパス取得リクエストのペイロードを検証する
+ * @param getRbacApiPathRequest RBAC APIパス取得のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetRbacApiPathRequest = (getRbacApiPathRequest: GetRbacApiPathRequestDto): boolean => {
-	return true // 没有什么好校验的
+	return true // 検証するものは特にない
 }
 
 /**
- * 校验创建 RBAC 角色的请求载荷
- * @param createRbacApiPathRequest 创建 RBAC 角色的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBACロール作成リクエストのペイロードを検証する
+ * @param createRbacApiPathRequest RBACロール作成のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkCreateRbacRoleRequest = (createRbacRoleRequest: CreateRbacRoleRequestDto): boolean => {
 	return (
 		!!createRbacRoleRequest.roleName
-		&& createRbacRoleRequest.roleColor ? /^#([0-9A-Fa-f]{8})$/.test(createRbacRoleRequest.roleColor) : true // 如果 roleColor 不为空，则测试是否符合八位 HAX 颜色代码格式（例如：#66CCFFFF），如果 roleColor 为空，则直接为 true
+		&& createRbacRoleRequest.roleColor ? /^#([0-9A-Fa-f]{8})$/.test(createRbacRoleRequest.roleColor) : true // roleColorが空でない場合は、8桁のHAXカラーコード形式（例：#66CCFFFF）に一致するかどうかをテストし、空の場合は直接true
 	)
 }
 
 /**
- * 校验删除 RBAC 角色的请求载荷
- * @param createRbacApiPathRequest 删除 RBAC 角色的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBACロール削除リクエストのペイロードを検証する
+ * @param createRbacApiPathRequest RBACロール削除のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkDeleteRbacRoleRequest = (deleteRbacRoleRequest: DeleteRbacRoleRequestDto): boolean => {
 	return ( !!deleteRbacRoleRequest.roleName )
 }
 
 /**
- * 检查获取 RBAC 角色的请求载荷
- * @param getRbacRoleRequest 获取 RBAC 角色的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * RBACロール取得リクエストのペイロードを確認する
+ * @param getRbacRoleRequest RBACロール取得のリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkGetRbacRoleRequest = (getRbacRoleRequest: GetRbacRoleRequestDto): boolean => {
-	return true // 没什么好检查的
+	return true // 確認するものは特にない
 }
 
 /**
- * 校验为角色更新 API 路径权限的请求载荷
- * @param updateApiPathPermissionsForRoleRequest 为角色更新 API 路径权限的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * ロールにAPIパス権限を更新するリクエストペイロードを検証する
+ * @param updateApiPathPermissionsForRoleRequest ロールにAPIパス権限を更新するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkUpdateApiPathPermissionsForRoleRequest = (updateApiPathPermissionsForRoleRequest: UpdateApiPathPermissionsForRoleRequestDto): boolean => {
 	return (
@@ -858,22 +858,22 @@ const checkUpdateApiPathPermissionsForRoleRequest = (updateApiPathPermissionsFor
 }
 
 /**
- * 校验管理员更新用户角色的请求载荷
- * @param adminUpdateUserRoleRequest 管理员更新用户角色的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * 管理者がユーザーのロールを更新するリクエストペイロードを検証する
+ * @param adminUpdateUserRoleRequest 管理者がユーザーのロールを更新するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAdminUpdateUserRoleRequest = (adminUpdateUserRoleRequest: AdminUpdateUserRoleRequestDto): boolean => {
 	return (
-		(!!adminUpdateUserRoleRequest.uuid || (adminUpdateUserRoleRequest.uid !== undefined && adminUpdateUserRoleRequest !== null)) // uuid 和 uid 至少有一个不为空
+		(!!adminUpdateUserRoleRequest.uuid || (adminUpdateUserRoleRequest.uid !== undefined && adminUpdateUserRoleRequest !== null)) // uuidとuidの少なくとも一方が空でない
 		&& !!adminUpdateUserRoleRequest.newRoles && Array.isArray(adminUpdateUserRoleRequest.newRoles)
 		&& adminUpdateUserRoleRequest.newRoles.every(role => !!role)
 	)
 }
 
 /**
- * 通过 UID 获取一个用户的角色
- * @param adminGetUserRolesByUidRequest 通过 UID 获取一个用户的角色的请求载荷
- * @returns 合法返回 true, 不合法返回 false
+ * UIDでユーザーのロールを取得する
+ * @param adminGetUserRolesByUidRequest UIDでユーザーのロールを取得するリクエストペイロード
+ * @returns 有効な場合はtrue、無効な場合はfalseを返す
  */
 const checkAdminGetUserRolesByUidRequest = (adminGetUserRolesByUidRequest: AdminGetUserRolesByUidRequestDto): boolean => {
 	return ( adminGetUserRolesByUidRequest.uid !== undefined && adminGetUserRolesByUidRequest.uid !== null )

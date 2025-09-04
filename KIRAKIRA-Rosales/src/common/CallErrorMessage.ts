@@ -1,7 +1,7 @@
 /**
- * 自动生成报错文本，而无需每次复制一长串字符串
- * @param message: string 额外显示字符串
+ * 長い文字列を毎回コピーすることなく、エラーテキストを自動生成します
+ * @param message: string 追加表示文字列
  */
 export const callErrorMessage = (message: string) => {
-	return `<p>前面的区域以后再来探索吧？</p>   <p>诚邀您加入 KIRAKIRA 开发团队： employee@kirakira.com</p>   <br/>   <div>${message}</div>`
+	return `<p>この先のエリアは、また後で探索しに来てくださいね。</p>   <p>KIRAKIRA 開発チームへのご参加を心よりお待ちしております: employee@kirakira.com</p>   <br/>   <div>${message}</div>`
 }

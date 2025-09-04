@@ -1,58 +1,58 @@
 import { VideoTag } from './VideoTagControllerDto.js'
 
 /**
- * 单个视频分 P 数据参数
+ * 動画パートのデータパラメータ
  */
 export type VideoPartDto = {
-	/** 分 P ID */
+	/** パートID */
 	id: number;
-	/** 视频分 P 标题 */
+	/** 動画パートのタイトル */
 	videoPartTitle: string;
-	/** 视频直链 */
+	/** 動画の直接リンク */
 	link: string;
 }
 
 /**
- * 上传视频的请求参数
+ * 動画アップロードのリクエストパラメータ
  */
 export type UploadVideoRequestDto = {
-	/** 每 P 视频的数据 */
+	/** 各パートの動画データ */
 	videoPart: VideoPartDto[];
-	/** 视频标题 */
+	/** 動画タイトル */
 	title: string;
-	/** 封面图链接 */
+	/** カバー画像のリンク */
 	image: string;
-	/** 创作者 UID */
+	/** 作成者のUID */
 	uploaderId: number;
-	/** 视频时长，单位 ms */
+	/** 動画時間（ms） */
 	duration: number;
-	/** 视频描述 */
+	/** 動画説明 */
 	description?: string;
-	/** 视频分区 */
+	/** 動画カテゴリ */
 	videoCategory: string;
-	/** 视频版权 */
+	/** 動画の著作権 */
 	copyright: string;
 	/** 原作者 */
 	originalAuthor?: string;
-	/** 原视频链接 */
+	/** 元動画のリンク */
 	originalLink?: string;
-	/** 是否发布到动态 */
+	/** フィードに投稿するか */
 	pushToFeed: boolean;
-	/** 声明为原创 */
+	/** オリジナルとして宣言するか */
 	ensureOriginal: boolean;
-	/** 视频 TAG */
+	/** 動画TAG */
 	videoTagList: VideoTag[];
 }
 
 /**
- * 视频上传的返回的参数
+ * 動画アップロードのレスポンスパラメータ
  */
 export type UploadVideoResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 视频 ID */
+	/** 動画ID */
 	videoId?: number;
 }
 
@@ -61,210 +61,210 @@ export type UploadVideoResponseDto = {
 // }
 
 /**
- * 展示视频卡片需要的返回参数
+ * 動画カード表示に必要なレスポンスパラメータ
  */
 export type ThumbVideoResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 获取到的视频数量，如果没获取到则为 0 */
+	/** 取得した動画数（取得できなかった場合は0） */
 	videosCount: number;
-	/** 请求到的视频的数据 */
+	/** リクエストされた動画データ */
 	videos: {
-		/** 视频 ID (KVID) */
+		/** 動画ID (KVID) */
 		videoId: number;
-		/** 视频标题 */
+		/** 動画タイトル */
 		title: string;
-		/** 封面图链接 */
+		/** カバー画像のリンク */
 		image?: string;
-		/** 视频上传的日期，时间戳格式 */
+		/** 動画アップロード日（タイムスタンプ形式） */
 		uploadDate?: number;
-		/** 视频播放量 */
+		/** 動画再生数 */
 		watchedCount?: number;
-		/** 视频作者名 */
+		/** 動画作成者名 */
 		uploader?: string;
-		/** 视频作者昵称 */
+		/** 動画作成者のニックネーム */
 		uploaderNickname?: string;
-		/** 创作者 UID */
+		/** 作成者のUID */
 		uploaderId?: number;
-		/** 视频时长，单位 ms */
+		/** 動画時間（ms） */
 		duration?: number;
-		/** 视频描述 */
+		/** 動画説明 */
 		description?: string;
-		/** 是否被屏蔽 */
+		/** ブロックされているか */
 		isBlockedByOther?: boolean;
 	}[];
 }
 
 /**
- * 从视频 ID 获取视频的请求参数
+ * 動画IDから動画を取得するリクエストパラメータ
  */
 export type GetVideoByKvidRequestDto = {
-	/** 视频 ID (KVID) */
+	/** 動画ID (KVID) */
 	videoId: number;
 }
 
 /**
- * 上传视频的用户信息
+ * 動画をアップロードしたユーザーの情報
  */
 type UploaderInfoDto = {
-	/** 用户 ID */
+	/** ユーザーID */
 	uid: number;
-	/** 用户名 */
+	/** ユーザー名 */
 	username: string;
-	/** 用户昵称 */
+	/** ニックネーム */
 	userNickname?: string;
-	/** 用户头像的链接 */
+	/** アバターのリンク */
 	avatar?: string;
-	/** 用户背景图片的链接 */
+	/** ユーザー背景画像のリンク */
 	userBannerImage?: string;
-	/** 用户的个性签名 */
+	/** 自己紹介 */
 	signature?: string;
-	/** 是否正在关注该上传者 */
+	/** このアップローダーをフォローしているか */
 	isFollowing: boolean;
-	/** 上传者是否是自己 */
+	/** アップローダーが自分自身か */
 	isSelf: boolean;
 }
 
 /**
- * 用户被屏蔽的状态
+ * ユーザーのブロック状態
  */
 type BlockState = { isBlockedByOther: boolean, isBlocked: boolean; isHidden: boolean }
 
 /**
- * 视频页面需要的响应
+ * 動画ページに必要なレスポンス
  */
 export type GetVideoByKvidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 请求到的视频的数据 */
+	/** リクエストされた動画データ */
 	video?: {
-		/** 视频 ID (KVID) */
+		/** 動画ID (KVID) */
 		videoId: number;
-		/** 视频分 P 数据 */
+		/** 動画パートデータ */
 		videoPart: VideoPartDto[];
-		/** 视频标题 */
+		/** 動画タイトル */
 		title: string;
-		/** 封面图链接 */
+		/** カバー画像のリンク */
 		image?: string;
-		/** 视频上传的日期，时间戳格式 */
+		/** 動画アップロード日（タイムスタンプ形式） */
 		uploadDate?: number;
-		/** 视频播放量 */
+		/** 動画再生数 */
 		watchedCount?: number;
-		/** 视频作者 ID */
+		/** 動画作成者ID */
 		uploader?: string;
-		/** 创作者 UUID */
+		/** 作成者のUUID */
 		uploaderUUID?: string;
-		/** 创作者 UID */
+		/** 作成者のUID */
 		uploaderId?: number;
-		/** 视频作者信息 */
+		/** 動画作成者情報 */
 		uploaderInfo?: UploaderInfoDto;
-		/** 视频时长，单位 ms */
+		/** 動画時間（ms） */
 		duration?: number;
-		/** 视频描述 */
+		/** 動画説明 */
 		description?: string;
-		/** 视频分区 */
+		/** 動画カテゴリ */
 		videoCategory: string;
-		/** 视频版权 */
+		/** 動画の著作権 */
 		copyright: string;
-		/** 视频 TAG */
+		/** 動画TAG */
 		videoTagList: VideoTag[];
 	};
 } & BlockState
 
 /**
- * 根据视频 ID (KVID) 检查视频是否存在的请求载荷
+ * 動画ID (KVID) で動画が存在するか確認するリクエストペイロード
  */
 export type CheckVideoExistRequestDto = {
-	/** 视频 ID (KVID) */
+	/** 動画ID (KVID) */
 	videoId: number;
 }
 
 /**
- * 根据视频 ID (KVID) 检查视频是否存在的请求响应
+ * 動画ID (KVID) で動画が存在するか確認するレスポンス
  */
 export type CheckVideoExistResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 视频是否存在 */
+	/** 動画が存在するか */
 	exist: boolean;
 }
 
 /**
- * 根据视频 ID (KVID) 检查视频是否被屏蔽的请求响应
+ * 動画ID (KVID) で動画がブロックされているか確認するレスポンス
  */
 export type CheckVideoBlockedByKvidResponseDto = {
-	/** 是否请求成功 */
+	/** リクエストが成功したか */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 是否屏蔽用户 */
+	/** ユーザーをブロックしているか */
 	isBlocked?: boolean;
-	/** 是否被其他用户屏蔽 */
+	/** 他のユーザーにブロックされているか */
 	isBlockedByOther?: boolean;
-	/** 是否被隐藏 */
+	/** 非表示にされているか */
 	isHidden?: boolean;
 }
 
 /**
- * 从 UID 获取视频的请求参数
+ * UIDから動画を取得するリクエストパラメータ
  */
 export type GetVideoByUidRequestDto = {
-	/** 用户的 UID */
+	/** ユーザーのUID */
 	uid: number;
 }
 
 /**
- * 从 UID 获取视频的请求的响应结果
+ * UIDから動画を取得するリクエストのレスポンス
  */
 export type GetVideoByUidResponseDto = ThumbVideoResponseDto & BlockState
 
 /**
- * 根据关键字搜索视频的请求参数
+ * キーワードで動画を検索するリクエストパラメータ
  */
 export type SearchVideoByKeywordRequestDto = {
 	keyword: string;
 }
 
 /**
- * 根据关键字搜索视频的响应结果
+ * キーワードで動画を検索するレスポンス
  */
 export type SearchVideoByKeywordResponseDto = ThumbVideoResponseDto & {}
 
 /**
- * 获取视频文件 TUS 上传端点请求参数
+ * 動画ファイルTUSアップロードエンドポイント取得リクエストパラメータ
  */
 export type GetVideoFileTusEndpointRequestDto = {
-	/** 视频上传分片大小，Cloudflare 只支持 256KiB 的倍数，最小 5242880 子节，最大 209715200 子节，建议 52428800 子节 */
+	/** 動画アップロードのチャンクサイズ。Cloudflareは256KiBの倍数のみサポート。最小5,242,880バイト、最大209,715,200バイト。推奨は52,428,800バイト */
 	uploadLength: number;
-	/** 视频元数据 */
+	/** 動画メタデータ */
 	uploadMetadata: string;
 }
 
 /**
- * 获取用于上传视频封面图的预签名 URL 的响应结果
+ * 動画カバー画像アップロード用署名付きURL取得レスポンス
  */
 export type GetVideoCoverUploadSignedUrlResponseDto = {
-	/** 请求是否成功，成功返回 true，否则返回 false */
+	/** リクエストが成功したか。成功ならtrue、失敗ならfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
-	/** 请求到的视频封面图上传预签名 URL 数据 */
+	/** リクエストされた動画カバー画像アップロード用署名付きURLデータ */
 	result?: {
-		/** 预签名 URL */
+		/** 署名付きURL */
 		signedUrl: string;
-		/** 文件名 */
+		/** ファイル名 */
 		fileName: string;
 	};
 }
 
 /**
- * 根据视频 TAG ID 搜索视频的请求载荷
+ * 動画TAG IDで動画を検索するリクエストペイロード
  */
 export type SearchVideoByVideoTagIdRequestDto = {
 	/** TAG ID */
@@ -272,47 +272,47 @@ export type SearchVideoByVideoTagIdRequestDto = {
 }
 
 /**
- * 通过视频 TAG ID 获取视频的请求响应
+ * 動画TAG IDで動画を取得するレスポンス
  */
 export type SearchVideoByVideoTagIdResponseDto = ThumbVideoResponseDto & {}
 
 /**
- * 删除一个视频的请求载荷
+ * 動画削除リクエストペイロード
  */
 export type DeleteVideoRequestDto = {
-	/** 视频 ID (KVID) */
+	/** 動画ID (KVID) */
 	videoId: number;
 }
 
 /**
- * 删除一个视频的请求响应
+ * 動画削除レスポンス
  */
 export type DeleteVideoResponseDto = {
-	/** 请求是否成功，成功返回 true，否则返回 false */
+	/** リクエストが成功したか。成功ならtrue、失敗ならfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }
 
 /**
- * 等待被审核的视频列表
+ * レビュー待ち動画リスト
  */
 export type PendingReviewVideoResponseDto = {} & ThumbVideoResponseDto
 
 /**
- * 通过一个待审核视频的请求载荷
+ * レビュー待ち動画承認リクエストペイロード
  */
 export type ApprovePendingReviewVideoRequestDto = {
-	/** 视频 ID (KVID) */
+	/** 動画ID (KVID) */
 	videoId: number;
 }
 
 /**
- * 通过一个待审核视频的请求响应
+ * レビュー待ち動画承認レスポンス
  */
 export type ApprovePendingReviewVideoResponseDto = {
-	/** 请求是否成功，成功返回 true，否则返回 false */
+	/** リクエストが成功したか。成功ならtrue、失敗ならfalse */
 	success: boolean;
-	/** 附加的文本消息 */
+	/** 追加メッセージ */
 	message?: string;
 }

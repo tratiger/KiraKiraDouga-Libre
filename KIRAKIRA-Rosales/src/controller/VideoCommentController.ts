@@ -4,7 +4,7 @@ import { koaCtx, koaNext } from '../type/koaTypes.js'
 import { AdminDeleteVideoCommentRequestDto, CancelVideoCommentDownvoteRequestDto, CancelVideoCommentUpvoteRequestDto, DeleteSelfVideoCommentRequestDto, EmitVideoCommentDownvoteRequestDto, EmitVideoCommentRequestDto, EmitVideoCommentUpvoteRequestDto, GetVideoCommentByKvidRequestDto } from './VideoCommentControllerDto.js'
 
 /**
- * 用户发送视频评论
+ * ユーザーが動画コメントを送信
  * @param ctx context
  * @param next context
  */
@@ -13,15 +13,15 @@ export const emitVideoCommentController = async (ctx: koaCtx, next: koaNext) => 
 	const uuid = ctx.cookies.get('uuid')
 	const token = ctx.cookies.get('token')
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uuid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
 	const emitVideoCommentRequest: EmitVideoCommentRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论正文 */
+		/** コメント本文 */
 		text: data.text,
 	}
 	const emitVideoCommentResponse = await emitVideoCommentService(emitVideoCommentRequest, uuid, token)
@@ -30,7 +30,7 @@ export const emitVideoCommentController = async (ctx: koaCtx, next: koaNext) => 
 }
 
 /**
- * 根据 KVID 获取视频评论列表，并检查当前用户是否对获取到的评论有点赞/点踩，如果有，相应的值会变为 true
+ * KVIDで動画コメントリストを取得し、現在のユーザーが高評価/低評価しているか確認。していれば対応する値がtrueになる
  * @param ctx context
  * @param next context
  */
@@ -53,7 +53,7 @@ export const getVideoCommentListByKvidController = async (ctx: koaCtx, next: koa
 }
 
 /**
- * 用户为视频评论点赞
+ * ユーザーが動画コメントに高評価
  * @param ctx context
  * @param next context
  */
@@ -62,9 +62,9 @@ export const emitVideoCommentUpvoteController = async (ctx: koaCtx, next: koaNex
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const emitVideoCommentUpvoteRequest: EmitVideoCommentUpvoteRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论 ID */
+		/** コメントID */
 		id: data.id,
 	}
 	const emitVideoCommentUpvoteResponse = await emitVideoCommentUpvoteService(emitVideoCommentUpvoteRequest, uid, token)
@@ -73,7 +73,7 @@ export const emitVideoCommentUpvoteController = async (ctx: koaCtx, next: koaNex
 }
 
 /**
- * 用户为视频评论点踩
+ * ユーザーが動画コメントに低評価
  * @param ctx context
  * @param next context
  */
@@ -82,9 +82,9 @@ export const emitVideoCommentDownvoteController = async (ctx: koaCtx, next: koaN
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const emitVideoCommentUpvoteRequest: EmitVideoCommentDownvoteRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论 ID */
+		/** コメントID */
 		id: data.id,
 	}
 	const emitVideoCommentDownvoteResponse = await emitVideoCommentDownvoteService(emitVideoCommentUpvoteRequest, uid, token)
@@ -93,7 +93,7 @@ export const emitVideoCommentDownvoteController = async (ctx: koaCtx, next: koaN
 }
 
 /**
- * 用户取消一个视频评论的点赞
+ * ユーザーが動画コメントの高評価を取り消し
  * @param ctx context
  * @param next context
  */
@@ -102,9 +102,9 @@ export const cancelVideoCommentUpvoteController = async (ctx: koaCtx, next: koaN
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const cancelVideoCommentUpvoteRequest: CancelVideoCommentUpvoteRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论 ID */
+		/** コメントID */
 		id: data.id,
 	}
 	const emitVideoCommentResponse = await cancelVideoCommentUpvoteService(cancelVideoCommentUpvoteRequest, uid, token)
@@ -113,7 +113,7 @@ export const cancelVideoCommentUpvoteController = async (ctx: koaCtx, next: koaN
 }
 
 /**
- * 用户取消一个视频评论的点踩
+ * ユーザーが動画コメントの低評価を取り消し
  * @param ctx context
  * @param next context
  */
@@ -122,9 +122,9 @@ export const cancelVideoCommentDownvoteController = async (ctx: koaCtx, next: ko
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const cancelVideoCommentDownvoteRequest: CancelVideoCommentDownvoteRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论 ID */
+		/** コメントID */
 		id: data.id,
 	}
 	const emitVideoCommentResponse = await cancelVideoCommentDownvoteService(cancelVideoCommentDownvoteRequest, uid, token)
@@ -133,7 +133,7 @@ export const cancelVideoCommentDownvoteController = async (ctx: koaCtx, next: ko
 }
 
 /**
- * 删除一条自己发布的视频评论
+ * 自身が投稿した動画コメントを削除
  * @param ctx context
  * @param next context
  */
@@ -142,9 +142,9 @@ export const deleteSelfVideoCommentController = async (ctx: koaCtx, next: koaNex
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 	const deleteSelfVideoCommentRequest: DeleteSelfVideoCommentRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论的路由 */
+		/** コメントのルート */
 		commentRoute: data.commentRoute,
 	}
 	const deleteSelfVideoCommentResponse = await deleteSelfVideoCommentService(deleteSelfVideoCommentRequest, uid, token)
@@ -153,7 +153,7 @@ export const deleteSelfVideoCommentController = async (ctx: koaCtx, next: koaNex
 }
 
 /**
- * 管理员删除一条视频评论
+ * 管理者が動画コメントを削除
  * @param ctx context
  * @param next context
  */
@@ -162,15 +162,15 @@ export const adminDeleteVideoCommentController = async (ctx: koaCtx, next: koaNe
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 
-	// RBAC 权限验证
+	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
 	const adminDeleteVideoCommentRequest: AdminDeleteVideoCommentRequestDto = {
-		/** KVID 视频 ID */
+		/** KVID 動画ID */
 		videoId: data.videoId,
-		/** 评论的路由 */
+		/** コメントのルート */
 		commentRoute: data.commentRoute,
 	}
 	const adminDeleteVideoCommentResponse = await adminDeleteVideoCommentService(adminDeleteVideoCommentRequest, uid, token)

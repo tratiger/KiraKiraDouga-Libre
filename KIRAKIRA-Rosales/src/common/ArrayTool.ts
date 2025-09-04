@@ -1,11 +1,10 @@
-
 /**
  *
- * 在 js 中为一个复杂对象数组去重
+ * JavaScriptで複雑なオブジェクト配列の重複を除去します
  * BY: ChatGPT-4, 02
  *
- * @param array 被去重的数组
- * @returns 去重完成的数组
+ * @param array 重複除去対象の配列
+ * @returns 重複除去後の配列
  */
 export const removeDuplicateObjects = <T>(array: T[]): T[] => {
 	if (array && array.length > 0) {
@@ -28,16 +27,16 @@ type NestedArray<T> = T | NestedArray<T>[]
 
 /**
  *
- * 去除对象数组中的重复对象，递归深度比较且提供更好的鲁棒性
- * // ? 去重时，对象的属性顺序发生变化时无法比较, {foo: 1, bar: 2} 和 {bar: 2, foo: 1} 算作不同的对象，性能更好
+ * オブジェクト配列から重複したオブジェクトを除去します。再帰的に深く比較し、より高い堅牢性を提供します
+ * // ? 重複除去時、オブジェクトのプロパティの順序が異なると比較できません。{foo: 1, bar: 2} と {bar: 2, foo: 1} は異なるオブジェクトとして扱われ、パフォーマンスが向上します
  * BY: ChatGPT-4, 02
  *
- * @param array 被去重的数组
- * @returns 去重完成的数组
+ * @param array 重複除去対象の配列
+ * @returns 重複除去後の配列
  */
 export const removeDuplicateObjectsInDeepArrayStrong = <T>(inputArray: NestedArray<T>): T[] => {
 	try {
-		// 将输入数组扁平化为一维数组
+		// 入力配列を1次元配列にフラット化します
 		const flattenArray = <T>(arr: NestedArray<T>): T[] => {
 			if (!Array.isArray(arr)) {
 				return [arr]
@@ -48,12 +47,12 @@ export const removeDuplicateObjectsInDeepArrayStrong = <T>(inputArray: NestedArr
 			}, [])
 		}
 
-		// 检查两个对象是否相等
+		// 2つのオブジェクトが等しいかどうかをチェックします
 		const isEqual = (obj1: unknown, obj2: unknown): boolean => {
 			return JSON.stringify(obj1) === JSON.stringify(obj2)
 		}
 
-		// 去除重复的对象
+		// 重複したオブジェクトを除去します
 		const removeDuplicates = <T>(arr: T[]): T[] => {
 			return arr.filter((value, index, self) => {
 				return self.findIndex(item => isEqual(item, value)) === index
@@ -64,16 +63,16 @@ export const removeDuplicateObjectsInDeepArrayStrong = <T>(inputArray: NestedArr
 			const flattenedArray = flattenArray<T>(inputArray)
 			return removeDuplicates<T>(flattenedArray)
 		} else {
-			console.error('something error in function removeDuplicateObjectsStrongInDeepArray, required data "inputArray" is empty')
+			console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました。必須データ"inputArray"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function removeDuplicateObjectsStrongInDeepArray')
+		console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました')
 		return []
 	}
 }
 
-// 对象比较函数
+// オブジェクト比較関数
 const objectsAreEqual = <T>(a: T, b: T): boolean => {
 	if (a && b) {
 		const keysA = Object.keys(a).sort()
@@ -90,7 +89,7 @@ const objectsAreEqual = <T>(a: T, b: T): boolean => {
 			
 		return true
 	} else {
-		console.error('something error in function objectsAreEqual, required data "a" or "b" is empty')
+		console.error('objectsAreEqual関数でエラーが発生しました。必須データ"a"または"b"が空です')
 		return false
 	}
 }
@@ -98,16 +97,16 @@ const objectsAreEqual = <T>(a: T, b: T): boolean => {
 
 /**
  *
- * 去除对象数组中的重复对象，递归深度比较且提供更好的鲁棒性
- * // > 去重时，对象的属性顺序发生变化时仍然可以比较，{foo: 1, bar: 2} 和 {bar: 2, foo: 1} 算作相同的对象，性能降低
+ * オブジェクト配列から重複したオブジェクトを除去します。再帰的に深く比較し、より高い堅牢性を提供します
+ * // > 重複除去時、オブジェクトのプロパティの順序が異なっても比較可能です。{foo: 1, bar: 2} と {bar: 2, foo: 1} は同じオブジェクトとして扱われ、パフォーマンスは低下します
  * BY: ChatGPT-4, 02
  *
- * @param array 被去重的数组
- * @returns 去重完成的数组
+ * @param array 重複除去対象の配列
+ * @returns 重複除去後の配列
  */
 export const removeDuplicateObjectsInDeepArrayAndDeepObjectStrong = <T>(inputArray: NestedArray<T>): T[] => {
 	try {
-		// 将输入数组扁平化为一维数组
+		// 入力配列を1次元配列にフラット化します
 		const flattenArray = <T>(arr: NestedArray<T>): T[] => {
 			if (!Array.isArray(arr)) {
 				return [arr]
@@ -118,7 +117,7 @@ export const removeDuplicateObjectsInDeepArrayAndDeepObjectStrong = <T>(inputArr
 			}, [])
 		}
 
-		// 去除重复的对象
+		// 重複したオブジェクトを除去します
 		const removeDuplicates = <T>(arr: T[]): T[] => {
 			return arr.filter((value, index, self) => {
 				return self.findIndex(item => objectsAreEqual<T>(item, value)) === index
@@ -129,33 +128,33 @@ export const removeDuplicateObjectsInDeepArrayAndDeepObjectStrong = <T>(inputArr
 			const flattenedArray = flattenArray<T>(inputArray)
 			return removeDuplicates<T>(flattenedArray)
 		} else {
-			console.error('something error in function removeDuplicateObjectsStrongInDeepArray, required data "inputArray" is empty')
+			console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました。必須データ"inputArray"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function removeDuplicateObjectsStrongInDeepArray')
+		console.error('removeDuplicateObjectsStrongInDeepArray関数でエラーが発生しました')
 		return []
 	}
 }
 
 /**
- * 去重合并两个对象数组
+ * 2つのオブジェクト配列をマージし、重複を除去します
  * BY: ChatGPT-4, 02
  *
- * @param arr1 要合并的第一个对象数组
- * @param arr2 要合并的第二个对象数组
+ * @param arr1 マージする最初のオブジェクト配列
+ * @param arr2 マージする2番目のオブジェクト配列
  *
- * @returns 合并后的新对象数组，包含去重处理
+ * @returns マージおよび重複除去後の新しいオブジェクト配列
  */
 export const mergeAndDeduplicateObjectArrays = <T>(arr1: T[], arr2: T[]): T[] => {
 	try {
-		// 检查数组是否为空
+		// 配列が空かどうかをチェックします
 		if (arr1 || arr2) {
-			// 处理空数组情况
+			// 空の配列の場合を処理します
 			if (arr1 === undefined || arr1 === null) return arr2
 			if (arr2 === undefined || arr2 === null) return arr1
 
-			// 合并数组并去重
+			// 配列をマージして重複を除去します
 			const mergedArray: T[] = [...arr1, ...arr2]
 			const uniqueArray: T[] = []
 
@@ -168,11 +167,11 @@ export const mergeAndDeduplicateObjectArrays = <T>(arr1: T[], arr2: T[]): T[] =>
 
 			return uniqueArray
 		} else {
-			console.error('something error in function mergeAndDeduplicateObjectArrays, required data "inputArray(arr1 and arr2)" is empty')
+			console.error('mergeAndDeduplicateObjectArrays関数でエラーが発生しました。必須データ"inputArray(arr1 and arr2)"が空です')
 			return []
 		}
 	} catch (error) {
-		console.error('something error in function mergeAndDeduplicateObjectArrays')
+		console.error('mergeAndDeduplicateObjectArrays関数でエラーが発生しました')
 		return []
 	}
 }

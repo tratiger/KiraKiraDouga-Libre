@@ -1,9 +1,9 @@
 import mongoose, { ClientSession } from "mongoose"
 
 /**
- * 创建并启动事务
- * @returns 一个已经启动的事务
- * @throws error 创建或启动事务失败
+ * トランザクションを作成して開始します
+ * @returns 既に開始されているトランザクション
+ * @throws error トランザクションの作成または開始に失敗しました
  */
 export const createAndStartSession = async (): Promise<ClientSession> => {
 	try {
@@ -11,14 +11,14 @@ export const createAndStartSession = async (): Promise<ClientSession> => {
 		session.startTransaction()
 		return session
 	} catch (error) {
-		throw new Error('启动 MongoDB Session 失败', error)
+		throw new Error('MongoDBセッションの開始に失敗しました', error)
 	}
 }
 
 /**
- * 回滚并结束事务
- * @param session 事务 session
- * @returns 成功回滚并结束事务返回 true，否则返回 false
+ * トランザクションをロールバックして終了します
+ * @param session トランザクションセッション
+ * @returns トランザクションのロールバックと終了に成功した場合はtrue、それ以外の場合はfalseを返します
  */
 export const abortAndEndSession = async (session: ClientSession): Promise<boolean> => {
 	if (!session) {
@@ -35,9 +35,9 @@ export const abortAndEndSession = async (session: ClientSession): Promise<boolea
 }
 
 /**
- * 提交并结束事务
- * @param session 事务 session
- * @returns 成功提交并结束事务返回 true，否则返回 false
+ * トランザクションをコミットして終了します
+ * @param session トランザクションセッション
+ * @returns トランザクションのコミットと終了に成功した場合はtrue、それ以外の場合はfalseを返します
  */
 export const commitAndEndSession = async (session: ClientSession): Promise<boolean> => {
 	if (!session) {

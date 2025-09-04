@@ -1,26 +1,26 @@
 // /**
-//  * 不同语言所对应的 TAG 名
+//  * 各言語に対応するTAG名
 //  */
 // export const VideoTagNameDocument = {
-// 	/** TAG 的语言 - 非空，原则上应该唯一 // WARN: 无法指定指定子文档的唯一索引，只能在业务上避免并做校验 */
+// 	/** TAGの言語 - 空でないこと、原則としてユニークであるべき // WARN: サブドキュメントにユニークインデックスを指定できないため、ビジネスロジックで重複を回避し、検証を行う必要があります */
 // 	lang: { type: String, required: true as const },
-// 	/** 不同语言所对应的 TAG 名 */
+// 	/** 各言語に対応するTAG名 */
 // 	tagName: { type: String, required: true as const },
 // }
 
 // /**
-//  * 视频 TAG 数据
+//  * 動画TAGデータ
 //  */
 // export const VideoTagDocument = {
-// 	/** Elasticsearch 索引模板 */
+// 	/** Elasticsearchインデックステンプレート */
 // 	schema: {
-// 		/** TAG ID - 非空，唯一 */
+// 		/** TAG ID - 空でないこと、ユニーク */
 // 		tagId: { type: Number, required: true as const },
-// 		/** 不同语言所对应的 TAG 名 */
+// 		/** 各言語に対応するTAG名 */
 // 		tagNameList: { type: [VideoTagNameDocument], required: true as const },
-// 		/** 系统专用字段-最后编辑时间 - 非空 */
+// 		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 // 		editDateTime: { type: Number, required: true as const },
 // 	},
-// 	/** Elasticsearch 索引名 */
+// 	/** Elasticsearchインデックス名 */
 // 	indexName: 'search-kirakira-video-tag-elasticsearch',
 // }

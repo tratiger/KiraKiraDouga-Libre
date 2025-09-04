@@ -1,15 +1,15 @@
 import { ClientSession } from 'mongoose'
 import { getNextSequenceValuePool } from '../dbPool/DbClusterPool.js'
 
-// NOTE 自增序列默认会跳过的值
+// NOTE: 自己増分シーケンスがデフォルトでスキップする値
 const __DEFAULT_SEQUENCE_EJECT__: number[] = [9, 42, 233, 404, 2233, 10388, 10492, 114514]
 
 /**
- * 获取自增 ID 的结果
- * @param success 执行结果，程序执行成功，返回 true，程序执行失败，返回 false
- * @param sequenceId 自增项的 ID 的项
- * @param sequenceValue 自增 ID 的值
- * @param message 额外信息
+ * 自己増分IDの取得結果
+ * @param success 実行結果。プログラムが正常に実行された場合はtrue、失敗した場合はfalseを返す
+ * @param sequenceId 自己増分項目のID
+ * @param sequenceValue 自己増分IDの値
+ * @param message 追加情報
  */
 type SequenceNumberResultType = {
 	success: boolean;
@@ -19,12 +19,12 @@ type SequenceNumberResultType = {
 }
 
 /**
- * 获取自增序列的下一个值
- * @param sequenceId 自增序列的 key
- * @param sequenceDefaultNumber 序列的初始值，默认：0，如果序列已创建，则无效，该值可以为负数
- * @param sequenceStep 序列的步长，默认：1，每次调用该方法时可以指定不同的步长，该值可以为负数
- * @param session 事务
- * @returns 查询状态和结果，应为自增序列的下一个值
+ * 自己増分シーケンスの次の値を取得する
+ * @param sequenceId 自己増分シーケンスのキー
+ * @param sequenceDefaultNumber シーケンスの初期値。デフォルト：0。シーケンスが既に作成されている場合は無効。この値は負数でもかまいません
+ * @param sequenceStep シーケンスのステップ。デフォルト：1。このメソッドを呼び出すたびに異なるステップを指定できます。この値は負数でもかまいません
+ * @param session トランザクション
+ * @returns クエリのステータスと結果。自己増分シーケンスの次の値である必要があります
  */
 export const getNextSequenceValueService = async (sequenceId: string, sequenceDefaultNumber: number = 0, sequenceStep: number = 1, session?: ClientSession): Promise<SequenceNumberResultType> => {
 	try {
@@ -33,33 +33,33 @@ export const getNextSequenceValueService = async (sequenceId: string, sequenceDe
 				const getNextSequenceValue = await getNextSequenceValuePool(sequenceId, sequenceDefaultNumber, sequenceStep, { session })
 				const sequenceValue = getNextSequenceValue?.result
 				if (getNextSequenceValue.success && sequenceValue !== null && sequenceValue !== undefined) {
-					return { success: true, sequenceId, sequenceValue, message: '获取自增 ID 成功' }
+					return { success: true, sequenceId, sequenceValue, message: '自己増分IDの取得に成功しました' }
 				} else {
-					console.error('ERROR', '程序错误，获取到的自增 ID 为空', { error: getNextSequenceValue.error, message: getNextSequenceValue.message })
-					return { success: false, sequenceId, message: '程序错误，获取到的自增 ID 异常' }
+					console.error('ERROR', 'プログラムエラー、取得した自己増分IDが空です', { error: getNextSequenceValue.error, message: getNextSequenceValue.message })
+					return { success: false, sequenceId, message: 'プログラムエラー、取得した自己増分IDが異常です' }
 				}
 			} catch (error) {
-				console.error('ERROR', '自增 ID 获取失败，向 MongoDB 查询自增 ID 数据时出现异常：', error)
-				return { success: false, sequenceId, message: '程序错误，存取自增 ID 时出现异常' }
+				console.error('ERROR', '自己増分IDの取得に失敗しました、MongoDBへの自己増分IDデータクエリで例外が発生しました：', error)
+				return { success: false, sequenceId, message: 'プログラムエラー、自己増分IDの保存・取得時に例外が発生しました' }
 			}
 		} else {
-			console.error('ERROR', '自增 ID 获取失败，必要的参数 sequenceId 为空')
-			return { success: false, message: '程序错误，获取自增 ID 时出现异常，缺少必要的参数' }
+			console.error('ERROR', '自己増分IDの取得に失敗しました、必須パラメータsequenceIdが空です')
+			return { success: false, message: 'プログラムエラー、自己増分IDの取得時に例外が発生しました、必須パラメータがありません' }
 		}
 	} catch (error) {
-		console.error('ERROR', '自增 ID 获取失败, getAndAddOneBySequenceId 异常退出：', error)
-		return { success: false, message: '程序错误，获取自增 ID 的程序执行时出现异常' }
+		console.error('ERROR', '自己増分IDの取得に失敗しました、getAndAddOneBySequenceIdが異常終了しました：', error)
+		return { success: false, message: 'プログラムエラー、自己増分ID取得プログラムの実行中に例外が発生しました' }
 	}
 }
 
 /**
- * 获取自增序列的下一个值，但是可以跳过 eject 指定数组中的 “非法值” 直到自增到下一个 “合法” 的值
- * @param sequenceId 自增序列的 key
- * @param eject 创建序列时主动跳过的数字的数组，需要每次调用该函数时指定，如果不指定则会使用 __DEFAULT_SEQUENCE_EJECT__ 作为缺省的跳过数组
- * @param sequenceDefaultNumber 序列的初始值，默认：0，如果序列已创建，则无效，该值可以为负数
- * @param sequenceStep 序列的步长，默认：1，每次调用该方法时可以指定不同的步长，该值可以为负数
- * @param session 事务
- * @returns 查询状态和结果，应为自增序列的下一个值
+ * 自己増分シーケンスの次の値を取得しますが、ejectで指定された配列内の「不正な値」をスキップして、次の「正当な」値まで自己増分できます
+ * @param sequenceId 自己増分シーケンスのキー
+ * @param eject シーケンス作成時に能動的にスキップする数値の配列。この関数を呼び出すたびに指定する必要があります。指定しない場合は__DEFAULT_SEQUENCE_EJECT__がデフォルトのスキップ配列として使用されます
+ * @param sequenceDefaultNumber シーケンスの初期値。デフォルト：0。シーケンスが既に作成されている場合は無効。この値は負数でもかまいません
+ * @param sequenceStep シーケンスのステップ。デフォルト：1。このメソッドを呼び出すたびに異なるステップを指定できます。この値は負数でもかまいません
+ * @param session トランザクション
+ * @returns クエリのステータスと結果。自己増分シーケンスの次の値である必要があります
  */
 export const getNextSequenceValueEjectService = async (sequenceId: string, eject: number[] = __DEFAULT_SEQUENCE_EJECT__, sequenceDefaultNumber: number = 0, sequenceStep: number = 1, session?: ClientSession): Promise<SequenceNumberResultType> => {
 	try {
@@ -69,19 +69,15 @@ export const getNextSequenceValueEjectService = async (sequenceId: string, eject
 			getNextSequenceValueServiceResult = await getNextSequenceValueService(sequenceId, sequenceDefaultNumber, sequenceStep, session)
 			nextSequenceValue = getNextSequenceValueServiceResult?.sequenceValue
 
-			// 如果获取失败或者返回的值为空，则直接跳出循环
+			// 取得に失敗した場合や返された値が空の場合は、ループを直接抜けます
 			if (!getNextSequenceValueServiceResult.success || nextSequenceValue === null || nextSequenceValue === undefined) {
-				console.error('ERROR', '循环获取自增 ID 时出现异常，数据异常')
-				return { success: false, sequenceId, message: '循环获取自增 ID 时出现异常，返回的结果可能为空或不成功' }
+				console.error('ERROR', '自己増分IDのループ取得中に例外が発生しました、データが異常です')
+				return { success: false, sequenceId, message: '自己増分IDのループ取得中に例外が発生しました、返された結果が空または失敗した可能性があります' }
 			}
 		} while (eject && eject.includes(nextSequenceValue))
-		return { success: true, sequenceId, sequenceValue: nextSequenceValue, message: '获取自增序列成功' }
+		return { success: true, sequenceId, sequenceValue: nextSequenceValue, message: '自己増分シーケンスの取得に成功しました' }
 	} catch (error) {
-		console.error('ERROR', '循环获取自增 ID 时出现异常')
-		return { success: false, sequenceId, message: '循环获取自增 ID 的程序执行时出现异常' }
+		console.error('ERROR', '自己増分IDのループ取得中に例外が発生しました')
+		return { success: false, sequenceId, message: '自己増分IDのループ取得プログラムの実行中に例外が発生しました' }
 	}
 }
-
-
-
-

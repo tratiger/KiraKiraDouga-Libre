@@ -1,5 +1,5 @@
 /**
- * 获取正确的 Cookie Domain 设置
+ * 正しいCookieドメイン設定を取得します
  * @returns string Cookie Domain
  */
 export function getCorrectCookieDomain(): string {
@@ -10,6 +10,6 @@ export function getCorrectCookieDomain(): string {
 		const localhostCookieDomain = ''
 		return serverEnv && serverEnv === devEnvFlag ? localhostCookieDomain : (serverRootUrl || localhostCookieDomain)
 	} catch (error) {
-		console.error('ERROR', '获取 Cookie Domain 时出错：', error)
+		console.error('ERROR', 'Cookieドメインの取得中にエラーが発生しました：', error)
 	}
 }

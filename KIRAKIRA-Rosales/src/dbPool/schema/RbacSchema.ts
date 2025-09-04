@@ -2,82 +2,82 @@ import { Schema } from 'mongoose'
 
 /**
  * KIRAKIRA RBAC
- * 
- * KIRAKIRA RBAC 原子化权限控制的最小单位是 API 路径。
- * * 一个用户可以拥有多个角色
- * * 一个角色可以对应多位用户
- * * 一个角色可以拥有对多个 API 的访问权限
- * * 一个 API 可以对应多个角色
+ *
+ * KIRAKIRA RBACの最小単位はAPIパスです。
+ * * 1人のユーザーが複数のロールを持つことができます
+ * * 1つのロールが複数のユーザーに対応できます
+ * * 1つのロールが複数のAPIへのアクセス権を持つことができます
+ * * 1つのAPIが複数のロールに対応できます
  */
 
 /**
- * API 路径的列表
- * KIRAKIRA RBAC 原子化权限控制的最小单位，即精确控制每个 API 接口的访问权限
+ * APIパスのリスト
+ * KIRAKIRA RBACの最小単位であり、各APIインターフェースのアクセス権を正確に制御します
  */
 class RbacApiSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** API 路径的 UUID - 非空 - 唯一 */
+		/** APIパスのUUID - 空でないこと - ユニーク */
 		apiPathUuid: { type: String, required: true, unique: true },
-		/** API 路径 - 非空 - 唯一 */
+		/** APIパス - 空でないこと - ユニーク */
 		apiPath: { type: String, required: true, unique: true },
-		/** API 路径的类型 */
+		/** APIパスのタイプ */
 		apiPathType: { type: String },
-		/** API 路径的颜色 */
+		/** APIパスの色 */
 		apiPathColor: { type: String },
-		/** API 路径的描述 */
+		/** APIパスの説明 */
 		apiPathDescription: { type: String },
-		/** API 路径创建者 - 非空 */
+		/** APIパス作成者 - 空でないこと */
 		creatorUuid: { type: String, required: true },
-		/** API 路径最后更新者 - 非空 */
+		/** APIパス最終更新者 - 空でないこと */
 		lastEditorUuid: { type: String, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'rbac-api-list'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const RbacApiSchema = new RbacApiSchemaFactory()
 
 /**
- * RBAC 角色
- * 
- * 一个用户可以拥有多个角色
- * 一个角色可以对应多位用户
- * 一个角色可以拥有对多个 API 的访问权限
- * 一个 API 可以对应多个角色
+ * RBACロール
+ *
+ * 1人のユーザーが複数のロールを持つことができます
+ * 1つのロールが複数のユーザーに対応できます
+ * 1つのロールが複数のAPIへのアクセス権を持つことができます
+ * 1つのAPIが複数のロールに対応できます
  */
 class RbacRoleSchemaFactory {
-	/** MongoDB Schema */
+	/** MongoDBスキーマ */
 	schema = {
-		/** 角色的 UUID */
+		/** ロールのUUID */
 		roleUuid: { type: String, required: true, unique: true },
-		/** 角色的名字 */
+		/** ロール名 */
 		roleName: { type: String, required: true, unique: true },
-		/** 角色的类型 */
+		/** ロールのタイプ */
 		roleType: { type: String },
-		/** 角色的颜色 */
+		/** ロールの色 */
 		roleColor: { type: String },
-		/** 角色的描述 */
+		/** ロールの説明 */
 		roleDescription: { type: String },
-		/** 这个角色有哪些 API 路径的访问权 */
+		/** このロールがアクセス権を持つAPIパス */
 		apiPathPermissions: { type: [String], required: true },
-		/** API 路径创建者 - 非空 */
+		/** APIパス作成者 - 空でないこと */
 		creatorUuid: { type: String, required: true },
-		/** API 路径最后更新者 - 非空 */
+		/** APIパス最終更新者 - 空でないこと */
 		lastEditorUuid: { type: String, required: true },
-		/** 系统专用字段-创建时间 - 非空 */
+		/** システム専用フィールド - 作成日時 - 空でないこと */
 		createDateTime: { type: Number, required: true },
-		/** 系统专用字段-最后编辑时间 - 非空 */
+		/** システム専用フィールド - 最終編集日時 - 空でないこと */
 		editDateTime: { type: Number, required: true },
 	}
-	/** MongoDB 集合名 */
+	/** MongoDBコレクション名 */
 	collectionName = 'rbac-role'
-	/** Mongoose Schema 实例 */
+	/** Mongooseスキーマインスタンス */
 	schemaInstance = new Schema(this.schema)
 }
 export const RbacRoleSchema = new RbacRoleSchemaFactory()
