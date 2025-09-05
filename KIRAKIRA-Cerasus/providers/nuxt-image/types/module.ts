@@ -100,7 +100,6 @@ export interface IPXOptions extends Omit<IPXRuntimeConfig, "alias"> {
 }
 
 export interface ImageProviders {
-	cloudflare?: any;
 	cloudinary?: Partial<CloudinaryOptions>;
 	contentful?: any;
 	cloudimage?: any;

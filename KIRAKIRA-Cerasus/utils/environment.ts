@@ -31,36 +31,12 @@ export const environment = {
 			return DEFAULT_BACKEND_URI;
 		}
 	},
-	/** cloudflareの画像プロバイダー名。本番環境ではcloudflare-prod、それ以外ではcloudflare-stgを使用します */
-	get cloudflareImageProvider() {
-		const provider = import.meta.env.VITE_CLOUDFLARE_IMAGES_PROVIDER as string;
-		if (!provider)
-			console.error("ERROR", "Server startup failed,  the value of the environment variable CLOUDFLARE_IMAGES_PROVIDER was not specified.");
-		if (provider === "cloudflare-prod" || provider === "cloudflare-stg")
-			return provider;
-		else
-			return "cloudflare-stg";
-	},
-	/** Cloudflare MPD 動画マニフェストURLテンプレート。"{videoId}"部分は実際の動画IDに置き換えられます。本番とテストで異なるURLを使用します */
-	get cloudflareStreamVideoMpdUrlTemplate() {
-		const DEFAULT_CLOUDFLARE_STREAM_SUBDOMAIN = "https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/";
-		try {
-			const subdomain = import.meta.env.VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN;
-			if (!subdomain) {
-				console.error("ERROR", "Server startup failed,  the value of the environment variable BACKEND_URL was not specified.");
-				return DEFAULT_CLOUDFLARE_STREAM_SUBDOMAIN;
-			}
-			const subdomainUri = new URL(subdomain);
-			const subdomainUriHref = subdomainUri.href;
-			if (!subdomainUriHref) {
-				console.error("ERROR", "System startup failed, the parsed result of the environment variable BACKEND_URL is empty.");
-				return DEFAULT_CLOUDFLARE_STREAM_SUBDOMAIN;
-			}
-
-			return `${subdomainUriHref}{videoId}/manifest/video.mpd`;
-		} catch (error) {
-			console.error("ERROR", "System startup failed, environment variable BACKEND_URL parsing failed:", error);
-			return DEFAULT_CLOUDFLARE_STREAM_SUBDOMAIN;
-		}
+	/** MinIOの公開URL。ビデオや画像などのアセットを提供するために使用されます */
+	get minioPublicUrl() {
+		const endpoint = import.meta.env.VITE_MINIO_ENDPOINT || "localhost";
+		const port = import.meta.env.VITE_MINIO_PORT || "9000";
+		const bucket = import.meta.env.VITE_MINIO_BUCKET || "kirakira";
+		const useSsl = import.meta.env.VITE_MINIO_USE_SSL === 'true';
+		return `${useSsl ? 'https' : 'http'}://${endpoint}:${port}/${bucket}`;
 	},
 };

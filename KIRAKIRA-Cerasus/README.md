@@ -212,7 +212,7 @@ pnpm dev-live-demo
 典型的なカスタム起動コマンドは次のようになります：
 ```bash
 # 以下のコマンドは 'pnpm dev-local' と同等です
-pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
+pnpm nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
 ```
 
 起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
@@ -222,13 +222,6 @@ pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PR
   クロスプラットフォームの環境変数を設定し、コマンドが異なるOS（WindowsやLinuxなど）で正常に実行されることを保証します。
 2. `VITE_BACKEND_URI=https://localhost:9999`\
   `VITE_BACKEND_URI` という名前の環境変数を注入します。その値はバックエンドAPIのURIである `https://localhost:9999` です。
-3. `VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg`\
-  `VITE_CLOUDFLARE_IMAGES_PROVIDER` という名前の環境変数を注入します。その値は `cloudflare-stg` です。\
-  これは、`cloudflare-stg` という名前の [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider) を使用することを意味します。\
-  NuxtImage Custom Provider の設定を変更する必要がある場合は、ルートディレクトリの `nuxt.config.ts` 内の `image.providers` セクションに移動してください。
-4. `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://custom...stream.com/`\
-  `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` という名前の環境変数を注入します。その値は `https://custom...stream.com/` です。\
-  この環境変数は、Cloudflare Stream サービスのカスタムサブドメインを指定します。
 5. `nuxi dev`\
   Nuxt の開発サーバーを起動します。オプションのパラメータについては、[こちらの公式ドキュメント](https://nuxt.com/docs/api/commands/dev) を参照してください。
 6. `--host`\

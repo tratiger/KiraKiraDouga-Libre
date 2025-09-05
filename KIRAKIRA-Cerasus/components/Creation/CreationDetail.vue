@@ -103,7 +103,7 @@
 		if (props.cover) {
 			const image = useImage();
 			const IMAGE_MAX_WIDTH = 999999;
-			window.open(image(props.cover, { width: IMAGE_MAX_WIDTH }, { provider: environment.cloudflareImageProvider }), "_blank"); // TODO: まず、画像をダウンロードするのではなく、新しいタブで画像を直接開くスタイルに一時的に変更します
+			window.open(image(props.cover, { width: IMAGE_MAX_WIDTH }), "_blank"); // TODO: まず、画像をダウンロードするのではなく、新しいタブで画像を直接開くスタイルに一時的に変更します
 			// downloadFile(props.cover, `${props.title} (kv${props.videoId})`);
 		} else useToast(t.toast.something_went_wrong, "error");
 	}

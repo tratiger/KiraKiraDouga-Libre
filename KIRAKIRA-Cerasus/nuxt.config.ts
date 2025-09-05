@@ -225,24 +225,11 @@ export default defineNuxtConfig({
 
 	image: {
 		format: ["avif", "webp"], // <NuxtImg>にのみ適用され、<NuxtImg>には無効です。
+		provider: 'minio',
 		providers: {
-			cloudflareProd: {
-				name: "cloudflare-prod", // optional value to overrider provider name
-				provider: "./providers/nuxt-image/cloudflare-images.ts", // Path to custom provider
-				options: {
-					// ... provider options
-					baseURL: "https://kirafile.com",
-					accountHash: "Gyz90amG54C4b_dtJiRpYg",
-				},
-			},
-			cloudflareStg: {
-				name: "cloudflare-stg", // optional value to overrider provider name
-				provider: "./providers/nuxt-image/cloudflare-images.ts", // Path to custom provider
-				options: {
-					// ... provider options
-					baseURL: "https://starcitizen.rip",
-					accountHash: "nLUFLrrgVwzQdEx8eL5BaA",
-				},
+			minio: {
+				name: "minio",
+				provider: "./providers/nuxt-image/minio.ts",
 			},
 		},
 	},

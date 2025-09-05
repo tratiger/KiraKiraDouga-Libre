@@ -19,7 +19,6 @@
 		return Number.isFinite(uid) ? `/user/${uid}` : props.to;
 	});
 
-	const provider = computed(() => props.avatar?.startsWith("blob:http") ? undefined : environment.cloudflareImageProvider);
 	const appSettings = useAppSettingsStore();
 </script>
 
@@ -27,7 +26,6 @@
 	<Comp v-ripple="Boolean(userLink) || Boolean(hoverable)" :class="{ hoverable }">
 		<NuxtImg
 			v-if="avatar"
-			:provider
 			:src="avatar"
 			alt="avatar"
 			draggable="false"

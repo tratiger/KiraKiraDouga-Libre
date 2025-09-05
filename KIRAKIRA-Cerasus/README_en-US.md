@@ -208,7 +208,7 @@ Sometimes, the preset quick start command does not meet your needs. In this case
 A typical custom startup command looks like:
 ```bash
 # The following command is equivalent to 'pnpm dev-local'
-pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
+pnpm nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
 ```
 
 After it started, you should be able to preview at this URL: https://localhost:3000/
@@ -218,13 +218,6 @@ Parsing of the above command:
 Set cross-platform environment variables to ensure that the command can be executed normally under different operating systems (such as Windows and Linux).
 2. `VITE_BACKEND_URI=https://localhost:9999`\
 Injects an environment variable named `VITE_BACKEND_URI` with the value `https://localhost:9999`, which is the URI of the backend API.
-3. `VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg`\
-Injects an environment variable named `VITE_CLOUDFLARE_IMAGES_PROVIDER` with the value `cloudflare-stg`. \
-This indicates that you are using the [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider) named `cloudflare-stg`. \
-To modify the configuration of the NuxtImage Custom Provider, go to the `image.providers` section in file `nuxt.config.ts` in the root directory.
-4. `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://custom...stream.com/`\
-Inject an environment variable named `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` with a value of `https://custom...stream.com/`. \
-This environment variable specifies the custom subdomain of the Cloudflare Stream service.
 5. `nuxi dev`\
 Start Nuxt development server. Optional parameters can refer to [this official document](https://nuxt.com/docs/api/commands/dev).
 6. `--host`\

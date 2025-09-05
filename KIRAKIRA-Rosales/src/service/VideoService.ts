@@ -1,6 +1,12 @@
 import { Client } from '@elastic/elasticsearch'
 import mongoose, { InferSchemaType, PipelineStage } from 'mongoose'
-import { createCloudflareImageUploadSignedUrl } from '../cloudflare/index.js'
+import {
+	createMinioPutSignedUrl,
+	startMultipartUpload,
+	getMultipartUploadPartSignedUrl,
+	completeMultipartUpload,
+	abortMultipartUpload
+} from '../minio/index.js'
 import { isEmptyObject } from '../common/ObjectTool.js'
 import { generateSecureRandomString } from '../common/RandomTool.js'
 import { CreateOrUpdateBrowsingHistoryRequestDto } from '../controller/BrowsingHistoryControllerDto.js'
@@ -650,60 +656,6 @@ export const searchVideoByKeywordService = async (searchVideoByKeywordRequest: S
 }
 
 /**
- * 動画ファイルのTUSアップロードエンドポイントを取得
- * @param uid ユーザーUID
- * @param token ユーザートークン
- * @param getVideoFileTusEndpointRequest 動画ファイルのTUSアップロードエンドポイントを取得するリクエストペイロード
- * @returns 動画ファイルのTUSアップロードエンドポイントアドレス
- */
-export const getVideoFileTusEndpointService = async (uid: number, token: string, getVideoFileTusEndpointRequest: GetVideoFileTusEndpointRequestDto): Promise<string | undefined> => {
-	try {
-		if ((await checkUserTokenService(uid, token)).success) {
-			const streamTusEndpointUrl = process.env.CF_STREAM_TUS_ENDPOINT_URL
-			const streamToken = process.env.CF_STREAM_TOKEN
-			const uploadLength = getVideoFileTusEndpointRequest.uploadLength
-			const uploadMetadata = getVideoFileTusEndpointRequest.uploadMetadata
-
-			if (!streamTusEndpointUrl && !streamToken) {
-				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、streamTusEndpointUrlとstreamTokenが空の可能性があります。環境変数の設定を確認してください（CF_STREAM_TUS_ENDPOINT_URL, CF_STREAM_TOKEN）')
-				return undefined
-			}
-			try {
-				const videoTusEndpointResponse = await fetch(streamTusEndpointUrl, {
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${streamToken}`,
-						'Tus-Resumable': '1.0.0',
-						'Upload-Length': `${uploadLength}`,
-						'Upload-Metadata': uploadMetadata,
-					},
-				})
-				if (!videoTusEndpointResponse.ok) {
-					console.error('ERROR', `Cloudflare Stream TUSエンドポイントを作成できません、HTTPエラー！ステータス：${videoTusEndpointResponse.status}`)
-					return undefined
-				}
-				const videoTusEndpoint = videoTusEndpointResponse.headers.get('location')
-				if (videoTusEndpoint) {
-					return videoTusEndpoint
-				} else {
-					console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエスト結果が空です')
-					return undefined
-				}
-			} catch (error) {
-				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエストの送信に失敗しました', error?.response?.data)
-				return undefined
-			}
-		} else {
-			console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、ユーザー検証に失敗しました', { uid })
-			return undefined
-		}
-	} catch (error) {
-		console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、不明なエラー：', error)
-		return undefined
-	}
-}
-
-/**
  * 動画カバー画像のアップロード用署名付きURLを取得
  * @param uid ユーザーUID
  * @param token ユーザートークン
@@ -714,10 +666,17 @@ export const getVideoCoverUploadSignedUrlService = async (uid: number, token: st
 		if ((await checkUserTokenService(uid, token)).success) {
 			const now = new Date().getTime()
 			const fileName = `video-cover-${uid}-${generateSecureRandomString(32)}-${now}`
+			const bucketName = process.env.MINIO_BUCKET
+			if (!bucketName) {
+				console.error('ERROR', 'MINIO_BUCKET environment variable is not set.')
+				return { success: false, message: 'サーバー設定エラー。' }
+			}
 			try {
-				const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
+				const signedUrl = await createMinioPutSignedUrl(bucketName, fileName, 660)
 				if (signedUrl) {
 					return { success: true, message: '動画カバー画像のアップロード用署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
+				} else {
+					return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました' }
 				}
 			} catch (error) {
 				console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
@@ -1146,3 +1105,85 @@ const checkDeleteVideoRequest = (deleteVideoRequest: DeleteVideoRequestDto): boo
 const checkApprovePendingReviewVideoRequest = (approvePendingReviewVideoRequest: ApprovePendingReviewVideoRequestDto) => {
 	return (!!approvePendingReviewVideoRequest.videoId && typeof approvePendingReviewVideoRequest.videoId === 'number' && approvePendingReviewVideoRequest.videoId >= 0)
 }
+
+export const startMultipartUploadService = async (fileName: string, uid: number, token: string) => {
+	if (!(await checkUserTokenService(uid, token)).success) {
+		console.error('ERROR', 'startMultipartUploadService failed, user validation failed');
+		return { success: false, message: 'User validation failed' };
+	}
+
+	const bucketName = process.env.MINIO_BUCKET;
+	if (!bucketName) {
+		console.error('ERROR', 'MINIO_BUCKET environment variable is not set.');
+		return { success: false, message: 'Server configuration error.' };
+	}
+
+	const objectKey = `video-upload-${uid}-${generateSecureRandomString(16)}-${fileName}`;
+	const uploadId = await startMultipartUpload(bucketName, objectKey);
+
+	if (uploadId) {
+		return { success: true, uploadId, key: objectKey };
+	} else {
+		return { success: false, message: 'Failed to start multipart upload.' };
+	}
+};
+
+export const getMultipartUploadPartSignedUrlService = async (key: string, partNumber: number, uploadId: string, uid: number, token: string) => {
+	if (!(await checkUserTokenService(uid, token)).success) {
+		console.error('ERROR', 'getMultipartUploadPartSignedUrlService failed, user validation failed');
+		return { success: false, message: 'User validation failed' };
+	}
+
+	const bucketName = process.env.MINIO_BUCKET;
+	if (!bucketName) {
+		console.error('ERROR', 'MINIO_BUCKET environment variable is not set.');
+		return { success: false, message: 'Server configuration error.' };
+	}
+
+	const url = await getMultipartUploadPartSignedUrl(bucketName, key, partNumber, uploadId);
+	if (url) {
+		return { success: true, url };
+	} else {
+		return { success: false, message: 'Failed to get signed URL for part.' };
+	}
+};
+
+export const completeMultipartUploadService = async (key: string, uploadId: string, parts: { ETag: string; PartNumber: number }[], uid: number, token: string) => {
+	if (!(await checkUserTokenService(uid, token)).success) {
+		console.error('ERROR', 'completeMultipartUploadService failed, user validation failed');
+		return { success: false, message: 'User validation failed' };
+	}
+
+	const bucketName = process.env.MINIO_BUCKET;
+	if (!bucketName) {
+		console.error('ERROR', 'MINIO_BUCKET environment variable is not set.');
+		return { success: false, message: 'Server configuration error.' };
+	}
+
+	const result = await completeMultipartUpload(bucketName, key, uploadId, parts);
+	if (result) {
+		return { success: true, location: result.Location };
+	} else {
+		return { success: false, message: 'Failed to complete multipart upload.' };
+	}
+};
+
+export const abortMultipartUploadService = async (key: string, uploadId: string, uid: number, token: string) => {
+	if (!(await checkUserTokenService(uid, token)).success) {
+		console.error('ERROR', 'abortMultipartUploadService failed, user validation failed');
+		return { success: false, message: 'User validation failed' };
+	}
+
+	const bucketName = process.env.MINIO_BUCKET;
+	if (!bucketName) {
+		console.error('ERROR', 'MINIO_BUCKET environment variable is not set.');
+		return { success: false, message: 'Server configuration error.' };
+	}
+
+	const result = await abortMultipartUpload(bucketName, key, uploadId);
+	if (result) {
+		return { success: true };
+	} else {
+		return { success: false, message: 'Failed to abort multipart upload.' };
+	}
+};

@@ -294,6 +294,55 @@ export type DeleteVideoResponseDto = {
 	message?: string;
 }
 
+// Multipart Upload DTOs
+export type StartMultipartUploadRequestDto = {
+	fileName: string;
+};
+
+export type StartMultipartUploadResponseDto = {
+	success: boolean;
+	uploadId?: string;
+	key?: string;
+	message?: string;
+};
+
+export type GetMultipartUploadPartSignedUrlRequestDto = {
+	key: string;
+	partNumber: number;
+	uploadId: string;
+};
+
+export type GetMultipartUploadPartSignedUrlResponseDto = {
+	success: boolean;
+	url?: string;
+	message?: string;
+};
+
+export type CompleteMultipartUploadRequestDto = {
+	key: string;
+	uploadId: string;
+	parts: {
+		ETag: string;
+		PartNumber: number;
+	}[];
+};
+
+export type CompleteMultipartUploadResponseDto = {
+	success: boolean;
+	location?: string;
+	message?: string;
+};
+
+export type AbortMultipartUploadRequestDto = {
+	key: string;
+	uploadId: string;
+};
+
+export type AbortMultipartUploadResponseDto = {
+	success: boolean;
+	message?: string;
+};
+
 /**
  * レビュー待ち動画リスト
  */

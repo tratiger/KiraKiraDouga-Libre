@@ -1,5 +1,5 @@
 import mongoose, { InferSchemaType, PipelineStage, ClientSession, startSession } from 'mongoose'
-import { createCloudflareImageUploadSignedUrl } from '../cloudflare/index.js'
+import { createMinioPutSignedUrl } from '../minio/index.js'
 import { isInvalidEmail, sendMail } from '../common/EmailTool.js'
 import { comparePasswordSync, hashPasswordSync } from '../common/HashTool.js'
 import { isEmptyObject } from '../common/ObjectTool.js'
@@ -1143,7 +1143,12 @@ export const getUserAvatarUploadSignedUrlService = async (uid: number, token: st
 		if (await checkUserToken(uid, token)) {
 			const now = new Date().getTime()
 			const fileName = `avatar-${uid}-${generateSecureRandomString(32)}-${now}`
-			const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
+			const bucketName = process.env.MINIO_BUCKET
+			if (!bucketName) {
+				console.error('ERROR', 'MINIO_BUCKET environment variable is not set.')
+				return { success: false, message: 'サーバー設定エラー。' }
+			}
+			const signedUrl = await createMinioPutSignedUrl(bucketName, fileName, 660)
 			if (signedUrl && fileName) {
 				return { success: true, message: 'アバターのアップロードを開始する準備ができました', userAvatarUploadSignedUrl: signedUrl, userAvatarFilename: fileName }
 			} else {
@@ -1156,6 +1161,7 @@ export const getUserAvatarUploadSignedUrlService = async (uid: number, token: st
 		}
 	} catch (error) {
 		console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、エラーメッセージ', error, { uid })
+		return { success: false, message: 'アップロード用の署名付きURLの取得中にエラーが発生しました。' }
 	}
 }
 

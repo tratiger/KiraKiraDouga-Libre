@@ -115,7 +115,6 @@
 								<template #image>
 									<NuxtImg
 										:style
-										:provider="environment.cloudflareImageProvider"
 										:src="thumbnail"
 										:alt="`preview-${filter}`"
 										:draggable="false"
