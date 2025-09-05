@@ -17,6 +17,8 @@ import { getNextSequenceValueEjectService } from './SequenceValueService.js'
 import { checkUserTokenByUuidService, checkUserTokenService, getUserUid, getUserUuid } from './UserService.js'
 import { FollowingSchema } from '../dbPool/schema/FeedSchema.js'
 import { buildBlockListMongooseFilter, checkBlockUserService, checkIsBlockedByOtherUserService } from './BlockService.js'
+import { S3Client, CreateMultipartUploadCommand, PutObjectCommand } from '@aws-sdk/client-s3';  
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';  
 
 /**
  * 動画を更新
@@ -703,35 +705,111 @@ export const getVideoFileTusEndpointService = async (uid: number, token: string,
 	}
 }
 
-/**
- * 動画カバー画像のアップロード用署名付きURLを取得
- * @param uid ユーザーUID
- * @param token ユーザートークン
- * @returns GetVideoCoverUploadSignedUrlResponseDto 動画カバー画像のアップロード用署名付きURL取得リクエストのレスポンス結果
- */
-export const getVideoCoverUploadSignedUrlService = async (uid: number, token: string): Promise<GetVideoCoverUploadSignedUrlResponseDto> => {
-	try {
-		if ((await checkUserTokenService(uid, token)).success) {
-			const now = new Date().getTime()
-			const fileName = `video-cover-${uid}-${generateSecureRandomString(32)}-${now}`
-			try {
-				const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
-				if (signedUrl) {
-					return { success: true, message: '動画カバー画像のアップロード用署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
-				}
-			} catch (error) {
-				console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
-				return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました' }
-			}
-		} else {
-			console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました')
-			return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
-		}
-	} catch (error) {
-		console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました：', error)
-		return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、原因不明' }
-	}
-}
+/**  
+ * MinIO用の動画カバー画像アップロード署名付きURLを取得する  
+ * @param uid ユーザーID  
+ * @param token ユーザートークン  
+ * @returns MinIO署名付きURLの結果  
+ */  
+export const getVideoCoverUploadSignedUrlService = async (uid: number, token: string): Promise<GetVideoCoverUploadSignedUrlResponseDto> => {  
+    try {  
+        if (await checkUserToken(uid, token)) {  
+            const now = new Date().getTime();  
+            const fileName = `video-cover-${uid}-${generateSecureRandomString(32)}-${now}`;  
+              
+            // MinIO S3クライアントの設定  
+            const s3Client = new S3Client({  
+                region: 'us-east-1',  
+                endpoint: process.env.MINIO_ENDPOINT,  
+                credentials: {  
+                    accessKeyId: process.env.MINIO_ACCESS_KEY!,  
+                    secretAccessKey: process.env.MINIO_SECRET_KEY!,  
+                },  
+                forcePathStyle: true,  
+            });  
+  
+            // 署名付きURL生成  
+            const command = new PutObjectCommand({  
+                Bucket: process.env.MINIO_BUCKET || 'kirakira-videos',  
+                Key: fileName,  
+                ContentType: 'image/*',  
+            });  
+  
+            const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 600 }); // 10分間有効  
+  
+            if (signedUrl && fileName) {  
+                return {   
+                    success: true,   
+                    message: '動画カバー画像のアップロードを開始する準備ができました',   
+                    result: { signedUrl, fileName }   
+                };  
+            } else {  
+                return { success: false, message: 'アップロードに失敗しました、画像アップロードURLを生成できません' };  
+            }  
+        } else {  
+            console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、不正なユーザーです', { uid });  
+            return { success: false, message: 'アップロードに失敗しました、アップロード権限を取得できません' };  
+        }  
+    } catch (error) {  
+        console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、エラーメッセージ', error, { uid });  
+        return { success: false, message: 'アップロードに失敗しました、サーバーエラーが発生しました' };  
+    }  
+};  
+
+/**  
+ * MinIO用の動画ファイル直接アップロードサービス  
+ * @param uid ユーザーID  
+ * @param token ユーザートークン  
+ * @param fileName ファイル名  
+ * @param fileSize ファイルサイズ  
+ * @returns MinIOマルチパートアップロード開始の結果  
+ */  
+export const createVideoUploadSessionService = async (uid: number, token: string, fileName: string, fileSize: number): Promise<CreateVideoUploadSessionResponseDto> => {  
+    try {  
+        if (await checkUserToken(uid, token)) {  
+            const now = new Date().getTime();  
+            const objectKey = `videos/${uid}/${now}-${fileName}`;  
+              
+            // MinIO S3クライアントの設定  
+            const s3Client = new S3Client({  
+                region: 'us-east-1',  
+                endpoint: process.env.MINIO_ENDPOINT,  
+                credentials: {  
+                    accessKeyId: process.env.MINIO_ACCESS_KEY!,  
+                    secretAccessKey: process.env.MINIO_SECRET_KEY!,  
+                },  
+                forcePathStyle: true,  
+            });  
+  
+            // マルチパートアップロード開始  
+            const command = new CreateMultipartUploadCommand({  
+                Bucket: process.env.MINIO_BUCKET || 'kirakira-videos',  
+                Key: objectKey,  
+                ContentType: 'video/*',  
+            });  
+  
+            const response = await s3Client.send(command);  
+  
+            if (response.UploadId) {  
+                return {  
+                    success: true,  
+                    message: '動画アップロードセッションが作成されました',  
+                    uploadId: response.UploadId,  
+                    objectKey: objectKey,  
+                    bucketName: process.env.MINIO_BUCKET || 'kirakira-videos'  
+                };  
+            } else {  
+                return { success: false, message: 'アップロードセッションの作成に失敗しました' };  
+            }  
+        } else {  
+            console.error('ERROR', 'アップロードセッションの作成に失敗しました、不正なユーザーです', { uid });  
+            return { success: false, message: 'アップロードセッションの作成に失敗しました、アップロード権限を取得できません' };  
+        }  
+    } catch (error) {  
+        console.error('ERROR', 'アップロードセッションの作成に失敗しました、エラーメッセージ', error, { uid });  
+        return { success: false, message: 'アップロードセッションの作成に失敗しました、サーバーエラーが発生しました' };  
+    }  
+};
 
 /**
  * 動画TAG IDに基づいて動画データを検索

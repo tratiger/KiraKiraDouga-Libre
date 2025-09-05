@@ -1,6 +1,7 @@
 import * as tus from "tus-js-client";
 import { DELETE, GET, POST, uploadFile2CloudflareImages } from "../Common";
 import type { ApprovePendingReviewVideoRequestDto, ApprovePendingReviewVideoResponseDto, CheckVideoExistRequestDto, CheckVideoExistResponseDto, DeleteVideoRequestDto, DeleteVideoResponseDto, GetVideoByKvidRequestDto, GetVideoByKvidResponseDto, GetVideoByUidRequestDto, GetVideoByUidResponseDto, GetVideoCoverUploadSignedUrlResponseDto, PendingReviewVideoResponseDto, SearchVideoByVideoTagIdRequestDto, SearchVideoByVideoTagIdResponseDto, ThumbVideoResponseDto, UploadVideoRequestDto, UploadVideoResponseDto } from "./VideoControllerDto";
+import { S3Client, CreateMultipartUploadCommand, UploadPartCommand, CompleteMultipartUploadCommand } from "@aws-sdk/client-s3";  
 
 const BACK_END_URI = environment.backendUri;
 const VIDEO_API_URI = `${BACK_END_URI}video`;
@@ -105,142 +106,290 @@ export const searchVideoByTagIds = async (searchVideoByVideoTagIdRequest: Search
 		return { success: false, message: "TAG IDが提供されていません", videosCount: 0, videos: [] };
 };
 
-/**
- * TUSでファイルをアップロードします
- */
-export class TusFileUploader {
-	step: "pending" | "created" | "uploading" | "pausing" | "success" | "error" = "pending";
-	process: Promise<string>;
-	uploading?: tus.Upload;
-	isUploadingVideo: Ref<boolean>;
-
-	/**
-	 * TUSでファイルをアップロードします
-	 * @param file - ファイル
-	 * @param progress - 進捗（Vueリアクティブ状態）
-	 * @param isUploadingVideo - 動画をアップロード中かどうか（Vueリアクティブ状態）
-	 */
-	constructor(file: File, progress: Ref<number>, isUploadingVideo: Ref<boolean>) {
-		if (!file) {
-			this.step = "error";
-			useToast(t.toast.upload_file_not_found, "error");
-			throw new Error(t.toast.upload_file_not_found);
-		}
-		this.isUploadingVideo = isUploadingVideo;
-		this.process = new Promise<string>((resolve, reject) => {
-			let videoId = "";
-			// Create a new tus upload
-			const uploader = new tus.Upload(file, {
-				endpoint: `${VIDEO_API_URI}/tus`,
-				onBeforeRequest(req) {
-					const url = req.getURL();
-					if (url?.includes(VIDEO_API_URI)) { // バックエンドAPIにアップロード先のURLをリクエストする場合にのみ、クロスオリジンでのcookie送信を許可します。
-						const xhr = req.getUnderlyingObject();
-						xhr.withCredentials = true;
-					}
-				},
-				retryDelays: [0, 3000, 5000, 10000, 20000], // リトライタイムアウト
-				chunkSize: 52428800, // 動画チャンクサイズ
-				storeFingerprintForResuming: true, // アップロード再開用のキーを保存 // WARN: 通常実行時はTrueにすべきです
-				removeFingerprintOnSuccess: true, // アップロード成功後に再開用のキーを削除
-				metadata: {
-					name: file.name,
-					maxDurationSeconds: "1800", // 最大動画長、1800秒（30分）
-					expiry: getCloudflareRFC3339ExpiryDateTime(3600), // 最大アップロード時間、3600秒（1時間）
-				},
-				onError: error => {
-					console.error("ERROR", "Upload error:", error);
-					this.step = "error";
-					reject(error);
-				},
-				onProgress: (bytesUploaded, bytesTotal) => {
-					const percentage = bytesUploaded / bytesTotal * 100;
-					progress.value = percentage;
-					console.info(bytesUploaded, bytesTotal, percentage.toFixed(2) + "%"); // useless
-				},
-				onSuccess: () => {
-					console.info("Video upload success");
-					if (videoId) {
-						this.step = "success";
-						resolve(videoId);
-					} else
-						reject(new Error("Can not find the video ID"));
-				},
-				onAfterResponse: (req, res) => {
-					if (!req.getURL().includes(VIDEO_API_URI)) {
-						const headerVideoId = res?.getHeader("stream-media-id");
-						if (headerVideoId)
-							videoId = headerVideoId;
-					}
-				},
-			});
-			this.uploading = uploader;
-			this.step = "created";
-			// Check if there are any previous uploads to continue.
-			uploader.findPreviousUploads().then(previousUploads => {
-				// Found previous uploads so we select the first one.
-				if (previousUploads.length > 0)
-					uploader.resumeFromPreviousUpload(previousUploads[0]);
-
-				// Start the upload
-				uploader.start();
-				this.step = "uploading";
-				isUploadingVideo.value = true;
-			});
-		});
-	}
-
-	/**
-	 * TUSアップロードを一時停止します
-	 */
-	abort() {
-		if (this.uploading)
-			if (this.step === "uploading") {
-				this.uploading.abort();
-				this.step = "pausing";
-				this.isUploadingVideo.value = false;
-			} else
-				console.error(`Upload pause failed, Pausing can only work when in 'uploading' step, but you are in '${this.step}' step.`);
-	}
-
-	/**
-	 * TUSアップロードを再開します
-	 */
-	resume() {
-		if (this.uploading)
-			if (this.step === "pausing") {
-				this.uploading.start();
-				this.step = "uploading";
-				this.isUploadingVideo.value = true;
-			} else
-				console.error(`Upload resume failed, Uploading can only work when in 'pausing' step, but you are in '${this.step}' step.`);
-	}
+/**  
+ * MinIO S3互換APIでファイルをアップロードします  
+ */  
+export class MinIOFileUploader {  
+    step: "pending" | "created" | "uploading" | "pausing" | "success" | "error" = "pending";  
+    process: Promise<string>;  
+    isUploadingVideo: Ref<boolean>;  
+    private s3Client: S3Client;  
+    private uploadId?: string;  
+    private parts: Array<{ ETag: string; PartNumber: number }> = [];  
+  
+    /**  
+     * MinIO S3互換APIでファイルをアップロードします  
+     * @param file - ファイル  
+     * @param progress - 進捗（Vueリアクティブ状態）  
+     * @param isUploadingVideo - 動画をアップロード中かどうか（Vueリアクティブ状態）  
+     */  
+    constructor(file: File, progress: Ref<number>, isUploadingVideo: Ref<boolean>) {  
+        if (!file) {  
+            this.step = "error";  
+            useToast(t.toast.upload_file_not_found, "error");  
+            throw new Error(t.toast.upload_file_not_found);  
+        }  
+          
+        this.isUploadingVideo = isUploadingVideo;  
+        this.s3Client = new S3Client({  
+            region: 'us-east-1',  
+            endpoint: environment.minioEndpoint,  
+            credentials: {  
+                accessKeyId: environment.minioAccessKey,  
+                secretAccessKey: environment.minioSecretKey,  
+            },  
+            forcePathStyle: true,  
+        });  
+  
+        this.process = this.uploadFile(file, progress);  
+    }  
+  
+    private async uploadFile(file: File, progress: Ref<number>): Promise<string> {  
+        try {  
+            const key = `videos/${Date.now()}-${file.name}`;  
+              
+            // マルチパートアップロード開始  
+            const createCommand = new CreateMultipartUploadCommand({  
+                Bucket: environment.minioBucket,  
+                Key: key,  
+                ContentType: file.type,  
+            });  
+              
+            const createResponse = await this.s3Client.send(createCommand);  
+            this.uploadId = createResponse.UploadId;  
+            this.step = "created";  
+  
+            // ファイルを5MBチャンクに分割  
+            const chunkSize = 5 * 1024 * 1024; // 5MB  
+            const totalChunks = Math.ceil(file.size / chunkSize);  
+              
+            this.step = "uploading";  
+            this.isUploadingVideo.value = true;  
+  
+            // 各チャンクをアップロード  
+            for (let i = 0; i < totalChunks; i++) {  
+                const start = i * chunkSize;  
+                const end = Math.min(start + chunkSize, file.size);  
+                const chunk = file.slice(start, end);  
+  
+                const uploadCommand = new UploadPartCommand({  
+                    Bucket: environment.minioBucket,  
+                    Key: key,  
+                    PartNumber: i + 1,  
+                    UploadId: this.uploadId,  
+                    Body: chunk,  
+                });  
+  
+                const uploadResponse = await this.s3Client.send(uploadCommand);  
+                this.parts.push({  
+                    ETag: uploadResponse.ETag!,  
+                    PartNumber: i + 1,  
+                });  
+  
+                // 進捗更新  
+                progress.value = ((i + 1) / totalChunks) * 100;  
+            }  
+  
+            // マルチパートアップロード完了  
+            const completeCommand = new CompleteMultipartUploadCommand({  
+                Bucket: environment.minioBucket,  
+                Key: key,  
+                UploadId: this.uploadId,  
+                MultipartUpload: { Parts: this.parts },  
+            });  
+  
+            await this.s3Client.send(completeCommand);  
+            this.step = "success";  
+            this.isUploadingVideo.value = false;  
+              
+            return key; // MinIOのオブジェクトキーを返す  
+        } catch (error) {  
+            console.error("ERROR", "Upload error:", error);  
+            this.step = "error";  
+            this.isUploadingVideo.value = false;  
+            throw error;  
+        }  
+    }  
+  
+    /**  
+     * アップロードを中止します  
+     */  
+    abort() {  
+        // MinIOでは中止機能の実装が必要  
+        this.step = "pausing";  
+        this.isUploadingVideo.value = false;  
+    }  
+  
+    /**  
+     * アップロードを再開します  
+     */  
+    resume() {  
+        // MinIOでは再開機能の実装が必要  
+        this.step = "uploading";  
+        this.isUploadingVideo.value = true;  
+    }  
 }
 
-/**
- * 動画カバー画像アップロード用の署名付きURLを取得します。アップロードは60秒に制限されています
- * @returns 動画カバー画像アップロード用の署名付きURLリクエストのレスポンス
- */
-export async function getVideoCoverUploadSignedUrl(): Promise<GetVideoCoverUploadSignedUrlResponseDto> {
-	return (await GET(`${VIDEO_API_URI}/cover/preUpload`, { credentials: "include" })) as GetVideoCoverUploadSignedUrlResponseDto;
+/**  
+ * MinIO用の動画カバー画像アップロード署名付きURLを取得します  
+ * @returns MinIO署名付きURLリクエストのレスポンス  
+ */  
+export async function getVideoCoverUploadSignedUrl(): Promise<GetVideoCoverUploadSignedUrlResponseDto> {  
+    return (await GET(`${VIDEO_API_URI}/cover/preUpload/minio`, { credentials: "include" })) as GetVideoCoverUploadSignedUrlResponseDto;  
+}  
+  
+/**  
+ * MinIO S3互換API経由で動画カバー画像をアップロードします  
+ * @param fileName - ファイル名  
+ * @param videoCoverBlobData - Blobでエンコードされた動画カバーファイル  
+ * @param signedUrl - MinIO署名付きURL  
+ * @returns boolean アップロード結果  
+ */  
+export async function uploadVideoCover(fileName: string, videoCoverBlobData: Blob, signedUrl: string): Promise<boolean> {  
+    try {  
+        const response = await fetch(signedUrl, {  
+            method: 'PUT',  
+            body: videoCoverBlobData,  
+            headers: {  
+                'Content-Type': videoCoverBlobData.type,  
+            },  
+        });  
+          
+        if (response.ok) {  
+            return true;  
+        } else {  
+            throw new Error(`Upload failed with status: ${response.status}`);  
+        }  
+    } catch (error) {  
+        console.error("動画カバーのアップロードに失敗しました。エラー情報：", error, { videoCoverBlobData, signedUrl });  
+        return false;  
+    }  
 }
 
-/**
- * 署名付きURL経由で動画カバー画像をアップロードします
- * @param fileName - ファイル名
- * @param videoCoverBlobData - Blobでエンコードされた動画カバーファイル
- * @param signedUrl - 署名付きURL
- * @returns boolean アップロード結果
- */
-export async function uploadVideoCover(fileName: string, videoCoverBlobData: Blob, signedUrl: string): Promise<boolean> {
-	try {
-		await uploadFile2CloudflareImages(fileName, signedUrl, videoCoverBlobData, 60000);
-		return true;
-	} catch (error) {
-		console.error("動画カバーのアップロードに失敗しました。エラー情報：", error, { videoCoverBlobData, signedUrl });
-		return false;
-	}
+  
+/**  
+ * MinIO用動画アップロードセッションを作成します  
+ * @param fileName ファイル名  
+ * @param fileSize ファイルサイズ  
+ * @returns アップロードセッション情報  
+ */  
+export async function createVideoUploadSession(fileName: string, fileSize: number): Promise<CreateVideoUploadSessionResponseDto> {  
+    return (await POST(`${VIDEO_API_URI}/upload/session`, {   
+        body: { fileName, fileSize },  
+        credentials: "include"   
+    })) as CreateVideoUploadSessionResponseDto;  
+}  
+  
+
+/**  
+ * MinIOFileUploaderクラスの修正版（セッション対応）  
+ */  
+export class MinIOFileUploader {  
+    step: "pending" | "created" | "uploading" | "pausing" | "success" | "error" = "pending";  
+    process: Promise<string>;  
+    isUploadingVideo: Ref<boolean>;  
+    private s3Client: S3Client;  
+    private uploadId?: string;  
+    private objectKey?: string;  
+    private parts: Array<{ ETag: string; PartNumber: number }> = [];  
+  
+    constructor(file: File, progress: Ref<number>, isUploadingVideo: Ref<boolean>) {  
+        if (!file) {  
+            this.step = "error";  
+            useToast(t.toast.upload_file_not_found, "error");  
+            throw new Error(t.toast.upload_file_not_found);  
+        }  
+          
+        this.isUploadingVideo = isUploadingVideo;  
+        this.s3Client = new S3Client({  
+            region: 'us-east-1',  
+            endpoint: environment.minioEndpoint,  
+            credentials: {  
+                accessKeyId: environment.minioAccessKey,  
+                secretAccessKey: environment.minioSecretKey,  
+            },  
+            forcePathStyle: true,  
+        });  
+  
+        this.process = this.uploadFile(file, progress);  
+    }  
+  
+    private async uploadFile(file: File, progress: Ref<number>): Promise<string> {  
+        try {  
+            // バックエンドでアップロードセッションを作成  
+            const sessionResult = await createVideoUploadSession(file.name, file.size);  
+              
+            if (!sessionResult.success || !sessionResult.uploadId || !sessionResult.objectKey) {  
+                throw new Error('アップロードセッションの作成に失敗しました');  
+            }  
+  
+            this.uploadId = sessionResult.uploadId;  
+            this.objectKey = sessionResult.objectKey;  
+            this.step = "created";  
+  
+            // ファイルを5MBチャンクに分割  
+            const chunkSize = 5 * 1024 * 1024; // 5MB  
+            const totalChunks = Math.ceil(file.size / chunkSize);  
+              
+            this.step = "uploading";  
+            this.isUploadingVideo.value = true;  
+  
+            // 各チャンクをアップロード  
+            for (let i = 0; i < totalChunks; i++) {  
+                const start = i * chunkSize;  
+                const end = Math.min(start + chunkSize, file.size);  
+                const chunk = file.slice(start, end);  
+  
+                const uploadCommand = new UploadPartCommand({  
+                    Bucket: sessionResult.bucketName,  
+                    Key: this.objectKey,  
+                    PartNumber: i + 1,  
+                    UploadId: this.uploadId,  
+                    Body: chunk,  
+                });  
+  
+                const uploadResponse = await this.s3Client.send(uploadCommand);  
+                this.parts.push({  
+                    ETag: uploadResponse.ETag!,  
+                    PartNumber: i + 1,  
+                });  
+  
+                // 進捗更新  
+                progress.value = ((i + 1) / totalChunks) * 100;  
+            }  
+  
+            // マルチパートアップロード完了  
+            const completeCommand = new CompleteMultipartUploadCommand({  
+                Bucket: sessionResult.bucketName,  
+                Key: this.objectKey,  
+                UploadId: this.uploadId,  
+                MultipartUpload: { Parts: this.parts },  
+            });  
+  
+            await this.s3Client.send(completeCommand);  
+            this.step = "success";  
+            this.isUploadingVideo.value = false;  
+              
+            return this.objectKey; // MinIOのオブジェクトキーを返す  
+        } catch (error) {  
+            console.error("ERROR", "Upload error:", error);  
+            this.step = "error";  
+            this.isUploadingVideo.value = false;  
+            throw error;  
+        }  
+    }  
+  
+    abort() {  
+        this.step = "pausing";  
+        this.isUploadingVideo.value = false;  
+    }  
+  
+    resume() {  
+        this.step = "uploading";  
+        this.isUploadingVideo.value = true;  
+    }  
 }
+
 
 /**
  * アップロードが完了した動画を提出します

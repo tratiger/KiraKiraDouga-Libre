@@ -50,6 +50,7 @@ import { adminGetUserRolesByUidController, adminUpdateUserRoleController, create
 import { getStgEnvBackEndSecretController } from '../controller/ConsoleSecretController.js'
 import { addNewUid2FeedGroupController, administratorApproveFeedGroupInfoChangeController, administratorDeleteFeedGroupController, createFeedGroupController, createOrEditFeedGroupInfoController, deleteFeedGroupController, followingUploaderController, getFeedContentController, getFeedGroupCoverUploadSignedUrlController, getFeedGroupListController, removeUidFromFeedGroupController, unfollowingUploaderController } from '../controller/FeedController.js'
 import { addRegexController, blockKeywordController, blockTagController, blockUserByUidController, getBlockListController, hideUserByUidController, removeRegexController, showUserByUidController, unblockKeywordController, unblockTagController, unblockUserByUidController } from '../controller/BlockController.js'
+import { videoStreamController } from '../controller/VideoStreamController.js';  
 
 const router = new Router()
 
@@ -58,7 +59,12 @@ const router = new Router()
 router.get('/', helloWorld) // テスト // DELETE ME
 router.get('/02/koa/hello', helloWorld) // テスト // DELETE ME
 
-
+//minio関連
+router.get('/video/cover/preUpload/minio', videoController.getVideoCoverUploadSignedUrl);  
+router.post('/video/upload/session', videoController.createVideoUploadSession);  
+router.get('/user/avatar/preUpload/minio', userController.getUserAvatarUploadSignedUrl);  
+router.get('/video/stream/:objectKey', videoStreamController.streamVideo);  
+router.get('/image/:objectKey', videoStreamController.serveImage);  
 
 
 
@@ -452,7 +458,7 @@ router.post('/video/search/tag', searchVideoByVideoTagIdController) // TAG IDで
 // 	"tagId": [1, 2]
 // }
 
-router.post('/video/tus', getVideoFileTusEndpointController) // TUSアップロードエンドポイントを取得
+//router.post('/video/tus', getVideoFileTusEndpointController) // TUSアップロードエンドポイントを取得
 // https://localhost:9999/video/tus
 // cookie: uid, token
 

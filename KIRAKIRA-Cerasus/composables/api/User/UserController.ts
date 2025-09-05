@@ -186,30 +186,41 @@ export async function userLogout(props: { appSettingsStore: AppSettingsStoreType
 	return logoutResult;
 }
 
-/**
- * ユーザーアバターの更新：ユーザーがアバターをアップロードするための署名付きURLを取得します。アップロードは60秒に制限されています
- * @returns ユーザーアバターアップロード用の署名付きURL取得リクエストのレスポンス
- */
-export const getUserAvatarUploadSignedUrl = async (): Promise<GetUserAvatarUploadSignedUrlResponseDto> => {
-	return await GET(`${USER_API_URI}/avatar/preUpload`, { credentials: "include" }) as GetUserAvatarUploadSignedUrlResponseDto;
-};
+/**  
+ * MinIO用のユーザーアバターアップロード署名付きURLを取得します  
+ * @returns MinIO署名付きURLリクエストのレスポンス  
+ */  
+export async function getUserAvatarUploadSignedUrl(): Promise<GetUserAvatarUploadSignedUrlResponseDto> {  
+    return (await GET(`${USER_API_URI}/avatar/preUpload/minio`, { credentials: "include" })) as GetUserAvatarUploadSignedUrlResponseDto;  
+}  
 
-/**
- * 署名付きURLに基づいてユーザーアバターをアップロードします
- * @param fileName - アバターのファイル名
- * @param avatarBlobData - Blobでエンコードされたユーザーアバターファイル
- * @param signedUrl - 署名付きURL
- * @returns アップロードに成功した場合はtrue、失敗した場合はfalseを返します
- */
-export const uploadUserAvatar = async (fileName: string, avatarBlobData: Blob, signedUrl: string): Promise<boolean> => {
-	try {
-		await uploadFile2CloudflareImages(fileName, signedUrl, avatarBlobData, 60000);
-		return true;
-	} catch (error) {
-		console.error("ERROR", "アバターのアップロードに失敗しました:", error, { avatarBlobData, signedUrl });
-		return false;
-	}
-};
+/**  
+ * MinIO S3互換API経由でユーザーアバターをアップロードします  
+ * @param fileName - ファイル名  
+ * @param avatarBlobData - Blobでエンコードされたアバターファイル  
+ * @param signedUrl - MinIO署名付きURL  
+ * @returns boolean アップロード結果  
+ */  
+export async function uploadUserAvatar(fileName: string, avatarBlobData: Blob, signedUrl: string): Promise<boolean> {  
+    try {  
+        const response = await fetch(signedUrl, {  
+            method: 'PUT',  
+            body: avatarBlobData,  
+            headers: {  
+                'Content-Type': avatarBlobData.type,  
+            },  
+        });  
+          
+        if (response.ok) {  
+            return true;  
+        } else {  
+            throw new Error(`Upload failed with status: ${response.status}`);  
+        }  
+    } catch (error) {  
+        console.error("ユーザーアバターのアップロードに失敗しました。エラー情報：", error, { avatarBlobData, signedUrl });  
+        return false;  
+    }  
+}
 
 /**
  * ユーザー設定を取得します。getUserSettingsRequestが渡され、cookie（uid、token）が提供されている場合は、getUserSettingsRequestのパラメータを使用します

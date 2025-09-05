@@ -19,8 +19,8 @@
 		return Number.isFinite(uid) ? `/user/${uid}` : props.to;
 	});
 
-	const provider = computed(() => props.avatar?.startsWith("blob:http") ? undefined : environment.cloudflareImageProvider);
-	const appSettings = useAppSettingsStore();
+    const provider = computed(() => props.avatar?.startsWith("blob:http") ? undefined : environment.minioImageProvider);  
+    const appSettings = useAppSettingsStore();  
 </script>
 
 <template>

@@ -25,11 +25,10 @@
 	"author": "KIRAKIRA Project Team",
 	"scripts": {
 		"dev-local": "cross-env pnpm run dev-local-stg",
-		"dev-local-stg": "cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",
-		"dev-local-prod": "cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-prod VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-yvgxn6arnuae3q89.cloudflarestream.com/ nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",
-		"dev-stg-demo": "cross-env VITE_BACKEND_URI=https://stg-rosales.kirafile.com VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",
-		"dev-live-demo": "cross-env VITE_BACKEND_URI=https://rosales.kirakira.moe VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-prod VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-yvgxn6arnuae3q89.cloudflarestream.com/ nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",
-		"build": "nuxt build",
+		"dev-local-stg": "cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_MINIO_IMAGES_PROVIDER=minio-stg VITE_MINIO_ENDPOINT=https://localhost:9000/ VITE_MINIO_ACCESS_KEY=minioadmin VITE_MINIO_SECRET_KEY=minioadmin VITE_MINIO_BUCKET=kirakira-videos nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",  
+		"dev-local-prod": "cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_MINIO_IMAGES_PROVIDER=minio-prod VITE_MINIO_ENDPOINT=https://localhost:9000/ VITE_MINIO_ACCESS_KEY=minioadmin VITE_MINIO_SECRET_KEY=minioadmin VITE_MINIO_BUCKET=kirakira-videos nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",  
+		"dev-stg-demo": "cross-env VITE_BACKEND_URI=https://stg-rosales.kirafile.com VITE_MINIO_IMAGES_PROVIDER=minio-stg VITE_MINIO_ENDPOINT=https://minio-stg.kirafile.com/ VITE_MINIO_ACCESS_KEY=your-access-key VITE_MINIO_SECRET_KEY=your-secret-key VITE_MINIO_BUCKET=kirakira-videos nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",  
+		"dev-live-demo": "cross-env VITE_BACKEND_URI=https://rosales.kirakira.moe VITE_MINIO_IMAGES_PROVIDER=minio-prod VITE_MINIO_ENDPOINT=https://minio.kirakira.moe/ VITE_MINIO_ACCESS_KEY=your-access-key VITE_MINIO_SECRET_KEY=your-secret-key VITE_MINIO_BUCKET=kirakira-videos nuxt dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key",		"build": "nuxt build",
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "node postinstall.js",
@@ -150,7 +149,9 @@
 		"vue-audio-visual": "^3.0.11",
 		"vue-cropper": "^1.1.4",
 		"vue-router-better-scroller": "^0.0.0",
-		"vue-virtual-scroller": "2.0.0-beta.8"
+		"vue-virtual-scroller": "2.0.0-beta.8",
+		"@aws-sdk/client-s3": "^3.450.0",  
+        "@aws-sdk/s3-request-presigner": "^3.450.0"  
 	},
 	"config": {
 		"commitizen": {

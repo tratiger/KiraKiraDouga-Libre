@@ -1,5 +1,5 @@
 import mongoose, { InferSchemaType, PipelineStage, ClientSession, startSession } from 'mongoose'
-import { createCloudflareImageUploadSignedUrl } from '../cloudflare/index.js'
+import { createMinIOImageUploadSignedUrl } from '../minio/index.js' 
 import { isInvalidEmail, sendMail } from '../common/EmailTool.js'
 import { comparePasswordSync, hashPasswordSync } from '../common/HashTool.js'
 import { isEmptyObject } from '../common/ObjectTool.js'
@@ -89,6 +89,9 @@ import { abortAndEndSession, commitAndEndSession, createAndStartSession } from '
 import { StorageClassAnalysisSchemaVersion } from '@aws-sdk/client-s3'
 import { FollowingSchema } from '../dbPool/schema/FeedSchema.js'
 import { checkBlockUserService, checkIsBlockedByOtherUserService } from './BlockService.js'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';  
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';  
+
 
 authenticator.options = { window: 1 } // TOTPに1ウィンドウの猶予を設定
 
@@ -1131,32 +1134,51 @@ export const getUserInfoByUidService = async (getUserInfoByUidRequest: GetUserIn
 	}
 }
 
-/**
- * ユーザーのアバターを更新し、ユーザーがアバターをアップロードするための署名付きURLを取得する。アップロード時間は60秒に制限される
- * @param uid ユーザーID
- * @param token ユーザートークン
- * @returns ユーザーがアバターをアップロードするための署名付きURLの結果
- */
-export const getUserAvatarUploadSignedUrlService = async (uid: number, token: string): Promise<GetUserAvatarUploadSignedUrlResponseDto> => {
-	// TODO 画像アップロードロジックは書き直す必要があります。現在、ユーザーが画像のアップロードに失敗しても、データベース内の古いアバターリンクが新しいアバターリンクに置き換えられてしまい、現在の画像は審査プロセスに追加されていません
-	try {
-		if (await checkUserToken(uid, token)) {
-			const now = new Date().getTime()
-			const fileName = `avatar-${uid}-${generateSecureRandomString(32)}-${now}`
-			const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
-			if (signedUrl && fileName) {
-				return { success: true, message: 'アバターのアップロードを開始する準備ができました', userAvatarUploadSignedUrl: signedUrl, userAvatarFilename: fileName }
-			} else {
-				// TODO 画像アップロードロジックは書き直す必要があります。現在、ユーザーが画像のアップロードに失敗しても、データベース内の古いアバターリンクが新しいアバターリンクに置き換えられてしまい、現在の画像は審査プロセスに追加されていません
-				return { success: false, message: 'アップロードに失敗しました、画像アップロードURLを生成できません。もう一度アバターをアップロードしてください' }
-			}
-		} else {
-			console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、不正なユーザーです', { uid })
-			return { success: false, message: 'アップロードに失敗しました、アップロード権限を取得できません' }
-		}
-	} catch (error) {
-		console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、エラーメッセージ', error, { uid })
-	}
+/**  
+ * ユーザーのアバターを更新し、ユーザーがアバターをアップロードするためのMinIO署名付きURLを取得する  
+ * @param uid ユーザーID  
+ * @param token ユーザートークン  
+ * @returns ユーザーがアバターをアップロードするためのMinIO署名付きURLの結果  
+ */  
+export const getUserAvatarUploadSignedUrlService = async (uid: number, token: string): Promise<GetUserAvatarUploadSignedUrlResponseDto> => {  
+    try {  
+        if (await checkUserToken(uid, token)) {  
+            const now = new Date().getTime()  
+            const fileName = `avatar-${uid}-${generateSecureRandomString(32)}-${now}`  
+              
+            // MinIO S3クライアントの設定  
+            const s3Client = new S3Client({  
+                region: 'us-east-1',  
+                endpoint: process.env.MINIO_ENDPOINT,  
+                credentials: {  
+                    accessKeyId: process.env.MINIO_ACCESS_KEY!,  
+                    secretAccessKey: process.env.MINIO_SECRET_KEY!,  
+                },  
+                forcePathStyle: true,  
+            });  
+  
+            // 署名付きURL生成  
+            const command = new PutObjectCommand({  
+                Bucket: process.env.MINIO_BUCKET || 'kirakira-avatars',  
+                Key: fileName,  
+                ContentType: 'image/*',  
+            });  
+  
+            const signedUrl = await createMinIOImageUploadSignedUrl(fileName, 660) // 10分間有効  
+  
+            if (signedUrl && fileName) {  
+                return { success: true, message: 'アバターのアップロードを開始する準備ができました', userAvatarUploadSignedUrl: signedUrl, userAvatarFilename: fileName }  
+            } else {  
+                return { success: false, message: 'アップロードに失敗しました、画像アップロードURLを生成できません。もう一度アバターをアップロードしてください' }  
+            }  
+        } else {  
+            console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、不正なユーザーです', { uid })  
+            return { success: false, message: 'アップロードに失敗しました、アップロード権限を取得できません' }  
+        }  
+    } catch (error) {  
+        console.error('ERROR', 'アップロード用の署名付きURLの取得に失敗しました、エラーメッセージ', error, { uid })  
+        return { success: false, message: 'アップロードに失敗しました、サーバーエラーが発生しました' }  
+    }  
 }
 
 /**

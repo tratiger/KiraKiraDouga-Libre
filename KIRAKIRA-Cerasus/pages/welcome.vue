@@ -69,32 +69,32 @@
 	/**
 	 * アバター変更イベント。サーバーに新しい画像を送信します。
 	 */
-	async function handleSubmitAvatarImage() {
-		try {
-			isUploadingUserAvatar.value = true;
-			const blobImageData = await cropper.value?.getCropBlobData();
-			if (blobImageData) {
-				const userAvatarUploadSignedUrlResult = await api.user.getUserAvatarUploadSignedUrl();
-				const userAvatarUploadSignedUrl = userAvatarUploadSignedUrlResult.userAvatarUploadSignedUrl;
-				const userAvatarUploadFilename = userAvatarUploadSignedUrlResult.userAvatarFilename;
-				if (userAvatarUploadSignedUrlResult.success && userAvatarUploadSignedUrl && userAvatarUploadFilename) {
-					const uploadResult = await api.user.uploadUserAvatar(userAvatarUploadFilename, blobImageData, userAvatarUploadSignedUrl);
-					if (uploadResult) {
-						avatarBlob.value = userAvatarUploadFilename;
-						isAvatarCropperOpened.value = false;
-						clearBlobUrl(); // メモリを解放
-					}
-					isUploadingUserAvatar.value = false;
-				}
-			} else {
-				useToast("トリミング後の画像を取得できません！", "error"); // TODO: 多言語
-				console.error("ERROR", "トリミング後の画像を取得できません");
-			}
-		} catch (error) {
-			useToast("アバターのアップロードに失敗しました！", "error"); // TODO: 多言語
-			console.error("ERROR", "ユーザーアバターのアップロード中にエラーが発生しました", error);
-			isUploadingUserAvatar.value = false;
-		}
+	async function handleSubmitAvatarImage() {  
+		try {  
+			isUploadingUserAvatar.value = true;  
+			const blobImageData = await cropper.value?.getCropBlobData();  
+			if (blobImageData) {  
+				const userAvatarUploadSignedUrlResult = await api.user.getUserAvatarUploadSignedUrl();  
+				const userAvatarUploadSignedUrl = userAvatarUploadSignedUrlResult.userAvatarUploadSignedUrl;  
+				const userAvatarUploadFilename = userAvatarUploadSignedUrlResult.userAvatarFilename;  
+				if (userAvatarUploadSignedUrlResult.success && userAvatarUploadSignedUrl && userAvatarUploadFilename) {  
+					const uploadResult = await api.user.uploadUserAvatar(userAvatarUploadFilename, blobImageData, userAvatarUploadSignedUrl);  
+					if (uploadResult) {  
+						avatarBlob.value = userAvatarUploadFilename;  
+						isAvatarCropperOpened.value = false;  
+						clearBlobUrl(); // メモリを解放  
+					}  
+					isUploadingUserAvatar.value = false;  
+				}  
+			} else {  
+				useToast("トリミング後の画像を取得できません！", "error");  
+				console.error("ERROR", "トリミング後の画像を取得できません");  
+			}  
+		} catch (error) {  
+			useToast("アバターのアップロードに失敗しました！", "error");  
+			console.error("ERROR", "ユーザーアバターのアップロード中にエラーが発生しました", error);  
+			isUploadingUserAvatar.value = false;  
+		}  
 	}
 
 	/**

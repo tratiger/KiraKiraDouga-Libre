@@ -254,3 +254,47 @@ export const approvePendingReviewVideoController = async (ctx: koaCtx, next: koa
 	await next()
 }
 
+/**  
+ * MinIO用動画カバー画像アップロード署名付きURL取得エンドポイント  
+ */  
+app.get('/video/cover/preUpload/minio', async (req: Request, res: Response) => {  
+    try {  
+        const uid = req.cookies?.uid ? Number(req.cookies.uid) : undefined;  
+        const token = req.cookies?.token;  
+  
+        if (!uid || !token) {  
+            return res.status(401).json({ success: false, message: 'ユーザー認証が必要です' });  
+        }  
+  
+        const result = await getVideoCoverUploadSignedUrlService(uid, token);  
+        res.json(result);  
+    } catch (error) {  
+        console.error('ERROR', 'MinIO動画カバー画像アップロード署名付きURL取得エラー', error);  
+        res.status(500).json({ success: false, message: 'サーバーエラーが発生しました' });  
+    }  
+});  
+  
+/**  
+ * MinIO用動画アップロードセッション作成エンドポイント  
+ */  
+app.post('/video/upload/session', async (req: Request, res: Response) => {  
+    try {  
+        const uid = req.cookies?.uid ? Number(req.cookies.uid) : undefined;  
+        const token = req.cookies?.token;  
+        const { fileName, fileSize } = req.body;  
+  
+        if (!uid || !token) {  
+            return res.status(401).json({ success: false, message: 'ユーザー認証が必要です' });  
+        }  
+  
+        if (!fileName || !fileSize) {  
+            return res.status(400).json({ success: false, message: 'ファイル名とファイルサイズが必要です' });  
+        }  
+  
+        const result = await createVideoUploadSessionService(uid, token, fileName, fileSize);  
+        res.json(result);  
+    } catch (error) {  
+        console.error('ERROR', 'MinIO動画アップロードセッション作成エラー', error);  
+        res.status(500).json({ success: false, message: 'サーバーエラーが発生しました' });  
+    }  
+});

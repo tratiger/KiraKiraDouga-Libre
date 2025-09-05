@@ -896,3 +896,24 @@ export const adminEditUserInfoController = async (ctx: koaCtx, next: koaNext) =>
 	ctx.body = await adminEditUserInfoService(editUserInfoRequest, adminUUID, adminToken)
 	await next()
 }
+
+
+/**  
+ * MinIO用ユーザーアバターアップロード署名付きURL取得エンドポイント  
+ */  
+app.get('/user/avatar/preUpload/minio', async (req: Request, res: Response) => {  
+    try {  
+        const uid = req.cookies?.uid ? Number(req.cookies.uid) : undefined;  
+        const token = req.cookies?.token;  
+  
+        if (!uid || !token) {  
+            return res.status(401).json({ success: false, message: 'ユーザー認証が必要です' });  
+        }  
+  
+        const result = await getUserAvatarUploadSignedUrlService(uid, token);  
+        res.json(result);  
+    } catch (error) {  
+        console.error('ERROR', 'MinIOユーザーアバターアップロード署名付きURL取得エラー', error);  
+        res.status(500).json({ success: false, message: 'サーバーエラーが発生しました' });  
+    }  
+});

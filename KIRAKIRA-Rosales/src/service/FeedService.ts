@@ -8,7 +8,7 @@ import { abortAndEndSession, commitAndEndSession, createAndStartSession } from "
 import { CheckUserExistsByUuidRequestDto } from "../controller/UserControllerDto.js";
 import { v4 as uuidV4 } from 'uuid'
 import { generateSecureRandomString } from "../common/RandomTool.js";
-import { createCloudflareImageUploadSignedUrl } from "../cloudflare/index.js";
+import { createMinIOImageUploadSignedUrl } from "../minio/index.js"; 
 import { VideoSchema } from "../dbPool/schema/VideoSchema.js";
 
 /**
@@ -511,34 +511,62 @@ export const deleteFeedGroupService = async (deleteFeedGroupRequest: DeleteFeedG
 	}
 }
 
-/**
- * フィードグループのカバー画像をアップロードするための署名付きURLを取得する
- * @param uuid ユーザーのUUID
- * @param token ユーザーのトークン
- * @returns GetFeedGroupCoverUploadSignedUrlResponseDto フィードグループのカバー画像をアップロードするための署名付きURLを取得するリクエストレスポンス
- */
-export const getFeedGroupCoverUploadSignedUrlService = async (uuid: string, token: string): Promise<GetFeedGroupCoverUploadSignedUrlResponseDto> => {
-	try {
-		if (!(await checkUserTokenByUuidService(uuid, token)).success) {
-			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました')
-			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
-		}
-		const now = new Date().getTime()
-		const fileName = `feed-group-cover-${uuid}-${generateSecureRandomString(32)}-${now}`
-		try {
-			const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
-			if (signedUrl) {
-				return { success: true, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
-			}
-		} catch (error) {
-			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
-			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました' }
-		}
-	} catch (error) {
-		console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました：', error)
-		return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました、原因不明' }
-	}
-}
+/**  
+ * MinIO用フィードグループカバー画像アップロード署名付きURLを取得する  
+ * @param uuid ユーザーのUUID  
+ * @param token ユーザーのトークン  
+ * @returns MinIO署名付きURLの結果  
+ */  
+export const getFeedGroupCoverUploadSignedUrlService = async (uuid: string, token: string): Promise<GetFeedGroupCoverUploadSignedUrlResponseDto> => {  
+    try {  
+        if (!(await checkUserTokenByUuidService(uuid, token)).success) {  
+            console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました');  
+            return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' };  
+        }  
+          
+        const now = new Date().getTime();  
+        const fileName = `feed-group-cover-${uuid}-${generateSecureRandomString(32)}-${now}`;  
+          
+        try {  
+            // MinIO S3クライアントの設定  
+            const s3Client = new S3Client({  
+                region: 'us-east-1',  
+                endpoint: process.env.MINIO_ENDPOINT,  
+                credentials: {  
+                    accessKeyId: process.env.MINIO_ACCESS_KEY!,  
+                    secretAccessKey: process.env.MINIO_SECRET_KEY!,  
+                },  
+                forcePathStyle: true,  
+            });  
+  
+            // 署名付きURL生成  
+            const command = new PutObjectCommand({  
+                Bucket: process.env.MINIO_BUCKET || 'kirakira-images',  
+                Key: fileName,  
+                ContentType: 'image/*',  
+            });  
+  
+            const signedUrl = await createMinIOImageUploadSignedUrl(fileName, 660) // 10分間有効  
+  
+            if (signedUrl) {  
+                return {   
+                    success: true,   
+                    message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に成功しました',   
+                    result: { fileName, signedUrl }   
+                };  
+            } else {  
+                return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、URLを生成できません' };  
+            }  
+        } catch (error) {  
+            console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました', error);  
+            return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました' };  
+        }  
+    } catch (error) {  
+        console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました：', error);  
+        return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得中にエラーが発生しました、原因不明' };  
+    }  
+};
+
 
 /**
  * フィードグループ情報を作成または更新する

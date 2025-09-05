@@ -1,5 +1,5 @@
 <script setup lang="ts">
-	import type { TusFileUploader } from "~/composables/api/Video/VideoController";
+	import type { MinIOFileUploader } from "~/composables/api/Video/VideoController";  
 
 	const props = defineProps<{
 		files: File[];
@@ -44,7 +44,7 @@
 	const hoveredTagContent = ref<[number, string]>(); // 鼠标 hover 的 TAG
 	const hideExceptMe = ref(false);
 	const hideTimeoutId = ref<Timeout>();
-	let uploader: TusFileUploader;
+	let uploader: MinIOFileUploader; 
 	const isUploadingVideo = ref(false);
 
 	/**
@@ -128,25 +128,32 @@
 		}
 	}
 
-	/**
-	 * TUS 上传视频文件
-	 * @param files - 文件列表。
-	 */
-	function tusUpload(files: File[]) {
-		if (!files || files.length === 0) {
-			useToast(t.toast.upload_file_not_found, "error");
-			return;
-		}
-
-		uploader = new api.video.TusFileUploader(files[0], uploadProgress, isUploadingVideo);
-		uploader.process?.then((videoId: string) => {
-			cloudflareVideoId.value = videoId;
-			useToast(t.toast.uploaded, "success");
-		}).catch((error: unknown) => {
-			useToast(t.toast.upload_failed, "error");
-			console.error("ERROR", "Upload Failed:", error);
-		});
-	}
+    /**  
+     * MinIO S3互換APIで動画ファイルをアップロード  
+     * @param files - ファイルリスト。  
+     */  
+    function minioUpload(files: File[]) {  
+        if (!files || files.length === 0) {  
+            useToast(t.toast.upload_file_not_found, "error");  
+            return;  
+        }  
+  
+        uploader = new api.video.MinIOFileUploader(files[0], uploadProgress, isUploadingVideo);  
+        uploader.process?.then((objectKey: string) => {  
+            cloudflareVideoId.value = objectKey; // MinIOオブジェクトキーを保存  
+            useToast(t.toast.uploaded, "success");  
+        }).catch((error: unknown) => {  
+            useToast(t.toast.upload_failed, "error");  
+            console.error("ERROR", "Upload Failed:", error);  
+        });  
+    }  
+  
+    /**  
+     * 組件加载后等待三秒开始上传视频文件  
+     */  
+    onMounted(() => setTimeout(() => {  
+        minioUpload(props.files); // tusUpload → minioUpload  
+    }, 3000));  
 
 	/**
 	 * 暂停 TUS 上传视频文件
