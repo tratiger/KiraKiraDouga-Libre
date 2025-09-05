@@ -70,8 +70,7 @@ flowchart TD
     %% 外部システム
     subgraph "外部システム"
         Backend["KIRAKIRA-Rosales バックエンド"]:::external
-        CloudflareImages["Cloudflare 画像"]:::external
-        CloudflareStream["Cloudflare ストリーミング"]:::external
+        MinIO["MinIO オブジェクトストレージ"]:::external
     end
 
     %% Connections between layers
@@ -80,8 +79,7 @@ flowchart TD
     Modules -->|"影響"| NuxtApp
     PluginsProviders -->|"ミドルウェア"| NuxtApp
     ComposablesStores -->|"API取得"| Backend
-    PluginsProviders -->|"統合"| CloudflareImages
-    PluginsProviders -->|"統合"| CloudflareStream
+    ComposablesStores -->|"統合"| MinIO
     UIComponents -->|"ディレクティブバインド"| PluginsProviders
     AssetsStyling -->|"装飾"| UIComponents
     Internationalization -->|"翻訳"| UIComponents
@@ -162,12 +160,6 @@ HTTPS をサポートする開発サーバーを起動し、**ローカル**の�
 pnpm dev-local
 ```
 
-> [!WARNING]\
-> ローカルバックエンドに接続していても、画像リソースファイルは公式のステージング環境のCloudflare Imagesサービスにリクエストされ、動画アップロード時には公式ステージング環境のCloudflare Streamサブドメインテンプレートが使用されます。ご自身のCloudflare ImagesおよびCloudflare Streamサービスを使用したい場合は、下記の「カスタム起動コマンド」セクションを参照してください。
-
-> [!WARNING]\
-> 本番環境へのアクセス権を持つ開発者は、`pnpm run dev-local-prod` コマンドを使用して、本番環境のCloudflare ImagesおよびCloudflare Streamサービスに接続することもできます。
-
 起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
 
 #### オンラインバックエンドと連携して実行
@@ -212,7 +204,7 @@ pnpm dev-live-demo
 典型的なカスタム起動コマンドは次のようになります：
 ```bash
 # 以下のコマンドは 'pnpm dev-local' と同等です
-pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
+pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_MINIO_PUBLIC_URL=http://localhost:9000/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
 ```
 
 起動後、このアドレスでアクセスできるはずです：https://localhost:3000/
@@ -222,14 +214,10 @@ pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PR
   クロスプラットフォームの環境変数を設定し、コマンドが異なるOS（WindowsやLinuxなど）で正常に実行されることを保証します。
 2. `VITE_BACKEND_URI=https://localhost:9999`\
   `VITE_BACKEND_URI` という名前の環境変数を注入します。その値はバックエンドAPIのURIである `https://localhost:9999` です。
-3. `VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg`\
-  `VITE_CLOUDFLARE_IMAGES_PROVIDER` という名前の環境変数を注入します。その値は `cloudflare-stg` です。\
-  これは、`cloudflare-stg` という名前の [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider) を使用することを意味します。\
-  NuxtImage Custom Provider の設定を変更する必要がある場合は、ルートディレクトリの `nuxt.config.ts` 内の `image.providers` セクションに移動してください。
-4. `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://custom...stream.com/`\
-  `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` という名前の環境変数を注入します。その値は `https://custom...stream.com/` です。\
-  この環境変数は、Cloudflare Stream サービスのカスタムサブドメインを指定します。
-5. `nuxi dev`\
+3. `VITE_MINIO_PUBLIC_URL=http://localhost:9000/`\
+  `VITE_MINIO_PUBLIC_URL` という名前の環境変数を注入します。その値は `http://localhost:9000/` です。\
+  この環境変数は、MinIOオブジェクトストレージサービスの公開アクセスURLを指定します。
+4. `nuxi dev`\
   Nuxt の開発サーバーを起動します。オプションのパラメータについては、[こちらの公式ドキュメント](https://nuxt.com/docs/api/commands/dev) を参照してください。
 6. `--host`\
   `--host` の後にパラメータが指定されていない場合、開発サーバーはすべてのホストをリッスンします。詳細は下記の「モバイルデバイスでのテストとプレビュー」セクションを参照してください。

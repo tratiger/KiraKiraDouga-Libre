@@ -36,6 +36,8 @@
 			if (value) closeLater();
 		},
 	});
+	const { getUrl: getMinioUrl } = useMinioUrl();
+	const avatarUrl = computed(() => getMinioUrl('images', selfUserInfoStore.userInfo.avatar));
 	const isChecking2FA = ref(false); // ユーザーが2FAを有効にしているか確認中
 	const isTryingLogin = ref(false); // ログイン試行中
 	const isTryingRegistration = ref(false);
@@ -766,7 +768,7 @@
 						<div class="line"></div>
 					</div>
 					<div class="avatar">
-						<NuxtImg v-if="selfUserInfoStore.userInfo.avatar" :provider="environment.cloudflareImageProvider" :src="selfUserInfoStore.userInfo.avatar" alt="avatar" />
+						<NuxtImg v-if="avatarUrl" :src="avatarUrl" alt="avatar" />
 						<Icon v-else name="person" />
 					</div>
 					<div ref="loginAnimationText" class="texts">

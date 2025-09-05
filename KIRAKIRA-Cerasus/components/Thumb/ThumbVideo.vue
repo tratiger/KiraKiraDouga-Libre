@@ -32,10 +32,12 @@
 		blank: () => useAppSettingsStore().isOpenVideoInNewTab,
 	});
 
+	const { getUrl: getMinioUrl } = useMinioUrl();
 	const watchedCount = computed(() => getCompactDecimal(props.watchedCount));
 	const duration = computed(() => props.duration ?? Duration.placeholder);
 	const link = computed(() => props.videoId !== undefined && props.videoId !== null ?
 		`/video/kv${props.videoId}` : props.link);
+	const imageUrl = computed(() => getMinioUrl('images', props.image));
 	const useRelativeDate = useAppSettingsStore().relativeDate;
 </script>
 
@@ -45,9 +47,8 @@
 			<div v-ripple class="card">
 				<div class="cover-wrapper">
 					<NuxtImg
-						v-if="image"
-						:provider="environment.cloudflareImageProvider"
-						:src="image"
+						v-if="imageUrl"
+						:src="imageUrl"
 						alt="cover"
 						class="cover"
 						:draggable="false"

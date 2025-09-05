@@ -19,16 +19,20 @@
 		return Number.isFinite(uid) ? `/user/${uid}` : props.to;
 	});
 
-	const provider = computed(() => props.avatar?.startsWith("blob:http") ? undefined : environment.cloudflareImageProvider);
+	const { getUrl: getMinioUrl } = useMinioUrl();
+	const avatarUrl = computed(() => {
+		if (!props.avatar) return undefined;
+		if (props.avatar.startsWith("blob:http")) return props.avatar;
+		return getMinioUrl('images', props.avatar);
+	});
 	const appSettings = useAppSettingsStore();
 </script>
 
 <template>
 	<Comp v-ripple="Boolean(userLink) || Boolean(hoverable)" :class="{ hoverable }">
 		<NuxtImg
-			v-if="avatar"
-			:provider
-			:src="avatar"
+			v-if="avatarUrl"
+			:src="avatarUrl"
 			alt="avatar"
 			draggable="false"
 			format="avif"

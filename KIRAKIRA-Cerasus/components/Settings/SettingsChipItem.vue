@@ -18,6 +18,8 @@
 		href?: string;
 	}>();
 
+	const { getUrl: getMinioUrl } = useMinioUrl();
+	const imageUrl = computed(() => getMinioUrl('images', props.image));
 	const isExtenalLink = computed(() => props.href?.includes(":/"));
 </script>
 
@@ -26,8 +28,7 @@
 		<div :class="{ pictorial: image || icon }">
 			<div v-if="image" class="image">
 				<NuxtImg
-					:src="image"
-					:provider="environment.cloudflareImageProvider"
+					:src="imageUrl"
 					alt="image"
 					draggable="false"
 					format="avif"

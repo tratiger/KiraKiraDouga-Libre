@@ -44,7 +44,23 @@ import {
 	requestSendForgotPasswordVerificationCodeController,
 } from '../controller/UserController.js'
 import { adminDeleteVideoCommentController, cancelVideoCommentDownvoteController, cancelVideoCommentUpvoteController, deleteSelfVideoCommentController, emitVideoCommentController, emitVideoCommentDownvoteController, emitVideoCommentUpvoteController, getVideoCommentListByKvidController } from '../controller/VideoCommentController.js'
-import { approvePendingReviewVideoController, checkVideoExistController, deleteVideoByKvidController, getPendingReviewVideoController, getThumbVideoController, getVideoByKvidController, getVideoByUidController, getVideoCoverUploadSignedUrlController, getVideoFileTusEndpointController, searchVideoByKeywordController, searchVideoByVideoTagIdController, updateVideoController } from '../controller/VideoController.js'
+import {
+	abortVideoUploadController,
+	approvePendingReviewVideoController,
+	checkVideoExistController,
+	completeVideoUploadController,
+	deleteVideoByKvidController,
+	getMultipartSignedUrlController,
+	getPendingReviewVideoController,
+	getThumbVideoController,
+	getVideoByKvidController,
+	getVideoByUidController,
+	getVideoCoverUploadSignedUrlController,
+	initiateVideoUploadController,
+	searchVideoByKeywordController,
+	searchVideoByVideoTagIdController,
+	updateVideoController,
+} from '../controller/VideoController.js'
 import { createVideoTagController, getVideoTagByTagIdController, searchVideoTagController } from '../controller/VideoTagController.js'
 import { adminGetUserRolesByUidController, adminUpdateUserRoleController, createRbacApiPathController, createRbacRoleController, deleteRbacApiPathController, deleteRbacRoleController, getRbacApiPathController, getRbacRoleController, updateApiPathPermissionsForRoleController } from '../controller/RbacController.js'
 import { getStgEnvBackEndSecretController } from '../controller/ConsoleSecretController.js'
@@ -452,8 +468,20 @@ router.post('/video/search/tag', searchVideoByVideoTagIdController) // TAG IDで
 // 	"tagId": [1, 2]
 // }
 
-router.post('/video/tus', getVideoFileTusEndpointController) // TUSアップロードエンドポイントを取得
-// https://localhost:9999/video/tus
+router.post('/video/upload/initiate', initiateVideoUploadController) // マルチパートアップロードを開始
+// https://localhost:9999/video/upload/initiate
+// cookie: uid, token
+
+router.post('/video/upload/part-url', getMultipartSignedUrlController) // パートアップロード用の署名付きURLを取得
+// https://localhost:9999/video/upload/part-url
+// cookie: uid, token
+
+router.post('/video/upload/complete', completeVideoUploadController) // マルチパートアップロードを完了
+// https://localhost:9999/video/upload/complete
+// cookie: uid, token
+
+router.post('/video/upload/abort', abortVideoUploadController) // マルチパートアップロードを中断
+// https://localhost:9999/video/upload/abort
 // cookie: uid, token
 
 router.get('/video/cover/preUpload', getVideoCoverUploadSignedUrlController) // 動画カバー画像アップロード用の署名付きURLを取得

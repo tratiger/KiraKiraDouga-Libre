@@ -237,13 +237,102 @@ export type SearchVideoByKeywordRequestDto = {
 export type SearchVideoByKeywordResponseDto = ThumbVideoResponseDto & {}
 
 /**
- * 動画ファイルTUSアップロードエンドポイント取得リクエストパラメータ
+ * マルチパートアップロード開始リクエスト
  */
-export type GetVideoFileTusEndpointRequestDto = {
-	/** 動画アップロードのチャンクサイズ。Cloudflareは256KiBの倍数のみサポート。最小5,242,880バイト、最大209,715,200バイト。推奨は52,428,800バイト */
-	uploadLength: number;
-	/** 動画メタデータ */
-	uploadMetadata: string;
+export type InitiateVideoUploadRequestDto = {
+	/** アップロードするファイル名 */
+	fileName: string;
+}
+
+/**
+ * マルチパートアップロード開始レスポンス
+ */
+export type InitiateVideoUploadResponseDto = {
+	/** リクエストが成功したか */
+	success: boolean;
+	/** 追加メッセージ */
+	message?: string;
+	/** 結果 */
+	result?: {
+		/** アップロードID */
+		uploadId: string;
+		/** オブジェクトキー */
+		objectKey: string;
+	};
+}
+
+/**
+ * パートアップロード用署名付きURL取得リクエスト
+ */
+export type GetMultipartSignedUrlRequestDto = {
+	/** オブジェクトキー */
+	objectKey: string;
+	/** アップロードID */
+	uploadId: string;
+	/** パート番号 */
+	partNumber: number;
+}
+
+/**
+ * パートアップロード用署名付きURL取得レスポンス
+ */
+export type GetMultipartSignedUrlResponseDto = {
+	/** リクエストが成功したか */
+	success: boolean;
+	/** 追加メッセージ */
+	message?: string;
+	/** 結果 */
+	result?: {
+		/** 署名付きURL */
+		signedUrl: string;
+	};
+}
+
+/**
+ * マルチパートアップロード完了リクエスト
+ */
+export type CompleteVideoUploadRequestDto = {
+	/** オブジェクトキー */
+	objectKey: string;
+	/** アップロードID */
+	uploadId: string;
+	/** アップロードされたパートの情報 */
+	parts: {
+		/** ETag */
+		ETag: string;
+		/** パート番号 */
+		PartNumber: number;
+	}[];
+}
+
+/**
+ * マルチパートアップロード完了レスポンス
+ */
+export type CompleteVideoUploadResponseDto = {
+	/** リクエストが成功したか */
+	success: boolean;
+	/** 追加メッセージ */
+	message?: string;
+}
+
+/**
+ * マルチパートアップロード中断リクエスト
+ */
+export type AbortVideoUploadRequestDto = {
+	/** オブジェクトキー */
+	objectKey: string;
+	/** アップロードID */
+	uploadId: string;
+}
+
+/**
+ * マルチパートアップロード中断レスポンス
+ */
+export type AbortVideoUploadResponseDto = {
+	/** リクエストが成功したか */
+	success: boolean;
+	/** 追加メッセージ */
+	message?: string;
 }
 
 /**

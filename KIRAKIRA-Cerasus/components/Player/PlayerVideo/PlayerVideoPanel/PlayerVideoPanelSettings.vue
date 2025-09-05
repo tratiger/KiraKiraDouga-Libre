@@ -8,6 +8,9 @@
 		settings: PlayerVideoSettings;
 	}>();
 
+	const { getUrl: getMinioUrl } = useMinioUrl();
+	const thumbnailUrl = computed(() => getMinioUrl('images', props.thumbnail));
+
 	type Filters = keyof PlayerVideoSettings["filter"] | "rotation90" | "rotation180" | "rotation270";
 
 	/* TODO: 多言語対応。 */
@@ -115,8 +118,7 @@
 								<template #image>
 									<NuxtImg
 										:style
-										:provider="environment.cloudflareImageProvider"
-										:src="thumbnail"
+										:src="thumbnailUrl"
 										:alt="`preview-${filter}`"
 										:draggable="false"
 										format="avif"

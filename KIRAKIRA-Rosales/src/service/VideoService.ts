@@ -1,11 +1,41 @@
 import { Client } from '@elastic/elasticsearch'
 import mongoose, { InferSchemaType, PipelineStage } from 'mongoose'
-import { createCloudflareImageUploadSignedUrl } from '../cloudflare/index.js'
 import { isEmptyObject } from '../common/ObjectTool.js'
 import { generateSecureRandomString } from '../common/RandomTool.js'
 import { CreateOrUpdateBrowsingHistoryRequestDto } from '../controller/BrowsingHistoryControllerDto.js'
-import { ApprovePendingReviewVideoRequestDto, ApprovePendingReviewVideoResponseDto, CheckVideoBlockedByKvidResponseDto, CheckVideoExistRequestDto, CheckVideoExistResponseDto, DeleteVideoRequestDto, DeleteVideoResponseDto, GetVideoByKvidRequestDto, GetVideoByKvidResponseDto, GetVideoByUidRequestDto, GetVideoByUidResponseDto, GetVideoCoverUploadSignedUrlResponseDto, GetVideoFileTusEndpointRequestDto, PendingReviewVideoResponseDto, SearchVideoByKeywordRequestDto, SearchVideoByKeywordResponseDto, SearchVideoByVideoTagIdRequestDto, SearchVideoByVideoTagIdResponseDto, ThumbVideoResponseDto, UploadVideoRequestDto, UploadVideoResponseDto, VideoPartDto } from '../controller/VideoControllerDto.js'
+import {
+	AbortVideoUploadRequestDto,
+	AbortVideoUploadResponseDto,
+	ApprovePendingReviewVideoRequestDto,
+	ApprovePendingReviewVideoResponseDto,
+	CheckVideoBlockedByKvidResponseDto,
+	CheckVideoExistRequestDto,
+	CheckVideoExistResponseDto,
+	CompleteVideoUploadRequestDto,
+	CompleteVideoUploadResponseDto,
+	DeleteVideoRequestDto,
+	DeleteVideoResponseDto,
+	GetMultipartSignedUrlRequestDto,
+	GetMultipartSignedUrlResponseDto,
+	GetVideoByKvidRequestDto,
+	GetVideoByKvidResponseDto,
+	GetVideoByUidRequestDto,
+	GetVideoByUidResponseDto,
+	GetVideoCoverUploadSignedUrlResponseDto,
+	InitiateVideoUploadRequestDto,
+	InitiateVideoUploadResponseDto,
+	PendingReviewVideoResponseDto,
+	SearchVideoByKeywordRequestDto,
+	SearchVideoByKeywordResponseDto,
+	SearchVideoByVideoTagIdRequestDto,
+	SearchVideoByVideoTagIdResponseDto,
+	ThumbVideoResponseDto,
+	UploadVideoRequestDto,
+	UploadVideoResponseDto,
+	VideoPartDto,
+} from '../controller/VideoControllerDto.js'
 import { DbPoolOptions, deleteDataFromMongoDB, findOneAndUpdateData4MongoDB, insertData2MongoDB, selectDataByAggregateFromMongoDB, selectDataFromMongoDB } from '../dbPool/DbClusterPool.js'
+import { abortMinioMultipartUpload, completeMinioMultipartUpload, createMinioMultipartUpload, createMinioPutSignedUrl, getMinioMultipartSignedUrl } from '../minio/index.js'
 import { OrderByType, QueryType, SelectType, UpdateType } from '../dbPool/DbClusterPoolTypes.js'
 import { UserInfoSchema } from '../dbPool/schema/UserSchema.js'
 import { RemovedVideoSchema, VideoSchema } from '../dbPool/schema/VideoSchema.js'
@@ -650,56 +680,135 @@ export const searchVideoByKeywordService = async (searchVideoByKeywordRequest: S
 }
 
 /**
- * 動画ファイルのTUSアップロードエンドポイントを取得
+ * MinIOのマルチパート動画アップロードを開始します。
  * @param uid ユーザーUID
  * @param token ユーザートークン
- * @param getVideoFileTusEndpointRequest 動画ファイルのTUSアップロードエンドポイントを取得するリクエストペイロード
- * @returns 動画ファイルのTUSアップロードエンドポイントアドレス
+ * @param initiateVideoUploadRequest リクエストペイロード
+ * @returns マルチパートアップロードの開始結果
  */
-export const getVideoFileTusEndpointService = async (uid: number, token: string, getVideoFileTusEndpointRequest: GetVideoFileTusEndpointRequestDto): Promise<string | undefined> => {
+export const initiateVideoUploadService = async (uid: number, token: string, initiateVideoUploadRequest: InitiateVideoUploadRequestDto): Promise<InitiateVideoUploadResponseDto> => {
 	try {
-		if ((await checkUserTokenService(uid, token)).success) {
-			const streamTusEndpointUrl = process.env.CF_STREAM_TUS_ENDPOINT_URL
-			const streamToken = process.env.CF_STREAM_TOKEN
-			const uploadLength = getVideoFileTusEndpointRequest.uploadLength
-			const uploadMetadata = getVideoFileTusEndpointRequest.uploadMetadata
+		if (!(await checkUserTokenService(uid, token)).success) {
+			return { success: false, message: 'ユーザー検証に失敗しました' }
+		}
+		const { fileName } = initiateVideoUploadRequest
+		const now = new Date().getTime()
+		const objectKey = `video-${uid}-${now}-${fileName}`
+		const bucketName = process.env.MINIO_VIDEO_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_VIDEO_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
 
-			if (!streamTusEndpointUrl && !streamToken) {
-				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、streamTusEndpointUrlとstreamTokenが空の可能性があります。環境変数の設定を確認してください（CF_STREAM_TUS_ENDPOINT_URL, CF_STREAM_TOKEN）')
-				return undefined
-			}
-			try {
-				const videoTusEndpointResponse = await fetch(streamTusEndpointUrl, {
-					method: 'POST',
-					headers: {
-						Authorization: `Bearer ${streamToken}`,
-						'Tus-Resumable': '1.0.0',
-						'Upload-Length': `${uploadLength}`,
-						'Upload-Metadata': uploadMetadata,
-					},
-				})
-				if (!videoTusEndpointResponse.ok) {
-					console.error('ERROR', `Cloudflare Stream TUSエンドポイントを作成できません、HTTPエラー！ステータス：${videoTusEndpointResponse.status}`)
-					return undefined
-				}
-				const videoTusEndpoint = videoTusEndpointResponse.headers.get('location')
-				if (videoTusEndpoint) {
-					return videoTusEndpoint
-				} else {
-					console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエスト結果が空です')
-					return undefined
-				}
-			} catch (error) {
-				console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、リクエストの送信に失敗しました', error?.response?.data)
-				return undefined
-			}
+		const uploadId = await createMinioMultipartUpload(bucketName, objectKey)
+
+		if (uploadId) {
+			return { success: true, message: 'マルチパートアップロードの開始に成功しました', result: { uploadId, objectKey } }
 		} else {
-			console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、ユーザー検証に失敗しました', { uid })
-			return undefined
+			return { success: false, message: 'マルチパートアップロードの開始に失敗しました' }
 		}
 	} catch (error) {
-		console.error('ERROR', 'Cloudflare Stream TUSエンドポイントを作成できません、不明なエラー：', error)
-		return undefined
+		console.error('ERROR', 'マルチパートアップロードの開始中に不明なエラーが発生しました:', error)
+		return { success: false, message: '不明なエラーが発生しました' }
+	}
+}
+
+/**
+ * MinIOのマルチパートアップロードのパート用の署名付きURLを取得します。
+ * @param uid ユーザーUID
+ * @param token ユーザートークン
+ * @param getMultipartSignedUrlRequest リクエストペイロード
+ * @returns 署名付きURL
+ */
+export const getMultipartSignedUrlService = async (uid: number, token: string, getMultipartSignedUrlRequest: GetMultipartSignedUrlRequestDto): Promise<GetMultipartSignedUrlResponseDto> => {
+	try {
+		if (!(await checkUserTokenService(uid, token)).success) {
+			return { success: false, message: 'ユーザー検証に失敗しました' }
+		}
+
+		const { objectKey, uploadId, partNumber } = getMultipartSignedUrlRequest
+		const bucketName = process.env.MINIO_VIDEO_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_VIDEO_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
+
+		const signedUrl = await getMinioMultipartSignedUrl(bucketName, objectKey, uploadId, partNumber)
+
+		if (signedUrl) {
+			return { success: true, message: '署名付きURLの取得に成功しました', result: { signedUrl } }
+		} else {
+			return { success: false, message: '署名付きURLの取得に失敗しました' }
+		}
+	} catch (error) {
+		console.error('ERROR', 'マルチパート署名付きURLの取得中に不明なエラーが発生しました:', error)
+		return { success: false, message: '不明なエラーが発生しました' }
+	}
+}
+
+/**
+ * MinIOのマルチパートアップロードを完了します。
+ * @param uid ユーザーUID
+ * @param token ユーザートークン
+ * @param completeVideoUploadRequest リクエストペイロード
+ * @returns アップロード完了の結果
+ */
+export const completeVideoUploadService = async (uid: number, token: string, completeVideoUploadRequest: CompleteVideoUploadRequestDto): Promise<CompleteVideoUploadResponseDto> => {
+	try {
+		if (!(await checkUserTokenService(uid, token)).success) {
+			return { success: false, message: 'ユーザー検証に失敗しました' }
+		}
+
+		const { objectKey, uploadId, parts } = completeVideoUploadRequest
+		const bucketName = process.env.MINIO_VIDEO_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_VIDEO_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
+
+		const success = await completeMinioMultipartUpload(bucketName, objectKey, uploadId, parts)
+
+		if (success) {
+			return { success: true, message: 'アップロードの完了に成功しました' }
+		} else {
+			return { success: false, message: 'アップロードの完了に失敗しました' }
+		}
+	} catch (error) {
+		console.error('ERROR', 'マルチパートアップロードの完了中に不明なエラーが発生しました:', error)
+		return { success: false, message: '不明なエラーが発生しました' }
+	}
+}
+
+/**
+ * MinIOのマルチパートアップロードを中断します。
+ * @param uid ユーザーUID
+ * @param token ユーザートークン
+ * @param abortVideoUploadRequest リクエストペイロード
+ * @returns アップロード中断の結果
+ */
+export const abortVideoUploadService = async (uid: number, token: string, abortVideoUploadRequest: AbortVideoUploadRequestDto): Promise<AbortVideoUploadResponseDto> => {
+	try {
+		if (!(await checkUserTokenService(uid, token)).success) {
+			return { success: false, message: 'ユーザー検証に失敗しました' }
+		}
+
+		const { objectKey, uploadId } = abortVideoUploadRequest
+		const bucketName = process.env.MINIO_VIDEO_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_VIDEO_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
+
+		const success = await abortMinioMultipartUpload(bucketName, objectKey, uploadId)
+
+		if (success) {
+			return { success: true, message: 'アップロードの中断に成功しました' }
+		} else {
+			return { success: false, message: 'アップロードの中断に失敗しました' }
+		}
+	} catch (error) {
+		console.error('ERROR', 'マルチパートアップロードの中断中に不明なエラーが発生しました:', error)
+		return { success: false, message: '不明なエラーが発生しました' }
 	}
 }
 
@@ -711,21 +820,25 @@ export const getVideoFileTusEndpointService = async (uid: number, token: string,
  */
 export const getVideoCoverUploadSignedUrlService = async (uid: number, token: string): Promise<GetVideoCoverUploadSignedUrlResponseDto> => {
 	try {
-		if ((await checkUserTokenService(uid, token)).success) {
-			const now = new Date().getTime()
-			const fileName = `video-cover-${uid}-${generateSecureRandomString(32)}-${now}`
-			try {
-				const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
-				if (signedUrl) {
-					return { success: true, message: '動画カバー画像のアップロード用署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
-				}
-			} catch (error) {
-				console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
-				return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました' }
-			}
-		} else {
-			console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました')
+		if (!(await checkUserTokenService(uid, token)).success) {
 			return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
+		}
+
+		const bucketName = process.env.MINIO_IMAGE_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_IMAGE_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
+
+		const now = new Date().getTime()
+		const objectKey = `video-cover-${uid}-${generateSecureRandomString(32)}-${now}`
+		const signedUrl = await createMinioPutSignedUrl(bucketName, objectKey, 600) // 10分間有効
+
+		if (signedUrl) {
+			return { success: true, message: '動画カバー画像のアップロード用署名付きURLの取得に成功しました', result: { fileName: objectKey, signedUrl } }
+		} else {
+			console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました')
+			return { success: false, message: '動画カバー画像のアップロード用署名付きURLの取得に失敗しました、リクエストに失敗しました' }
 		}
 	} catch (error) {
 		console.error('ERROR', '動画カバー画像のアップロード用署名付きURLの取得に失敗しました：', error)

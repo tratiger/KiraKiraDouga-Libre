@@ -1,12 +1,11 @@
 <script setup lang="ts">
-	import type { TusFileUploader } from "~/composables/api/Video/VideoController";
+	import type { MinioFileUploader } from "~/composables/api/Video/VideoController";
 
 	const props = defineProps<{
 		files: File[];
 	}>();
 
 	const BASE_THUMBNAIL_URL = "static/images/thumbnail.png"; // FIXME: Nuxt Image 的 src 为 undefined 或 "" 时会出错，见 https://github.com/nuxt/image/issues/1299
-	const BASE_THUMBNAIL_ID = environment.cloudflareImageProvider === "cloudflare-prod" ? "f907a7bd-3247-4415-1f5e-a67a5d3ea100" : "ea693cd1-5e58-4e07-1391-49c133e30300";
 
 	const copyright = ref<Copyright>("original"); // 视频版权
 	const title = ref(""); // 视频标题
@@ -16,20 +15,21 @@
 	const pushToFeed = ref(true); // 是否发布到动态
 	const ensureOriginal = ref(false); // 声明为原创
 	const thumbnailBlob = ref<string>(); // 封面图 Blob
-	const thumbnailUrl = ref<string>(BASE_THUMBNAIL_URL); // 封面图 Blob 或 URL
+	const thumbnailObjectKey = ref<string>(); // 封面图对象键
+	const { getUrl: getMinioUrl } = useMinioUrl();
+	const thumbnailDisplayUrl = computed(() => getMinioUrl('images', thumbnailObjectKey.value) ?? BASE_THUMBNAIL_URL);
 	const thumbnailInput = ref<HTMLInputElement>();
 	const currentLanguage = computed(getCurrentLocale); // 当前用户的语言
 	const tags = reactive<Map<VideoTag["tagId"], VideoTag>>(new Map()); // 视频标签
 	const displayTags = computed<DisplayVideoTag[]>(() => [...tags.values()].map(tagName => getDisplayVideoTagWithCurrentLanguage(currentLanguage.value, tagName))); // 用于显示的 TAG，相较于上方的 tags 数据结构更简单。
 	const description = ref(""); // 视频简介
 	const uploadProgress = ref(0); // 视频上传进度
-	const cloudflareVideoId = ref<string>(); // Cloudflare 视频 ID
+	const videoObjectKey = ref<string>(); // MinIO 视频对象键
 	const isCommitButtonLoading = ref<boolean>(false); // 投稿按钮是否在 loading 状态
 	const isCoverCropperOpen = ref<boolean>(false); // 封面图裁剪器是否开启状态
 	const isUploadingCover = ref<boolean>(false); // 是否正在上传封面图
 	const cropper = ref(); // 图片裁剪器对象
-	const isNetworkImage = computed(() => thumbnailUrl.value !== BASE_THUMBNAIL_URL); // 封面图是静态资源图片还是网图，即用户是否已经完成封面图上传
-	const provider = computed(() => isNetworkImage.value ? environment.cloudflareImageProvider : undefined); // 根据 isNetworkImage 的值判断是否使用 cloudflare 作为 Nuxt Image 提供商
+	const isNetworkImage = computed(() => !!thumbnailObjectKey.value); // 封面图是静态资源图片还是网图，即用户是否已经完成封面图上传
 	// 视频分类
 	const VIDEO_CATEGORY = new Map([
 		["anime", t.category.anime],
@@ -44,7 +44,7 @@
 	const hoveredTagContent = ref<[number, string]>(); // 鼠标 hover 的 TAG
 	const hideExceptMe = ref(false);
 	const hideTimeoutId = ref<Timeout>();
-	let uploader: TusFileUploader;
+	let uploader: MinioFileUploader;
 	const isUploadingVideo = ref(false);
 
 	/**
@@ -113,7 +113,7 @@
 		if (coverUploadSignedUrlResult?.success && filename && signedUrl) {
 			const uploadVideoCoverResult = await api.video.uploadVideoCover(filename, blobImageData, signedUrl);
 			if (uploadVideoCoverResult) {
-				thumbnailUrl.value = filename;
+				thumbnailObjectKey.value = filename;
 				isUploadingCover.value = false;
 				isCoverCropperOpen.value = false;
 				clearBlobUrl(); // 释放内存
@@ -129,44 +129,39 @@
 	}
 
 	/**
-	 * TUS 上传视频文件
+	 * MinIO 上传视频文件
 	 * @param files - 文件列表。
 	 */
-	function tusUpload(files: File[]) {
+	function startUpload(files: File[]) {
 		if (!files || files.length === 0) {
 			useToast(t.toast.upload_file_not_found, "error");
 			return;
 		}
 
-		uploader = new api.video.TusFileUploader(files[0], uploadProgress, isUploadingVideo);
-		uploader.process?.then((videoId: string) => {
-			cloudflareVideoId.value = videoId;
+		uploader = new api.video.MinioFileUploader(files[0], uploadProgress, isUploadingVideo);
+		uploader.process?.then((objectKey: string) => {
+			videoObjectKey.value = objectKey;
 			useToast(t.toast.uploaded, "success");
 		}).catch((error: unknown) => {
-			useToast(t.toast.upload_failed, "error");
-			console.error("ERROR", "Upload Failed:", error);
+			if ((error as Error).name !== 'AbortError') {
+				useToast(t.toast.upload_failed, "error");
+				console.error("ERROR", "Upload Failed:", error);
+			}
 		});
 	}
 
 	/**
-	 * 暂停 TUS 上传视频文件
+	 * 暂停上传视频文件
 	 */
 	function stopUploading() {
 		if (isUploadingVideo.value) uploader.abort();
 	}
 
 	/**
-	 * 继续 TUS 上传视频文件
-	 */
-	function continueUploading() {
-		if (!isUploadingVideo.value) uploader.resume();
-	}
-
-	/**
 	 * 提交视频（确认投稿）
 	 */
 	async function commitVideo() {
-		if (!cloudflareVideoId.value) {
+		if (!videoObjectKey.value) {
 			useToast(t.toast.upload_not_completed, "error");
 			return;
 		}
@@ -193,11 +188,11 @@
 				{
 					id: 0,
 					videoPartTitle: props.files[0].name,
-					link: getCloudflareMpdVideoUrl(cloudflareVideoId.value),
+					link: videoObjectKey.value,
 				},
 			],
 			title: title.value,
-			image: isNetworkImage.value ? thumbnailUrl.value : BASE_THUMBNAIL_ID, // 没上传封面时使用默认封面图 ID // TODO: 自动获取视频截图作为封面
+			image: thumbnailObjectKey.value || "", // 没上传封面时为空
 			uploaderId: uid,
 			duration: 300, // TODO: 视频时长
 			description: description.value,
@@ -220,6 +215,9 @@
 					showConfetti(); // 显示五彩纸屑。
 					navigate(`/video/kv${videoId}`);
 				}, 1000);
+			} else {
+				isCommitButtonLoading.value = false;
+				useToast(commitVideoResult.message || t.toast.upload_failed, "error");
 			}
 		} catch (error) {
 			isCommitButtonLoading.value = false;
@@ -290,7 +288,7 @@
 	 * 组件加载后等待三秒开始上传视频文件
 	 */
 	onMounted(() => setTimeout(() => {
-		tusUpload(props.files);
+		startUpload(props.files);
 	}, 3000));
 
 	const [onContentEnter, onContentLeave] = simpleAnimateSize("height", 500, eases.easeInOutSmooth);
@@ -325,9 +323,8 @@
 				<div v-ripple class="cover" @click="thumbnailInput?.click()">
 					<div class="mask">{{ t.select_cover }}</div>
 					<NuxtImg
-						v-if="thumbnailUrl"
-						:provider
-						:src="thumbnailUrl"
+						v-if="thumbnailDisplayUrl"
+						:src="thumbnailDisplayUrl"
 						:width="350"
 						alt="thumbnail"
 						:draggable="false"
@@ -367,8 +364,7 @@
 				<div class="progress-card toolbox-card">
 					<!-- 在这里上传和管理分 P -->
 					<ProgressBar class="progress" :value="uploadProgress" />
-					<SoftButton icon="pause" v-if="isUploadingVideo" :disabled="!!cloudflareVideoId" @click="stopUploading" />
-					<SoftButton icon="play" v-else :disabled="!!cloudflareVideoId" @click="continueUploading" />
+					<SoftButton icon="pause" v-if="isUploadingVideo" :disabled="!!videoObjectKey" @click="stopUploading" />
 				</div>
 
 				<div class="toolbox-card">
@@ -430,8 +426,8 @@
 					<div class="submit">
 						<Button
 							icon="send"
-							:disabled="!cloudflareVideoId || isCommitButtonLoading"
-							:loading="!cloudflareVideoId || isCommitButtonLoading"
+							:disabled="!videoObjectKey || isCommitButtonLoading"
+							:loading="!videoObjectKey || isCommitButtonLoading"
 							@click="commitVideo"
 						>
 							{{ t.upload }}

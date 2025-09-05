@@ -53,7 +53,7 @@
 			const videoData = videoDataResponse.video;
 			const videoPartData = videoData?.videoPart?.[0]; // TODO: パート分け動画に対応するため、ここで取得する動画は配列になります。現在は tạm thờiに配列の0番目を取得していますが、配列内のすべての動画を読み込み、IDでソートしてパートリストとしてレンダリングするように改善する必要があります。
 			if (videoData?.title && videoPartData?.link) {
-				videoSource.value = videoPartData.link;
+				videoSource.value = getMinioVideoUrl(videoPartData.link);
 				videoDetails.value = {
 					videoPart: videoData.videoPart ?? [],
 					title: videoData.title ?? "",

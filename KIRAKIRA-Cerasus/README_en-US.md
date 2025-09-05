@@ -70,8 +70,7 @@ flowchart TD
     %% External Systems
     subgraph "External Systems"
         Backend["KIRAKIRA-Rosales Backend"]:::external
-        CloudflareImages["Cloudflare Images"]:::external
-        CloudflareStream["Cloudflare Stream"]:::external
+        MinIO["MinIO Object Storage"]:::external
     end
 
     %% Connections between layers
@@ -80,8 +79,7 @@ flowchart TD
     Modules -->|"affects"| NuxtApp
     PluginsProviders -->|"middleware"| NuxtApp
     ComposablesStores -->|"fetch_API"| Backend
-    PluginsProviders -->|"integrates"| CloudflareImages
-    PluginsProviders -->|"integrates"| CloudflareStream
+    ComposablesStores -->|"Integrating with"| MinIO
     UIComponents -->|"directive_binding"| PluginsProviders
     AssetsStyling -->|"styles"| UIComponents
     Internationalization -->|"translations"| UIComponents
@@ -159,12 +157,6 @@ You can also run the following command in the root directory to start:
 ```bash
 pnpm dev-local
 ```
-> [!WARNING]\
-> Although you connect to the local backend, you will still request image asset files from the official staging environment Cloudflare Images service, and use the official staging environment Cloudflare Stream subdomain template when uploading videos. If you want to use your own Cloudflare Images and Cloudflare Stream services, please refer to the "Custom startup command" section below.
-
-> [!WARNING]\
-> For developers with access to the production environment, you can also use the `pnpm run dev-local-prod` command to connect to the production environment Cloudflare Images and Cloudflare Stream services.
-
 After it started, you should be able to preview at this URL: https://localhost:3000/
 
 
@@ -208,7 +200,7 @@ Sometimes, the preset quick start command does not meet your needs. In this case
 A typical custom startup command looks like:
 ```bash
 # The following command is equivalent to 'pnpm dev-local'
-pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://customer-o9xrvgnj5fidyfm4.cloudflarestream.com/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
+pnpm cross-env VITE_BACKEND_URI=https://localhost:9999 VITE_MINIO_PUBLIC_URL=http://localhost:9000/ nuxi dev --host --https --ssl-cert server/server.cer --ssl-key server/server.key
 ```
 
 After it started, you should be able to preview at this URL: https://localhost:3000/
@@ -218,14 +210,10 @@ Parsing of the above command:
 Set cross-platform environment variables to ensure that the command can be executed normally under different operating systems (such as Windows and Linux).
 2. `VITE_BACKEND_URI=https://localhost:9999`\
 Injects an environment variable named `VITE_BACKEND_URI` with the value `https://localhost:9999`, which is the URI of the backend API.
-3. `VITE_CLOUDFLARE_IMAGES_PROVIDER=cloudflare-stg`\
-Injects an environment variable named `VITE_CLOUDFLARE_IMAGES_PROVIDER` with the value `cloudflare-stg`. \
-This indicates that you are using the [NuxtImage Custom Provider](https://image.nuxt.com/advanced/custom-provider) named `cloudflare-stg`. \
-To modify the configuration of the NuxtImage Custom Provider, go to the `image.providers` section in file `nuxt.config.ts` in the root directory.
-4. `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN=https://custom...stream.com/`\
-Inject an environment variable named `VITE_CLOUDFLARE_STREAM_CUSTOMER_SUBDOMAIN` with a value of `https://custom...stream.com/`. \
-This environment variable specifies the custom subdomain of the Cloudflare Stream service.
-5. `nuxi dev`\
+3. `VITE_MINIO_PUBLIC_URL=http://localhost:9000/`\
+Injects an environment variable named `VITE_MINIO_PUBLIC_URL` with the value `http://localhost:9000/`. \
+This environment variable specifies the public access URL for the MinIO Object Storage service.
+4. `nuxi dev`\
 Start Nuxt development server. Optional parameters can refer to [this official document](https://nuxt.com/docs/api/commands/dev).
 6. `--host`\
 No parameters are specified after `--host`, indicating that the development server listens to all hosts. For details, please refer to the "Mobile Webpage Testing & Preview" section below

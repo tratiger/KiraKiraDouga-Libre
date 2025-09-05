@@ -1,6 +1,5 @@
-import * as tus from "tus-js-client";
 import { DELETE, GET, POST, uploadFile2CloudflareImages } from "../Common";
-import type { ApprovePendingReviewVideoRequestDto, ApprovePendingReviewVideoResponseDto, CheckVideoExistRequestDto, CheckVideoExistResponseDto, DeleteVideoRequestDto, DeleteVideoResponseDto, GetVideoByKvidRequestDto, GetVideoByKvidResponseDto, GetVideoByUidRequestDto, GetVideoByUidResponseDto, GetVideoCoverUploadSignedUrlResponseDto, PendingReviewVideoResponseDto, SearchVideoByVideoTagIdRequestDto, SearchVideoByVideoTagIdResponseDto, ThumbVideoResponseDto, UploadVideoRequestDto, UploadVideoResponseDto } from "./VideoControllerDto";
+import type { ApprovePendingReviewVideoRequestDto, ApprovePendingReviewVideoResponseDto, CheckVideoExistRequestDto, CheckVideoExistResponseDto, DeleteVideoRequestDto, DeleteVideoResponseDto, GetVideoByKvidRequestDto, GetVideoByKvidResponseDto, GetVideoByUidRequestDto, GetVideoByUidResponseDto, GetVideoCoverUploadSignedUrlResponseDto, PendingReviewVideoResponseDto, SearchVideoByVideoTagIdRequestDto, SearchVideoByVideoTagIdResponseDto, ThumbVideoResponseDto, UploadVideoRequestDto, UploadVideoResponseDto, InitiateVideoUploadRequestDto, InitiateVideoUploadResponseDto, GetMultipartSignedUrlRequestDto, GetMultipartSignedUrlResponseDto, CompleteVideoUploadRequestDto, CompleteVideoUploadResponseDto, AbortVideoUploadRequestDto, AbortVideoUploadResponseDto } from "./VideoControllerDto";
 
 const BACK_END_URI = environment.backendUri;
 const VIDEO_API_URI = `${BACK_END_URI}video`;
@@ -106,115 +105,167 @@ export const searchVideoByTagIds = async (searchVideoByVideoTagIdRequest: Search
 };
 
 /**
- * TUSでファイルをアップロードします
+ * MinIOにファイルをマルチパートアップロードします
  */
-export class TusFileUploader {
-	step: "pending" | "created" | "uploading" | "pausing" | "success" | "error" = "pending";
+export class MinioFileUploader {
+	step: "pending" | "initiating" | "uploading" | "completing" | "success" | "error" | "aborting" = "pending";
 	process: Promise<string>;
-	uploading?: tus.Upload;
 	isUploadingVideo: Ref<boolean>;
+	private file: File;
+	private progress: Ref<number>;
+	private uploadId?: string;
+	private objectKey?: string;
+	private abortController: AbortController;
 
-	/**
-	 * TUSでファイルをアップロードします
-	 * @param file - ファイル
-	 * @param progress - 進捗（Vueリアクティブ状態）
-	 * @param isUploadingVideo - 動画をアップロード中かどうか（Vueリアクティブ状態）
-	 */
 	constructor(file: File, progress: Ref<number>, isUploadingVideo: Ref<boolean>) {
 		if (!file) {
 			this.step = "error";
 			useToast(t.toast.upload_file_not_found, "error");
 			throw new Error(t.toast.upload_file_not_found);
 		}
+		this.file = file;
+		this.progress = progress;
 		this.isUploadingVideo = isUploadingVideo;
-		this.process = new Promise<string>((resolve, reject) => {
-			let videoId = "";
-			// Create a new tus upload
-			const uploader = new tus.Upload(file, {
-				endpoint: `${VIDEO_API_URI}/tus`,
-				onBeforeRequest(req) {
-					const url = req.getURL();
-					if (url?.includes(VIDEO_API_URI)) { // バックエンドAPIにアップロード先のURLをリクエストする場合にのみ、クロスオリジンでのcookie送信を許可します。
-						const xhr = req.getUnderlyingObject();
-						xhr.withCredentials = true;
-					}
-				},
-				retryDelays: [0, 3000, 5000, 10000, 20000], // リトライタイムアウト
-				chunkSize: 52428800, // 動画チャンクサイズ
-				storeFingerprintForResuming: true, // アップロード再開用のキーを保存 // WARN: 通常実行時はTrueにすべきです
-				removeFingerprintOnSuccess: true, // アップロード成功後に再開用のキーを削除
-				metadata: {
-					name: file.name,
-					maxDurationSeconds: "1800", // 最大動画長、1800秒（30分）
-					expiry: getCloudflareRFC3339ExpiryDateTime(3600), // 最大アップロード時間、3600秒（1時間）
-				},
-				onError: error => {
-					console.error("ERROR", "Upload error:", error);
-					this.step = "error";
-					reject(error);
-				},
-				onProgress: (bytesUploaded, bytesTotal) => {
-					const percentage = bytesUploaded / bytesTotal * 100;
-					progress.value = percentage;
-					console.info(bytesUploaded, bytesTotal, percentage.toFixed(2) + "%"); // useless
-				},
-				onSuccess: () => {
-					console.info("Video upload success");
-					if (videoId) {
-						this.step = "success";
-						resolve(videoId);
-					} else
-						reject(new Error("Can not find the video ID"));
-				},
-				onAfterResponse: (req, res) => {
-					if (!req.getURL().includes(VIDEO_API_URI)) {
-						const headerVideoId = res?.getHeader("stream-media-id");
-						if (headerVideoId)
-							videoId = headerVideoId;
-					}
-				},
-			});
-			this.uploading = uploader;
-			this.step = "created";
-			// Check if there are any previous uploads to continue.
-			uploader.findPreviousUploads().then(previousUploads => {
-				// Found previous uploads so we select the first one.
-				if (previousUploads.length > 0)
-					uploader.resumeFromPreviousUpload(previousUploads[0]);
-
-				// Start the upload
-				uploader.start();
-				this.step = "uploading";
-				isUploadingVideo.value = true;
-			});
-		});
+		this.abortController = new AbortController();
+		this.process = this.start();
 	}
 
-	/**
-	 * TUSアップロードを一時停止します
-	 */
-	abort() {
-		if (this.uploading)
-			if (this.step === "uploading") {
-				this.uploading.abort();
-				this.step = "pausing";
+	private async start(): Promise<string> {
+		try {
+			this.step = "initiating";
+			this.isUploadingVideo.value = true;
+
+			// 1. マルチパートアップロードを開始
+			const initiateResult = await initiateVideoUpload({ fileName: this.file.name });
+			if (!initiateResult.success || !initiateResult.result) {
+				throw new Error(initiateResult.message || "アップロードの開始に失敗しました。");
+			}
+			this.uploadId = initiateResult.result.uploadId;
+			this.objectKey = initiateResult.result.objectKey;
+
+			// 2. ファイルをチャンクに分割してアップロード
+			this.step = "uploading";
+			const uploadedParts = await this.uploadParts();
+
+			// 3. アップロードを完了
+			this.step = "completing";
+			const completeResult = await completeVideoUpload({
+				objectKey: this.objectKey,
+				uploadId: this.uploadId,
+				parts: uploadedParts,
+			});
+			if (!completeResult.success) {
+				throw new Error(completeResult.message || "アップロードの完了に失敗しました。");
+			}
+
+			this.step = "success";
+			this.isUploadingVideo.value = false;
+			this.progress.value = 100;
+			return this.objectKey; // 成功したらオブジェクトキーを返す
+		} catch (error: any) {
+			if (error.name === 'AbortError') {
+				console.info("Upload aborted by user.");
+				this.step = "error";
+			} else {
+				console.error("ERROR", "Upload failed:", error);
+				this.step = "error";
 				this.isUploadingVideo.value = false;
-			} else
-				console.error(`Upload pause failed, Pausing can only work when in 'uploading' step, but you are in '${this.step}' step.`);
+				// エラーが発生した場合、中断処理を試みる
+				if (this.uploadId && this.objectKey) {
+					await this.abort();
+				}
+			}
+			throw error;
+		}
+	}
+
+	private async uploadParts(): Promise<{ ETag: string; PartNumber: number }[]> {
+		const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB
+		const totalChunks = Math.ceil(this.file.size / CHUNK_SIZE);
+		const uploadedParts: { ETag: string; PartNumber: number }[] = [];
+		let uploadedSize = 0;
+
+		for (let partNumber = 1; partNumber <= totalChunks; partNumber++) {
+			if (this.abortController.signal.aborted) throw new Error("Upload aborted");
+
+			const start = (partNumber - 1) * CHUNK_SIZE;
+			const end = Math.min(start + CHUNK_SIZE, this.file.size);
+			const chunk = this.file.slice(start, end);
+
+			const urlResult = await getMultipartSignedUrl({
+				objectKey: this.objectKey!,
+				uploadId: this.uploadId!,
+				partNumber: partNumber,
+			});
+
+			if (!urlResult.success || !urlResult.result) {
+				throw new Error(`パート${partNumber}のURL取得に失敗しました: ${urlResult.message}`);
+			}
+
+			const signedUrl = urlResult.result.signedUrl;
+			const response = await fetch(signedUrl, {
+				method: 'PUT',
+				body: chunk,
+				signal: this.abortController.signal,
+			});
+
+			if (!response.ok) {
+				throw new Error(`パート${partNumber}のアップロードに失敗しました。ステータス: ${response.status}`);
+			}
+
+			const etag = response.headers.get('ETag');
+			if (!etag) {
+				throw new Error(`パート${partNumber}のETagが取得できませんでした。`);
+			}
+
+			uploadedParts.push({ ETag: etag.replace(/"/g, ''), PartNumber: partNumber });
+			uploadedSize += chunk.size;
+			this.progress.value = (uploadedSize / this.file.size) * 100;
+		}
+
+		return uploadedParts;
 	}
 
 	/**
-	 * TUSアップロードを再開します
+	 * アップロードを中断します
 	 */
-	resume() {
-		if (this.uploading)
-			if (this.step === "pausing") {
-				this.uploading.start();
-				this.step = "uploading";
-				this.isUploadingVideo.value = true;
-			} else
-				console.error(`Upload resume failed, Uploading can only work when in 'pausing' step, but you are in '${this.step}' step.`);
+	async abort() {
+		this.abortController.abort();
+		this.step = "aborting";
+		this.isUploadingVideo.value = false;
+		if (this.uploadId && this.objectKey) {
+			await abortVideoUpload({ uploadId: this.uploadId, objectKey: this.objectKey });
+			console.info("Abort request sent to server.");
+		}
 	}
+}
+
+/**
+ * マルチパートアップロードを開始
+ */
+export async function initiateVideoUpload(initiateVideoUploadRequest: InitiateVideoUploadRequestDto): Promise<InitiateVideoUploadResponseDto> {
+	return await POST(`${VIDEO_API_URI}/upload/initiate`, initiateVideoUploadRequest, { credentials: "include" }) as InitiateVideoUploadResponseDto;
+}
+
+/**
+ * パートアップロード用の署名付きURLを取得
+ */
+export async function getMultipartSignedUrl(getMultipartSignedUrlRequest: GetMultipartSignedUrlRequestDto): Promise<GetMultipartSignedUrlResponseDto> {
+	return await POST(`${VIDEO_API_URI}/upload/part-url`, getMultipartSignedUrlRequest, { credentials: "include" }) as GetMultipartSignedUrlResponseDto;
+}
+
+/**
+ * マルチパートアップロードを完了
+ */
+export async function completeVideoUpload(completeVideoUploadRequest: CompleteVideoUploadRequestDto): Promise<CompleteVideoUploadResponseDto> {
+	return await POST(`${VIDEO_API_URI}/upload/complete`, completeVideoUploadRequest, { credentials: "include" }) as CompleteVideoUploadResponseDto;
+}
+
+/**
+ * マルチパートアップロードを中断
+ */
+export async function abortVideoUpload(abortVideoUploadRequest: AbortVideoUploadRequestDto): Promise<AbortVideoUploadResponseDto> {
+	return await POST(`${VIDEO_API_URI}/upload/abort`, abortVideoUploadRequest, { credentials: "include" }) as AbortVideoUploadResponseDto;
 }
 
 /**
@@ -234,7 +285,14 @@ export async function getVideoCoverUploadSignedUrl(): Promise<GetVideoCoverUploa
  */
 export async function uploadVideoCover(fileName: string, videoCoverBlobData: Blob, signedUrl: string): Promise<boolean> {
 	try {
-		await uploadFile2CloudflareImages(fileName, signedUrl, videoCoverBlobData, 60000);
+		// MinIOへのアップロードはPUTリクエストを使用します
+		await fetch(signedUrl, {
+			method: 'PUT',
+			body: videoCoverBlobData,
+			headers: {
+				'Content-Type': videoCoverBlobData.type,
+			},
+		});
 		return true;
 	} catch (error) {
 		console.error("動画カバーのアップロードに失敗しました。エラー情報：", error, { videoCoverBlobData, signedUrl });

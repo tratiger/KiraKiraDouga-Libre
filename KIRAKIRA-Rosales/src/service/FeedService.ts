@@ -8,7 +8,7 @@ import { abortAndEndSession, commitAndEndSession, createAndStartSession } from "
 import { CheckUserExistsByUuidRequestDto } from "../controller/UserControllerDto.js";
 import { v4 as uuidV4 } from 'uuid'
 import { generateSecureRandomString } from "../common/RandomTool.js";
-import { createCloudflareImageUploadSignedUrl } from "../cloudflare/index.js";
+import { createMinioPutSignedUrl } from "../minio/index.js";
 import { VideoSchema } from "../dbPool/schema/VideoSchema.js";
 
 /**
@@ -524,14 +524,18 @@ export const getFeedGroupCoverUploadSignedUrlService = async (uuid: string, toke
 			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、ユーザー検証に失敗しました' }
 		}
 		const now = new Date().getTime()
-		const fileName = `feed-group-cover-${uuid}-${generateSecureRandomString(32)}-${now}`
-		try {
-			const signedUrl = await createCloudflareImageUploadSignedUrl(fileName, 660)
-			if (signedUrl) {
-				return { success: true, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に成功しました', result: { fileName, signedUrl } }
-			}
-		} catch (error) {
-			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました', error)
+		const bucketName = process.env.MINIO_IMAGE_BUCKET
+		if (!bucketName) {
+			console.error('ERROR', 'MINIO_IMAGE_BUCKETが設定されていません。')
+			return { success: false, message: 'サーバー設定エラー' }
+		}
+		const objectKey = `feed-group-cover-${uuid}-${generateSecureRandomString(32)}-${now}`
+		const signedUrl = await createMinioPutSignedUrl(bucketName, objectKey, 600)
+
+		if (signedUrl) {
+			return { success: true, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に成功しました', result: { fileName: objectKey, signedUrl } }
+		} else {
+			console.error('ERROR', 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました')
 			return { success: false, message: 'フィードグループのカバー画像をアップロードするための署名付きURLの取得に失敗しました、リクエストに失敗しました' }
 		}
 	} catch (error) {

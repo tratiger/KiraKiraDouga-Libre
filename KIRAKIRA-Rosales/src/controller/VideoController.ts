@@ -1,7 +1,36 @@
 import { isPassRbacCheck } from '../service/RbacService.js'
-import { approvePendingReviewVideoService, checkVideoExistByKvidService, deleteVideoByKvidService, getPendingReviewVideoService, getThumbVideoService, getVideoByKvidService, getVideoByUidRequestService, getVideoCoverUploadSignedUrlService, getVideoFileTusEndpointService, searchVideoByKeywordService, searchVideoByVideoTagIdService, updateVideoService } from '../service/VideoService.js'
+import {
+	abortVideoUploadService,
+	approvePendingReviewVideoService,
+	checkVideoExistByKvidService,
+	completeVideoUploadService,
+	deleteVideoByKvidService,
+	getMultipartSignedUrlService,
+	getPendingReviewVideoService,
+	getThumbVideoService,
+	getVideoByKvidService,
+	getVideoByUidRequestService,
+	getVideoCoverUploadSignedUrlService,
+	initiateVideoUploadService,
+	searchVideoByKeywordService,
+	searchVideoByVideoTagIdService,
+	updateVideoService,
+} from '../service/VideoService.js'
 import { koaCtx, koaNext } from '../type/koaTypes.js'
-import { ApprovePendingReviewVideoRequestDto, CheckVideoExistRequestDto, DeleteVideoRequestDto, GetVideoByKvidRequestDto, GetVideoByUidRequestDto, GetVideoFileTusEndpointRequestDto, SearchVideoByKeywordRequestDto, SearchVideoByVideoTagIdRequestDto, UploadVideoRequestDto } from './VideoControllerDto.js'
+import {
+	AbortVideoUploadRequestDto,
+	ApprovePendingReviewVideoRequestDto,
+	CheckVideoExistRequestDto,
+	CompleteVideoUploadRequestDto,
+	DeleteVideoRequestDto,
+	GetMultipartSignedUrlRequestDto,
+	GetVideoByKvidRequestDto,
+	GetVideoByUidRequestDto,
+	InitiateVideoUploadRequestDto,
+	SearchVideoByKeywordRequestDto,
+	SearchVideoByVideoTagIdRequestDto,
+	UploadVideoRequestDto,
+} from './VideoControllerDto.js'
 
 /**
  * 動画をアップロード
@@ -125,36 +154,97 @@ export const searchVideoByKeywordController = async (ctx: koaCtx, next: koaNext)
 }
 
 /**
- * 動画ファイルTUSアップロードエンドポイントを取得
+ * マルチパートアップロードを開始
  * @param ctx context
  * @param next context
- * @returns 取得した動画情報
  */
-export const getVideoFileTusEndpointController = async (ctx: koaCtx, next: koaNext) => {
+export const initiateVideoUploadController = async (ctx: koaCtx, next: koaNext) => {
 	const uid = parseInt(ctx.cookies.get('uid'), 10)
 	const token = ctx.cookies.get('token')
 
-	// RBAC 権限検証
 	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
 		return
 	}
 
-	const getVideoFileTusEndpointRequest: GetVideoFileTusEndpointRequestDto = {
-		uploadLength: parseInt(ctx.get('Upload-Length'), 10),
-		uploadMetadata: ctx.get('Upload-Metadata') || '',
+	const data = ctx.request.body as Partial<InitiateVideoUploadRequestDto>
+	const request: InitiateVideoUploadRequestDto = {
+		fileName: data.fileName || '',
 	}
 
-	const destination = await getVideoFileTusEndpointService(uid, token, getVideoFileTusEndpointRequest)
-	ctx.set({
-		'Access-Control-Expose-Headers': 'Location',
-		'Access-Control-Allow-Headers': '*',
-		'Access-Control-Allow-Origin': '*',
-		Location: destination,
-	})
-	ctx.body = destination ? 'true' : 'false'
+	ctx.body = await initiateVideoUploadService(uid, token, request)
 	await next()
 }
 
+/**
+ * マルチパートアップロードのパートURLを取得
+ * @param ctx context
+ * @param next context
+ */
+export const getMultipartSignedUrlController = async (ctx: koaCtx, next: koaNext) => {
+	const uid = parseInt(ctx.cookies.get('uid'), 10)
+	const token = ctx.cookies.get('token')
+
+	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
+		return
+	}
+
+	const data = ctx.request.body as Partial<GetMultipartSignedUrlRequestDto>
+	const request: GetMultipartSignedUrlRequestDto = {
+		objectKey: data.objectKey || '',
+		uploadId: data.uploadId || '',
+		partNumber: data.partNumber || -1,
+	}
+
+	ctx.body = await getMultipartSignedUrlService(uid, token, request)
+	await next()
+}
+
+/**
+ * マルチパートアップロードを完了
+ * @param ctx context
+ * @param next context
+ */
+export const completeVideoUploadController = async (ctx: koaCtx, next: koaNext) => {
+	const uid = parseInt(ctx.cookies.get('uid'), 10)
+	const token = ctx.cookies.get('token')
+
+	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
+		return
+	}
+
+	const data = ctx.request.body as Partial<CompleteVideoUploadRequestDto>
+	const request: CompleteVideoUploadRequestDto = {
+		objectKey: data.objectKey || '',
+		uploadId: data.uploadId || '',
+		parts: data.parts || [],
+	}
+
+	ctx.body = await completeVideoUploadService(uid, token, request)
+	await next()
+}
+
+/**
+ * マルチパートアップロードを中断
+ * @param ctx context
+ * @param next context
+ */
+export const abortVideoUploadController = async (ctx: koaCtx, next: koaNext) => {
+	const uid = parseInt(ctx.cookies.get('uid'), 10)
+	const token = ctx.cookies.get('token')
+
+	if (!await isPassRbacCheck({ uid, apiPath: ctx.path }, ctx)) {
+		return
+	}
+
+	const data = ctx.request.body as Partial<AbortVideoUploadRequestDto>
+	const request: AbortVideoUploadRequestDto = {
+		objectKey: data.objectKey || '',
+		uploadId: data.uploadId || '',
+	}
+
+	ctx.body = await abortVideoUploadService(uid, token, request)
+	await next()
+}
 
 /**
  * 動画カバー画像アップロード用署名付きURLを取得

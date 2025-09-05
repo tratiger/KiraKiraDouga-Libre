@@ -224,27 +224,7 @@ export default defineNuxtConfig({
 	},
 
 	image: {
-		format: ["avif", "webp"], // <NuxtImg>にのみ適用され、<NuxtImg>には無効です。
-		providers: {
-			cloudflareProd: {
-				name: "cloudflare-prod", // optional value to overrider provider name
-				provider: "./providers/nuxt-image/cloudflare-images.ts", // Path to custom provider
-				options: {
-					// ... provider options
-					baseURL: "https://kirafile.com",
-					accountHash: "Gyz90amG54C4b_dtJiRpYg",
-				},
-			},
-			cloudflareStg: {
-				name: "cloudflare-stg", // optional value to overrider provider name
-				provider: "./providers/nuxt-image/cloudflare-images.ts", // Path to custom provider
-				options: {
-					// ... provider options
-					baseURL: "https://starcitizen.rip",
-					accountHash: "nLUFLrrgVwzQdEx8eL5BaA",
-				},
-			},
-		},
+		format: ["avif", "webp"],
 	},
 
 	piniaPersistedstate: {
@@ -323,6 +303,7 @@ export default defineNuxtConfig({
 		public: {
 			gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
 			gitCommit: process.env.VERCEL_GIT_COMMIT_SHA,
+			minioPublicUrl: process.env.VITE_MINIO_PUBLIC_URL || 'http://localhost:9000/',
 		},
 	},
 

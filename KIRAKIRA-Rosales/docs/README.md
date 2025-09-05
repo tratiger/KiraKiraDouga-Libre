@@ -18,7 +18,7 @@ KIRAKIRA-RosalesはTypeScriptで書かれています。TypeScriptの型チェ�
 バックエンドの生産環境はAWSのEKSクラスタにデプロイされています。
 バックエンドはMongoDBデータベースクラスタとElasticsearch検索エンジンクラスタに依存しており、これらも同様にAWS EKSにデプロイされています。
 
-ストレージについては、MongoDBとElasticsearchが生成するデータはAWS EKSにマウントされたAWS EBS (Elastic Block Store)ブロックストレージに保存され、画像や動画ファイルはCloudflareのR2、Images、Streamによって保存されます。
+ストレージについては、MongoDBとElasticsearchが生成するデータはAWS EKSにマウントされたAWS EBS (Elastic Block Store)ブロックストレージに保存され、画像や動画ファイルはMinIOオブジェクトストレージによって保存されます。
 
 [![](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://tc39.es)
 [![](https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -27,7 +27,7 @@ KIRAKIRA-RosalesはTypeScriptで書かれています。TypeScriptの型チェ�
 [![](https://img.shields.io/badge/-MongoDB-EEEEEE?style=flat-square&logo=MongoDB&logoColor=00ed64)](https://www.mongodb.com)
 [![](https://img.shields.io/badge/-Elasticsearch-07a0d7?style=flat-square&logo=Elasticsearch&logoColor=333333)](https://www.elastic.co/elasticsearch)
 [![](https://img.shields.io/badge/-Kubernetes-0075e4?style=flat-square&logo=Kubernetes&logoColor=white)](https://kubernetes.io/)
-[![](https://img.shields.io/badge/-Cloudflare-f6821f?style=flat-square&logo=Cloudflare&logoColor=white)](https://www.cloudflare.com)
+[![](https://img.shields.io/badge/-MinIO-c74842?style=flat-square&logo=minio&logoColor=white)](https://min.io/)
 
 ## II. インストールと起動
 ### 1. リポジトリのクローン
@@ -91,7 +91,7 @@ npm run dev-hot
 ├ docs - ドキュメントを格納（このドキュメントもこのディレクトリにあります）
 ├ old - 削除したくない古いコードを格納
 ├ src - ソースコードを格納
-│  ├ cloudflare - Cloudflare関連の共通コードを格納
+│  ├ minio - MinIO関連の共通コードを格納
 │  ├ common - 共通関数を格納
 │  ├ controller - controller層。受け取ったリクエストペイロードデータを処理し、リクエストレスポンスデータを拡充するために使用
 │  ├ dbPool - MongoDB関連の共通コードを格納
